@@ -14,10 +14,12 @@
 #include <iterator>
 #include <unordered_map>
 
+#include "rain.h"
 #include "graphics/shader.h"
-#include "graphics/camera.h"
-#include "core/transform.h"
 #include "core/game_engine.h"
+#include "graphics/camera.h"
+#include "camera_controller.h"
+#include "core/transform.h"
 
 std::unordered_map<std::string, std::string> _args;
 std::string rootpath;
@@ -25,101 +27,30 @@ bool wireframe;
 GLuint vertexShader;
 GLuint fragmentShader;
 Shader shaderProgram;
-float mixValue;
-float screenWidth;
-float screenHeight;
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-float lastX = 400, lastY = 300;
-//float yaw = 0.0f, pitch = 0.0f;
-bool firstMouse = true;
+GLuint VAO;
+GLuint containerTex;
+GLuint smileTex;
 
-//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-//glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-//glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-
-
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 void processInput(GLFWwindow *window);
-std::string GetExePath();
-
-template<typename Out>
-void split(const std::string &s, char delim, Out result)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim))
-    {
-        *(result++) = item;
-    }
-}
-
-std::vector<std::string> split(const std::string &s, char delim);
-
-
+void update();
 
 int main(int argc, char** argv)
 {
     for (int i = 0; i < argc; i++)
     {
-        std::vector<std::string> arg = split(argv[i], '=');
-        std::cout << "arg : " << arg[0] << std::endl;
+        std::vector<std::string> arg = Rain::split(argv[i], '=');
         if (arg.size() > 1)
         {
             _args[arg[0]] = arg[1];
         }
     }
 
-    rootpath = GetExePath();
-    if (_args["root"] != "")
-    {
-        rootpath = _args["root"];
-    }
-    std::cout << "root path : " << rootpath.c_str() << std::endl;
-
-    screenWidth = 800;
-    screenHeight = 600;
-
+    Rain::Init(_args);
+    Rain::Engine()->SetUpdateCallback(update);
+    rootpath = Rain::ResourcesRoot();
     wireframe = false;
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "Rain Engine", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        system("PAUSE");
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        system("PAUSE");
-        return -1;
-    }
-
-    glEnable(GL_DEPTH_TEST);
-
-    glViewport(0, 0, screenWidth, screenHeight);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
-
-    InputManager* _inputManager = new InputManager(window);
-    
     float vertices[] =
     {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -172,7 +103,6 @@ int main(int argc, char** argv)
     };
 
     // texture 1
-    GLuint containerTex;
     glGenTextures(1, &containerTex);
     glBindTexture(GL_TEXTURE_2D, containerTex);
 
@@ -198,7 +128,6 @@ int main(int argc, char** argv)
 
 
     // texture 2
-    GLuint smileTex;
     glGenTextures(1, &smileTex);
     glBindTexture(GL_TEXTURE_2D, smileTex);
 
@@ -222,7 +151,6 @@ int main(int argc, char** argv)
     GLuint VBO;
     glGenBuffers(1, &VBO);
 
-    GLuint VAO;
     glGenVertexArrays(1, &VAO);
 
     //unsigned int EBO;
@@ -252,66 +180,23 @@ int main(int argc, char** argv)
     shaderProgram.setParameter("uTexture0", 0);
     shaderProgram.setParameter("uTexture1", 1);
 
-    mixValue = 0.0f;
+
     
+    Rain::Run();
 
-
-    glm::mat4 proj = glm::mat4(1);
-    glm::mat4 view = glm::mat4(1);
-    //view = glm::translate(view, cameraPos);
-    while (!glfwWindowShouldClose(window))
-    {
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        processInput(window);
-
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        float variationValue = (sin(glfwGetTime()) / 2.0f) + 0.5f;
-        glm::mat4 model = glm::mat4(1);
-        //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-        proj = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
-        shaderProgram.use();
-        shaderProgram.setParameter("mixValue", mixValue);
-        shaderProgram.setParameter("model", model);
-        shaderProgram.setParameter("proj", proj);
-        shaderProgram.setParameter("view", view);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, containerTex);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, smileTex);
-
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
     return 0;
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
 }
 
 void processInput(GLFWwindow *window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, true);
-    }
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+
+}
+
+
+void update()
+{
+    // input update
+    if (Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
     {
         if (!wireframe)
         {
@@ -323,82 +208,38 @@ void processInput(GLFWwindow *window)
         }
         wireframe = !wireframe;
     }
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    if (Rain::Input()->IsKeyPressed(GLFW_KEY_R))
     {
         shaderProgram.reload();
         shaderProgram.use();
         shaderProgram.setParameter("uTexture0", 0);
         shaderProgram.setParameter("uTexture1", 1);
     }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-    {
-        mixValue += 0.01f;
-        if (mixValue > 1.0f) mixValue = 1.0f;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-    {
-        mixValue -= 0.01f;
-        if (mixValue < 0.0f) mixValue = 0.0f;
-    }
-    // CAMERA MOVEMENT
-    float cameraSpeed = 5.0f * deltaTime;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-}
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
 
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
+    // recup mat view, mat proj
+    CameraController* camController = Rain::Engine()->GetCameraController();
+    Camera* camera = camController->GetCamera();
+    Transform* camTransform = camController->GetTransform();
     
+    glm::mat4 proj = camera->GetProjectionMatrix();
+    glm::mat4 view = camera->GetViewMatrix(camTransform->_Position);
 
-    float sensitivity = 0.05f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+    // render
+    glm::mat4 model = glm::mat4(1);
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-    camera._camera.Tick(glm::vec2(xoffset, yoffset));
 
-    /* yaw += xoffset;
-     pitch += yoffset;
+    shaderProgram.use();
+    shaderProgram.setParameter("model", model);
+    shaderProgram.setParameter("proj", proj);
+    shaderProgram.setParameter("view", view);
 
-     if (pitch > 89.0f)
-         pitch = 89.0f;
-     if (pitch < -89.0f)
-         pitch = -89.0f;
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, containerTex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, smileTex);
 
-     glm::vec3 front;
-     front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-     front.y = sin(glm::radians(pitch));
-     front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-     cameraFront = glm::normalize(front);*/
-}
-
-std::string GetExePath()
-{
-    char buffer[MAX_PATH];
-    GetModuleFileName(NULL, buffer, MAX_PATH);
-    std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-    return std::string(buffer).substr(0, pos);
-}
-
-std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
 }

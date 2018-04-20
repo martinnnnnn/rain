@@ -1,23 +1,34 @@
 #pragma once
 
-
 class Camera;
 class Transform;
-class InputManager;
+class InputEngine;
 
 class CameraController
 {
-    CameraController(Camera* camera, Transform* transform, InputManager* inputmanager) : 
-        _camera(camera)
-        , _transform(transform)
-        , _inputManager(inputmanager)
+public:
+    enum class Direction
+    {
+        FORWARD = 0,
+        BACKWARD = 1,
+        LEFT = 2,
+        RIGHT = 3
+    };
+
+    CameraController() : 
+        m_camera(nullptr)
+        , m_transform(nullptr)
+        , m_inputEngine(nullptr)
     {}
 
-
+    int Init(InputEngine* _inputEngine);
     void Tick();
+    Camera* GetCamera();
+    Transform* GetTransform();
 
 private:
-    Camera* _camera;
-    Transform* _transform;
-    InputManager* _inputManager;
+    Camera* m_camera;
+    Transform* m_transform;
+    InputEngine* m_inputEngine;
+    float m_movementSpeed;
 };

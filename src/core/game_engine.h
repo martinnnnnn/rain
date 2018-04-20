@@ -1,12 +1,20 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
+//#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-class InputManager
+#include <unordered_map>
+#include <string>
+#include <functional>
+
+class CameraController;
+class Camera;
+class GLFWwindow;
+
+class InputEngine
 {
 public:
-    InputManager(GLFWwindow* window);
+    InputEngine(GLFWwindow* window);
     void Tick();
 
 
@@ -21,6 +29,7 @@ private:
     bool _firstMouse;
 
 
+
 };
 
 
@@ -28,17 +37,42 @@ class GameEngine
 {
 public:
 
-    GameEngine();
-    void Init();
+    int Init(std::unordered_map<std::string, std::string> _args);
+    void Run();
 
     GLFWwindow* Getwindow();
-    InputManager* GetInputManager();
+    InputEngine* GetInputEngine();
+    CameraController* GetCameraController();
+    Camera* GetCamera();
+    float GetDeltaTime();
+    std::string GetResourcesRoot();
+    void SetUpdateCallback(std::function<void(void)> _function);
 
 private:
-    InputManager* m_inputManager;
+    InputEngine* m_inputEngine;
     GLFWwindow* m_window;
+    CameraController* m_cameraController;
+
     float m_deltaTime;
     float m_screenWidth;
     float m_screenHeight;
+    std::string m_resourcesRootPath;
+    float m_lastFrame;
+    std::function<void(void)> m_updateCallback;
 
+private:
+    static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
+public:
+    ~GameEngine() {}
+    static GameEngine& Get()
+    {
+        static GameEngine *instance = new GameEngine();
+        return *instance;
+    }
+private:
+    GameEngine();
+    GameEngine(GameEngine const&) = delete;
+    void operator=(GameEngine const&) = delete;
+        
 };
