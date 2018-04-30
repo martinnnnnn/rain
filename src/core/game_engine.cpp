@@ -86,7 +86,7 @@ int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
         glfwTerminate();
         return -1;
     }
-    glfwSetWindowPos(m_window, 600, 600);
+    //glfwSetWindowPos(m_window, 600, 600);
     glfwMakeContextCurrent(m_window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

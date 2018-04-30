@@ -16,13 +16,13 @@ Shader::Shader()
 
 }
 
-void Shader::init(const char* vertexPath, const char* fragmentPath)
+void Shader::init(const std::string& vertexPath, const std::string& fragmentPath)
 {
     _vertexPath = vertexPath;
     _fragmentPath = fragmentPath;
 
-    std::string s1 = readFile(_vertexPath);
-    std::string s2 = readFile(_fragmentPath);
+    std::string s1 = readFile(_vertexPath.c_str());
+    std::string s2 = readFile(_fragmentPath.c_str());
     const char* vShaderCode = s1.c_str();
     const char* fShaderCode = s2.c_str();
 
@@ -33,42 +33,29 @@ void Shader::init(const char* vertexPath, const char* fragmentPath)
     load(vShaderCode, fShaderCode);
 }
 
+//void Shader::init(const char* vertexPath, const char* fragmentPath)
+//{
+//    _vertexPath = (char*)malloc(length_of_a);
+//    memcpy(b, a, length_of_a);
+//
+//    _vertexPath = vertexPath;
+//    _fragmentPath = fragmentPath;
+//
+//    std::string s1 = readFile(_vertexPath);
+//    std::string s2 = readFile(_fragmentPath);
+//    const char* vShaderCode = s1.c_str();
+//    const char* fShaderCode = s2.c_str();
+//
+//    _ID = glCreateProgram();
+//    _vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//    _fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//
+//    load(vShaderCode, fShaderCode);
+//}
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
     init(vertexPath, fragmentPath);
-    /* _vertexPath = vertexPath;
-     _fragmentPath = fragmentPath;
-
-     std::string s1 = readFile(_vertexPath);
-     std::string s2 = readFile(_fragmentPath);
-     const char* vShaderCode = s1.c_str();
-     const char* fShaderCode = s2.c_str();
-
-     _ID = glCreateProgram();
-     load(vShaderCode, fShaderCode);*/
-
-    //GLuint vertex, fragment;
-    //int success;
-    //char infoLog[512];
-
-    //vertex = glCreateShader(GL_VERTEX_SHADER);
-    //glShaderSource(vertex, 1, &vShaderCode, NULL);
-    //glCompileShader(vertex);
-    //checkCompileErrors(vertex, "VERTEX");
-
-    //fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    //glShaderSource(fragment, 1, &fShaderCode, NULL);
-    //glCompileShader(fragment);
-    //checkCompileErrors(fragment, "FRAGMENT");
-
-    //_ID = glCreateProgram();
-    //glAttachShader(_ID, vertex);
-    //glAttachShader(_ID, fragment);
-    //glLinkProgram(_ID);
-    //checkCompileErrors(_ID, "PROGRAM");
-
-    //glDeleteShader(vertex);
-    //glDeleteShader(fragment);
 }
 
 std::string Shader::readFile(const char* path)
@@ -96,8 +83,8 @@ std::string Shader::readFile(const char* path)
 
 void Shader::reload()
 {
-    std::string s1 = readFile(_vertexPath);
-    std::string s2 = readFile(_fragmentPath);
+    std::string s1 = readFile(_vertexPath.c_str());
+    std::string s2 = readFile(_fragmentPath.c_str());
     const char* vShaderCode = s1.c_str();
     const char* fShaderCode = s2.c_str();
 
@@ -111,11 +98,11 @@ void Shader::load(const char* vShaderCode, const char* fShaderCode)
 
     glShaderSource(_vertexShader, 1, &vShaderCode, NULL);
     glCompileShader(_vertexShader);
-    checkCompileErrors(_vertexShader, "VERTEX");
+    checkCompileErrors(_vertexShader, "VERTEX of " + _vertexPath);
 
     glShaderSource(_fragmentShader, 1, &fShaderCode, NULL);
     glCompileShader(_fragmentShader);
-    checkCompileErrors(_fragmentShader, "FRAGMENT");
+    checkCompileErrors(_fragmentShader, "FRAGMENT of " + _fragmentPath);
 
     glAttachShader(_ID, _vertexShader);
     glAttachShader(_ID, _fragmentShader);

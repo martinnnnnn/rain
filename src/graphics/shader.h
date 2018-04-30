@@ -14,7 +14,8 @@ public:
 
     Shader();
     Shader(const char* vertexPath, const char* fragmentPath);
-    void init(const char* vertexPath, const char* fragmentPath);
+    void init(const std::string& vertexPath, const std::string& fragmentPath);
+    //void init(const char* vertexPath, const char* fragmentPath);
 
     void load(const char* vShaderCode, const char* fShaderCode);
     void reload();
@@ -37,8 +38,8 @@ public:
 private:
     void checkCompileErrors(unsigned int shader, std::string type);
 
-    const char* _vertexPath;
-    const char* _fragmentPath;
+    std::string _vertexPath;
+    std::string _fragmentPath;
     GLuint _vertexShader, _fragmentShader;
 
 };

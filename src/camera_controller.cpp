@@ -44,6 +44,20 @@ void CameraController::Tick()
         movement += right * velocity;
     }
     m_transform->Translate(movement);
+
+    glm::vec2 mouseOffset = Rain::Input()->GetMouseOffset();
+    mouseOffset.x *= 0.1f;
+    mouseOffset.y *= 0.1f;
+
+    static float m_yaw = -90.0;
+    static float m_pitch = 0.0f;
+    m_yaw += mouseOffset.x;
+    m_pitch += mouseOffset.y;
+
+    if (m_pitch > 89.0f)
+        m_pitch = 89.0f;
+    if (m_pitch < -89.0f)
+        m_pitch = -89.0f;
 }
                              
 
