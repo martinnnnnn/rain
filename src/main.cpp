@@ -301,6 +301,10 @@ void sandboxUpdate()
     glm::mat4 model = glm::mat4(1);
     //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
+    lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
+    glm::mat4 lightModel = glm::mat4(1);
+    lightModel = glm::translate(lightModel, lightPos);
+    lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
 
     shaderProgram.use();
     shaderProgram.setParameter("model", model);
@@ -308,6 +312,17 @@ void sandboxUpdate()
     shaderProgram.setParameter("view", view);
     shaderProgram.setParameter("lightPos", lightPos);
     shaderProgram.setParameter("viewPos", camTransform->_Position);
+    shaderProgram.setParameter("mat.ambient", 1.0f, 0.5f, 0.31f);
+    shaderProgram.setParameter("mat.diffuse", 1.0f, 0.5f, 0.31f);
+    shaderProgram.setParameter("mat.specular", 0.5f, 0.5f, 0.5f);
+    shaderProgram.setParameter("mat.shininess", 32.0f);
+    shaderProgram.setParameter("light.position", lightPos);
+    glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
+    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.1f);
+    shaderProgram.setParameter("light.ambient", ambientColor);
+    shaderProgram.setParameter("light.diffuse", diffuseColor);
+    shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, containerTex);
     glActiveTexture(GL_TEXTURE1);
@@ -316,11 +331,6 @@ void sandboxUpdate()
     glBindVertexArray(boxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-
-    lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
-    glm::mat4 lightModel = glm::mat4(1);
-    lightModel = glm::translate(lightModel, lightPos);
-    lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
 
     lightshaderProgram.use();
     lightshaderProgram.setParameter("model", lightModel);
