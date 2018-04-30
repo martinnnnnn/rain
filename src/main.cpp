@@ -1,10 +1,3 @@
-#include <glad/glad.h> 
-#include <GLFW/glfw3.h>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/trigonometric.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -15,26 +8,31 @@
 #include <iterator>
 #include <unordered_map>
 
+#include "utility/stdincl_3d.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "rain.h"
 #include "graphics/shader.h"
 #include "core/game_engine.h"
 #include "graphics/camera.h"
 #include "camera_controller.h"
 #include "core/transform.h"
+#include "input/input_engine.h"
+#include "graphics/light.h"
 
 std::unordered_map<std::string, std::string> _args;
 std::string rootpath;
 bool wireframe;
-GLuint vertexShader;
-GLuint fragmentShader;
-Shader shaderProgram;
-Shader lightshaderProgram;
+rain::Shader shaderProgram;
+rain::Shader lightshaderProgram;
 GLuint boxVBO;
 GLuint boxVAO;
 GLuint lightVBO;
 GLuint lightVAO;
-GLuint containerTex;
-GLuint smileTex;
+GLuint container2Diffuse;
+GLuint container2Specular;
+GLuint container2Emissive;
 glm::vec3 lightPos;
 
 void sandboxInit();
@@ -45,23 +43,24 @@ int main(int argc, char** argv)
 {
     for (int i = 0; i < argc; i++)
     {
-        std::vector<std::string> arg = Rain::split(argv[i], '=');
+        std::vector<std::string> arg = rain::Rain::split(argv[i], '=');
         if (arg.size() > 1)
         {
             _args[arg[0]] = arg[1];
         }
     }
 
-    Rain::Init(_args);
-    Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
+    rain::Rain::Init(_args);
+    rain::Transform* camTransform = rain::Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
-    Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-    rootpath = Rain::ResourcesRoot();
+
+    rain::Rain::Engine()->SetUpdateCallback(sandboxUpdate);
+    rootpath = rain::Rain::ResourcesRoot();
     wireframe = false;
 
     sandboxInit();
 
-    Rain::Run();
+    rain::Rain::Run();
 
     return 0;
 }
@@ -219,10 +218,14 @@ void sandboxInit()
 
     glBindVertexArray(0);
 
+
+    //
     //----------------------------------------------------------
-    // texture 1
-    glGenTextures(1, &containerTex);
-    glBindTexture(GL_TEXTURE_2D, containerTex);
+
+
+    // container2
+    glGenTextures(1, &container2Diffuse);
+    glBindTexture(GL_TEXTURE_2D, container2Diffuse);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -231,11 +234,10 @@ void sandboxInit()
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
-
-    unsigned char *data = stbi_load(std::string(rootpath + "/wall.jpg").c_str(), &width, &height, &nrChannels, 0);
+    unsigned char * data = stbi_load(std::string(rootpath + "/images/container2.png").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -245,15 +247,16 @@ void sandboxInit()
     stbi_image_free(data);
 
     //----------------------------------------------------------
-    // texture 2
-    glGenTextures(1, &smileTex);
-    glBindTexture(GL_TEXTURE_2D, smileTex);
+    // container2
+    glGenTextures(1, &container2Specular);
+    glBindTexture(GL_TEXTURE_2D, container2Specular);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    data = stbi_load(std::string(rootpath + "/awesomeface.png").c_str(), &width, &height, &nrChannels, 0);
+
+    data = stbi_load(std::string(rootpath + "/images/container2_specular.png").c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -267,22 +270,57 @@ void sandboxInit()
 
 
     //----------------------------------------------------------
+    // container2
+    glGenTextures(1, &container2Emissive);
+    glBindTexture(GL_TEXTURE_2D, container2Emissive);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    data = stbi_load(std::string(rootpath + "/images/matrix.jpg").c_str(), &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    //----------------------------------------------------------
     // shader
     std::string vertexPath = rootpath + "/shaders/shader1.vs";
     std::string fragmentPath = rootpath + "/shaders/shader1.fs";
+    rain::Light light;
+    light.Type = rain::Light::Type::DIRECTIONAL;
+    light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    light.ambient = glm::vec3(1.f, 1.f, 1.f);
+    glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
+    light.diffuse = lightColor * glm::vec3(0.5f);
+    light.ambient = light.diffuse * glm::vec3(0.1f);
+
+
     shaderProgram.init(vertexPath, fragmentPath);
     shaderProgram.use();
-    shaderProgram.setParameter("uTexture0", 0);
-    shaderProgram.setParameter("uTexture1", 1);
-    shaderProgram.setParameter("lightColor", glm::vec3(1,0.5,0.5));
-    
+    shaderProgram.setParameter("mat.shininess", 32.0f);
+    shaderProgram.setParameter("light.ambient", light.diffuse);
+    shaderProgram.setParameter("light.diffuse", light.ambient);
+    shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("mat.diffuse", 0);
+    shaderProgram.setParameter("mat.specular", 1);
+    shaderProgram.setParameter("mat.emissive", 2);
 
     std::string lightVertexPath = rootpath + "/shaders/light_shader.vs";
     std::string lightFragmentPath = rootpath + "/shaders/light_shader.fs";
+    lightPos = glm::vec3(3, 1, 2);
     lightshaderProgram.init(lightVertexPath, lightFragmentPath);
     lightshaderProgram.use();
-    lightPos = glm::vec3(3, 1, 2);
-    lightshaderProgram.setParameter("color", glm::vec3(1,1,1));
+    lightshaderProgram.setParameter("color", glm::vec3(1.0f, 1.0f, 1.0f));
+
 }
 
 void sandboxUpdate()
@@ -290,16 +328,16 @@ void sandboxUpdate()
     checkInputs();
 
     // recup mat view, mat proj
-    CameraController* camController = Rain::Engine()->GetCameraController();
-    Camera* camera = camController->GetCamera();
-    Transform* camTransform = camController->GetTransform();
+    rain::CameraController* camController = rain::Rain::Engine()->GetCameraController();
+    rain::Camera* camera = camController->GetCamera();
+    rain::Transform* camTransform = camController->GetTransform();
     
     glm::mat4 proj = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix(camTransform->_Position);
 
     // render
     glm::mat4 model = glm::mat4(1);
-    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
     glm::mat4 lightModel = glm::mat4(1);
@@ -310,23 +348,14 @@ void sandboxUpdate()
     shaderProgram.setParameter("model", model);
     shaderProgram.setParameter("proj", proj);
     shaderProgram.setParameter("view", view);
-    shaderProgram.setParameter("lightPos", lightPos);
     shaderProgram.setParameter("viewPos", camTransform->_Position);
-    shaderProgram.setParameter("mat.ambient", 1.0f, 0.5f, 0.31f);
-    shaderProgram.setParameter("mat.diffuse", 1.0f, 0.5f, 0.31f);
-    shaderProgram.setParameter("mat.specular", 0.5f, 0.5f, 0.5f);
-    shaderProgram.setParameter("mat.shininess", 32.0f);
     shaderProgram.setParameter("light.position", lightPos);
-    glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
-    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.1f);
-    shaderProgram.setParameter("light.ambient", ambientColor);
-    shaderProgram.setParameter("light.diffuse", diffuseColor);
-    shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, containerTex);
+    glBindTexture(GL_TEXTURE_2D, container2Diffuse);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, smileTex);
+    glBindTexture(GL_TEXTURE_2D, container2Specular);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, container2Emissive);
 
     glBindVertexArray(boxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -344,7 +373,7 @@ void sandboxUpdate()
 
 void checkInputs()
 {
-    if (Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
+    if (rain::Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
     {
         if (!wireframe)
         {
@@ -356,12 +385,67 @@ void checkInputs()
         }
         wireframe = !wireframe;
     }
-    if (Rain::Input()->IsKeyPressed(GLFW_KEY_R))
+    if (rain::Rain::Input()->IsKeyPressed(GLFW_KEY_R))
     {
         shaderProgram.reload();
         shaderProgram.use();
-        shaderProgram.setParameter("uTexture0", 0);
-        shaderProgram.setParameter("uTexture1", 1);
-        shaderProgram.setParameter("lightColor", glm::vec3(1, 0.5, 0.5));
+         glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
+         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.1f);
+         shaderProgram.setParameter("mat.shininess", 32.0f);
+         shaderProgram.setParameter("light.ambient", ambientColor);
+         shaderProgram.setParameter("light.diffuse", diffuseColor);
+         shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
+         shaderProgram.setParameter("mat.diffuse", 0);
+         shaderProgram.setParameter("mat.specular", 1);
+         shaderProgram.setParameter("mat.emissive", 2);
     }
 }
+
+
+//----------------------------------------------------------
+//// texture 1
+//glGenTextures(1, &containerTex);
+//glBindTexture(GL_TEXTURE_2D, containerTex);
+
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+//int width, height, nrChannels;
+//stbi_set_flip_vertically_on_load(true);
+
+//unsigned char *data = stbi_load(std::string(rootpath + "/wall.jpg").c_str(), &width, &height, &nrChannels, 0);
+//if (data)
+//{
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//    glGenerateMipmap(GL_TEXTURE_2D);
+//}
+//else
+//{
+//    std::cout << "Failed to load texture" << std::endl;
+//}
+//stbi_image_free(data);
+
+////----------------------------------------------------------
+//// texture 2
+//glGenTextures(1, &smileTex);
+//glBindTexture(GL_TEXTURE_2D, smileTex);
+
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+////data = nullptr;
+//data = stbi_load(std::string(rootpath + "/awesomeface.png").c_str(), &width, &height, &nrChannels, 0);
+//if (data)
+//{
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//    glGenerateMipmap(GL_TEXTURE_2D);
+//}
+//else
+//{
+//    std::cout << "Failed to load texture" << std::endl;
+//}
+//stbi_image_free(data);

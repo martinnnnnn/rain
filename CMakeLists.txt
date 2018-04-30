@@ -29,7 +29,8 @@ add_subdirectory(external/bullet)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# /W4 /Za
 
 #### INCLUDES ####
 message(STATUS "> including directories")
@@ -65,7 +66,7 @@ macro(GroupSources curdir)
         else()
             string(REPLACE "/" "\\" groupname ${curdir})
             string(REPLACE "src" "src" groupname ${groupname})
-            message(STATUS ">>> creating source groupe : ${PROJECT_SOURCE_DIR}/${curdir}/${child}")
+            message(STATUS ">>> creating source groupe : ${groupname}")
             source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
 
         endif()

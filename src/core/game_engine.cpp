@@ -1,189 +1,147 @@
 #include "game_engine.h"
 
-#include <glad/glad.h> 
-#include <GLFW/glfw3.h>
 
 #include <iostream>
+
+#include "utility/stdincl_3d.h"
 
 #include "rain.h"
 #include "camera_controller.h"
 #include "graphics/camera.h"
+#include "input/input_engine.h"
 
-InputEngine::InputEngine(GLFWwindow* window) :
-    _window(window),
-    _firstMouse(true)
+namespace rain
 {
-}
-
-void InputEngine::Tick()
-{
-    double xpos, ypos;
-    glfwGetCursorPos(_window, &xpos, &ypos);
-
-    if (_firstMouse)
+    //----------------------------------------------------------
+    GameEngine::GameEngine() :
+        m_inputEngine(nullptr),
+        m_window(nullptr)
     {
-        _lastPos.x = xpos;
-        _lastPos.y = ypos;
-        _firstMouse = false;
-    }
-    _offset.x = xpos - _lastPos.x;
-    _offset.y = _lastPos.y - ypos;
-    _lastPos.x = xpos;
-    _lastPos.y = ypos;
-}
 
-bool InputEngine::IsKeyPressed(int keyCode)
-{
-    if (glfwGetKey(_window, keyCode) == GLFW_PRESS)
-    {
-        return true;
-    }
-    return false;
-}
-
-
-glm::vec2 InputEngine::GetMousePosition()
-{
-    double xpos, ypos;
-    glfwGetCursorPos(_window, &xpos, &ypos);
-    return glm::vec2(xpos, ypos);
-}
-
-glm::vec2 InputEngine::GetMouseOffset()
-{
-    return _offset;
-}
-
-//----------------------------------------------------------
-GameEngine::GameEngine() :
-    m_inputEngine(nullptr),
-    m_window(nullptr)
-{
-
-}
-
-int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
-{
-    m_resourcesRootPath = Rain::GetExePath();
-    if (_args["root"] != "")
-    {
-        m_resourcesRootPath = _args["root"];
-    }
-    std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
-
-    m_screenWidth = 800;
-    m_screenHeight = 600;
-
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    m_window = glfwCreateWindow(m_screenWidth, m_screenHeight, "Rain Engine", NULL, NULL);
-    if (m_window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    //glfwSetWindowPos(m_window, 600, 600);
-    glfwMakeContextCurrent(m_window);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
     }
 
-    glEnable(GL_DEPTH_TEST);
-
-    glViewport(0, 0, m_screenWidth, m_screenHeight);
-    glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
-
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
-
-    m_inputEngine = new InputEngine(m_window);
-    m_cameraController = new CameraController();
-    m_cameraController->Init(m_inputEngine);
-}
-
-void GameEngine::SetUpdateCallback(std::function<void(void)> _function)
-{
-    m_updateCallback = _function;
-}
-
-void GameEngine::Run()
-{
-    while (!glfwWindowShouldClose(m_window))
+    int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
-        // inputs relative to window
-        if (m_inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+        m_resourcesRootPath = Rain::GetExePath();
+        if (_args["root"] != "")
         {
-            glfwSetWindowShouldClose(m_window, true);
+            m_resourcesRootPath = _args["root"];
+        }
+        std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
+
+        m_screenWidth = 800;
+        m_screenHeight = 600;
+
+        glfwInit();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+        m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
+        if (m_window == NULL)
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+        //glfwSetWindowPos(m_window, 600, 600);
+        glfwMakeContextCurrent(m_window);
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cout << "Failed to initialize GLAD" << std::endl;
+            return -1;
         }
 
-        // delta time update
-        float currentFrame = glfwGetTime();
-        m_deltaTime = currentFrame - m_lastFrame;
-        m_lastFrame = currentFrame;
+        glEnable(GL_DEPTH_TEST);
 
-        // input
-        m_inputEngine->Tick();
+        glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
+        glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
 
-        // objects
-        m_cameraController->Tick();
-        GetCamera()->Tick();
+        glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // rendering
-        m_updateCallback();
-
-
-
-        glfwSwapBuffers(m_window);
-        glfwPollEvents();
+        m_inputEngine = new InputEngine(m_window);
+        m_cameraController = new CameraController();
+        m_cameraController->Init(m_inputEngine);
+        return 0;
     }
 
-    glfwTerminate();
-}
+    void GameEngine::SetUpdateCallback(std::function<void(void)> _function)
+    {
+        m_updateCallback = _function;
+    }
 
-GLFWwindow* GameEngine::Getwindow()
-{
-    return m_window;
-}
+    void GameEngine::Run()
+    {
+        while (!glfwWindowShouldClose(m_window))
+        {
+            // inputs relative to window
+            if (m_inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+            {
+                glfwSetWindowShouldClose(m_window, true);
+            }
 
-CameraController* GameEngine::GetCameraController()
-{
-    return m_cameraController;
-}
+            // delta time update
+            float currentFrame = (float)glfwGetTime();
+            m_deltaTime = currentFrame - m_lastFrame;
+            m_lastFrame = currentFrame;
 
-Camera* GameEngine::GetCamera()
-{
-    return m_cameraController->GetCamera();
-}
+            // input
+            m_inputEngine->Tick();
 
-InputEngine* GameEngine::GetInputEngine()
-{
-    return m_inputEngine;
-}
+            // objects
+            m_cameraController->Tick();
+            GetCamera()->Tick();
 
-std::string GameEngine::GetResourcesRoot()
-{
-    return m_resourcesRootPath;
-}
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-float GameEngine::GetDeltaTime()
-{
-    return m_deltaTime;
-}
+            // rendering
+            m_updateCallback();
 
 
 
-void GameEngine::framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
+            glfwSwapBuffers(m_window);
+            glfwPollEvents();
+        }
 
+        glfwTerminate();
+    }
+
+    GLFWwindow* GameEngine::Getwindow()
+    {
+        return m_window;
+    }
+
+    CameraController* GameEngine::GetCameraController()
+    {
+        return m_cameraController;
+    }
+
+    Camera* GameEngine::GetCamera()
+    {
+        return m_cameraController->GetCamera();
+    }
+
+    InputEngine* GameEngine::GetInputEngine()
+    {
+        return m_inputEngine;
+    }
+
+    std::string GameEngine::GetResourcesRoot()
+    {
+        return m_resourcesRootPath;
+    }
+
+    float GameEngine::GetDeltaTime()
+    {
+        return m_deltaTime;
+    }
+
+    void GameEngine::framebuffer_size_callback(::GLFWwindow* window, int width, int height)
+    {
+        glViewport(0, 0, width, height);
+
+    }
 }

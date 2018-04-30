@@ -1,39 +1,43 @@
 #pragma once
 
+#include "utility/stdincl_3d.h"
+
 
 #include <sstream>
 #include <string>
 #include <unordered_map>
 
-class InputEngine;
-class GameEngine;
-class GLFWwindow;
-class Camera;
-
-class Rain
+namespace rain
 {
-public:
-    static void Init(std::unordered_map<std::string, std::string> _args);
-    static void Run();
+    class InputEngine;
+    class GameEngine;
+    class Camera;
 
-    static float GetDeltaTime();
-    static GameEngine* Engine();
-    static GLFWwindow* Window();
-    static Camera* Camera();
-    static InputEngine* Input();
-    static std::string ResourcesRoot();
-    static std::string GetExePath();
-
-    static std::vector<std::string> split(const std::string &s, char delim);
-
-    template<typename Out>
-    static void split(const std::string &s, char delim, Out result)
+    class Rain
     {
-        std::stringstream ss(s);
-        std::string item;
-        while (std::getline(ss, item, delim))
+    public:
+        static void Init(std::unordered_map<std::string, std::string> _args);
+        static void Run();
+
+        static float GetDeltaTime();
+        static GameEngine* Engine();
+        static GLFWwindow* Window();
+        static Camera* Camera();
+        static InputEngine* Input();
+        static std::string ResourcesRoot();
+        static std::string GetExePath();
+
+        static std::vector<std::string> split(const std::string &s, char delim);
+
+        template<typename Out>
+        static void split(const std::string &s, char delim, Out result)
         {
-            *(result++) = item;
+            std::stringstream ss(s);
+            std::string item;
+            while (std::getline(ss, item, delim))
+            {
+                *(result++) = item;
+            }
         }
-    }
-};
+    };
+}
