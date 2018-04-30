@@ -306,13 +306,14 @@ void sandboxInit()
 
     shaderProgram.init(vertexPath, fragmentPath);
     shaderProgram.use();
-    shaderProgram.setParameter("mat.shininess", 32.0f);
-    shaderProgram.setParameter("light.ambient", light.diffuse);
-    shaderProgram.setParameter("light.diffuse", light.ambient);
-    shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
+	shaderProgram.setParameter("dirLight.direction", light.direction);
+	shaderProgram.setParameter("dirLight.ambient", light.diffuse);
+    shaderProgram.setParameter("dirLight.diffuse", light.ambient);
+    shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
     shaderProgram.setParameter("mat.diffuse", 0);
     shaderProgram.setParameter("mat.specular", 1);
     shaderProgram.setParameter("mat.emissive", 2);
+    shaderProgram.setParameter("mat.shininess", 32.0f);
 
     std::string lightVertexPath = rootpath + "/shaders/light_shader.vs";
     std::string lightFragmentPath = rootpath + "/shaders/light_shader.fs";
@@ -337,7 +338,7 @@ void sandboxUpdate()
 
     // render
     glm::mat4 model = glm::mat4(1);
-    model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+    //model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
     glm::mat4 lightModel = glm::mat4(1);
@@ -349,7 +350,7 @@ void sandboxUpdate()
     shaderProgram.setParameter("proj", proj);
     shaderProgram.setParameter("view", view);
     shaderProgram.setParameter("viewPos", camTransform->_Position);
-    shaderProgram.setParameter("light.position", lightPos);
+    //shaderProgram.setParameter("light.position", lightPos);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, container2Diffuse);
     glActiveTexture(GL_TEXTURE1);
