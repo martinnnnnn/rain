@@ -26,6 +26,7 @@ std::string rootpath;
 bool wireframe;
 rain::Shader shaderProgram;
 rain::Shader lightshaderProgram;
+rain::Shader outlineShaderProgram;
 GLuint boxVBO;
 GLuint boxVAO;
 GLuint lightVBO;
@@ -349,6 +350,7 @@ void sandboxInit()
     shaderProgram.setParameter("mat.emissive", 2);
     shaderProgram.setParameter("mat.shininess", 32.0f);
 
+	// light cube shader
     std::string lightVertexPath = rootpath + "/shaders/light_shader.vs";
     std::string lightFragmentPath = rootpath + "/shaders/light_shader.fs";
     lightPos = glm::vec3(3, 1, 2);
@@ -356,6 +358,10 @@ void sandboxInit()
     lightshaderProgram.use();
     lightshaderProgram.setParameter("color", glm::vec3(1.0f, 1.0f, 1.0f));
 
+	// outline cube shader
+	std::string outlineVextexPath = rootpath + "/shaders/shader1.vs";
+	std::string outlineFragmentPath = rootpath + "/shaders/outline.fs";
+	outlineShaderProgram.init(outlineVextexPath, outlineFragmentPath);
 }
 
 void sandboxUpdate()
@@ -379,6 +385,9 @@ void sandboxUpdate()
     lightModel = glm::translate(lightModel, lightPos);
     lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
 
+
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
     shaderProgram.use();
     shaderProgram.setParameter("model", model);
     shaderProgram.setParameter("proj", proj);
@@ -394,7 +403,6 @@ void sandboxUpdate()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, container2Emissive);
 
-	//glm::vec3 cubePositions[] 
     glBindVertexArray(boxVAO);
 	for (int i = 0; i < 10; ++i)
 	{
@@ -406,7 +414,28 @@ void sandboxUpdate()
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST);
+	outlineShaderProgram.use();
+	outlineShaderProgram.setParameter("model", model);
+	outlineShaderProgram.setParameter("proj", proj);
+	outlineShaderProgram.setParameter("view", view);
+	for (int i = 0; i < 10; ++i)
+	{
+		glm::mat4 model = glm::mat4(1);
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
+		outlineShaderProgram.setParameter("model", model);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
     glBindVertexArray(0);
+	glStencilMask(0xFF);
+	glEnable(GL_DEPTH_TEST);
 
     lightshaderProgram.use();
     lightshaderProgram.setParameter("model", lightModel);
