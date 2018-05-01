@@ -27,6 +27,10 @@ bool wireframe;
 rain::Shader shaderProgram;
 rain::Shader lightshaderProgram;
 rain::Shader outlineShaderProgram;
+rain::Shader screenquadShader;
+GLuint quadVAO, quadVBO;
+GLuint frameBuffer;
+GLuint textureColorBuffer;
 GLuint boxVBO;
 GLuint boxVAO;
 GLuint lightVBO;
@@ -40,6 +44,7 @@ glm::vec3* cubePositions;
 void sandboxInit();
 void sandboxUpdate();
 void checkInputs();
+void CreateFrameBuffer();
 
 int main(int argc, char** argv)
 {
@@ -53,6 +58,7 @@ int main(int argc, char** argv)
     }
 
     rain::Rain::Init(_args);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     rain::Transform* camTransform = rain::Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
 
@@ -60,8 +66,8 @@ int main(int argc, char** argv)
     rootpath = rain::Rain::ResourcesRoot();
     wireframe = false;
 
-    sandboxInit();
-
+	CreateFrameBuffer();
+	sandboxInit();
     rain::Rain::Run();
 
     return 0;
@@ -232,11 +238,72 @@ void sandboxInit()
 
     glBindVertexArray(0);
 
+	// ----------------------------------------------------------------------
+	// shader
+	std::string quadVertexPath = rootpath + "/shaders/screen_quad.vs";
+	std::string quadFragmentPath = rootpath + "/shaders/screen_quad.fs";
+	screenquadShader.init(quadVertexPath, quadFragmentPath);
+	screenquadShader.use();
+	screenquadShader.setParameter("screenTexture", 0);
 
-    //
+	// framebuffer
+	float quadVertices[] =
+	{
+		-0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  1.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  1.0f, 1.0f
+	};
+
+	glGenFramebuffers(1, &frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+	glGenTextures(1, &textureColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+
+	GLuint depthStencilBuffer;
+	glGenRenderbuffers(1, &depthStencilBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "ERROR::FRAMEBUFFER:: FRAMEBUFFER is not complete." << std::endl;
+	}
+
+	//glGenBuffers(1, &quadVAO);
+	//glBindVertexArray(quadVAO);
+
+	//glGenVertexArrays(1, &quadVBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	//glBindTexture(GL_TEXTURE_2D, container2Diffuse);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+	glGenVertexArrays(1, &quadVAO);
+	glGenBuffers(1, &quadVBO);
+	glBindVertexArray(quadVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
     //----------------------------------------------------------
-
-
     // container2
     glGenTextures(1, &container2Diffuse);
     glBindTexture(GL_TEXTURE_2D, container2Diffuse);
@@ -368,6 +435,12 @@ void sandboxUpdate()
 {
     checkInputs();
 
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+
     // recup mat view, mat proj
     rain::CameraController* camController = rain::Rain::Engine()->GetCameraController();
     rain::Camera* camera = camController->GetCamera();
@@ -444,6 +517,19 @@ void sandboxUpdate()
     glBindVertexArray(lightVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_STENCIL_TEST);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	screenquadShader.use();
+	glBindVertexArray(quadVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void checkInputs()
@@ -492,4 +578,30 @@ void checkInputs()
 		shaderProgram.setParameter("mat.emissive", 2);
 		shaderProgram.setParameter("mat.shininess", 32.0f);
     }
+}
+
+
+void CreateFrameBuffer()
+{
+	/*glGenFramebuffers(1, &frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+	glGenTextures(1, &textureColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+
+	GLuint depthStencilBuffer;
+	glGenRenderbuffers(1, &depthStencilBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "ERROR::FRAMEBUFFER:: FRAMEBUFFER is not complete." << std::endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 }

@@ -55,7 +55,8 @@ namespace rain
 
         glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
-
+		//glEnable(GL_CULL_FACE);
+		//glFrontFace(GL_CW);
         glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
         glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
 
