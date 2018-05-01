@@ -34,6 +34,7 @@ GLuint container2Diffuse;
 GLuint container2Specular;
 GLuint container2Emissive;
 glm::vec3 lightPos;
+glm::vec3* cubePositions;
 
 void sandboxInit();
 void sandboxUpdate();
@@ -163,6 +164,18 @@ void sandboxInit()
         0, 1, 3,   // first triangle
         1, 2, 3    // second triangle
     };
+
+	cubePositions = new glm::vec3[10];
+	cubePositions[0] = glm::vec3(0.0f, 0.0f, 0.0f);
+	cubePositions[1] = glm::vec3(2.0f, 5.0f, -15.0f);
+	cubePositions[2] = glm::vec3(-1.5f, -2.2f, -2.5f);
+	cubePositions[3] = glm::vec3(-3.8f, -2.0f, -12.3f);
+	cubePositions[4] = glm::vec3(2.4f, -0.4f, -3.5f);
+	cubePositions[5] = glm::vec3(-1.7f, 3.0f, -7.5f);
+	cubePositions[6] = glm::vec3(1.3f, -2.0f, -2.5f);
+	cubePositions[7] = glm::vec3(1.5f, 2.0f, -2.5f);
+	cubePositions[8] = glm::vec3(1.5f, 0.2f, -1.5f);
+	cubePositions[9] = glm::vec3(-1.3f, 1.0f, -2.5f);
 
     //----------------------------------------------------------
     // VAO & VBO & EBO for BOX
@@ -306,10 +319,31 @@ void sandboxInit()
 
     shaderProgram.init(vertexPath, fragmentPath);
     shaderProgram.use();
+	//directional light
 	shaderProgram.setParameter("dirLight.direction", light.direction);
 	shaderProgram.setParameter("dirLight.ambient", light.diffuse);
     shaderProgram.setParameter("dirLight.diffuse", light.ambient);
     shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
+
+	// point light
+	shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
+	shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
+	shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
+	shaderProgram.setParameter("pointLight.constant", 1.0f);
+	shaderProgram.setParameter("pointLight.linear", 0.09f);
+	shaderProgram.setParameter("pointLight.quadratic", 0.032f);
+
+	// spot light
+	shaderProgram.setParameter("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+	shaderProgram.setParameter("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+	shaderProgram.setParameter("spotLight.ambient", 0.1f, 0.1f, 0.1f);
+	shaderProgram.setParameter("spotLight.diffuse", 0.8f, 0.8f, 0.8f);
+	shaderProgram.setParameter("spotLight.specular", 1.0f, 1.0f, 1.0f);
+	shaderProgram.setParameter("spotLight.constant", 1.0f);
+	shaderProgram.setParameter("spotLight.linear", 0.09f);
+	shaderProgram.setParameter("spotLight.quadratic", 0.032f);
+
+	// material
     shaderProgram.setParameter("mat.diffuse", 0);
     shaderProgram.setParameter("mat.specular", 1);
     shaderProgram.setParameter("mat.emissive", 2);
@@ -350,7 +384,9 @@ void sandboxUpdate()
     shaderProgram.setParameter("proj", proj);
     shaderProgram.setParameter("view", view);
     shaderProgram.setParameter("viewPos", camTransform->_Position);
-    //shaderProgram.setParameter("light.position", lightPos);
+	shaderProgram.setParameter("pointLight.position", lightPos);
+	shaderProgram.setParameter("spotLight.position", camTransform->_Position);
+	shaderProgram.setParameter("spotLight.direction", camera->Front());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, container2Diffuse);
     glActiveTexture(GL_TEXTURE1);
@@ -358,15 +394,24 @@ void sandboxUpdate()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, container2Emissive);
 
+	//glm::vec3 cubePositions[] 
     glBindVertexArray(boxVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (int i = 0; i < 10; ++i)
+	{
+		glm::mat4 model = glm::mat4(1);
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		shaderProgram.setParameter("model", model);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
     glBindVertexArray(0);
 
     lightshaderProgram.use();
     lightshaderProgram.setParameter("model", lightModel);
     lightshaderProgram.setParameter("proj", proj);
     lightshaderProgram.setParameter("view", view);
-    lightshaderProgram.setParameter("lightPos", lightPos);
     glBindVertexArray(lightVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
@@ -390,63 +435,32 @@ void checkInputs()
     {
         shaderProgram.reload();
         shaderProgram.use();
-         glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
-         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
-         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.1f);
-         shaderProgram.setParameter("mat.shininess", 32.0f);
-         shaderProgram.setParameter("light.ambient", ambientColor);
-         shaderProgram.setParameter("light.diffuse", diffuseColor);
-         shaderProgram.setParameter("light.specular", 1.0f, 1.0f, 1.0f);
-         shaderProgram.setParameter("mat.diffuse", 0);
-         shaderProgram.setParameter("mat.specular", 1);
-         shaderProgram.setParameter("mat.emissive", 2);
+		rain::Light light;
+		light.Type = rain::Light::Type::DIRECTIONAL;
+		light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+		light.ambient = glm::vec3(1.f, 1.f, 1.f);
+		glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
+		light.diffuse = lightColor * glm::vec3(0.5f);
+		light.ambient = light.diffuse * glm::vec3(0.1f);
+
+		//directional light
+		shaderProgram.setParameter("dirLight.direction", light.direction);
+		shaderProgram.setParameter("dirLight.ambient", light.diffuse);
+		shaderProgram.setParameter("dirLight.diffuse", light.ambient);
+		shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
+
+		// point light
+		shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
+		shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
+		shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
+		shaderProgram.setParameter("pointLight.constant", 1.0f);
+		shaderProgram.setParameter("pointLight.linear", 0.09f);
+		shaderProgram.setParameter("pointLight.quadratic", 0.032f);
+
+		// material
+		shaderProgram.setParameter("mat.diffuse", 0);
+		shaderProgram.setParameter("mat.specular", 1);
+		shaderProgram.setParameter("mat.emissive", 2);
+		shaderProgram.setParameter("mat.shininess", 32.0f);
     }
 }
-
-
-//----------------------------------------------------------
-//// texture 1
-//glGenTextures(1, &containerTex);
-//glBindTexture(GL_TEXTURE_2D, containerTex);
-
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-//int width, height, nrChannels;
-//stbi_set_flip_vertically_on_load(true);
-
-//unsigned char *data = stbi_load(std::string(rootpath + "/wall.jpg").c_str(), &width, &height, &nrChannels, 0);
-//if (data)
-//{
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//    glGenerateMipmap(GL_TEXTURE_2D);
-//}
-//else
-//{
-//    std::cout << "Failed to load texture" << std::endl;
-//}
-//stbi_image_free(data);
-
-////----------------------------------------------------------
-//// texture 2
-//glGenTextures(1, &smileTex);
-//glBindTexture(GL_TEXTURE_2D, smileTex);
-
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-////data = nullptr;
-//data = stbi_load(std::string(rootpath + "/awesomeface.png").c_str(), &width, &height, &nrChannels, 0);
-//if (data)
-//{
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-//    glGenerateMipmap(GL_TEXTURE_2D);
-//}
-//else
-//{
-//    std::cout << "Failed to load texture" << std::endl;
-//}
-//stbi_image_free(data);
