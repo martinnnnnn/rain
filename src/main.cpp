@@ -249,13 +249,13 @@ void sandboxInit()
 	// framebuffer
 	float quadVertices[] =
 	{
-		-0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
 
-		-0.5f,  0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  1.0f, 1.0f
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f
 	};
 
 	glGenFramebuffers(1, &frameBuffer);
