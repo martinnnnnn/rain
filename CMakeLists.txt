@@ -29,7 +29,7 @@ add_subdirectory(external/bullet)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 # /W4 /Za
 
 #### INCLUDES ####

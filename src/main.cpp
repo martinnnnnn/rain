@@ -8,7 +8,7 @@
 #include <iterator>
 #include <unordered_map>
 
-#include "utility/stdincl_3d.h"
+#include "utility/incl_3d.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -42,11 +42,12 @@ GLuint container2Emissive;
 GLuint skyboxVAO;
 GLuint skyboxTexture;
 glm::vec3 lightPos;
-glm::vec3* cubePositions;
+std::vector<glm::vec3> cubePositions;
 
 void sandboxInit();
 void sandboxUpdate();
 void checkInputs();
+GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically = false);
 
 int main(int argc, char** argv)
 {
@@ -60,7 +61,6 @@ int main(int argc, char** argv)
     }
 
     rain::Rain::Init(_args);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     rain::Transform* camTransform = rain::Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
 
@@ -127,17 +127,19 @@ void sandboxInit()
         1, 2, 3    // second triangle
     };
 
-	cubePositions = new glm::vec3[10];
-	cubePositions[0] = glm::vec3(0.0f, 0.0f, 0.0f);
-	cubePositions[1] = glm::vec3(2.0f, 5.0f, -15.0f);
-	cubePositions[2] = glm::vec3(-1.5f, -2.2f, -2.5f);
-	cubePositions[3] = glm::vec3(-3.8f, -2.0f, -12.3f);
-	cubePositions[4] = glm::vec3(2.4f, -0.4f, -3.5f);
-	cubePositions[5] = glm::vec3(-1.7f, 3.0f, -7.5f);
-	cubePositions[6] = glm::vec3(1.3f, -2.0f, -2.5f);
-	cubePositions[7] = glm::vec3(1.5f, 2.0f, -2.5f);
-	cubePositions[8] = glm::vec3(1.5f, 0.2f, -1.5f);
-	cubePositions[9] = glm::vec3(-1.3f, 1.0f, -2.5f);
+    cubePositions = 
+    {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f, 3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f, 2.0f, -2.5f),
+        glm::vec3(1.5f, 0.2f, -1.5f),
+        glm::vec3(-1.3f, 1.0f, -2.5f)
+    };
 
     //----------------------------------------------------------
     // VAO & VBO & EBO for BOX
@@ -167,8 +169,11 @@ void sandboxInit()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-
     glBindVertexArray(0);
+
+    container2Diffuse = loadTexture2D("/images/container2.png", GL_RGB, GL_RGBA, true);
+    container2Specular = loadTexture2D("/images/container2_specular.png", GL_RGB, GL_RGBA, true);
+    container2Emissive = loadTexture2D("/images/matrix.jpg", GL_RGB, GL_RGB, true);
 
     //----------------------------------------------------------
     // VAO & VBO & EBO for LIGHT
@@ -247,76 +252,6 @@ void sandboxInit()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-    //----------------------------------------------------------
-    // container2
-    glGenTextures(1, &container2Diffuse);
-    glBindTexture(GL_TEXTURE_2D, container2Diffuse);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char * data = stbi_load(std::string(rootpath + "/images/container2.png").c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    //----------------------------------------------------------
-    // container2
-    glGenTextures(1, &container2Specular);
-    glBindTexture(GL_TEXTURE_2D, container2Specular);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    data = stbi_load(std::string(rootpath + "/images/container2_specular.png").c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-
-    //----------------------------------------------------------
-    // container2
-    glGenTextures(1, &container2Emissive);
-    glBindTexture(GL_TEXTURE_2D, container2Emissive);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    data = stbi_load(std::string(rootpath + "/images/matrix.jpg").c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
     //----------------------------------------------------------
     // SKYBOX
     glGenTextures(1, &skyboxTexture);
@@ -331,6 +266,8 @@ void sandboxInit()
         rootpath + "/images/skybox/front.jpg",
         rootpath + "/images/skybox/back.jpg"
     };
+    int width, height, nrChannels;
+    unsigned char* data;
     stbi_set_flip_vertically_on_load(false);
     for (int i = 0; i < skyboxFaces.size(); ++i)
     {
@@ -639,4 +576,41 @@ void checkInputs()
 		shaderProgram.setParameter("mat.emissive", 2);
 		shaderProgram.setParameter("mat.shininess", 32.0f);
     }
+}
+
+
+GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically)
+{
+    GLuint id;
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_set_flip_vertically_on_load(flipVertically);
+    if (path != "")
+    {
+        int width, height, nrChannels;
+        unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else
+        {
+            std::cout << "Failed to load texture" << std::endl;
+            
+        }
+        stbi_image_free(data);
+    }
+    else
+    {
+        int width, height;
+        glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, NULL);
+    }
+    return id;
 }
