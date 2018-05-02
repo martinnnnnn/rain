@@ -53,8 +53,12 @@ void main()
 	outColor += GetPointLight(pointLight);
 	outColor += GetSpotLight(spotLight);
     outColor += texture(skybox, R).rgb * texture(mat.specular, TextCoord).rgb;
+    float ratio = 1.00 / 2.42;
+    I = normalize(Position - viewPos);
+    R = refract(I, normalize(Normal), ratio);
+    outColor += texture(skybox, R).rgb, 1.0 * (-texture(mat.specular, TextCoord).rgb);
+
 	FragColor = vec4(outColor, 1);
-    
 } 
 
 vec3 GetDirLight(Light light)
