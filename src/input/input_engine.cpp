@@ -4,8 +4,7 @@
 namespace rain
 {
     InputEngine::InputEngine(GLFWwindow* _window) :
-        m_window(_window),
-        m_firstMouse(true)
+        m_window(_window)
     {
     }
 
@@ -14,12 +13,13 @@ namespace rain
         double xpos, ypos;
         glfwGetCursorPos(m_window, &xpos, &ypos);
 
-        if (m_firstMouse)
+        static bool once = [this](double xpos, double ypos)
         {
             m_lastPos.x = (float)xpos;
             m_lastPos.y = (float)ypos;
-            m_firstMouse = false;
-        }
+            return true;
+        } (xpos, ypos);
+
         m_offset.x = (float)xpos - m_lastPos.x;
         m_offset.y = m_lastPos.y - (float)ypos;
         m_lastPos.x = (float)xpos;

@@ -19,6 +19,5 @@ namespace rain
         GLFWwindow * m_window;
         glm::vec2 m_lastPos;
         glm::vec2 m_offset;
-        bool m_firstMouse;
     };
 }
