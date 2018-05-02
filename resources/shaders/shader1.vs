@@ -15,6 +15,6 @@ void main()
 {
     Position = vec3(model * vec4(aPos, 1.0));
     TextCoord = aTextureCoord;
-    Normal = normalize(mat3(transpose(inverse(model))) * aNorm);  
+    Normal = mat3(transpose(inverse(model))) * aNorm;
     gl_Position = proj * view * model * vec4(aPos, 1.0);
 }

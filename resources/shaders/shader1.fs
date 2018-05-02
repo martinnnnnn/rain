@@ -36,16 +36,25 @@ uniform Light dirLight;
 uniform Light pointLight;
 uniform Light spotLight;
 
+uniform samplerCube skybox;
+
 vec3 GetDirLight(Light light);
 vec3 GetPointLight(Light light);
 vec3 GetSpotLight(Light light);
 vec4 GetLinearizedDepth();
+
+
 void main()
 {
+    vec3 I = normalize(Position - viewPos);
+    vec3 R = reflect(I, normalize(Normal));
+
 	vec3 outColor = GetDirLight(dirLight);
 	outColor += GetPointLight(pointLight);
 	outColor += GetSpotLight(spotLight);
+    outColor += texture(skybox, R).rgb * texture(mat.specular, TextCoord).rgb;
 	FragColor = vec4(outColor, 1);
+    
 } 
 
 vec3 GetDirLight(Light light)

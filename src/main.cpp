@@ -459,6 +459,10 @@ void sandboxInit()
     shaderProgram.setParameter("mat.emissive", 2);
     shaderProgram.setParameter("mat.shininess", 32.0f);
 
+    // env mapping
+    shaderProgram.setParameter("skybox", 3);
+
+
 	// light cube shader
     std::string lightVertexPath = rootpath + "/shaders/light_shader.vs";
     std::string lightFragmentPath = rootpath + "/shaders/light_shader.fs";
@@ -520,12 +524,15 @@ void sandboxUpdate()
 	shaderProgram.setParameter("pointLight.position", lightPos);
 	shaderProgram.setParameter("spotLight.position", camTransform->Position);
 	shaderProgram.setParameter("spotLight.direction", camera->Front);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, container2Diffuse);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, container2Specular);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, container2Emissive);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
     glBindVertexArray(boxVAO);
 	for (int i = 0; i < 10; ++i)
