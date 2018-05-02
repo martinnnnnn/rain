@@ -22,8 +22,8 @@ namespace rain
         float deltaTime = Rain::GetDeltaTime();
         float velocity = m_movementSpeed * deltaTime;
         glm::vec3 movement(0.0f, 0.0f, 0.0f);
-        glm::vec3 front = m_camera->Front();
-        glm::vec3 right = m_camera->Right();
+        glm::vec3 front = m_camera->Front;
+        glm::vec3 right = m_camera->Right;
 
         if (m_inputEngine->IsKeyPressed(GLFW_KEY_W))
         {
