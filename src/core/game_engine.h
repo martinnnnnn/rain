@@ -1,10 +1,10 @@
 #pragma once
 
+#include <glm/glm.hpp>
 
 #include <unordered_map>
 #include <string>
 #include <functional>
-
 struct GLFWwindow;
 
 namespace rain
@@ -28,7 +28,7 @@ namespace rain
         float GetDeltaTime();
         std::string GetResourcesRoot();
         void SetUpdateCallback(std::function<void(void)> _function);
-
+        glm::vec2 GetWindowSize();
     private:
         InputEngine* m_inputEngine;
         GLFWwindow* m_window;

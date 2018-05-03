@@ -22,15 +22,23 @@ namespace rain
 
     int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
+        m_screenWidth = 800;
+        m_screenHeight = 600;
         m_resourcesRootPath = Rain::GetExePath();
-        if (_args["root"] != "")
+        if (_args["resources_path"] != "")
         {
-            m_resourcesRootPath = _args["root"];
+            m_resourcesRootPath = _args["resources_path"];
+        }
+        if (_args["screen_width"] != "")
+        {
+            m_screenWidth = stof(_args["screen_width"]);
+        }
+        if (_args["screen_height"] != "")
+        {
+            m_screenHeight = stof(_args["screen_height"]);
         }
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 
-        m_screenWidth = 800;
-        m_screenHeight = 600;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -142,9 +150,15 @@ namespace rain
         return m_deltaTime;
     }
 
+    glm::vec2 GameEngine::GetWindowSize()
+    {
+        return glm::vec2(m_screenWidth, m_screenHeight);
+    }
+
     void GameEngine::framebuffer_size_callback(::GLFWwindow* window, int width, int height)
     {
         glViewport(0, 0, width, height);
 
     }
 }
+

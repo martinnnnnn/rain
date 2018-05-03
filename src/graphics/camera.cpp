@@ -15,7 +15,7 @@ namespace rain
         m_pitch = 0.0f;
     
         updateCameraVectors();
-        updateProjectionMatrix(glm::vec2(800,600));
+        updateProjectionMatrix(Rain::GetWindowSize());
     }
 
 

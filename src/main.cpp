@@ -21,14 +21,15 @@
 #include "input/input_engine.h"
 #include "graphics/light.h"
 
-std::unordered_map<std::string, std::string> _args;
+using namespace rain;
+
 std::string rootpath;
 bool wireframe;
-rain::Shader shaderProgram;
-rain::Shader lightshaderProgram;
-rain::Shader outlineShaderProgram;
-rain::Shader screenquadShader;
-rain::Shader skyboxShader;
+Shader shaderProgram;
+Shader lightshaderProgram;
+Shader outlineShaderProgram;
+Shader screenquadShader;
+Shader skyboxShader;
 GLuint quadVAO, quadVBO;
 GLuint frameBuffer;
 GLuint textureColorBuffer;
@@ -51,25 +52,18 @@ GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _fo
 
 int main(int argc, char** argv)
 {
-    for (int i = 0; i < argc; i++)
-    {
-        std::vector<std::string> arg = rain::Rain::split(argv[i], '=');
-        if (arg.size() > 1)
-        {
-            _args[arg[0]] = arg[1];
-        }
-    }
+    
 
-    rain::Rain::Init(_args);
-    rain::Transform* camTransform = rain::Rain::Engine()->GetCameraController()->GetTransform();
+    Rain::Init(Rain::getArguments(argc, argv));
+    Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
 
-    rain::Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-    rootpath = rain::Rain::ResourcesRoot();
+    Rain::Engine()->SetUpdateCallback(sandboxUpdate);
+    rootpath = Rain::ResourcesRoot();
     wireframe = false;
 
 	sandboxInit();
-    rain::Rain::Run();
+    Rain::Run();
 
     return 0;
 }
@@ -224,7 +218,7 @@ void sandboxInit()
 
 	glGenTextures(1, &textureColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Rain::GetWindowSize().x, Rain::GetWindowSize().y, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -232,7 +226,7 @@ void sandboxInit()
 	GLuint depthStencilBuffer;
 	glGenRenderbuffers(1, &depthStencilBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Rain::GetWindowSize().x, Rain::GetWindowSize().y);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -269,7 +263,7 @@ void sandboxInit()
     int width, height, nrChannels;
     unsigned char* data;
     stbi_set_flip_vertically_on_load(false);
-    for (int i = 0; i < skyboxFaces.size(); ++i)
+    for (size_t i = 0; i < skyboxFaces.size(); ++i)
     {
         data = stbi_load(skyboxFaces[i].c_str(), &width, &height, &nrChannels, 0);
         if (data)
@@ -355,8 +349,8 @@ void sandboxInit()
     // shader
     std::string vertexPath = rootpath + "/shaders/shader1.vs";
     std::string fragmentPath = rootpath + "/shaders/shader1.fs";
-    rain::Light light;
-    light.Type = rain::Light::Type::DIRECTIONAL;
+    Light light;
+    light.Type = Light::Type::DIRECTIONAL;
     light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
     light.ambient = glm::vec3(1.f, 1.f, 1.f);
     glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
@@ -419,9 +413,9 @@ void sandboxUpdate()
     checkInputs();
 
     // recup mat view, mat proj
-    rain::CameraController* camController = rain::Rain::Engine()->GetCameraController();
-    rain::Camera* camera = camController->GetCamera();
-    rain::Transform* camTransform = camController->GetTransform();
+    CameraController* camController = Rain::Engine()->GetCameraController();
+    Camera* camera = camController->GetCamera();
+    Transform* camTransform = camController->GetTransform();
 
     glm::mat4 proj = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix(camTransform->Position);
@@ -532,7 +526,7 @@ void sandboxUpdate()
 
 void checkInputs()
 {
-    if (rain::Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
+    if (Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
     {
         if (!wireframe)
         {
@@ -544,12 +538,12 @@ void checkInputs()
         }
         wireframe = !wireframe;
     }
-    if (rain::Rain::Input()->IsKeyPressed(GLFW_KEY_R))
+    if (Rain::Input()->IsKeyPressed(GLFW_KEY_R))
     {
         shaderProgram.reload();
         shaderProgram.use();
-		rain::Light light;
-		light.Type = rain::Light::Type::DIRECTIONAL;
+		Light light;
+		light.Type = Light::Type::DIRECTIONAL;
 		light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
 		light.ambient = glm::vec3(1.f, 1.f, 1.f);
 		glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
@@ -591,26 +585,19 @@ GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _fo
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     stbi_set_flip_vertically_on_load(flipVertically);
-    if (path != "")
+   
+    int width, height, nrChannels;
+    unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
+    if (data)
     {
-        int width, height, nrChannels;
-        unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
-        if (data)
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-        else
-        {
-            std::cout << "Failed to load texture" << std::endl;
-            
-        }
-        stbi_image_free(data);
+        glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        int width, height;
-        glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, NULL);
+        std::cout << "Failed to load texture" << std::endl;
+
     }
+    stbi_image_free(data);
     return id;
 }

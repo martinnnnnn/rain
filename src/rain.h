@@ -26,9 +26,11 @@ namespace rain
         static InputEngine* Input();
         static std::string ResourcesRoot();
         static std::string GetExePath();
+        static glm::vec2 GetWindowSize();
 
+        // utility functions
+        static std::unordered_map<std::string, std::string> getArguments(int argc, char** argv);
         static std::vector<std::string> split(const std::string &s, char delim);
-
         template<typename Out>
         static void split(const std::string &s, char delim, Out result)
         {
