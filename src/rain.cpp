@@ -63,7 +63,7 @@ namespace rain
         return Engine()->GetWindowSize();
     }
     
-    std::unordered_map<std::string, std::string> Rain::getArguments(int _argc, char** _argv)
+    std::unordered_map<std::string, std::string> Rain::GetArguments(int _argc, char** _argv)
     {
         std::unordered_map<std::string, std::string> args;
         for (int i = 0; i < _argc; i++)

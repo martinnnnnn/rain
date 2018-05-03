@@ -52,9 +52,7 @@ GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _fo
 
 int main(int argc, char** argv)
 {
-    
-
-    Rain::Init(Rain::getArguments(argc, argv));
+    Rain::Init(Rain::GetArguments(argc, argv));
     Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
 
