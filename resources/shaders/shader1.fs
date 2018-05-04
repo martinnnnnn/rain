@@ -1,9 +1,16 @@
 #version 330 core
 out vec4 FragColor;
 
-in vec3 Position;
-in vec3 Normal;
-in vec2 TextCoord;
+//in vec3 Position;
+//in vec3 Normal;
+//in vec2 TextCoord;
+
+in VS_OUT
+{
+    vec3 Position;
+    vec3 Normal;
+    vec2 TextCoord;
+} fs_in;
 
 struct Material
 {
@@ -46,46 +53,46 @@ vec4 GetLinearizedDepth();
 
 void main()
 {
-    vec3 I = normalize(Position - viewPos);
-    vec3 R = reflect(I, normalize(Normal));
+    vec3 I = normalize(fs_in.Position - viewPos);
+    vec3 R = reflect(I, normalize(fs_in.Normal));
 
 	vec3 outColor = GetDirLight(dirLight);
 	outColor += GetPointLight(pointLight);
 	outColor += GetSpotLight(spotLight);
-    outColor += texture(skybox, R).rgb * texture(mat.specular, TextCoord).rgb;
+    outColor += texture(skybox, R).rgb * texture(mat.specular, fs_in.TextCoord).rgb;
     float ratio = 1.00 / 2.42;
-    I = normalize(Position - viewPos);
-    R = refract(I, normalize(Normal), ratio);
-    outColor += texture(skybox, R).rgb, 1.0 * (-texture(mat.specular, TextCoord).rgb);
+    I = normalize(fs_in.Position - viewPos);
+    R = refract(I, normalize(fs_in.Normal), ratio);
+    outColor += texture(skybox, R).rgb, 1.0 * (-texture(mat.specular, fs_in.TextCoord).rgb);
 
 	FragColor = vec4(outColor, 1);
 } 
 
 vec3 GetDirLight(Light light)
 {
-    vec3 viewDir = normalize(viewPos - Position);
+    vec3 viewDir = normalize(viewPos - fs_in.Position);
 	vec3 lightDir = normalize(-light.direction);
-	vec3 reflectDir = reflect(-lightDir, Normal);
+	vec3 reflectDir = reflect(-lightDir, fs_in.Normal);
 
-	vec3 ambientLight = light.ambient * texture(mat.diffuse, TextCoord).rgb;
-	vec3 diffuseLight = max(dot(Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, TextCoord).rgb;
-	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, TextCoord).rgb;
-	vec3 emissive = texture(mat.emissive, TextCoord).rgb;
+	vec3 ambientLight = light.ambient * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 diffuseLight = max(dot(fs_in.Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, fs_in.TextCoord).rgb;
+	vec3 emissive = texture(mat.emissive, fs_in.TextCoord).rgb;
 	return ambientLight + diffuseLight + specularLight;
 }
 
 vec3 GetPointLight(Light light)
 {
-	float distance = length(light.position - Position);
+	float distance = length(light.position - fs_in.Position);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-	vec3 viewDir = normalize(viewPos - Position);
-	vec3 lightDir = normalize(light.position - Position);
-	vec3 reflectDir = reflect(-lightDir, Normal);
+	vec3 viewDir = normalize(viewPos - fs_in.Position);
+	vec3 lightDir = normalize(light.position - fs_in.Position);
+	vec3 reflectDir = reflect(-lightDir, fs_in.Normal);
 
-	vec3 ambientLight = light.ambient * texture(mat.diffuse, TextCoord).rgb;
-	vec3 diffuseLight = max(dot(Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, TextCoord).rgb;
-	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, TextCoord).rgb;
-	vec3 emissiveLight = texture(mat.emissive, TextCoord).rgb;
+	vec3 ambientLight = light.ambient * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 diffuseLight = max(dot(fs_in.Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, fs_in.TextCoord).rgb;
+	vec3 emissiveLight = texture(mat.emissive, fs_in.TextCoord).rgb;
 
 	ambientLight *= attenuation;
 	diffuseLight *= attenuation;
@@ -97,20 +104,20 @@ vec3 GetPointLight(Light light)
 
 vec3 GetSpotLight(Light light)
 {
-	float distance = length(light.position - Position);
+	float distance = length(light.position - fs_in.Position);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-	vec3 viewDir = normalize(viewPos - Position);
-	vec3 lightDir = normalize(light.position - Position);
-	vec3 reflectDir = reflect(-lightDir, Normal);
+	vec3 viewDir = normalize(viewPos - fs_in.Position);
+	vec3 lightDir = normalize(light.position - fs_in.Position);
+	vec3 reflectDir = reflect(-lightDir, fs_in.Normal);
 
 	float theta = dot(lightDir, normalize(-light.direction));
 	float epsilon   = light.cutOff - light.outerCutOff;
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-	vec3 ambientLight = light.ambient * texture(mat.diffuse, TextCoord).rgb;
-	vec3 diffuseLight = max(dot(Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, TextCoord).rgb;
-	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, TextCoord).rgb;
-	vec3 emissiveLight = texture(mat.emissive, TextCoord).rgb;
+	vec3 ambientLight = light.ambient * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 diffuseLight = max(dot(fs_in.Normal, lightDir), 0.0) * light.diffuse * texture(mat.diffuse, fs_in.TextCoord).rgb;
+	vec3 specularLight = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess) * light.specular * texture(mat.specular, fs_in.TextCoord).rgb;
+	vec3 emissiveLight = texture(mat.emissive, fs_in.TextCoord).rgb;
 
 	ambientLight *= attenuation;
 	diffuseLight *= attenuation * intensity;

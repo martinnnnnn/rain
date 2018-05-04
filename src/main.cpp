@@ -26,7 +26,9 @@ using namespace rain;
 std::string rootpath;
 bool wireframe;
 Shader shaderProgram;
-Shader lightshaderProgram;
+Shader lightshaderProgramRed;
+Shader lightshaderProgramBlue;
+Shader lightshaderProgramYellow;
 Shader outlineShaderProgram;
 Shader screenquadShader;
 Shader skyboxShader;
@@ -37,6 +39,7 @@ GLuint boxVBO;
 GLuint boxVAO;
 GLuint lightVBO;
 GLuint lightVAO;
+GLuint uboMatrices;
 GLuint container2Diffuse;
 GLuint container2Specular;
 GLuint container2Emissive;
@@ -393,12 +396,32 @@ void sandboxInit()
 
 
 	// light cube shader
-    std::string lightVertexPath = rootpath + "/shaders/light_shader.vs";
-    std::string lightFragmentPath = rootpath + "/shaders/light_shader.fs";
-    lightPos = glm::vec3(3, 1, 2);
-    lightshaderProgram.init(lightVertexPath, lightFragmentPath);
-    lightshaderProgram.use();
-    lightshaderProgram.setParameter("color", glm::vec3(1.0f, 1.0f, 1.0f));
+    lightshaderProgramRed.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_red.fs");
+    lightshaderProgramBlue.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_blue.fs");
+    lightshaderProgramYellow.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_yellow.fs");
+
+    unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(lightshaderProgramRed.id, "Matrices");
+    unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(lightshaderProgramBlue.id, "Matrices");
+    unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(lightshaderProgramYellow.id, "Matrices");
+
+    glUniformBlockBinding(lightshaderProgramRed.id, uniformBlockIndexRed, 0);
+    glUniformBlockBinding(lightshaderProgramBlue.id, uniformBlockIndexBlue, 0);
+    glUniformBlockBinding(lightshaderProgramYellow.id, uniformBlockIndexYellow, 0);
+
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
+
+    
+    glm::mat4 projection = Rain::Camera()->GetProjectionMatrix();
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
 
 	// outline cube shader
 	std::string outlineVextexPath = rootpath + "/shaders/shader1.vs";
@@ -432,15 +455,28 @@ void sandboxUpdate()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 
-    lightshaderProgram.use();
-    lightshaderProgram.setParameter("model", lightModel);
-    lightshaderProgram.setParameter("proj", proj);
-    lightshaderProgram.setParameter("view", view);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    lightshaderProgramRed.use();
+    lightshaderProgramRed.setParameter("model", lightModel);
     glBindVertexArray(lightVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
-    
+    lightModel = glm::translate(glm::mat4(1), glm::vec3(0, glm::sin(glfwGetTime()) * 4, glm::cos(glfwGetTime()) * 4));
+    lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
+    lightshaderProgramBlue.use();
+    lightshaderProgramRed.setParameter("model", lightModel);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    lightModel = glm::translate(glm::mat4(1), glm::vec3(glm::cos(glfwGetTime()) * 4, glm::sin(glfwGetTime()) * 4, 0));
+    lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
+    lightshaderProgramYellow.use();
+    lightshaderProgramRed.setParameter("model", lightModel);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
 
     // render
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
