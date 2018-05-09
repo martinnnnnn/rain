@@ -1,7 +1,7 @@
 #pragma once
 
 
-
+#include <string>
 
 namespace rain
 {
@@ -10,11 +10,11 @@ namespace rain
     class Material
     {
     public:
-        Material();
+        Material(const std::string& _shaderPath);
 
     private:
         Shader * m_shader;
-
+        std::string m_shaderPath;
 
     };
 }
