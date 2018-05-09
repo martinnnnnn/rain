@@ -16,7 +16,7 @@ namespace rain
     class Rain
     {
     public:
-        static void Init(std::unordered_map<std::string, std::string> _args);
+        static int Init(std::unordered_map<std::string, std::string> _args);
         static void Run();
 
         static float GetDeltaTime();

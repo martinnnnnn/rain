@@ -1,9 +1,6 @@
-#version 330 core
+#version 420 core
 out vec4 FragColor;
 
-//in vec3 Position;
-//in vec3 Normal;
-//in vec2 TextCoord;
 
 in VS_OUT
 {

@@ -20,6 +20,7 @@
 #include "core/transform.h"
 #include "input/input_engine.h"
 #include "graphics/light.h"
+#include "utility/gl_utils.h"
 
 using namespace rain;
 
@@ -51,11 +52,19 @@ std::vector<glm::vec3> cubePositions;
 void sandboxInit();
 void sandboxUpdate();
 void checkInputs();
+void loadShaders();
+
 GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically = false);
 
 int main(int argc, char** argv)
 {
-    Rain::Init(Rain::GetArguments(argc, argv));
+    int retval = Rain::Init(Rain::GetArguments(argc, argv));
+    if (retval != 0)
+    {
+        std::cout << "Couldn't launch the game." << std::endl;
+        system("PAUSE");
+        return -1;
+    }
     Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
 
@@ -64,6 +73,7 @@ int main(int argc, char** argv)
     wireframe = false;
 
 	sandboxInit();
+    loadShaders();
     Rain::Run();
 
     return 0;
@@ -195,13 +205,6 @@ void sandboxInit()
 
 	// ----------------------------------------------------------------------
     // FRAME BUFFFER
-	// shader
-	std::string quadVertexPath = rootpath + "/shaders/screen_quad.vs";
-	std::string quadFragmentPath = rootpath + "/shaders/screen_quad.fs";
-	screenquadShader.init(quadVertexPath, quadFragmentPath);
-	screenquadShader.use();
-	screenquadShader.setParameter("screenTexture", 0);
-
 	// framebuffer
 	float quadVertices[] =
 	{
@@ -219,7 +222,7 @@ void sandboxInit()
 
 	glGenTextures(1, &textureColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Rain::GetWindowSize().x, Rain::GetWindowSize().y, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)Rain::GetWindowSize().x, (GLsizei)Rain::GetWindowSize().y, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -227,7 +230,7 @@ void sandboxInit()
 	GLuint depthStencilBuffer;
 	glGenRenderbuffers(1, &depthStencilBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Rain::GetWindowSize().x, Rain::GetWindowSize().y);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (GLsizei)Rain::GetWindowSize().x, (GLsizei)Rain::GetWindowSize().y);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -261,6 +264,7 @@ void sandboxInit()
         rootpath + "/images/skybox/front.jpg",
         rootpath + "/images/skybox/back.jpg"
     };
+
     int width, height, nrChannels;
     unsigned char* data;
     stbi_set_flip_vertically_on_load(false);
@@ -340,73 +344,13 @@ void sandboxInit()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-    std::string skyboxVertexPath = rootpath + "/shaders/skybox.vs";
-    std::string skyboxFragmentPath = rootpath + "/shaders/skybox.fs";
-    skyboxShader.init(skyboxVertexPath, skyboxFragmentPath);
-    skyboxShader.use();
-    skyboxShader.setParameter("skybox", 0);
+    //unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(lightshaderProgramRed.id, "Matrices");
+    //unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(lightshaderProgramBlue.id, "Matrices");
+    //unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(lightshaderProgramYellow.id, "Matrices");
 
-    //----------------------------------------------------------
-    // shader
-    std::string vertexPath = rootpath + "/shaders/shader1.vs";
-    std::string fragmentPath = rootpath + "/shaders/shader1.fs";
-    Light light;
-    light.Type = Light::Type::DIRECTIONAL;
-    light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-    light.ambient = glm::vec3(1.f, 1.f, 1.f);
-    glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
-    light.diffuse = lightColor * glm::vec3(0.5f);
-    light.ambient = light.diffuse * glm::vec3(0.1f);
-
-
-    shaderProgram.init(vertexPath, fragmentPath);
-    shaderProgram.use();
-	//directional light
-	shaderProgram.setParameter("dirLight.direction", light.direction);
-	shaderProgram.setParameter("dirLight.ambient", light.diffuse);
-    shaderProgram.setParameter("dirLight.diffuse", light.ambient);
-    shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
-
-	// point light
-	shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
-	shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
-	shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
-	shaderProgram.setParameter("pointLight.constant", 1.0f);
-	shaderProgram.setParameter("pointLight.linear", 0.09f);
-	shaderProgram.setParameter("pointLight.quadratic", 0.032f);
-
-	// spot light
-	shaderProgram.setParameter("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-	shaderProgram.setParameter("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-	shaderProgram.setParameter("spotLight.ambient", 0.1f, 0.1f, 0.1f);
-	shaderProgram.setParameter("spotLight.diffuse", 0.8f, 0.8f, 0.8f);
-	shaderProgram.setParameter("spotLight.specular", 1.0f, 1.0f, 1.0f);
-	shaderProgram.setParameter("spotLight.constant", 1.0f);
-	shaderProgram.setParameter("spotLight.linear", 0.09f);
-	shaderProgram.setParameter("spotLight.quadratic", 0.032f);
-
-	// material
-    shaderProgram.setParameter("mat.diffuse", 0);
-    shaderProgram.setParameter("mat.specular", 1);
-    shaderProgram.setParameter("mat.emissive", 2);
-    shaderProgram.setParameter("mat.shininess", 32.0f);
-
-    // env mapping
-    shaderProgram.setParameter("skybox", 3);
-
-
-	// light cube shader
-    lightshaderProgramRed.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_red.fs");
-    lightshaderProgramBlue.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_blue.fs");
-    lightshaderProgramYellow.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_yellow.fs");
-
-    unsigned int uniformBlockIndexRed = glGetUniformBlockIndex(lightshaderProgramRed.id, "Matrices");
-    unsigned int uniformBlockIndexBlue = glGetUniformBlockIndex(lightshaderProgramBlue.id, "Matrices");
-    unsigned int uniformBlockIndexYellow = glGetUniformBlockIndex(lightshaderProgramYellow.id, "Matrices");
-
-    glUniformBlockBinding(lightshaderProgramRed.id, uniformBlockIndexRed, 0);
-    glUniformBlockBinding(lightshaderProgramBlue.id, uniformBlockIndexBlue, 0);
-    glUniformBlockBinding(lightshaderProgramYellow.id, uniformBlockIndexYellow, 0);
+    //glUniformBlockBinding(lightshaderProgramRed.id, uniformBlockIndexRed, 0);
+    //glUniformBlockBinding(lightshaderProgramBlue.id, uniformBlockIndexBlue, 0);
+    //glUniformBlockBinding(lightshaderProgramYellow.id, uniformBlockIndexYellow, 0);
 
     glGenBuffers(1, &uboMatrices);
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
@@ -414,19 +358,87 @@ void sandboxInit()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
-
     
     glm::mat4 projection = Rain::Camera()->GetProjectionMatrix();
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    //----------------------------------------------------------
+    // SHADERS
+    skyboxShader.init(rootpath + "/shaders/skybox.vs", rootpath + "/shaders/skybox.fs");
+    screenquadShader.init(rootpath + "/shaders/screen_quad.vs", rootpath + "/shaders/screen_quad.fs");
+    shaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/shader1.fs");
+    lightshaderProgramRed.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_red.fs");
+    lightshaderProgramBlue.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_blue.fs");
+    lightshaderProgramYellow.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_yellow.fs");
+	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
+}
 
 
-	// outline cube shader
-	std::string outlineVextexPath = rootpath + "/shaders/shader1.vs";
-	std::string outlineFragmentPath = rootpath + "/shaders/outline.fs";
-	outlineShaderProgram.init(outlineVextexPath, outlineFragmentPath);
+
+void loadShaders()
+{
+    skyboxShader.reload();
+    skyboxShader.use();
+    skyboxShader.setParameter("skybox", 0);
+
+    screenquadShader.reload();
+    screenquadShader.use();
+    screenquadShader.setParameter("screenTexture", 0);
+
+    shaderProgram.reload();
+    shaderProgram.use();
+    std::vector<GLSLAttrib> attribs = shaderProgram.GetGLSLAttributes();
+    for (size_t i = 0; i < attribs.size(); ++i)
+    {
+        std::cout << "name : " << attribs[i].name
+            << ", type : " << GLTypeToString(attribs[i].type)
+            << ", size : " << attribs[i].size << std::endl;
+    }
+
+    std::vector<GLSLUniform> uniforms = shaderProgram.GetGLSLUniforms();
+    for (size_t i = 0; i < uniforms.size(); ++i)
+    {
+        std::cout << "name : " << uniforms[i].name
+            << ", type : " << GLTypeToString(uniforms[i].type)
+            << ", size : " << uniforms[i].size << std::endl;
+    }
+
+    //directional light
+    shaderProgram.setParameter("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    shaderProgram.setParameter("dirLight.ambient", 0.5f, 0.5f, 0.5f);
+    shaderProgram.setParameter("dirLight.diffuse", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
+    // point light
+    shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
+    shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("pointLight.constant", 1.0f);
+    shaderProgram.setParameter("pointLight.linear", 0.09f);
+    shaderProgram.setParameter("pointLight.quadratic", 0.032f);
+    // spot light
+    shaderProgram.setParameter("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    shaderProgram.setParameter("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+    shaderProgram.setParameter("spotLight.ambient", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("spotLight.diffuse", 0.8f, 0.8f, 0.8f);
+    shaderProgram.setParameter("spotLight.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("spotLight.constant", 1.0f);
+    shaderProgram.setParameter("spotLight.linear", 0.09f);
+    shaderProgram.setParameter("spotLight.quadratic", 0.032f);
+    // material
+    shaderProgram.setParameter("mat.diffuse", 0);
+    shaderProgram.setParameter("mat.specular", 1);
+    shaderProgram.setParameter("mat.emissive", 2);
+    shaderProgram.setParameter("mat.shininess", 32.0f);
+    // env mapping
+    shaderProgram.setParameter("skybox", 3);
+
+    lightshaderProgramRed.reload();
+    lightshaderProgramBlue.reload();
+    lightshaderProgramYellow.reload();
+
+    outlineShaderProgram.reload();
 }
 
 void sandboxUpdate()
@@ -447,9 +459,7 @@ void sandboxUpdate()
     lightModel = glm::translate(lightModel, lightPos);
     lightModel = glm::scale(lightModel, glm::vec3(0.5f, 0.5f, 0.5f));
 
-
-
-	//glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    //glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
@@ -574,35 +584,7 @@ void checkInputs()
     }
     if (Rain::Input()->IsKeyPressed(GLFW_KEY_R))
     {
-        shaderProgram.reload();
-        shaderProgram.use();
-		Light light;
-		light.Type = Light::Type::DIRECTIONAL;
-		light.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-		light.ambient = glm::vec3(1.f, 1.f, 1.f);
-		glm::vec3 lightColor = glm::vec3(1.f, 1.f, 1.f);
-		light.diffuse = lightColor * glm::vec3(0.5f);
-		light.ambient = light.diffuse * glm::vec3(0.1f);
-
-		//directional light
-		shaderProgram.setParameter("dirLight.direction", light.direction);
-		shaderProgram.setParameter("dirLight.ambient", light.diffuse);
-		shaderProgram.setParameter("dirLight.diffuse", light.ambient);
-		shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
-
-		// point light
-		shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
-		shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
-		shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
-		shaderProgram.setParameter("pointLight.constant", 1.0f);
-		shaderProgram.setParameter("pointLight.linear", 0.09f);
-		shaderProgram.setParameter("pointLight.quadratic", 0.032f);
-
-		// material
-		shaderProgram.setParameter("mat.diffuse", 0);
-		shaderProgram.setParameter("mat.specular", 1);
-		shaderProgram.setParameter("mat.emissive", 2);
-		shaderProgram.setParameter("mat.shininess", 32.0f);
+        loadShaders();
     }
 }
 

@@ -95,6 +95,49 @@ namespace rain
     {
         glUseProgram(id);
     }
+
+    std::vector<GLSLAttrib> Shader::GetGLSLAttributes()
+    {
+        std::vector<GLSLAttrib> attribs;
+
+        GLint count;
+        GLint size;
+        GLenum type;
+        const GLsizei bufSize = 16;
+        GLchar name[16];
+        GLsizei length;
+
+        glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &count);
+
+        for (GLint i = 0; i < count; ++i)
+        {
+            glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
+            attribs.push_back(GLSLAttrib(type, name, size));
+        }
+        return attribs;
+    }
+
+    std::vector<GLSLUniform> Shader::GetGLSLUniforms()
+    {
+        std::vector<GLSLUniform> uniforms;
+
+        GLint count;
+        GLint size;
+        GLenum type;
+        const GLsizei bufSize = 16;
+        GLchar name[16];
+        GLsizei length;
+
+        glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
+
+        for (GLint i = 0; i < count; ++i)
+        {
+            glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
+            uniforms.push_back(GLSLUniform(type, name, size));
+        }
+        return uniforms;
+    }
+
     void Shader::setParameter(const std::string &_name, bool _value) const
     {
         glUniform1i(glGetUniformLocation(id, _name.c_str()), (int)_value);

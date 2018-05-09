@@ -10,9 +10,9 @@
 
 namespace rain
 {
-    void Rain::Init(std::unordered_map<std::string, std::string> _args)
+    int Rain::Init(std::unordered_map<std::string, std::string> _args)
     {
-        GameEngine::Get().Init(_args);
+        return GameEngine::Get().Init(_args);
     }
 
     void Rain::Run()
