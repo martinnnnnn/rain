@@ -6,5 +6,10 @@
 
 namespace rain
 {
-    std::string GLTypeToString(GLenum _enum);
+    class GLUtils
+    {
+    public:
+        static std::string GLTypeToString(GLenum _enum);
+
+    };
 }

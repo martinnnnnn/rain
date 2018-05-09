@@ -11,6 +11,7 @@
 #include "utility/incl_3d.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <nlohmann/json.hpp>
 
 #include "rain.h"
 #include "graphics/shader.h"
@@ -21,6 +22,7 @@
 #include "input/input_engine.h"
 #include "graphics/light.h"
 #include "utility/gl_utils.h"
+#include "graphics/material.h"
 
 using namespace rain;
 
@@ -55,9 +57,13 @@ void checkInputs();
 void loadShaders();
 
 GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically = false);
+using namespace nlohmann;
 
 int main(int argc, char** argv)
 {
+
+
+
     int retval = Rain::Init(Rain::GetArguments(argc, argv));
     if (retval != 0)
     {
@@ -74,7 +80,11 @@ int main(int argc, char** argv)
 
 	sandboxInit();
     loadShaders();
+
+
     Rain::Run();
+
+
 
     return 0;
 }
@@ -373,6 +383,10 @@ void sandboxInit()
     lightshaderProgramBlue.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_blue.fs");
     lightshaderProgramYellow.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_yellow.fs");
 	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
+
+    Material test;
+    test.Init(rootpath + "/shaders/shader1");
+
 }
 
 
@@ -389,21 +403,21 @@ void loadShaders()
 
     shaderProgram.reload();
     shaderProgram.use();
-    std::vector<GLSLAttrib> attribs = shaderProgram.GetGLSLAttributes();
-    for (size_t i = 0; i < attribs.size(); ++i)
-    {
-        std::cout << "name : " << attribs[i].name
-            << ", type : " << GLTypeToString(attribs[i].type)
-            << ", size : " << attribs[i].size << std::endl;
-    }
+    //std::vector<GLSLAttrib> attribs = shaderProgram.GetGLSLAttributes();
+    //for (size_t i = 0; i < attribs.size(); ++i)
+    //{
+    //    std::cout << "name : " << attribs[i].name
+    //        << ", type : " << GLTypeToString(attribs[i].type)
+    //        << ", size : " << attribs[i].size << std::endl;
+    //}
 
-    std::vector<GLSLUniform> uniforms = shaderProgram.GetGLSLUniforms();
-    for (size_t i = 0; i < uniforms.size(); ++i)
-    {
-        std::cout << "name : " << uniforms[i].name
-            << ", type : " << GLTypeToString(uniforms[i].type)
-            << ", size : " << uniforms[i].size << std::endl;
-    }
+    //std::vector<GLSLUniform> uniforms = shaderProgram.GetGLSLUniforms();
+    //for (size_t i = 0; i < uniforms.size(); ++i)
+    //{
+    //    std::cout << "name : " << uniforms[i].name
+    //        << ", type : " << GLTypeToString(uniforms[i].type)
+    //        << ", size : " << uniforms[i].size << std::endl;
+    //}
 
     //directional light
     shaderProgram.setParameter("dirLight.direction", -0.2f, -1.0f, -0.3f);

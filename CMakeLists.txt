@@ -40,7 +40,8 @@ include_directories(src/
                     external/glad/include/
                     external/glm/
                     external/glfw/include/
-                    external/stb/)
+                    external/stb/
+                    external/json/)
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")

@@ -1,0 +1,226 @@
+[
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "aNorm",
+        "size": 1,
+        "variable_type": "attribute"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "aPos",
+        "size": 1,
+        "variable_type": "attribute"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec2",
+        "name": "aTextureCoord",
+        "size": 1,
+        "variable_type": "attribute"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "dirLight.ambien",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "dirLight.diffus",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "dirLight.direct",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "dirLight.specul",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "sampler2D",
+        "name": "mat.diffuse",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "mat.shininess",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "sampler2D",
+        "name": "mat.specular",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "mat4",
+        "name": "model",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "pointLight.ambi",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "pointLight.cons",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "pointLight.diff",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "pointLight.line",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "pointLight.posi",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "pointLight.quad",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "pointLight.spec",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "mat4",
+        "name": "proj",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "samplerCube",
+        "name": "skybox",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "spotLight.ambie",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "spotLight.const",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "spotLight.cutOf",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "spotLight.diffu",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "spotLight.direc",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "spotLight.linea",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "spotLight.outer",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "spotLight.posit",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "float",
+        "name": "spotLight.quadr",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "spotLight.specu",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "mat4",
+        "name": "view",
+        "size": 1,
+        "variable_type": "uniform"
+    },
+    {
+        "default_value": 0,
+        "glsl_type": "vec3",
+        "name": "viewPos",
+        "size": 1,
+        "variable_type": "uniform"
+    }
+]

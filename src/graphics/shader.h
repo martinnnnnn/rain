@@ -7,22 +7,31 @@
 
 namespace rain
 {
-    struct GLSLAttrib
+    enum class GLSLVariableType
     {
-        GLSLAttrib(GLenum _type, char* _name, GLint _size) : type(_type), name(_name), size(_size) {}
-        GLenum type;
+        ATTRIBUTE,
+        UNIFORM,
+        LAST_INDEX
+    };
+
+
+    struct GLSLVariable
+    {
+        GLSLVariable(GLSLVariableType _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
+
+        GLSLVariableType variableType;
+        GLenum glslType;
         std::string name;
         GLint size;
     };
 
-    struct GLSLUniform
-    {
-        GLSLUniform(GLenum _type, char* _name, GLint _size) : type(_type), name(_name), size(_size) {}
-        GLenum type;
-        std::string name;
-        GLint size;
-    };
-
+    //struct GLSLUniform
+    //{
+    //    GLSLUniform(GLenum _type, char* _name, GLint _size) : type(_type), name(_name), size(_size) {}
+    //    GLenum type;
+    //    std::string name;
+    //    GLint size;
+    //};
 
     class Shader
     {
@@ -36,7 +45,7 @@ namespace rain
         void load(const char* _vShaderCode, const char* _fShaderCode);
         void reload();
         std::string readFile(const char* _path);
-    
+
         void use();
         void setParameter(const std::string &name, bool value) const;
         void setParameter(const std::string &name, int value) const;
@@ -49,15 +58,15 @@ namespace rain
         void setParameter(const std::string &name, const glm::fmat4 &matrix);
         //void setParameter(const std::string &name, CurrentTextureType);
 
-        std::vector<GLSLAttrib> GetGLSLAttributes();
-        std::vector<GLSLUniform> GetGLSLUniforms();
-
+        std::vector<GLSLVariable> GetGLSLVariables() const;
+        std::string static GLSLVariableTypeToString(GLSLVariableType value);
+        //std::vector<GLSLUniform> GetGLSLUniforms() const;
     private:
         void checkCompileErrors(unsigned int _shader, std::string _type);
 
         std::string m_vertexPath;
         std::string m_fragmentPath;
-        GLuint m_vertexShader, m_fragmentShader;
-
+        GLuint m_vertexShader;
+        GLuint m_fragmentShader;
     };
 }

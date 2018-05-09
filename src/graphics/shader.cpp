@@ -96,9 +96,9 @@ namespace rain
         glUseProgram(id);
     }
 
-    std::vector<GLSLAttrib> Shader::GetGLSLAttributes()
+    std::vector<GLSLVariable> Shader::GetGLSLVariables() const
     {
-        std::vector<GLSLAttrib> attribs;
+        std::vector<GLSLVariable> variables;
 
         GLint count;
         GLint size;
@@ -106,36 +106,37 @@ namespace rain
         const GLsizei bufSize = 16;
         GLchar name[16];
         GLsizei length;
-
+        
+        // retrieving attributes
         glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &count);
-
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
-            attribs.push_back(GLSLAttrib(type, name, size));
+            variables.push_back(GLSLVariable(GLSLVariableType::ATTRIBUTE, type, name, size));
         }
-        return attribs;
-    }
 
-    std::vector<GLSLUniform> Shader::GetGLSLUniforms()
-    {
-        std::vector<GLSLUniform> uniforms;
-
-        GLint count;
-        GLint size;
-        GLenum type;
-        const GLsizei bufSize = 16;
-        GLchar name[16];
-        GLsizei length;
-
+        // retrieving uniforms
         glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
-
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
-            uniforms.push_back(GLSLUniform(type, name, size));
+            variables.push_back(GLSLVariable(GLSLVariableType::UNIFORM, type, name, size));
         }
-        return uniforms;
+
+        return variables;
+    }
+
+    std::string Shader::GLSLVariableTypeToString(GLSLVariableType value)
+    {
+        switch (value)
+        {
+        case GLSLVariableType::ATTRIBUTE:
+            return "attribute";
+        case GLSLVariableType::UNIFORM:
+            return "uniform";
+        default:
+            return "unknown";
+        }
     }
 
     void Shader::setParameter(const std::string &_name, bool _value) const

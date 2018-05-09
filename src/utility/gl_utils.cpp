@@ -1,13 +1,10 @@
-#pragma once
+#include "gl_utils.h"
 
-#include "incl_3D.h"
-
-#include <string>
 
 namespace rain
 {
 
-    std::string GLTypeToString(GLenum _enum)
+    std::string GLUtils::GLTypeToString(GLenum _enum)
     {
         switch (_enum)
         {
