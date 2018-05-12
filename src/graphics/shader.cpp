@@ -103,8 +103,8 @@ namespace rain
         GLint count;
         GLint size;
         GLenum type;
-        const GLsizei bufSize = 16;
-        GLchar name[16];
+        const GLsizei bufSize = 32;
+        GLchar name[bufSize];
         GLsizei length;
         
         // retrieving attributes

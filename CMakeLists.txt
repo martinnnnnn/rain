@@ -41,7 +41,8 @@ include_directories(src/
                     external/glm/
                     external/glfw/include/
                     external/stb/
-                    external/json/)
+                    external/json/
+					external/imgui/)
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
@@ -49,10 +50,11 @@ add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 #### EXECUTABLE CREATION ####
 message(STATUS "> globing source files")
 file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.h" "src/*.hpp" "src/*.cpp")
-file(GLOB LIBS_SOURCES external/glad/src/glad.c)
+file(GLOB GLAD_SOURCES external/glad/src/glad.c)
+file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 
 message(STATUS "> adding files to exetutable")
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES} ${LIBS_SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
 
 #### GROUP CREATION ####
 macro(GroupSources curdir)

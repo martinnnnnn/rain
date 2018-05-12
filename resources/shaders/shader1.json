@@ -1,226 +1,344 @@
-[
-    {
-        "default_value": 0,
+{
+    "aNorm": {
         "glsl_type": "vec3",
         "name": "aNorm",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "attribute"
     },
-    {
-        "default_value": 0,
+    "aPos": {
         "glsl_type": "vec3",
         "name": "aPos",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "attribute"
     },
-    {
-        "default_value": 0,
+    "aTextureCoord": {
         "glsl_type": "vec2",
         "name": "aTextureCoord",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0
+        },
         "variable_type": "attribute"
     },
-    {
-        "default_value": 0,
+    "dirLight.ambient": {
         "glsl_type": "vec3",
-        "name": "dirLight.ambien",
+        "name": "dirLight.ambient",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "dirLight.diffuse": {
         "glsl_type": "vec3",
-        "name": "dirLight.diffus",
+        "name": "dirLight.diffuse",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "dirLight.direction": {
         "glsl_type": "vec3",
-        "name": "dirLight.direct",
+        "name": "dirLight.direction",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "dirLight.specular": {
         "glsl_type": "vec3",
-        "name": "dirLight.specul",
+        "name": "dirLight.specular",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "mat.diffuse": {
         "glsl_type": "sampler2D",
         "name": "mat.diffuse",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "mat.shininess": {
         "glsl_type": "float",
         "name": "mat.shininess",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "mat.specular": {
         "glsl_type": "sampler2D",
         "name": "mat.specular",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "model": {
         "glsl_type": "mat4",
         "name": "model",
         "size": 1,
+        "value": {
+            "00": 0.0,
+            "01": 0.0,
+            "02": 0.0,
+            "03": 0.0,
+            "10": 0.0,
+            "11": 0.0,
+            "12": 0.0,
+            "13": 0.0,
+            "20": 0.0,
+            "21": 0.0,
+            "22": 0.0,
+            "23": 0.0,
+            "30": 0.0,
+            "31": 0.0,
+            "32": 0.0,
+            "33": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.ambient": {
         "glsl_type": "vec3",
-        "name": "pointLight.ambi",
+        "name": "pointLight.ambient",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.constant": {
         "glsl_type": "float",
-        "name": "pointLight.cons",
+        "name": "pointLight.constant",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.diffuse": {
         "glsl_type": "vec3",
-        "name": "pointLight.diff",
+        "name": "pointLight.diffuse",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.linear": {
         "glsl_type": "float",
-        "name": "pointLight.line",
+        "name": "pointLight.linear",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.position": {
         "glsl_type": "vec3",
-        "name": "pointLight.posi",
+        "name": "pointLight.position",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.quadratic": {
         "glsl_type": "float",
-        "name": "pointLight.quad",
+        "name": "pointLight.quadratic",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "pointLight.specular": {
         "glsl_type": "vec3",
-        "name": "pointLight.spec",
+        "name": "pointLight.specular",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "proj": {
         "glsl_type": "mat4",
         "name": "proj",
         "size": 1,
+        "value": {
+            "00": 0.0,
+            "01": 0.0,
+            "02": 0.0,
+            "03": 0.0,
+            "10": 0.0,
+            "11": 0.0,
+            "12": 0.0,
+            "13": 0.0,
+            "20": 0.0,
+            "21": 0.0,
+            "22": 0.0,
+            "23": 0.0,
+            "30": 0.0,
+            "31": 0.0,
+            "32": 0.0,
+            "33": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "skybox": {
         "glsl_type": "samplerCube",
         "name": "skybox",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.ambient": {
         "glsl_type": "vec3",
-        "name": "spotLight.ambie",
+        "name": "spotLight.ambient",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.constant": {
         "glsl_type": "float",
-        "name": "spotLight.const",
+        "name": "spotLight.constant",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.cutOff": {
         "glsl_type": "float",
-        "name": "spotLight.cutOf",
+        "name": "spotLight.cutOff",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.diffuse": {
         "glsl_type": "vec3",
-        "name": "spotLight.diffu",
+        "name": "spotLight.diffuse",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.direction": {
         "glsl_type": "vec3",
-        "name": "spotLight.direc",
+        "name": "spotLight.direction",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.linear": {
         "glsl_type": "float",
-        "name": "spotLight.linea",
+        "name": "spotLight.linear",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.outerCutOff": {
         "glsl_type": "float",
-        "name": "spotLight.outer",
+        "name": "spotLight.outerCutOff",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.position": {
         "glsl_type": "vec3",
-        "name": "spotLight.posit",
+        "name": "spotLight.position",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.quadratic": {
         "glsl_type": "float",
-        "name": "spotLight.quadr",
+        "name": "spotLight.quadratic",
         "size": 1,
+        "value": 0,
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "spotLight.specular": {
         "glsl_type": "vec3",
-        "name": "spotLight.specu",
+        "name": "spotLight.specular",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "view": {
         "glsl_type": "mat4",
         "name": "view",
         "size": 1,
+        "value": {
+            "00": 0.0,
+            "01": 0.0,
+            "02": 0.0,
+            "03": 0.0,
+            "10": 0.0,
+            "11": 0.0,
+            "12": 0.0,
+            "13": 0.0,
+            "20": 0.0,
+            "21": 0.0,
+            "22": 0.0,
+            "23": 0.0,
+            "30": 0.0,
+            "31": 0.0,
+            "32": 0.0,
+            "33": 0.0
+        },
         "variable_type": "uniform"
     },
-    {
-        "default_value": 0,
+    "viewPos": {
         "glsl_type": "vec3",
         "name": "viewPos",
         "size": 1,
+        "value": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        },
         "variable_type": "uniform"
     }
-]
+}

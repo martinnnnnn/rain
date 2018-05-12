@@ -23,6 +23,7 @@ namespace rain
         GLenum glslType;
         std::string name;
         GLint size;
+
     };
 
     //struct GLSLUniform

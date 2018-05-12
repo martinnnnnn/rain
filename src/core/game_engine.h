@@ -43,6 +43,7 @@ namespace rain
 
     private:
         static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+		void initIMGUI();
 
     public:
         ~GameEngine() {}
