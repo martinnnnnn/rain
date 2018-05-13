@@ -16,7 +16,7 @@ namespace rain
     class CameraController;
     class Camera;
     class InputEngine;
-    
+	class FileSystem;
 
     class GameEngine
     {
@@ -37,6 +37,7 @@ namespace rain
         InputEngine* m_inputEngine;
         GLFWwindow* m_window;
         CameraController* m_cameraController;
+		FileSystem* m_fileSystem;
 
         float m_deltaTime;
         float m_screenWidth;

@@ -1,10 +1,36 @@
 #include "file_system.h"
 
 
-
+#include "imgui.h"
 
 namespace rain
 {
+
+	void PathNode::Print(std::string _tabs)
+	{
+		std::cout << _tabs << path << std::endl;
+		for (auto child : children)
+		{
+			child->Print(_tabs + "\t");
+		}
+	}
+
+	void PathNode::PrintToUI()
+	{
+		if (path.find(".") != std::string::npos)
+		{
+			ImGui::Text(path.c_str());
+		}
+		else if (ImGui::TreeNode(path.c_str()))
+		{
+			for (size_t i = 0; i < children.size(); ++i)
+			{
+				children[i]->PrintToUI();
+			}
+			ImGui::TreePop();
+		}
+	}
+
 	void FileSystem::Init(const std::string& _root)
 	{
 		m_rootNode = new PathNode();
@@ -25,7 +51,6 @@ namespace rain
 						path.push_back(p.filename().generic_string());
 						p = p.parent_path();
 					}
-					path.push_back(p.generic_string());
 
 					PathNode* node = m_rootNode;
 					for (int i = path.size() - 1; i >= 0; --i)
@@ -53,15 +78,10 @@ namespace rain
 				}
 			}
 		}
-		m_rootNode->Print("");
 	}
 
-	void PathNode::Print(std::string _tabs)
+	void FileSystem::PrintToUI()
 	{
-		std::cout << _tabs << path << std::endl;
-		for (auto child : children)
-		{
-			child->Print(_tabs+"\t");
-		}
+		m_rootNode->PrintToUI();
 	}
 }

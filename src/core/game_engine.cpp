@@ -44,8 +44,8 @@ namespace rain
         }
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 	
-		FileSystem fs;
-		fs.Init(m_resourcesRootPath);
+		m_fileSystem = new FileSystem();
+		m_fileSystem->Init(m_resourcesRootPath);
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -168,14 +168,17 @@ namespace rain
 			
 			if (ImGui::TreeNode("Resources : "))
 			{
-				for (int i = 0; i < 5; i++)
-					if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i))
-					{
-						ImGui::Text("blah blah");
-						ImGui::SameLine();
-						if (ImGui::SmallButton("button")) {};
-						ImGui::TreePop();
-					}
+				m_fileSystem->PrintToUI();
+				
+
+				//for (int i = 0; i < 5; i++)
+				//	if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i))
+				//	{
+				//		ImGui::Text("blah blah");
+				//		ImGui::SameLine();
+				//		if (ImGui::SmallButton("button")) {};
+				//		ImGui::TreePop();
+				//	}
 				ImGui::TreePop();
 			}
 

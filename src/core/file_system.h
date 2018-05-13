@@ -18,7 +18,7 @@ namespace rain
 		}
 
 		void Print(std::string _tabs);
-
+		void PrintToUI();
 
 		std::string path;
 		PathNode* father;
@@ -32,7 +32,7 @@ namespace rain
 	public:
 		FileSystem() : m_rootNode(nullptr) {}
 		void Init(const std::string& _root);
-		
+		void PrintToUI();
 	private:
 		PathNode* m_rootNode;
 	};
