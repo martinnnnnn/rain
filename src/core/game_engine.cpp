@@ -13,6 +13,7 @@ using namespace std::experimental::filesystem::v1;
 #include "camera_controller.h"
 #include "graphics/camera.h"
 #include "input/input_engine.h"
+#include "file_system.h"
 
 namespace rain
 {
@@ -42,15 +43,9 @@ namespace rain
             m_screenHeight = stof(_args["screen_height"]);
         }
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
-
-		for (auto& entry : recursive_directory_iterator(m_resourcesRootPath))
-		{
-			if (!is_directory(entry))
-			{
-				path p = path(entry);
-				std::cout << p << std::endl;
-			}
-		}
+	
+		FileSystem fs;
+		fs.Init(m_resourcesRootPath);
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

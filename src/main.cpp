@@ -617,7 +617,6 @@ GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _fo
     unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-		std::cout << path << " : " << nrChannels << std::endl;
         glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
