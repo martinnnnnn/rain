@@ -40,14 +40,19 @@ namespace rain
         GLuint id;
 
         Shader();
-        Shader(const char* _vertexPath, const char* _fragmentPath);
         void init(const std::string& _vertexPath, const std::string& _fragmentPath);
-
-        void load(const char* _vShaderCode, const char* _fShaderCode);
-        void reload();
-        std::string readFile(const char* _path);
-
         void use();
+        void Reload();
+
+		void Activate();
+
+		// use
+		//	bind texture
+		//	use shader
+		// set parameters ?
+
+
+
         void setParameter(const std::string &name, bool value) const;
         void setParameter(const std::string &name, int value) const;
         void setParameter(const std::string &name, float x) const;
@@ -63,6 +68,9 @@ namespace rain
         std::string static GLSLVariableTypeToString(GLSLVariableType value);
         //std::vector<GLSLUniform> GetGLSLUniforms() const;
     private:
+        void load(const char* _vShaderCode, const char* _fShaderCode);
+        std::string readFile(const char* _path);
+
         void checkCompileErrors(unsigned int _shader, std::string _type);
 
         std::string m_vertexPath;

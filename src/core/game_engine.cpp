@@ -2,6 +2,8 @@
 
 
 #include <iostream>
+#include <filesystem>
+using namespace std::experimental::filesystem::v1;
 
 #include "imgui.h"
 #include "imgui_impl_glfw_gl3.h"
@@ -41,12 +43,21 @@ namespace rain
         }
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 
+		for (auto& entry : recursive_directory_iterator(m_resourcesRootPath))
+		{
+			if (!is_directory(entry))
+			{
+				path p = path(entry);
+				std::cout << p << std::endl;
+			}
+		}
+
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create windowed full screen or lol like client
+        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
         m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
         if (m_window == NULL)
@@ -79,14 +90,13 @@ namespace rain
         glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
         glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
 
-        //glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
 
         m_inputEngine = new InputEngine(m_window);
         m_cameraController = new CameraController();
         m_cameraController->Init(m_inputEngine);
 
-		initIMGUI();
+		initUI();
         return 0;
     }
 
@@ -97,50 +107,14 @@ namespace rain
 
     void GameEngine::Run()
     {
-		bool show_demo_window = true;
-		bool show_another_window = false;
-		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		show_demo_window = true;
+		show_another_window = false;
+		clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
         while (!glfwWindowShouldClose(m_window))
         {
-			ImGui_ImplGlfwGL3_NewFrame();
-
-			// 1. Show a simple window.
-			// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
-			{
-				static float f = 0.0f;
-				static int counter = 0;
-				ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-				ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-				ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-				ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
-				ImGui::Checkbox("Another Window", &show_another_window);
-
-				if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-					counter++;
-				ImGui::SameLine();
-				ImGui::Text("counter = %d", counter);
-
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			}
-
-			// 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
-			if (show_another_window)
-			{
-				ImGui::Begin("Another Window", &show_another_window);
-				ImGui::Text("Hello from another window!");
-				if (ImGui::Button("Close Me"))
-					show_another_window = false;
-				ImGui::End();
-			}
-
-			// 3. Show the ImGui demo window. Most of the sample code is in ImGui::ShowDemoWindow(). Read its code to learn more about Dear ImGui!
-			if (show_demo_window)
-			{
-				ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-				ImGui::ShowDemoWindow(&show_demo_window);
-			}
+			updateUI();
+			
 
             // inputs relative to window
             if (m_inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
@@ -157,8 +131,16 @@ namespace rain
             m_inputEngine->Tick();
 
             // objects
-            m_cameraController->Tick();
-            GetCamera()->Tick();
+			if (Rain::Input()->IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
+			{
+				glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				m_cameraController->Tick();
+				GetCamera()->Tick();
+			}
+			else
+			{
+				glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			}
 
             glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glEnable(GL_STENCIL_TEST);
@@ -177,6 +159,51 @@ namespace rain
 
         glfwTerminate();
     }
+
+	void GameEngine::updateUI()
+	{
+		ImGui_ImplGlfwGL3_NewFrame();
+
+		// 1. Show a simple window.
+		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets automatically appears in a window called "Debug".
+		{
+			ImGui::SetNextWindowSize(ImVec2(400, 500), ImGuiCond_Always);
+			ImGui::Begin("Debug");
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			
+			if (ImGui::TreeNode("Resources : "))
+			{
+				for (int i = 0; i < 5; i++)
+					if (ImGui::TreeNode((void*)(intptr_t)i, "Child %d", i))
+					{
+						ImGui::Text("blah blah");
+						ImGui::SameLine();
+						if (ImGui::SmallButton("button")) {};
+						ImGui::TreePop();
+					}
+				ImGui::TreePop();
+			}
+
+			ImGui::End();
+		}
+
+		// 2. Show another simple window. In most cases you will use an explicit Begin/End pair to name your windows.
+		if (show_another_window)
+		{
+			ImGui::Begin("Another Window", &show_another_window);
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close Me"))
+				show_another_window = false;
+			ImGui::End();
+		}
+
+		// 3. Show the ImGui demo window. Most of the sample code is in ImGui::ShowDemoWindow(). Read its code to learn more about Dear ImGui!
+		if (show_demo_window)
+		{
+			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+			ImGui::ShowDemoWindow(&show_demo_window);
+		}
+	}
 
     GLFWwindow* GameEngine::Getwindow()
     {
@@ -219,7 +246,7 @@ namespace rain
 
     }
 
-	void GameEngine::initIMGUI()
+	void GameEngine::initUI()
 	{
 
 		IMGUI_CHECKVERSION();

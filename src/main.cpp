@@ -8,8 +8,7 @@
 #include <unordered_map>
 
 #include "utility/incl_3d.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+
 #include <nlohmann/json.hpp>
 
 #include "rain.h"
@@ -22,6 +21,8 @@
 #include "graphics/light.h"
 #include "utility/gl_utils.h"
 #include "graphics/material.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 using namespace rain;
 
@@ -60,9 +61,6 @@ using namespace nlohmann;
 
 int main(int argc, char** argv)
 {
-
-
-
     int retval = Rain::Init(Rain::GetArguments(argc, argv));
     if (retval != 0)
     {
@@ -392,15 +390,15 @@ void sandboxInit()
 
 void loadShaders()
 {
-    skyboxShader.reload();
+    skyboxShader.Reload();
     skyboxShader.use();
     skyboxShader.setParameter("skybox", 0);
 
-    screenquadShader.reload();
+    screenquadShader.Reload();
     screenquadShader.use();
     screenquadShader.setParameter("screenTexture", 0);
 
-    shaderProgram.reload();
+    shaderProgram.Reload();
     shaderProgram.use();
     //std::vector<GLSLAttrib> attribs = shaderProgram.GetGLSLAttributes();
     //for (size_t i = 0; i < attribs.size(); ++i)
@@ -447,11 +445,11 @@ void loadShaders()
     // env mapping
     shaderProgram.setParameter("skybox", 3);
 
-    lightshaderProgramRed.reload();
-    lightshaderProgramBlue.reload();
-    lightshaderProgramYellow.reload();
+    lightshaderProgramRed.Reload();
+    lightshaderProgramBlue.Reload();
+    lightshaderProgramYellow.Reload();
 
-    outlineShaderProgram.reload();
+    outlineShaderProgram.Reload();
 }
 
 void sandboxUpdate()
@@ -619,6 +617,7 @@ GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _fo
     unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
+		std::cout << path << " : " << nrChannels << std::endl;
         glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }

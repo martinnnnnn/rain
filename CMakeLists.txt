@@ -56,9 +56,9 @@ file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 message(STATUS "> adding files to exetutable")
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
 
+
 #### GROUP CREATION ####
 macro(GroupSources curdir)
-    message(STATUS ">> globing children")
     file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
     ${PROJECT_SOURCE_DIR}/${curdir}/*)
 
@@ -69,7 +69,7 @@ macro(GroupSources curdir)
         else()
             string(REPLACE "/" "\\" groupname ${curdir})
             string(REPLACE "src" "src" groupname ${groupname})
-            message(STATUS ">>> creating source groupe : ${groupname}")
+			message(STATUS ">>> creating source groupe : ${groupname}")
             source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
 
         endif()

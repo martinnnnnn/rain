@@ -22,21 +22,16 @@ namespace rain
         m_vertexPath = _vertexPath;
         m_fragmentPath = _fragmentPath;
 
-        std::string s1 = readFile(m_vertexPath.c_str());
-        std::string s2 = readFile(m_fragmentPath.c_str());
-        const char* vShaderCode = s1.c_str();
-        const char* fShaderCode = s2.c_str();
-
         id = glCreateProgram();
         m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
         m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-        load(vShaderCode, fShaderCode);
-    }
+		std::string s1 = readFile(m_vertexPath.c_str());
+		std::string s2 = readFile(m_fragmentPath.c_str());
 
-    Shader::Shader(const char* _vertexPath, const char* _fragmentPath)
-    {
-        init(_vertexPath, _fragmentPath);
+        const char* vShaderCode = s1.c_str();
+        const char* fShaderCode = s2.c_str();
+        load(vShaderCode, fShaderCode);
     }
 
     std::string Shader::readFile(const char* _path)
@@ -62,7 +57,7 @@ namespace rain
         return fileContent;
     }
 
-    void Shader::reload()
+    void Shader::Reload()
     {
         std::string s1 = readFile(m_vertexPath.c_str());
         std::string s2 = readFile(m_fragmentPath.c_str());

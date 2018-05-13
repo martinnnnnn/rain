@@ -5,6 +5,10 @@
 #include <unordered_map>
 #include <string>
 #include <functional>
+
+#include "imgui.h"
+
+
 struct GLFWwindow;
 
 namespace rain
@@ -41,9 +45,14 @@ namespace rain
         float m_lastFrame;
         std::function<void(void)> m_updateCallback;
 
+		bool show_demo_window;
+		bool show_another_window;
+		ImVec4 clear_color;
     private:
         static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-		void initIMGUI();
+		void initUI();
+		void updateUI();
+		
 
     public:
         ~GameEngine() {}
