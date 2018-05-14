@@ -6,12 +6,12 @@
 namespace rain
 {
 
-	void PathNode::Print(std::string _tabs)
+	void PathNode::PrintToConsole(std::string _tabs)
 	{
 		std::cout << _tabs << path << std::endl;
-		for (auto child : children)
+        for (size_t i = 0; i < children.size(); ++i)
 		{
-			child->Print(_tabs + "\t");
+			children[i]->PrintToConsole(_tabs + "\t");
 		}
 	}
 

@@ -5,11 +5,13 @@
 #include <vector>
 
 #include "shader.h"
+#include "core/component.h"
 
 namespace rain
 {
-    
-    class Material
+    class Texture;
+
+    class Material : public Component
     {
     public:
         Material() {}

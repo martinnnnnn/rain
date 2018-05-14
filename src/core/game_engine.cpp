@@ -30,17 +30,17 @@ namespace rain
         m_screenWidth = 800;
         m_screenHeight = 600;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
-        if (_args["resources_path"] != "")
+        if (_args["root"] != "")
         {
-            m_resourcesRootPath = _args["resources_path"];
+            m_resourcesRootPath = _args["root"];
         }
-        if (_args["screen_width"] != "")
+        if (_args["s_width"] != "")
         {
-            m_screenWidth = stof(_args["screen_width"]);
+            m_screenWidth = stof(_args["s_width"]);
         }
-        if (_args["screen_height"] != "")
+        if (_args["s_height"] != "")
         {
-            m_screenHeight = stof(_args["screen_height"]);
+            m_screenHeight = stof(_args["s_height"]);
         }
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 	
