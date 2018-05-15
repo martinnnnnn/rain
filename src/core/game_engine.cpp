@@ -27,8 +27,8 @@ namespace rain
 
     int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
-        m_screenWidth = 800;
-        m_screenHeight = 600;
+        m_screenWidth = 1720;
+        m_screenHeight = 1080;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
         if (_args["root"] != "")
         {
