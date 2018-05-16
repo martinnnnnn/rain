@@ -6,6 +6,7 @@
 #include <string>
 
 #include "utility/incl_3d.h"
+#include "graphics/texture.h"
 
 namespace rain
 {
@@ -18,20 +19,21 @@ namespace rain
 		glm::vec2 textCoords;
 	};
 
-	struct texture
-	{
-		GLuint id;
-		std::string type;
-	};
+	//struct texture
+	//{
+	//	GLuint id;
+	//	std::string type;
+ //       std::string path;
+	//};
 
 	class Mesh
 	{
 	public:
 		std::vector<vertex> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<texture> textures;
+		std::vector<Texture> textures;
 
-		Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<texture> _textures);
+		Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture> _textures);
 		void Draw(Shader* _shader);
 
 

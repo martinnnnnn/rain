@@ -18,7 +18,7 @@ namespace rain
         Material(const std::string& _shaderPath, bool _createDefaultIfMissing = true);
 
         int Init(const std::string& _shaderPath, bool _createDefaultIfMissing = true);
-
+        
 
 		// holds shader, textures
 

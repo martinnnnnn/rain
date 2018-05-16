@@ -6,7 +6,7 @@
 
 namespace rain
 {
-	Mesh::Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<texture> _textures)
+	Mesh::Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture> _textures)
 	{
 		vertices = _vertices;
 		indices = _indices;
@@ -41,11 +41,9 @@ namespace rain
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
 
-		// TODO
 		for (unsigned int i = 0; i < textures.size(); i++)
 		{
-			glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-											  // retrieve texture number (the N in diffuse_textureN)
+			glActiveTexture(GL_TEXTURE0 + i);
 			std::string number;
 			std::string name = textures[i].type;
 			if (name == "texture_diffuse")
