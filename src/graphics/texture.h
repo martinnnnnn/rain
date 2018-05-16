@@ -20,6 +20,7 @@ namespace rain
 
 	public:
 		GLuint id;
+        std::string type;
 	protected:
 		GLint m_format;
 	};

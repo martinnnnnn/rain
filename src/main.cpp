@@ -417,26 +417,30 @@ void loadShaders()
     //}
 
     //directional light
-    shaderProgram.setParameter("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    shaderProgram.setParameter("dirLight.ambient", 0.5f, 0.5f, 0.5f);
-    shaderProgram.setParameter("dirLight.diffuse", 0.1f, 0.1f, 0.1f);
-    shaderProgram.setParameter("dirLight.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("light1.type", 0);
+    shaderProgram.setParameter("light1.direction", -0.2f, -1.0f, -0.3f);
+    shaderProgram.setParameter("light1.ambient", 0.5f, 0.5f, 0.5f);
+    shaderProgram.setParameter("light1.diffuse", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("light1.specular", 1.0f, 1.0f, 1.0f);
     // point light
-    shaderProgram.setParameter("pointLight.ambient", 0.1f, 0.1f, 0.1f);
-    shaderProgram.setParameter("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
-    shaderProgram.setParameter("pointLight.specular", 1.0f, 1.0f, 1.0f);
-    shaderProgram.setParameter("pointLight.constant", 1.0f);
-    shaderProgram.setParameter("pointLight.linear", 0.09f);
-    shaderProgram.setParameter("pointLight.quadratic", 0.032f);
+
+    shaderProgram.setParameter("light2.type", 1);
+    shaderProgram.setParameter("light2.ambient", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("light2.diffuse", 0.8f, 0.8f, 0.8f);
+    shaderProgram.setParameter("light2.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("light2.constant", 1.0f);
+    shaderProgram.setParameter("light2.linear", 0.09f);
+    shaderProgram.setParameter("light2.quadratic", 0.032f);
     // spot light
-    shaderProgram.setParameter("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-    shaderProgram.setParameter("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
-    shaderProgram.setParameter("spotLight.ambient", 0.1f, 0.1f, 0.1f);
-    shaderProgram.setParameter("spotLight.diffuse", 0.8f, 0.8f, 0.8f);
-    shaderProgram.setParameter("spotLight.specular", 1.0f, 1.0f, 1.0f);
-    shaderProgram.setParameter("spotLight.constant", 1.0f);
-    shaderProgram.setParameter("spotLight.linear", 0.09f);
-    shaderProgram.setParameter("spotLight.quadratic", 0.032f);
+    shaderProgram.setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
+    shaderProgram.setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
+    shaderProgram.setParameter("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
+    shaderProgram.setParameter("light3.ambient", 0.1f, 0.1f, 0.1f);
+    shaderProgram.setParameter("light3.diffuse", 0.8f, 0.8f, 0.8f);
+    shaderProgram.setParameter("light3.specular", 1.0f, 1.0f, 1.0f);
+    shaderProgram.setParameter("light3.constant", 1.0f);
+    shaderProgram.setParameter("light3.linear", 0.09f);
+    shaderProgram.setParameter("light3.quadratic", 0.032f);
     // material
     shaderProgram.setParameter("mat.diffuse", 0);
     shaderProgram.setParameter("mat.specular", 1);
