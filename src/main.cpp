@@ -382,7 +382,7 @@ void sandboxInit()
 	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
 
     Material test;
-    test.Init(rootpath + "/shaders/shader1");
+    test.Init(rootpath + "/shaders/shader1", false);
 
 }
 

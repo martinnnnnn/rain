@@ -23,16 +23,16 @@ namespace rain
         GLenum glslType;
         std::string name;
         GLint size;
-
+		union Value
+		{
+			int m_int;
+			float m_float;
+			glm::vec2 m_vec2;
+			glm::vec3 m_vec3;
+			glm::mat4 m_mat4;
+		};
+		Value value;
     };
-
-    //struct GLSLUniform
-    //{
-    //    GLSLUniform(GLenum _type, char* _name, GLint _size) : type(_type), name(_name), size(_size) {}
-    //    GLenum type;
-    //    std::string name;
-    //    GLint size;
-    //};
 
     class Shader
     {
@@ -45,13 +45,6 @@ namespace rain
         void Reload();
 
 		void Activate();
-
-		// use
-		//	bind texture
-		//	use shader
-		// set parameters ?
-
-
 
         void setParameter(const std::string &name, bool value) const;
         void setParameter(const std::string &name, int value) const;

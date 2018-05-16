@@ -15,9 +15,9 @@ namespace rain
     {
     public:
         Material() {}
-        Material(const std::string& _shaderPath, bool _createDefaultIfMissing = true);
+        Material(const std::string& _shaderPath, bool _eraseDefault = true);
 
-        int Init(const std::string& _shaderPath, bool _createDefaultIfMissing = true);
+        void Init(const std::string& _shaderPath, bool _eraseDefault = true);
         
 
 		// holds shader, textures
@@ -26,8 +26,9 @@ namespace rain
 		//	bind texture
 		//	use shader
 		// set parameters ?
-
-
+	private:
+		void writeShaderDefaultValueFile(const std::string& _datafilePath);
+		void readShaderDefaultValueFile(const std::string& _data);
 
     private:
         Shader * m_shader;

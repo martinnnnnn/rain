@@ -8,9 +8,9 @@
 namespace fs = std::experimental::filesystem::v1;
 namespace rain
 {
-	struct PathNode
+	struct pathNode
 	{
-		PathNode() :
+		pathNode() :
 			path(""),
 			father(nullptr)
 		{
@@ -21,8 +21,8 @@ namespace rain
 		void PrintToUI();
 
 		std::string path;
-		PathNode* father;
-		std::vector<PathNode*> children;
+		pathNode* father;
+		std::vector<pathNode*> children;
 	};
 
     class FileSystem
@@ -32,7 +32,7 @@ namespace rain
         void Init(const std::string& _root);
         void PrintToUI();
     private:
-        PathNode * m_rootNode;
+        pathNode * m_rootNode;
     };
 
 

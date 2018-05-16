@@ -31,9 +31,9 @@
 //	public:
 //		std::vector<vertex> vertices;
 //		std::vector<unsigned int> indices;
-//		std::vector<Texture> textures;
+//		std::vector<Texture2D> textures;
 //
-//		Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture> _textures);
+//		Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture2D> _textures);
 //		void Draw(Shader* _shader);
 //
 //
