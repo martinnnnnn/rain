@@ -1,357 +1,278 @@
-{
-    "aNorm": {
+[
+    {
         "glsl_type": "vec3",
         "name": "aNorm",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "attribute"
+        }
     },
-    "aPos": {
+    {
         "glsl_type": "vec3",
         "name": "aPos",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "attribute"
+        }
     },
-    "aTextureCoord": {
+    {
         "glsl_type": "vec2",
         "name": "aTextureCoord",
-        "size": 1,
         "value": {
-            "x": 4.0,
-            "y": 10.0
-        },
-        "variable_type": "attribute"
+            "x": 0.0,
+            "y": 0.0
+        }
     },
-    "light1.ambient": {
+    {
         "glsl_type": "vec3",
         "name": "light1.ambient",
-        "size": 1,
         "value": {
-            "x": 3.0,
-            "y": 5.0,
+            "x": 0.0,
+            "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light1.constant": {
+    {
         "glsl_type": "float",
         "name": "light1.constant",
-        "size": 1,
-        "value": 149814948,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light1.cutOff": {
+    {
         "glsl_type": "float",
         "name": "light1.cutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light1.diffuse": {
+    {
         "glsl_type": "vec3",
         "name": "light1.diffuse",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light1.direction": {
+    {
         "glsl_type": "vec3",
         "name": "light1.direction",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light1.linear": {
+    {
         "glsl_type": "float",
         "name": "light1.linear",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light1.outerCutOff": {
+    {
         "glsl_type": "float",
         "name": "light1.outerCutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light1.position": {
+    {
         "glsl_type": "vec3",
         "name": "light1.position",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light1.quadratic": {
+    {
         "glsl_type": "float",
         "name": "light1.quadratic",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light1.specular": {
+    {
         "glsl_type": "vec3",
         "name": "light1.specular",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light1.type": {
+    {
         "glsl_type": "int",
         "name": "light1.type",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.ambient": {
+    {
         "glsl_type": "vec3",
         "name": "light2.ambient",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light2.constant": {
+    {
         "glsl_type": "float",
         "name": "light2.constant",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.cutOff": {
+    {
         "glsl_type": "float",
         "name": "light2.cutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.diffuse": {
+    {
         "glsl_type": "vec3",
         "name": "light2.diffuse",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light2.direction": {
+    {
         "glsl_type": "vec3",
         "name": "light2.direction",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light2.linear": {
+    {
         "glsl_type": "float",
         "name": "light2.linear",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.outerCutOff": {
+    {
         "glsl_type": "float",
         "name": "light2.outerCutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.position": {
+    {
         "glsl_type": "vec3",
         "name": "light2.position",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light2.quadratic": {
+    {
         "glsl_type": "float",
         "name": "light2.quadratic",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light2.specular": {
+    {
         "glsl_type": "vec3",
         "name": "light2.specular",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light2.type": {
+    {
         "glsl_type": "int",
         "name": "light2.type",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.ambient": {
+    {
         "glsl_type": "vec3",
         "name": "light3.ambient",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light3.constant": {
+    {
         "glsl_type": "float",
         "name": "light3.constant",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.cutOff": {
+    {
         "glsl_type": "float",
         "name": "light3.cutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.diffuse": {
+    {
         "glsl_type": "vec3",
         "name": "light3.diffuse",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light3.direction": {
+    {
         "glsl_type": "vec3",
         "name": "light3.direction",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light3.linear": {
+    {
         "glsl_type": "float",
         "name": "light3.linear",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.outerCutOff": {
+    {
         "glsl_type": "float",
         "name": "light3.outerCutOff",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.position": {
+    {
         "glsl_type": "vec3",
         "name": "light3.position",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light3.quadratic": {
+    {
         "glsl_type": "float",
         "name": "light3.quadratic",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "light3.specular": {
+    {
         "glsl_type": "vec3",
         "name": "light3.specular",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     },
-    "light3.type": {
+    {
         "glsl_type": "int",
         "name": "light3.type",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "mat.diffuse": {
+    {
         "glsl_type": "sampler2D",
         "name": "mat.diffuse",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "mat.shininess": {
+    {
         "glsl_type": "float",
         "name": "mat.shininess",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "mat.specular": {
+    {
         "glsl_type": "sampler2D",
         "name": "mat.specular",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "model": {
+    {
         "glsl_type": "mat4",
         "name": "model",
-        "size": 1,
         "value": [
-            14.0,
             0.0,
-            12415.0,
-            984.1409,
+            0.0,
+            0.0,
+            0.0,
             0.0,
             0.0,
             0.0,
@@ -364,13 +285,11 @@
             0.0,
             0.0,
             0.0
-        ],
-        "variable_type": "uniform"
+        ]
     },
-    "proj": {
+    {
         "glsl_type": "mat4",
         "name": "proj",
-        "size": 1,
         "value": [
             0.0,
             0.0,
@@ -388,20 +307,16 @@
             0.0,
             0.0,
             0.0
-        ],
-        "variable_type": "uniform"
+        ]
     },
-    "skybox": {
+    {
         "glsl_type": "samplerCube",
         "name": "skybox",
-        "size": 1,
-        "value": 0,
-        "variable_type": "uniform"
+        "value": 0
     },
-    "view": {
+    {
         "glsl_type": "mat4",
         "name": "view",
-        "size": 1,
         "value": [
             0.0,
             0.0,
@@ -419,18 +334,15 @@
             0.0,
             0.0,
             0.0
-        ],
-        "variable_type": "uniform"
+        ]
     },
-    "viewPos": {
+    {
         "glsl_type": "vec3",
         "name": "viewPos",
-        "size": 1,
         "value": {
             "x": 0.0,
             "y": 0.0,
             "z": 0.0
-        },
-        "variable_type": "uniform"
+        }
     }
-}
+]

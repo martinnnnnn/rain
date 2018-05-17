@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "shader.h"
 #include "core/component.h"
@@ -28,7 +29,7 @@ namespace rain
 		// set parameters ?
 	private:
 		void writeShaderDefaultValueFile(const std::string& _datafilePath);
-		void readShaderDefaultValueFile(const std::string& _data);
+		void readShaderDefaultValueFile(std::ifstream& _inputFile);
 
     private:
         Shader * m_shader;
