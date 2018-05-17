@@ -1943,15 +1943,15 @@ class basic_json
     @since version 1.0.0; indentation character @a indent_char, option
            @a ensure_ascii and exceptions added in version 3.0.0
     */
-    string_t dump(const int indent = -1, const char indent_char = ' ',
-                  const bool ensure_ascii = false) const
+    string_t dump(const int indent = -1, const bool indent_exclude_array = false,
+                    const char indent_char = ' ', const bool ensure_ascii = false) const
     {
         string_t result;
         serializer s(detail::output_adapter<char, string_t>(result), indent_char);
 
         if (indent >= 0)
         {
-            s.dump(*this, true, ensure_ascii, static_cast<unsigned int>(indent));
+            s.dump(*this, true, ensure_ascii, static_cast<unsigned int>(indent), 0, indent_exclude_array);
         }
         else
         {

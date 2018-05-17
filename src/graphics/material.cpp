@@ -40,34 +40,16 @@ namespace rain
 
 		if (file.fail())
 		{
-			// file cannot be open : has to be created
-			std::cout << "creating file" << std::endl;
 			writeShaderDefaultValueFile(datapath);
 		}
 		else
 		{
 			if (_eraseDefault)
 			{
-				std::cout << "erasing default" << std::endl;
 				writeShaderDefaultValueFile(datapath);
 			}
 			else
 			{
-				std::cout << "reading" << std::endl;
-				//std::stringstream stream;
-				//stream << file.rdbuf();
-				//std::string fileAsString = stream.str();
-
-				//nlohmann::json variables;
-				//file >> variables;
-				//
-				//file.close();
-
-
-				//std::ofstream outfile(Rain::ResourcesRoot() + "sdlfkj.json");
-				//outfile << variables.dump(4);
-				//outfile.close();
-
 				readShaderDefaultValueFile(file);
 			}
 		}
@@ -111,15 +93,10 @@ namespace rain
 				    break;
 			    }
 			    variables[m_shaderVariables[i].name] = json;
-
-			    //json["name"] = m_shaderVariables[i].name;
-			    //json["variable_type"] = Shader::GLSLVariableTypeToString(m_shaderVariables[i].variableType);
-			    //json["size"] = m_shaderVariables[i].size;
-                //variables += json;
             }
 		}
 
-		outfile << std::setw(4) << variables;
+		outfile << variables.dump(4, true);
 		outfile.close();
 	}
 
@@ -127,9 +104,6 @@ namespace rain
 	{
         nlohmann::json variables;
         _inputFile >> variables;
-		//std::ofstream outfile(Rain::ResourcesRoot() + "/sdlfkj.json");
-		//outfile << variables.dump(4);
-		//outfile.close();
 
         for (size_t i = 0; i < m_shaderVariables.size(); ++i)
         {
@@ -169,25 +143,25 @@ namespace rain
                 switch (m_shaderVariables[i].glslType)
                 {
                 case GL_FLOAT:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_float:" << m_shaderVariables[i].value.m_float << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_float:" << m_shaderVariables[i].value.m_float << std::endl;
                     break;
                 case GL_FLOAT_VEC2:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_vec2:(" << m_shaderVariables[i].value.m_vec2.x << "," << m_shaderVariables[i].value.m_vec2.y << ")" << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_vec2:(" << m_shaderVariables[i].value.m_vec2.x << "," << m_shaderVariables[i].value.m_vec2.y << ")" << std::endl;
                     break;
                 case GL_FLOAT_VEC3:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_vec3:(" << m_shaderVariables[i].value.m_vec3.x << "," << m_shaderVariables[i].value.m_vec3.y << "," << m_shaderVariables[i].value.m_vec3.z << ")" << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_vec3:(" << m_shaderVariables[i].value.m_vec3.x << "," << m_shaderVariables[i].value.m_vec3.y << "," << m_shaderVariables[i].value.m_vec3.z << ")" << std::endl;
                     break;
                 case GL_FLOAT_MAT4:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_mat4:" << m_shaderVariables[i].value.m_mat4[0][0] << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_mat4:" << m_shaderVariables[i].value.m_mat4[0][0] << std::endl;
                     break;
                 case GL_SAMPLER_2D:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_int:" << m_shaderVariables[i].value.m_int << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_int:" << m_shaderVariables[i].value.m_int << std::endl;
                     break;
                 case GL_SAMPLER_CUBE:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_int:" << m_shaderVariables[i].value.m_int << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_int:" << m_shaderVariables[i].value.m_int << std::endl;
                     break;
                 default:
-                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "->" << "m_int:" << m_shaderVariables[i].value.m_int << std::endl;
+                    std::cout << std::setw(20) << std::left << m_shaderVariables[i].name << "-> m_int:" << m_shaderVariables[i].value.m_int << std::endl;
                     break;
                 }
             }

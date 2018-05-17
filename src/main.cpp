@@ -61,6 +61,12 @@ using namespace nlohmann;
 
 int main(int argc, char** argv)
 {
+    nlohmann::json j2 = {
+        { "list",{ 1, 0, 2 } },
+        { "currency", "USD" }
+    };
+
+    std::cout << j2.dump(4, true);
     int retval = Rain::Init(Rain::GetArguments(argc, argv));
     if (retval != 0)
     {
@@ -382,7 +388,7 @@ void sandboxInit()
 	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
 
     Material test;
-    test.Init(rootpath + "/shaders/shader1", false);
+    test.Init(rootpath + "/shaders/shader1", true);
 
 }
 
