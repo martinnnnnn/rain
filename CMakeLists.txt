@@ -42,8 +42,8 @@ include_directories(src/
                     external/glfw/include/
                     external/stb/
                     external/json/
-					external/imgui/)
-message(STATUS "HELLO ${ASSIMP_INCLUDE_INSTALL_DIR}")
+                    external/imgui/)
+
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 

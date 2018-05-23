@@ -4,9 +4,10 @@
 
 namespace rain
 {
-	int Texture2D::Load(const std::string& _path, bool _flipVertically)
+	int Texture2D::Load(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
 		m_path = _path;
+        m_type = _type;
 
 		glGenTextures(1, &id);
 		glBindTexture(GL_TEXTURE_2D, id);

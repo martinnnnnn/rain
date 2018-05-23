@@ -11,6 +11,23 @@
 
 namespace rain
 {
+    enum class Texture2DType
+    {
+        NONE = 0x0,
+        DIFFUSE = 0x1,
+        SPECULAR = 0x2,
+        AMBIENT = 0x3,
+        EMISSIVE = 0x4,
+        HEIGHT = 0x5,
+        NORMALS = 0x6,
+        SHININESS = 0x7,
+        OPACITY = 0x8,
+        DISPLACEMENT = 0x9,
+        LIGHTMAP = 0xA,
+        REFLECTION = 0xB,
+        UNKNOWN = 0xC,
+    };
+
 	class Texture
 	{
 	public:
@@ -30,11 +47,12 @@ namespace rain
 	public:
 		Texture2D() : Texture() {}
 
-		int Load(const std::string& _path, bool _flipVertically = false);
+		int Load(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
 		void Bind() override;
 
 	private: 
 		std::string m_path;
+        Texture2DType m_type;
 	};
 
 	
