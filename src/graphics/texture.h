@@ -5,12 +5,16 @@
 #include <vector>
 
 #include "utility/incl_3d.h"
-//#include "utility/img_utils.h"
 #include <stb_image.h>
 
 
 namespace rain
 {
+    namespace TextureUtils
+    {
+        GLint ChannelCountToFormat(int _channelCount);
+    }
+
     enum class Texture2DType
     {
         NONE = 0x0,
@@ -66,25 +70,4 @@ namespace rain
 	private:
 		std::vector<std::string> m_paths;
 	};
-
-
-	namespace TextureUtils
-	{
-		GLint ChannelCountToFormat(int _channelCount)
-		{
-			switch (_channelCount)
-			{
-			case 1:
-				return GL_RED;
-			case 2:
-				return GL_RG;
-			case 3:
-				return GL_RGB;
-			case 4:
-				return GL_RGBA;
-			default:
-				return GL_RGBA;
-			}
-		}
-	}
 }

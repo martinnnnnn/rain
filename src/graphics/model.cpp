@@ -121,7 +121,7 @@ namespace rain
 
     std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
     {
-        //std::vector<Texture2D> textures;
+        std::vector<Texture2D> textures;
         //for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
         //{
         //    aiString str;
@@ -132,6 +132,6 @@ namespace rain
         //    tex.path = str.C_Str();
         //    textures.push_back(tex);
         //}
-        //return textures;
+        return textures;
     }
 }

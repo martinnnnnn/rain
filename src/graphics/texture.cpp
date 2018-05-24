@@ -4,6 +4,26 @@
 
 namespace rain
 {
+    namespace TextureUtils
+    {
+        GLint ChannelCountToFormat(int _channelCount)
+        {
+            switch (_channelCount)
+            {
+            case 1:
+                return GL_RED;
+            case 2:
+                return GL_RG;
+            case 3:
+                return GL_RGB;
+            case 4:
+                return GL_RGBA;
+            default:
+                return GL_RGBA;
+            }
+        }
+    }
+
 	int Texture2D::Load(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
 		m_path = _path;
