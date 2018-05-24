@@ -5,8 +5,23 @@
 
 namespace rain
 {
+    namespace File
+    {
+        std::string GetDirectory(const std::string& _path)
+        {
+            fs::path p = fs::path(_path);
+            if (p.has_parent_path())
+            {
+                return p.parent_path().generic_string() + "/";
+            }
+            else
+            {
+                return "";
+            }
+        }
+    }
 
-	void pathNode::PrintToConsole(std::string _tabs)
+	void PathNode::PrintToConsole(std::string _tabs)
 	{
 		std::cout << _tabs << path << std::endl;
         for (size_t i = 0; i < children.size(); ++i)
@@ -15,7 +30,7 @@ namespace rain
 		}
 	}
 
-	void pathNode::PrintToUI()
+	void PathNode::PrintToUI()
 	{
 		if (path.find(".") != std::string::npos)
 		{
@@ -33,7 +48,7 @@ namespace rain
 
 	void FileSystem::Init(const std::string& _root)
 	{
-		m_rootNode = new pathNode();
+		m_rootNode = new PathNode();
 		m_rootNode->path = _root;
 		m_rootNode->father = nullptr;
 
@@ -52,7 +67,7 @@ namespace rain
 						p = p.parent_path();
 					}
 
-					pathNode* node = m_rootNode;
+					PathNode* node = m_rootNode;
 					for (int i = path.size() - 1; i >= 0; --i)
 					{
 						bool nodeFound = false;
@@ -67,7 +82,7 @@ namespace rain
 						}
 						if (!nodeFound)
 						{
-							pathNode* newNode = new pathNode();
+							PathNode* newNode = new PathNode();
 							newNode->path = path[i];
 							newNode->father = node;
 							node->children.push_back(newNode);

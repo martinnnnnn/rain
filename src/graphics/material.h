@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 
 #include "shader.h"
 #include "core/component.h"
@@ -32,8 +33,10 @@ namespace rain
 		void readShaderDefaultValueFile(std::ifstream& _inputFile);
 
     private:
-        Shader * m_shader;
+        Shader* m_shader;
         std::string m_shaderPath;
-        std::vector<GLSL::Variable> m_shaderVariables;
+        std::unordered_map<std::string, std::vector<GLSL::Variable>> m_shaderVariables;
+        std::vector<Texture*> m_textures;
+
     };
 }

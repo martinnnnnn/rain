@@ -23,6 +23,7 @@
 #include "graphics/material.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include "graphics/model.h"
 
 using namespace rain;
 
@@ -384,6 +385,7 @@ void sandboxInit()
     Material test;
     test.Init(rootpath + "/shaders/shader1", true);
 
+    //Model model(rootpath + "/models/nanosuit/nanosuit.obj");
 }
 
 

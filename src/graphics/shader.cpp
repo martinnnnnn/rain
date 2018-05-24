@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "utility/incl_3d.h"
-
+#include "utility/string_utils.h"
 
 
 namespace rain
@@ -66,7 +66,7 @@ namespace rain
         }
         catch (std::ifstream::failure e)
         {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ : " << _path << std::endl;
         }
 
         return fileContent;
@@ -106,9 +106,9 @@ namespace rain
         glUseProgram(id);
     }
 
-    std::vector<GLSL::Variable> Shader::GetGLSLVariables() const
+    std::unordered_map<std::string, std::vector<GLSL::Variable>> Shader::GetGLSLVariables() const
     {
-        std::vector<GLSL::Variable> variables;
+        std::unordered_map<std::string, std::vector<GLSL::Variable>> variables;
 
         GLint count;
         GLint size;
@@ -122,7 +122,26 @@ namespace rain
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
-            variables.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
+
+            // spliting the name to check if it's part of a struct
+            std::cout << name << std::endl;
+            std::vector<std::string> elements = String::split(name, '.');
+            std::cout << elements.size() << " : " << elements[0] << std::endl;
+            if (elements.size() > 1)
+            {
+                if (auto it = variables.find(elements[0]); it != variables.end())
+                {
+                    it->second.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
+                }
+                else
+                {
+                    variables[elements[0]].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
+                }
+            }
+            else
+            {
+                variables[""].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
+            }
         }
 
         // retrieving uniforms
@@ -130,7 +149,24 @@ namespace rain
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
-            variables.push_back(GLSL::Variable(GLSL::Type::UNIFORM, type, name, size));
+            std::cout << name << std::endl;
+            // spliting the name to check if it's part of a struct
+            std::vector<std::string> elements = String::split(name, '.');
+            if (elements.size() > 1)
+            {
+                if (auto it = variables.find(elements[0]); it != variables.end())
+                {
+                    it->second.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
+                }
+                else
+                {
+                    variables[elements[0]].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
+                }
+            }
+            else
+            {
+                variables[""].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
+            }
         }
 
         return variables;

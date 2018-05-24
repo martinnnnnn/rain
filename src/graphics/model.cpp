@@ -5,10 +5,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 
+#include "core/file_system.h"
+
 
 namespace rain
 {
-    Model::Model(char* _path)
+    Model::Model(const std::string& _path)
     {
         loadModel(_path);
     }
@@ -21,8 +23,9 @@ namespace rain
         }
     }
 
-    void Model::loadModel(std::string _path)
+    void Model::loadModel(const std::string& _path)
     {
+        m_path = _path;
         Assimp::Importer import;
         const aiScene *scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -31,7 +34,6 @@ namespace rain
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
             return;
         }
-        m_directory = _path.substr(0, _path.find_last_of('/'));
 
         processNode(scene->mRootNode, scene);
     }
@@ -92,22 +94,23 @@ namespace rain
 
             std::vector<Texture2D> textures;
 
-            for (aiTextureType i = (aiTextureType)0x0; i < AI_TEXTURE_TYPE_MAX; (aiTextureType)((int)i + 1))
+            for (aiTextureType i = (aiTextureType)0x0; i < AI_TEXTURE_TYPE_MAX;)
             {
+                i = (aiTextureType)((int)i + 1);
                 //i = (aiTextureType)((int)i + 1);
                 unsigned int textureCount = material->GetTextureCount(i);
                 for (unsigned int j = 0; j < textureCount; ++j)
                 {
                     aiString str;
-                    std::string s(str.C_Str());
                     material->GetTexture(i, j, &str);
                     Texture2D tex;
-                    tex.Load(str.C_Str(), (Texture2DType)i);
+                    tex.Load(File::GetDirectory(m_path), str.C_Str(), (Texture2DType)i);
+                    std::cout << str.C_Str() << " : " << TextureUtils::Texture2DTypeToString((Texture2DType)i) << std::endl;
                     textures.push_back(tex);
                 }
             }
 
-
+            
 
             //std::vector<Texture2D> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
             //textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());

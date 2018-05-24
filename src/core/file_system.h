@@ -8,21 +8,26 @@
 namespace fs = std::experimental::filesystem::v1;
 namespace rain
 {
-	struct pathNode
+    namespace File
+    {
+        std::string GetDirectory(const std::string& _path);
+    }
+
+	struct PathNode
 	{
-		pathNode() :
+		PathNode() :
 			path(""),
 			father(nullptr)
 		{
 			
 		}
 
-		void  PrintToConsole(std::string _tabs);
+		void PrintToConsole(std::string _tabs);
 		void PrintToUI();
 
 		std::string path;
-		pathNode* father;
-		std::vector<pathNode*> children;
+		PathNode* father;
+		std::vector<PathNode*> children;
 	};
 
     class FileSystem
@@ -32,7 +37,7 @@ namespace rain
         void Init(const std::string& _root);
         void PrintToUI();
     private:
-        pathNode * m_rootNode;
+        PathNode * m_rootNode;
     };
 
 

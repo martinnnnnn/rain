@@ -112,5 +112,5 @@ vec3 CalcLight(Light light)
 	specularLight *= attenuation * intensity;
 	emissiveLight *= attenuation * intensity;	
 
-	return ambientLight + diffuseLight + specularLight;
+	return ambientLight + diffuseLight + specularLight + emissiveLight;
 }

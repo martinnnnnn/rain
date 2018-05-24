@@ -6,7 +6,7 @@
 #include <iterator>
 
 #include "core/game_engine.h"
-
+#include "utility/string_utils.h"
 
 namespace rain
 {
@@ -68,10 +68,10 @@ namespace rain
         std::unordered_map<std::string, std::string> args;
         for (int i = 0; i < _argc; i++)
         {
-            std::vector<std::string> first = Rain::split(_argv[i], ';');
+            std::vector<std::string> first = String::split(_argv[i], ';');
             for (size_t j = 0; j < first.size(); j++)
             {
-                std::vector<std::string> second = Rain::split(first[j], '=');
+                std::vector<std::string> second = String::split(first[j], '=');
                 if (second.size() > 1)
                 {
                     args[second[0]] = second[1];
@@ -81,11 +81,5 @@ namespace rain
         return args;
     }
 
-    std::vector<std::string> Rain::split(const std::string &s, char delim)
-    {
-        std::vector<std::string> elems;
-        split(s, delim, std::back_inserter(elems));
-        return elems;
-    }
 
 }

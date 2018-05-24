@@ -1,6 +1,8 @@
 #include "texture.h"
 
 
+#include <stb_image.h>
+
 
 namespace rain
 {
@@ -22,11 +24,46 @@ namespace rain
                 return GL_RGBA;
             }
         }
+
+        std::string Texture2DTypeToString(Texture2DType _type)
+        {
+            switch (_type)
+            {
+            case Texture2DType::NONE:
+                return "none";
+            case Texture2DType::DIFFUSE:
+                return "diffuse";
+            case Texture2DType::SPECULAR:
+                return "specular";
+            case Texture2DType::AMBIENT:
+                return "ambient";
+            case Texture2DType::EMISSIVE:
+                return "emissive";
+            case Texture2DType::HEIGHT:
+                return "height";
+            case Texture2DType::NORMALS:
+                return "normals";
+            case Texture2DType::SHININESS:
+                return "shininess";
+            case Texture2DType::OPACITY:
+                return "opacity";
+            case Texture2DType::DISPLACEMENT:
+                return "displacement";
+            case Texture2DType::LIGHTMAP:
+                return "lightmap";
+            case Texture2DType::REFLECTION:
+                return "reflection";
+            case Texture2DType::UNKNOWN:
+                return "unknown";
+            }
+            return "unknown";
+        }
     }
 
-	int Texture2D::Load(const std::string& _path, Texture2DType _type, bool _flipVertically)
+	int Texture2D::Load(const std::string& _directory, const std::string& _fileName, Texture2DType _type, bool _flipVertically)
 	{
-		m_path = _path;
+		m_directory = _directory;
+        m_fileName = _fileName;
         m_type = _type;
 
 		glGenTextures(1, &id);
@@ -40,7 +77,7 @@ namespace rain
 		stbi_set_flip_vertically_on_load(_flipVertically);
 
 		int width, height, channelCount;
-		unsigned char * data = stbi_load(m_path.c_str(), &width, &height, &channelCount, 0);
+		unsigned char * data = stbi_load((m_directory + m_fileName).c_str(), &width, &height, &channelCount, 0);
 		if (data)
 		{
 			m_format = TextureUtils::ChannelCountToFormat(channelCount);
@@ -49,7 +86,7 @@ namespace rain
 		}
 		else
 		{
-			std::cout << "Failed to load texture at : " << m_path << std::endl;
+			std::cout << "Failed to load texture at : " << (m_directory + m_fileName) << std::endl;
 			return -1;
 		}
 		stbi_image_free(data);

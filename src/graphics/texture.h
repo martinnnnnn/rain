@@ -5,16 +5,10 @@
 #include <vector>
 
 #include "utility/incl_3d.h"
-#include <stb_image.h>
 
 
 namespace rain
 {
-    namespace TextureUtils
-    {
-        GLint ChannelCountToFormat(int _channelCount);
-    }
-
     enum class Texture2DType
     {
         NONE = 0x0,
@@ -32,12 +26,20 @@ namespace rain
         UNKNOWN = 0xC,
     };
 
+    namespace TextureUtils
+    {
+        GLint ChannelCountToFormat(int _channelCount);
+        std::string Texture2DTypeToString(Texture2DType _type);
+    }
+
+
+
 	class Texture
 	{
 	public:
 		Texture() {}
 
-		virtual void Bind() = 0;
+        virtual void Bind() {};
 
 	public:
 		GLuint id;
@@ -51,11 +53,12 @@ namespace rain
 	public:
 		Texture2D() : Texture() {}
 
-		int Load(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
+		int Load(const std::string& _directory, const std::string& _fileName, Texture2DType _type, bool _flipVertically = false);
 		void Bind() override;
 
 	private: 
-		std::string m_path;
+        std::string m_directory;
+        std::string m_fileName;
         Texture2DType m_type;
 	};
 

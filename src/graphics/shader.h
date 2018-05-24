@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace rain
 {
@@ -18,9 +19,11 @@ namespace rain
         };
 
         std::string TypeToString(Type value);
+
         struct Variable
         {
             Variable(GLSL::Type _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
+            Variable(GLSL::Type _variableType, GLenum _glslType, const std::string& _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
 
             GLSL::Type variableType;
             GLenum glslType;
@@ -35,6 +38,14 @@ namespace rain
                 glm::mat4 m_mat4;
             };
             Value value;
+        };
+
+        struct Struct
+        {
+            Struct(char* _name, std::vector<Variable> _variables) : name(_name), variables(_variables) {}
+
+            std::string name;
+            std::vector<Variable> variables;
         };
     }
 
@@ -64,8 +75,8 @@ namespace rain
         void setParameter(const std::string &name, const glm::fmat4 &matrix);
         //void setParameter(const std::string &name, CurrentTextureType);
 
-        std::vector<GLSL::Variable> GetGLSLVariables() const;
-        //std::vector<GLSLUniform> GetGLSLUniforms() const;
+        std::unordered_map<std::string, std::vector<GLSL::Variable>> GetGLSLVariables() const;
+
     private:
         void load(const char* _vShaderCode, const char* _fShaderCode);
         std::string readFile(const char* _path);
