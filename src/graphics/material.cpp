@@ -1,6 +1,5 @@
 #include "material.h"
 
-
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
@@ -65,155 +64,97 @@ namespace rain
 
         for (auto it : m_shaderVariables)
         {
-            if (it.first == "")
+            std::vector<GLSL::Variable> variables = it.second;
+            for (size_t i = 0; i < variables.size(); ++i)
             {
-                std::vector<GLSL::Variable> variables = it.second;
-                for (int i = 0; i < variables.size(); ++i)
+                nlohmann::json json;
+                json["glsl_type"] = GLUtils::GLTypeToString(variables[i].glslType);
+                switch (variables[i].glslType)
                 {
-                    nlohmann::json json;
-                    json["glsl_type"] = GLUtils::GLTypeToString(variables[i].glslType);
-                    switch (variables[i].glslType)
-                    {
-                    case GL_FLOAT:
-                        json["value"] = 0;
-                        break;
-                    case GL_FLOAT_VEC2:
-                        json["value"] = glm::vec2(0);
-                        break;
-                    case GL_FLOAT_VEC3:
-                        json["value"] = glm::vec3(0);
-                        break;
-                    case GL_FLOAT_MAT4:
-                        json["value"] = glm::mat4(0);
-                        break;
-                    case GL_SAMPLER_2D:
-                        json["value"] = 0;
-                        break;
-                    case GL_SAMPLER_CUBE:
-                        json["value"] = 0;
-                        break;
-                    default:
-                        json["value"] = 0;
-                        break;
-                    }
+                case GL_FLOAT:
+                    json["value"] = 0;
+                    break;
+                case GL_FLOAT_VEC2:
+                    json["value"] = glm::vec2(0);
+                    break;
+                case GL_FLOAT_VEC3:
+                    json["value"] = glm::vec3(0);
+                    break;
+                case GL_FLOAT_MAT4:
+                    json["value"] = glm::mat4(0);
+                    break;
+                case GL_SAMPLER_2D:
+                    json["value"] = 0;
+                    break;
+                case GL_SAMPLER_CUBE:
+                    json["value"] = 0;
+                    break;
+                default:
+                    json["value"] = 0;
+                    break;
+                }
+                if (it.first == "")
+                {
                     jsonVariables[variables[i].name] = json;
                 }
-            }
-            else
-            {
-                std::vector<GLSL::Variable> variables = it.second;
-                for (int i = 0; i < variables.size(); ++i)
+                else
                 {
-                    nlohmann::json json;
-                    json["glsl_type"] = GLUtils::GLTypeToString(variables[i].glslType);
-                    switch (variables[i].glslType)
-                    {
-                    case GL_FLOAT:
-                        json["value"] = 0;
-                        break;
-                    case GL_FLOAT_VEC2:
-                        json["value"] = glm::vec2(0);
-                        break;
-                    case GL_FLOAT_VEC3:
-                        json["value"] = glm::vec3(0);
-                        break;
-                    case GL_FLOAT_MAT4:
-                        json["value"] = glm::mat4(0);
-                        break;
-                    case GL_SAMPLER_2D:
-                        json["value"] = 0;
-                        break;
-                    case GL_SAMPLER_CUBE:
-                        json["value"] = 0;
-                        break;
-                    default:
-                        json["value"] = 0;
-                        break;
-                    }
                     jsonVariables[it.first][variables[i].name] = json;
                 }
             }
         }
-
-
-
-		//for (size_t i = 0; i < m_shaderVariables.size(); ++i)
-		//{
-  //          if (m_shaderVariables[i].variableType == GLSL::Type::UNIFORM)
-  //          {
-		//	    nlohmann::json json;
-		//	    json["glsl_type"] = GLUtils::GLTypeToString(m_shaderVariables[i].glslType);
-		//	    switch (m_shaderVariables[i].glslType)
-		//	    {
-		//	    case GL_FLOAT:
-		//		    json["value"] = 0;
-		//		    break;
-		//	    case GL_FLOAT_VEC2:
-		//		    json["value"] = glm::vec2(0);
-		//		    break;
-		//	    case GL_FLOAT_VEC3:
-		//		    json["value"] = glm::vec3(0);
-		//		    break;
-		//	    case GL_FLOAT_MAT4:
-		//		    json["value"] = glm::mat4(0);
-		//		    break;
-		//	    case GL_SAMPLER_2D:
-		//		    json["value"] = 0;
-		//		    break;
-		//	    case GL_SAMPLER_CUBE:
-		//		    json["value"] = 0;
-		//		    break;
-		//	    default:
-		//		    json["value"] = 0;
-		//		    break;
-		//	    }
-		//	    variables[m_shaderVariables[i].name] = json;
-  //          }
-		//}
-
-		outfile << jsonVariables.dump(4, true);
+		outfile << jsonVariables.dump(4);
 		outfile.close();
 	}
 
 	void Material::readShaderDefaultValueFile(std::ifstream& _inputFile)
 	{
-        /*nlohmann::json variables;
-        _inputFile >> variables;
+        nlohmann::json jsonVariables;
+        _inputFile >> jsonVariables;
 
-        for (size_t i = 0; i < m_shaderVariables.size(); ++i)
+        for (auto it : m_shaderVariables)
         {
-            if (m_shaderVariables[i].variableType == GLSL::Type::UNIFORM)
+            std::vector<GLSL::Variable> variables = it.second;
+            for (size_t i = 0; i < variables.size(); ++i)
             {
-                nlohmann::json obj = variables[m_shaderVariables[i].name];
-
-                std::string typestr = obj["glsl_type"].get<std::string>();
-                GLenum value = GLUtils::StringToGLType(typestr);
-
-                switch (value)
+                if (variables[i].variableType == GLSL::Type::UNIFORM)
                 {
-                case GL_FLOAT:
-                    m_shaderVariables[i].value.m_float = obj["value"].get<float>();
-                    break;
-                case GL_FLOAT_VEC2:
-                    m_shaderVariables[i].value.m_vec2 = obj["value"].get<glm::vec2>();
-                    break;
-                case GL_FLOAT_VEC3:
-                    m_shaderVariables[i].value.m_vec3 = obj["value"].get<glm::vec3>();
-                    break;
-                case GL_FLOAT_MAT4:
-                    m_shaderVariables[i].value.m_mat4 = obj["value"].get<glm::mat4>();
-                    break;
-                case GL_SAMPLER_2D:
-                    m_shaderVariables[i].value.m_int = obj["value"].get<int>();
-                    break;
-                case GL_SAMPLER_CUBE:
-                    m_shaderVariables[i].value.m_int = obj["value"].get<int>();
-                    break;
-                default:
-                    m_shaderVariables[i].value.m_int = obj["value"].get<int>();
-                    break;
+                    nlohmann::json obj;
+                    if (it.first == "")
+                    {
+                        obj = jsonVariables[variables[i].name];
+                    }
+                    else
+                    {
+                        obj = jsonVariables[it.first][variables[i].name];
+                    }
+                    GLenum glslType = GLUtils::StringToGLType(obj["glsl_type"].get<std::string>());
+                    switch (glslType)
+                    {
+                    case GL_FLOAT:
+                        m_shaderVariables[it.first][i].value.m_float = obj["value"].get<float>();
+                        break;
+                    case GL_FLOAT_VEC2:
+                        m_shaderVariables[it.first][i].value.m_vec2 = obj["value"].get<glm::vec2>();
+                        break;
+                    case GL_FLOAT_VEC3:
+                        m_shaderVariables[it.first][i].value.m_vec3 = obj["value"].get<glm::vec3>();
+                        break;
+                    case GL_FLOAT_MAT4:
+                        m_shaderVariables[it.first][i].value.m_mat4 = obj["value"].get<glm::mat4>();
+                        break;
+                    case GL_SAMPLER_2D:
+                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
+                        break;
+                    case GL_SAMPLER_CUBE:
+                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
+                        break;
+                    default:
+                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
+                        break;
+                    }
                 }
             }
-        }*/
+        }
 	}
 }

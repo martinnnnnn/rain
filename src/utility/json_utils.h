@@ -1,11 +1,11 @@
 #pragma once
 
 #include <nlohmann/json.hpp>
-
 #include <glm/glm.hpp>
 
 
-namespace nlohmann {
+namespace nlohmann
+{
 	template <>
 	struct adl_serializer<glm::vec2>
 	{

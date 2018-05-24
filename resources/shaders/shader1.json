@@ -1,193 +1,190 @@
 {
-"aNorm": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"aPos": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"aTextureCoord": {
-"glsl_type": "vec2",
-"value": {
-"x": 0.0,
-"y": 0.0
-}
-},
-"light1": {
-"ambient": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"constant": {
-"glsl_type": "float",
-"value": 0
-},
-"cutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"diffuse": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"direction": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"linear": {
-"glsl_type": "float",
-"value": 0
-},
-"outerCutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"position": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"quadratic": {
-"glsl_type": "float",
-"value": 0
-},
-"specular": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"type": {
-"glsl_type": "int",
-"value": 0
-}
-},
-"light2": {
-"ambient": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"constant": {
-"glsl_type": "float",
-"value": 0
-},
-"cutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"diffuse": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"direction": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"linear": {
-"glsl_type": "float",
-"value": 0
-},
-"outerCutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"position": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"quadratic": {
-"glsl_type": "float",
-"value": 0
-},
-"specular": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"type": {
-"glsl_type": "int",
-"value": 0
-}
-},
-"light3": {
-"ambient": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"constant": {
-"glsl_type": "float",
-"value": 0
-},
-"cutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"diffuse": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"direction": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"linear": {
-"glsl_type": "float",
-"value": 0
-},
-"outerCutOff": {
-"glsl_type": "float",
-"value": 0
-},
-"position": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"quadratic": {
-"glsl_type": "float",
-"value": 0
-},
-"specular": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-},
-"type": {
-"glsl_type": "int",
-"value": 0
-}
-},
-"mat": {
-"diffuse": {
-"glsl_type": "sampler2D",
-"value": 0
-},
-"emissive": {
-"glsl_type": "sampler2D",
-"value": 0
-},
-"shininess": {
-"glsl_type": "float",
-"value": 0
-},
-"specular": {
-"glsl_type": "sampler2D",
-"value": 0
-}
-},
-"model": {
-"glsl_type": "mat4",
-"value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-},
-"proj": {
-"glsl_type": "mat4",
-"value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-},
-"skybox": {
-"glsl_type": "samplerCube",
-"value": 0
-},
-"view": {
-"glsl_type": "mat4",
-"value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-},
-"viewPos": {
-"glsl_type": "vec3",
-"value": [0.0,0.0,0.0]
-}
+    "aNorm": {
+        "glsl_type": "vec3",
+        "value": [0.0,0.0,0.0]
+    },
+    "aPos": {
+        "glsl_type": "vec3",
+        "value": [0.0,0.0,0.0]
+    },
+    "aTextureCoord": {
+        "glsl_type": "vec2",
+        "value": [0.0,0.0]
+    },
+    "light1": {
+        "ambient": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "constant": {
+            "glsl_type": "float",
+            "value": 123123123
+        },
+        "cutOff": {
+            "glsl_type": "float",
+            "value": 123123
+        },
+        "diffuse": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "direction": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "linear": {
+            "glsl_type": "float",
+            "value": 1123123
+        },
+        "outerCutOff": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "position": {
+            "glsl_type": "vec3",
+            "value": [131231,0.123415850,123123.0]
+        },
+        "quadratic": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "specular": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "type": {
+            "glsl_type": "int",
+            "value": 0
+        }
+    },
+    "light2": {
+        "ambient": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "constant": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "cutOff": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "diffuse": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "direction": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "linear": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "outerCutOff": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "position": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "quadratic": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "specular": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "type": {
+            "glsl_type": "int",
+            "value": 0
+        }
+    },
+    "light3": {
+        "ambient": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "constant": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "cutOff": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "diffuse": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "direction": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "linear": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "outerCutOff": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "position": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "quadratic": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "specular": {
+            "glsl_type": "vec3",
+            "value": [0.0,0.0,0.0]
+        },
+        "type": {
+            "glsl_type": "int",
+            "value": 0
+        }
+    },
+    "mat": {
+        "diffuse": {
+            "glsl_type": "sampler2D",
+            "value": 0
+        },
+        "emissive": {
+            "glsl_type": "sampler2D",
+            "value": 0
+        },
+        "shininess": {
+            "glsl_type": "float",
+            "value": 0
+        },
+        "specular": {
+            "glsl_type": "sampler2D",
+            "value": 0
+        }
+    },
+    "model": {
+        "glsl_type": "mat4",
+        "value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    },
+    "proj": {
+        "glsl_type": "mat4",
+        "value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    },
+    "skybox": {
+        "glsl_type": "samplerCube",
+        "value": 0
+    },
+    "view": {
+        "glsl_type": "mat4",
+        "value": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    },
+    "viewPos": {
+        "glsl_type": "vec3",
+        "value": [0.0,0.0,0.0]
+    }
 }

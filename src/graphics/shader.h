@@ -39,14 +39,6 @@ namespace rain
             };
             Value value;
         };
-
-        struct Struct
-        {
-            Struct(char* _name, std::vector<Variable> _variables) : name(_name), variables(_variables) {}
-
-            std::string name;
-            std::vector<Variable> variables;
-        };
     }
 
 
