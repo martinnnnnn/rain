@@ -11,6 +11,21 @@
 
 namespace rain
 {
+    namespace GLSL
+    {
+        std::string TypeToString(Type value)
+        {
+            switch (value)
+            {
+            case Type::ATTRIBUTE:
+                return "attribute";
+            case Type::UNIFORM:
+                return "uniform";
+            default:
+                return "unknown";
+            }
+        }
+    }
 
     Shader::Shader()
     {
@@ -91,9 +106,9 @@ namespace rain
         glUseProgram(id);
     }
 
-    std::vector<GLSLVariable> Shader::GetGLSLVariables() const
+    std::vector<GLSL::Variable> Shader::GetGLSLVariables() const
     {
-        std::vector<GLSLVariable> variables;
+        std::vector<GLSL::Variable> variables;
 
         GLint count;
         GLint size;
@@ -107,7 +122,7 @@ namespace rain
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
-            variables.push_back(GLSLVariable(GLSLVariableType::ATTRIBUTE, type, name, size));
+            variables.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
         }
 
         // retrieving uniforms
@@ -115,24 +130,12 @@ namespace rain
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
-            variables.push_back(GLSLVariable(GLSLVariableType::UNIFORM, type, name, size));
+            variables.push_back(GLSL::Variable(GLSL::Type::UNIFORM, type, name, size));
         }
 
         return variables;
     }
 
-    std::string Shader::GLSLVariableTypeToString(GLSLVariableType value)
-    {
-        switch (value)
-        {
-        case GLSLVariableType::ATTRIBUTE:
-            return "attribute";
-        case GLSLVariableType::UNIFORM:
-            return "uniform";
-        default:
-            return "unknown";
-        }
-    }
 
     void Shader::setParameter(const std::string &_name, bool _value) const
     {

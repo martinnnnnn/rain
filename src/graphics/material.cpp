@@ -64,7 +64,7 @@ namespace rain
 		nlohmann::json variables;
 		for (size_t i = 0; i < m_shaderVariables.size(); ++i)
 		{
-            if (m_shaderVariables[i].variableType == GLSLVariableType::UNIFORM)
+            if (m_shaderVariables[i].variableType == GLSL::Type::UNIFORM)
             {
 			    nlohmann::json json;
 			    json["glsl_type"] = GLUtils::GLTypeToString(m_shaderVariables[i].glslType);
@@ -107,7 +107,7 @@ namespace rain
 
         for (size_t i = 0; i < m_shaderVariables.size(); ++i)
         {
-            if (m_shaderVariables[i].variableType == GLSLVariableType::UNIFORM)
+            if (m_shaderVariables[i].variableType == GLSL::Type::UNIFORM)
             {
                 nlohmann::json obj = variables[m_shaderVariables[i].name];
 

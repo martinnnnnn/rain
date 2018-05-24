@@ -34,6 +34,6 @@ namespace rain
     private:
         Shader * m_shader;
         std::string m_shaderPath;
-        std::vector<GLSLVariable> m_shaderVariables;
+        std::vector<GLSL::Variable> m_shaderVariables;
     };
 }

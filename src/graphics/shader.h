@@ -7,32 +7,39 @@
 
 namespace rain
 {
-    enum class GLSLVariableType
+
+    namespace GLSL
     {
-        ATTRIBUTE,
-        UNIFORM,
-        LAST_INDEX
-    };
+        enum class Type
+        {
+            ATTRIBUTE,
+            UNIFORM,
+            LAST_INDEX
+        };
+
+        std::string TypeToString(Type value);
+        struct Variable
+        {
+            Variable(GLSL::Type _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
+
+            GLSL::Type variableType;
+            GLenum glslType;
+            std::string name;
+            GLint size;
+            union Value
+            {
+                int m_int;
+                float m_float;
+                glm::vec2 m_vec2;
+                glm::vec3 m_vec3;
+                glm::mat4 m_mat4;
+            };
+            Value value;
+        };
+    }
 
 
-    struct GLSLVariable
-    {
-        GLSLVariable(GLSLVariableType _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
 
-        GLSLVariableType variableType;
-        GLenum glslType;
-        std::string name;
-        GLint size;
-		union Value
-		{
-			int m_int;
-			float m_float;
-			glm::vec2 m_vec2;
-			glm::vec3 m_vec3;
-			glm::mat4 m_mat4;
-		};
-		Value value;
-    };
 
     class Shader
     {
@@ -57,8 +64,7 @@ namespace rain
         void setParameter(const std::string &name, const glm::fmat4 &matrix);
         //void setParameter(const std::string &name, CurrentTextureType);
 
-        std::vector<GLSLVariable> GetGLSLVariables() const;
-        std::string static GLSLVariableTypeToString(GLSLVariableType value);
+        std::vector<GLSL::Variable> GetGLSLVariables() const;
         //std::vector<GLSLUniform> GetGLSLUniforms() const;
     private:
         void load(const char* _vShaderCode, const char* _fShaderCode);
