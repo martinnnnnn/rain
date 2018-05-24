@@ -124,24 +124,16 @@ namespace rain
             glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
 
             // spliting the name to check if it's part of a struct
-            std::cout << name << std::endl;
             std::vector<std::string> elements = String::split(name, '.');
-            std::cout << elements.size() << " : " << elements[0] << std::endl;
+
+            std::string splitedName = elements[0];
+            std::string key = "";
             if (elements.size() > 1)
             {
-                if (auto it = variables.find(elements[0]); it != variables.end())
-                {
-                    it->second.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
-                }
-                else
-                {
-                    variables[elements[0]].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
-                }
+                splitedName = elements[1];
+                key = elements[0];
             }
-            else
-            {
-                variables[""].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
-            }
+            variables[key].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, splitedName, size));
         }
 
         // retrieving uniforms
@@ -149,24 +141,18 @@ namespace rain
         for (GLint i = 0; i < count; ++i)
         {
             glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
-            std::cout << name << std::endl;
+
             // spliting the name to check if it's part of a struct
             std::vector<std::string> elements = String::split(name, '.');
+
+            std::string splitedName = elements[0];
+            std::string key = "";
             if (elements.size() > 1)
             {
-                if (auto it = variables.find(elements[0]); it != variables.end())
-                {
-                    it->second.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
-                }
-                else
-                {
-                    variables[elements[0]].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, elements[1], size));
-                }
+                splitedName = elements[1];
+                key = elements[0];
             }
-            else
-            {
-                variables[""].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, name, size));
-            }
+            variables[key].push_back(GLSL::Variable(GLSL::Type::UNIFORM, type, splitedName, size));
         }
 
         return variables;

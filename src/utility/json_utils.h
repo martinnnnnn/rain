@@ -9,18 +9,15 @@ namespace nlohmann {
 	template <>
 	struct adl_serializer<glm::vec2>
 	{
-		static void to_json(json& j, const glm::vec2& v)
+		static void to_json(json& j, const glm::vec2& vect)
 		{
-			j = json{
-				{ "x", v.x },
-				{ "y", v.y }
-			};
+			j = json{ vect.x, vect.y };
 		}
 
-		static void from_json(const json& j, glm::vec2& v)
+		static void from_json(const json& j, glm::vec2& vect)
 		{
-			v.x = j.at("x").get<float>();
-			v.y = j.at("y").get<float>();
+			vect.x = j[0].get<float>();
+			vect.y = j[1].get<float>();
 		}
 	};
 
@@ -29,19 +26,14 @@ namespace nlohmann {
 	{
 		static void to_json(json& j, const glm::vec3& vect)
 		{
-			j = json
-			{
-				{ "x", vect.x },
-				{ "y", vect.y },
-				{ "z", vect.z }
-			};
+			j = json { vect.x, vect.y, vect.z };
 		}
 
-		static void from_json(const json& j, glm::vec3& v)
+		static void from_json(const json& j, glm::vec3& vect)
 		{
-			v.x = j.at("x").get<float>();
-			v.y = j.at("y").get<float>();
-			v.z = j.at("z").get<float>();
+            vect.x = j[0].get<float>();
+            vect.y = j[1].get<float>();
+            vect.z = j[2].get<float>();
 		}
 	};
 
@@ -57,13 +49,6 @@ namespace nlohmann {
 				m[2][0] , m[2][1], m[2][2], m[2][3],
 				m[3][0] , m[3][1], m[3][2], m[3][3]
 			};
-			//j = json
-			//{
-			//	{ "00", m[0][0] },{ "01", m[0][1] },{ "02", m[0][2] },{ "03", m[0][3] },
-			//	{ "10", m[1][0] },{ "11", m[1][1] },{ "12", m[1][2] },{ "13", m[1][3] },
-			//	{ "20", m[2][0] },{ "21", m[2][1] },{ "22", m[2][2] },{ "23", m[2][3] },
-			//	{ "30", m[3][0] },{ "31", m[3][1] },{ "32", m[3][2] },{ "33", m[3][3] }
-			//};
 		}
 
 		static void from_json(const json& j, glm::mat4& m)
