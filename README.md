@@ -28,7 +28,7 @@ It should then work !
 
 I've started playing around with python's ctypes module to try and make an editor in python, once again mostly for learning purposes. To launch the game using python, you need to build the "rainlib" project in visual studio, then call the python script tools/editor.py
 
-## What's to do
+## What's left to do
 
 Pretty much everything, it's still a really small project.
 
