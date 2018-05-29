@@ -10,76 +10,76 @@
 
 namespace rain
 {
-    int Rain::Init(std::unordered_map<std::string, std::string> _args)
-    {
-        return GameEngine::Get().Init(_args);
-    }
+	int Rain::Init(std::unordered_map<std::string, std::string> _args)
+	{
+		return GameEngine::Get().Init(_args);
+	}
 
-    void Rain::Run()
-    {
-        GameEngine::Get().Run();
-    }
+	void Rain::Run()
+	{
+		GameEngine::Get().Run();
+	}
 
-    GameEngine* Rain::Engine()
-    {
-        return &(GameEngine::Get());
-    }
+	GameEngine* Rain::Engine()
+	{
+		return &(GameEngine::Get());
+	}
 
-    GLFWwindow* Rain::Window()
-    {
-        return GameEngine::Get().Getwindow();
-    }
+	GLFWwindow* Rain::Window()
+	{
+		return GameEngine::Get().Getwindow();
+	}
 
-    Camera* Rain::Camera()
-    {
-        return GameEngine::Get().GetCamera();
-    }
+	Camera* Rain::Camera()
+	{
+		return GameEngine::Get().GetCamera();
+	}
 
-    InputEngine* Rain::Input()
-    {
-        return GameEngine::Get().GetInputEngine();
-    }
+	InputEngine* Rain::Input()
+	{
+		return GameEngine::Get().GetInputEngine();
+	}
 
-    float Rain::GetDeltaTime()
-    {
-        return GameEngine::Get().GetDeltaTime();
-    }
+	float Rain::GetDeltaTime()
+	{
+		return GameEngine::Get().GetDeltaTime();
+	}
 
-    std::string Rain::GetExePath()
-    {
-        char buffer[MAX_PATH];
-        GetModuleFileName(NULL, buffer, MAX_PATH);
-        std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-        return std::string(buffer).substr(0, pos);
-    }
+	std::string Rain::GetExePath()
+	{
+		char buffer[MAX_PATH];
+		GetModuleFileName(NULL, buffer, MAX_PATH);
+		std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+		return std::string(buffer).substr(0, pos);
+	}
 
-    std::string Rain::ResourcesRoot()
-    {
-        return GameEngine::Get().GetResourcesRoot();
-    }
+	std::string Rain::ResourcesRoot()
+	{
+		return GameEngine::Get().GetResourcesRoot();
+	}
 
-    glm::vec2 Rain::GetWindowSize()
-    {
-        return Engine()->GetWindowSize();
-    }
-    
-    std::unordered_map<std::string, std::string> Rain::GetArguments(int _argc, char** _argv)
-    {
-        std::unordered_map<std::string, std::string> args;
-        for (int i = 0; i < _argc; i++)
-        {
-            std::vector<std::string> first = String::split(_argv[i], ';');
-            for (size_t j = 0; j < first.size(); j++)
-            {
-                std::vector<std::string> second = String::split(first[j], '=');
-                if (second.size() > 1)
-                {
-                    args[second[0]] = second[1];
-                }
-            }
-        }
-        return args;
-    }
+	glm::vec2 Rain::GetWindowSize()
+	{
+		return Engine()->GetWindowSize();
+	}
+
+	std::unordered_map<std::string, std::string> Rain::GetArguments(int _argc, char** _argv)
+	{
+		std::unordered_map<std::string, std::string> args;
+		for (int i = 0; i < _argc; i++)
+		{
+			std::vector<std::string> first = String::split(_argv[i], ';');
+			for (size_t j = 0; j < first.size(); j++)
+			{
+				std::vector<std::string> second = String::split(first[j], '=');
+				if (second.size() > 1)
+				{
+					args[second[0]] = second[1];
+				}
+			}
+		}
+		return args;
+	}
 
 
 }

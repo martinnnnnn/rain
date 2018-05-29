@@ -16,13 +16,13 @@
 
 namespace rain
 {
-    Material::Material(const std::string& _shaderPath, bool _createDefaultIfMissing) :
+    Material::Material(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _createDefaultIfMissing) :
         m_shaderPath(_shaderPath)
     {
-        Init(_shaderPath, _createDefaultIfMissing);
+        Init(_shaderPath, _textures, _createDefaultIfMissing);
     }
 
-    void Material::Init(const std::string& _shaderPath, bool _eraseDefault)
+    void Material::Init(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _eraseDefault)
     {
         m_shaderPath = _shaderPath;
         std::string vertexpath = m_shaderPath + ".vs";
@@ -54,7 +54,6 @@ namespace rain
 		}
 		
 	}
-
 
 	void Material::writeShaderDefaultValueFile(const std::string& _datafilePath)
 	{

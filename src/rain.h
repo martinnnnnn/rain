@@ -13,22 +13,21 @@ namespace rain
     class GameEngine;
     class Camera;
 
-    class Rain
+    namespace Rain
     {
-    public:
-        static int Init(std::unordered_map<std::string, std::string> _args);
-        static void Run();
+        int Init(std::unordered_map<std::string, std::string> _args);
+        void Run();
 
-        static float GetDeltaTime();
-        static GameEngine* Engine();
-        static GLFWwindow* Window();
-        static Camera* Camera();
-        static InputEngine* Input();
-        static std::string ResourcesRoot();
-        static std::string GetExePath();
-        static glm::vec2 GetWindowSize();
+        float GetDeltaTime();
+        GameEngine* Engine();
+        GLFWwindow* Window();
+        Camera* Camera();
+        InputEngine* Input();
+        std::string ResourcesRoot();
+        std::string GetExePath();
+        glm::vec2 GetWindowSize();
 
         // utility functions
-        static std::unordered_map<std::string, std::string> GetArguments(int argc, char** argv);
+        std::unordered_map<std::string, std::string> GetArguments(int argc, char** argv);
     };
 }
