@@ -30,6 +30,7 @@ namespace rain
         m_screenWidth = 800;
         m_screenHeight = 600;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
+		m_resourcesRootPath = "F:/__MARTIN/__INFO/__PROJECTS/rain/resources";
         if (_args["root"] != "")
         {
             m_resourcesRootPath = _args["root"];

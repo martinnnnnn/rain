@@ -29,7 +29,7 @@ add_subdirectory(external/bullet)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP")
 # /W4 /Za
 
 #### INCLUDES ####
@@ -86,8 +86,15 @@ target_link_libraries(${PROJECT_NAME} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
+add_definitions(-DEXPMODULE)
+add_library(rainlib SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+target_link_libraries(rainlib assimp glfw
+                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
+                      BulletDynamics BulletCollision LinearMath)
+
 #### RUNTIME OUTPUT DIRECTORY ####
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
+set_target_properties(rainlib PROPERTIES LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/lib")
 
 message(STATUS "> end of generation")

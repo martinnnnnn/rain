@@ -60,6 +60,34 @@ void loadShaders();
 GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically = false);
 using namespace nlohmann;
 
+
+#define DLLEXPORT extern "C" __declspec(dllexport)
+
+DLLEXPORT void LoadGame()
+{
+	std::unordered_map<std::string, std::string> maps;
+	int retval = Rain::Init(maps);
+	if (retval != 0)
+	{
+		std::cout << "Couldn't launch the game." << std::endl;
+		system("PAUSE");
+		return;
+	}
+	Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
+	camTransform->Translate(glm::vec3(0, 0, 5));
+
+	Rain::Engine()->SetUpdateCallback(sandboxUpdate);
+	rootpath = Rain::ResourcesRoot();
+	wireframe = false;
+
+	sandboxInit();
+	loadShaders();
+
+
+	Rain::Run();
+}
+
+
 int main(int argc, char** argv)
 {
     int retval = Rain::Init(Rain::GetArguments(argc, argv));
@@ -383,7 +411,7 @@ void sandboxInit()
 	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
 
     Material test;
-    test.Init(rootpath + "/shaders/shader1", false);
+    //test.Init(rootpath + std::vector<"/shaders/shader1", false);
 
     //Model model(rootpath + "/models/nanosuit/nanosuit.obj");
 }
