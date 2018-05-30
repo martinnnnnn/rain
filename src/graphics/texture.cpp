@@ -91,6 +91,7 @@ namespace rain
             return Texture2D{};
 		}
 		stbi_image_free(data);
+        return texture;
 	}
 
 

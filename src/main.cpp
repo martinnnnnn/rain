@@ -24,6 +24,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "graphics/model.h"
+#include "graphics/mesh.h"
 
 using namespace rain;
 
@@ -413,6 +414,7 @@ void sandboxInit()
     //test.Init(rootpath + std::vector<"/shaders/shader1", false);
 
     //Model model(rootpath + "/models/nanosuit/nanosuit.obj");
+    Model model = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 }
 
 

@@ -90,7 +90,6 @@ namespace rain
         m_screenWidth = 800;
         m_screenHeight = 600;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
-		m_resourcesRootPath = "ERROR";
         if (_args["root"] != "")
         {
             m_resourcesRootPath = _args["root"];

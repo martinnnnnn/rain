@@ -29,7 +29,6 @@ namespace rain
 		GLuint m_vao;
 		GLuint m_vbo;
 		GLuint m_ebo;
-        Mesh* parent;
 	};
 
     struct Material
@@ -58,6 +57,7 @@ namespace rain
     
     Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath);
     Material LoadMaterialData(const std::string& _dataPath, Shader* _shader);
+    void WriteDefault(Material* _material);
     void SetDefaultValues(Material* material);
     
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);
