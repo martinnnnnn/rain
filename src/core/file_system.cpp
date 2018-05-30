@@ -19,7 +19,20 @@ namespace rain
                 return "";
             }
         }
+        std::string GetFileName(const std::string& _path)
+        {
+            fs::path p = fs::path(_path);
+            if (p.has_filename())
+            {
+                return p.filename().generic_string();
+            }
+            else
+            {
+                return "";
+            }
+        }
     }
+
 
 	void PathNode::PrintToConsole(std::string _tabs)
 	{

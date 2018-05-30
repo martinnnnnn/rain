@@ -60,8 +60,7 @@ namespace rain
         }
     }
 
-    //TODO(martin) : error handling ?
-    //CHECK(martin) : check if working properly
+    //TODO(martin) : error handling
 	Texture2D LoadTexture2D(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
         Texture2D texture{};
@@ -95,8 +94,7 @@ namespace rain
 	}
 
 
-    //TODO(martin) : error handling ?
-    //CHECK(martin) : check if working properly
+    //TODO(martin) : error handling
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically)
 	{
         TextureCubeMap texture{};

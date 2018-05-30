@@ -8,6 +8,7 @@
 
 #include "utility/incl_3d.h"
 #include "graphics/texture.h"
+#include "shader.h"
 
 namespace rain
 {
@@ -34,7 +35,6 @@ namespace rain
     struct Material
     {
         Shader* shader;
-        std::string shaderPath;
         std::string dataPath;
         std::vector<GLSL::Variable> shaderVariables;
     };
@@ -42,17 +42,22 @@ namespace rain
     
     struct Model
     {
+        std::string path;
         Mesh* mesh;
         Material material;
         std::vector<Texture2D> textures;
     };
 
-    Mesh* InitMesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture2D> _textures);
-    void DrawMesh(Mesh* _mesh, Shader* _shader);
+    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
 
-    // 
+
+
+    void InitMesh(Mesh* _mesh);
+    void Draw(Model* _model);
+
+    
     Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath);
-    Material LoadMaterialData(Shader* _shader, const std::string& _materialPath);
+    Material LoadMaterialData(const std::string& _dataPath, Shader* _shader);
     void SetDefaultValues(Material* material);
     
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);

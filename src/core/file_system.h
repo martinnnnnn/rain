@@ -11,6 +11,7 @@ namespace rain
     namespace File
     {
         std::string GetDirectory(const std::string& _path);
+        std::string GetFileName(const std::string& _path);
     }
 
 	struct PathNode

@@ -7,21 +7,44 @@
 #include <nlohmann/json.hpp>
 
 #include "core/file_system.h"
-#include "shader.h"
 #include "utility/gl_utils.h"
 
 
 namespace rain
 {
+    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
+    {
+        //TODO(martin) : use name instead of taking the first model in the scene
+        Model model = GetModelsFromAssimpScene(_modelPath)[0];
+        InitMesh(model.mesh);
+        model.material = LoadMaterial(_materialDataPath, _shaderPath);
+
+        //TODO(martin) : not optimized - should be improved
+        for (size_t j = 0; j < model.textures.size(); ++j)
+        {
+            for (auto shaderVariable : model.material.shaderVariables)
+            {
+                std::string textureType = TextureUtils::Texture2DTypeToString(model.textures[j].type);
+                if (shaderVariable.name.find(textureType) != std::string::npos)
+                {
+                    shaderVariable.textureName = model.textures[j].path;
+                    break;
+                }
+            }
+        }
+        return model;
+    }
+
+
+
 
     Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath)
     {
         Material material;
 
-        material.shaderPath = _shaderPath;
         material.dataPath = _dataPath;
-        std::string vertexpath = material.shaderPath + ".vs";
-        std::string fragmentpath = material.shaderPath + ".fs";
+        std::string vertexpath = _shaderPath + ".vs";
+        std::string fragmentpath = _shaderPath + ".fs";
 
         material.shader = new Shader();
         material.shader->init(vertexpath, fragmentpath);
@@ -103,7 +126,6 @@ namespace rain
         }
         Material material;
 
-        material.shaderPath = "unknown";
         material.dataPath = _dataPath;
         material.shader = _shader;
         material.shader->use();
@@ -129,6 +151,7 @@ namespace rain
             aiMesh* aimesh = scene->mMeshes[i];
 
             Model model {};
+            model.path = _path;
             model.mesh = LoadMeshData(aimesh, scene);
             model.textures = LoadMeshTextures(aimesh, scene, File::GetDirectory(_path));
             models.push_back(model);
@@ -149,12 +172,6 @@ namespace rain
 
         return scene;
     }
-
-    std::vector<aiMesh*> GetMeshes(aiNode* _node, const aiScene* _scene, Mesh* parent)
-    {
-
-    }
-
 
     Mesh* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene)
     {
@@ -224,25 +241,19 @@ namespace rain
     }
 
 
-    Mesh* InitMesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture2D> _textures)
+    void InitMesh(Mesh* _mesh)
     {
-        //CHECK(martin) : need to check is this initialization actually work
-        Mesh* mesh = (Mesh*)malloc(sizeof(Mesh));
-        mesh->vertices = _vertices;
-        mesh->indices = _indices;
-        mesh->textures = _textures;
+        glGenVertexArrays(1, &_mesh->m_vao);
+        glGenBuffers(1, &_mesh->m_vbo);
+        glGenBuffers(1, &_mesh->m_ebo);
 
-        glGenVertexArrays(1, &mesh->m_vao);
-        glGenBuffers(1, &mesh->m_vbo);
-        glGenBuffers(1, &mesh->m_ebo);
+        glBindVertexArray(_mesh->m_vao);
 
-        glBindVertexArray(mesh->m_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, _mesh->m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(vertex), &mesh->vertices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh->m_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh->indices.size() * sizeof(unsigned int), &_mesh->indices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
@@ -254,27 +265,18 @@ namespace rain
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, textCoords));
 
         glBindVertexArray(0);
-
-        return mesh;
     }
 
-    void DrawMesh(Mesh* _mesh, Shader* _shader)
+    void Draw(Model* _model)
     {
         // TODO(martin) : change this draw method once material struct is setup
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-
-        for (unsigned int i = 0; i < _mesh->textures.size(); i++)
+        _model->material.shader->use();
+        for (unsigned int i = 0; i < _model->textures.size(); ++i)
         {
             glActiveTexture(GL_TEXTURE0 + i);
-            std::string number;
-            std::string name = _mesh->textures[i].type;
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular")
-                number = std::to_string(specularNr++);
-
-            _shader->setParameter(("material." + name + number).c_str(), (int)i);
+            
+            _model->material.shaderVariables;
+            _model->material.shader->setParameter("", (int)i);
             glBindTexture(GL_TEXTURE_2D, _mesh->textures[i].id);
         }
         glActiveTexture(GL_TEXTURE0);
