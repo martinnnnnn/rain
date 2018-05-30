@@ -32,45 +32,24 @@ namespace rain
         std::string Texture2DTypeToString(Texture2DType _type);
     }
 
-
-
-	class Texture
+	struct Texture2D
 	{
-	public:
-		Texture() {}
-
-        virtual void Bind() {};
-
-	public:
-		GLuint id;
-        std::string type;
-	protected:
-		GLint m_format;
+        GLuint id;
+        std::string path;
+        Texture2DType type;
+        GLint format;
 	};
 
-	class Texture2D : public Texture
+	struct TextureCubeMap
 	{
-	public:
-		Texture2D() : Texture() {}
-
-		int Load(const std::string& _directory, const std::string& _fileName, Texture2DType _type, bool _flipVertically = false);
-		void Bind() override;
-
-	private: 
-        std::string m_directory;
-        std::string m_fileName;
-        Texture2DType m_type;
+        GLuint id;
+		std::vector<std::string> paths;
+        Texture2DType type;
+        GLint format;
 	};
 
-	
-	class TextureCubeMap : public Texture
-	{
-	public:
-		TextureCubeMap() : Texture() {}
+    Texture2D LoadTexture2D(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
+	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically = false);
+    void BindTexture(GLenum _type, GLuint _id);
 
-		int Load(std::vector<std::string> _paths, bool _flipVertically = false);
-		void Bind() override;
-	private:
-		std::vector<std::string> m_paths;
-	};
 }

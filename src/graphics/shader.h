@@ -22,12 +22,13 @@ namespace rain
 
         struct Variable
         {
-            Variable(GLSL::Type _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
-            Variable(GLSL::Type _variableType, GLenum _glslType, const std::string& _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
+            //Variable(GLSL::Type _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
+            //Variable(GLSL::Type _variableType, GLenum _glslType, const std::string& _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}
 
             GLSL::Type variableType;
             GLenum glslType;
             std::string name;
+            std::string textureName;
             GLint size;
             union Value
             {
@@ -54,8 +55,6 @@ namespace rain
         void use();
         void Reload();
 
-		void Activate();
-
         void setParameter(const std::string &name, bool value) const;
         void setParameter(const std::string &name, int value) const;
         void setParameter(const std::string &name, float x) const;
@@ -65,9 +64,9 @@ namespace rain
         void setParameter(const std::string &name, const glm::fvec2 &vector) const;
         void setParameter(const std::string &name, const glm::fvec3 &vector) const;
         void setParameter(const std::string &name, const glm::fmat4 &matrix);
-        //void setParameter(const std::string &name, CurrentTextureType);
 
-        std::unordered_map<std::string, std::vector<GLSL::Variable>> GetGLSLVariables() const;
+        std::vector<GLSL::Variable> GetGLSLVariablesSimple() const;
+        std::unordered_map<std::string, std::vector<GLSL::Variable>> GetGLSLVariablesFancy() const;
 
     private:
         void load(const char* _vShaderCode, const char* _fShaderCode);

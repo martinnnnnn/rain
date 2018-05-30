@@ -11,7 +11,6 @@
 
 namespace rain
 {
-    class Texture;
 
     class Material : public Component
     {

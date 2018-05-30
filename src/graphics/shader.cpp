@@ -106,13 +106,45 @@ namespace rain
         glUseProgram(id);
     }
 
-    std::unordered_map<std::string, std::vector<GLSL::Variable>> Shader::GetGLSLVariables() const
+    std::vector<GLSL::Variable> Shader::GetGLSLVariablesSimple() const
+    {
+        std::vector<GLSL::Variable> variables;
+
+        GLint count;
+        GLint size;
+        GLenum glslType;
+        const GLsizei bufSize = 32;
+        GLchar name[bufSize];
+        GLsizei length;
+
+        // retrieving attributes
+        glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &count);
+        for (GLint i = 0; i < count; ++i)
+        {
+            glGetActiveAttrib(id, i, bufSize, &length, &size, &glslType, name);
+
+            variables.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, glslType, name, size));
+        }
+
+        // retrieving uniforms
+        glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
+        for (GLint i = 0; i < count; ++i)
+        {
+            glGetActiveUniform(id, i, bufSize, &length, &size, &glslType, name);
+
+            variables.push_back(GLSL::Variable(GLSL::Type::UNIFORM, glslType, name, size));
+        }
+
+        return variables;
+    }
+
+    std::unordered_map<std::string, std::vector<GLSL::Variable>> Shader::GetGLSLVariablesFancy() const
     {
         std::unordered_map<std::string, std::vector<GLSL::Variable>> variables;
 
         GLint count;
         GLint size;
-        GLenum type;
+        GLenum glslType;
         const GLsizei bufSize = 32;
         GLchar name[bufSize];
         GLsizei length;
@@ -121,7 +153,7 @@ namespace rain
         glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &count);
         for (GLint i = 0; i < count; ++i)
         {
-            glGetActiveAttrib(id, i, bufSize, &length, &size, &type, name);
+            glGetActiveAttrib(id, i, bufSize, &length, &size, &glslType, name);
 
             // spliting the name to check if it's part of a struct
             std::vector<std::string> elements = String::split(name, '.');
@@ -133,14 +165,14 @@ namespace rain
                 splitedName = elements[1];
                 key = elements[0];
             }
-            variables[key].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, type, splitedName, size));
+            variables[key].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, glslType, splitedName, size));
         }
 
         // retrieving uniforms
         glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count);
         for (GLint i = 0; i < count; ++i)
         {
-            glGetActiveUniform(id, i, bufSize, &length, &size, &type, name);
+            glGetActiveUniform(id, i, bufSize, &length, &size, &glslType, name);
 
             // spliting the name to check if it's part of a struct
             std::vector<std::string> elements = String::split(name, '.');
@@ -152,7 +184,7 @@ namespace rain
                 splitedName = elements[1];
                 key = elements[0];
             }
-            variables[key].push_back(GLSL::Variable(GLSL::Type::UNIFORM, type, splitedName, size));
+            variables[key].push_back(GLSL::Variable(GLSL::Type::UNIFORM, glslType, splitedName, size));
         }
 
         return variables;

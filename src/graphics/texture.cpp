@@ -60,14 +60,16 @@ namespace rain
         }
     }
 
-	int Texture2D::Load(const std::string& _directory, const std::string& _fileName, Texture2DType _type, bool _flipVertically)
+    //TODO(martin) : error handling ?
+    //CHECK(martin) : check if working properly
+	Texture2D LoadTexture2D(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
-		m_directory = _directory;
-        m_fileName = _fileName;
-        m_type = _type;
-
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_2D, id);
+        Texture2D texture{};
+        texture.path = _path;
+        texture.type = _type;
+        
+		glGenTextures(1, &texture.id);
+		glBindTexture(GL_TEXTURE_2D, texture.id);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -77,34 +79,31 @@ namespace rain
 		stbi_set_flip_vertically_on_load(_flipVertically);
 
 		int width, height, channelCount;
-		unsigned char * data = stbi_load((m_directory + m_fileName).c_str(), &width, &height, &channelCount, 0);
+		unsigned char * data = stbi_load((texture.path).c_str(), &width, &height, &channelCount, 0);
 		if (data)
 		{
-			m_format = TextureUtils::ChannelCountToFormat(channelCount);
-			glTexImage2D(GL_TEXTURE_2D, 0, m_format, width, height, 0, m_format, GL_UNSIGNED_BYTE, data);
+            texture.format = TextureUtils::ChannelCountToFormat(channelCount);
+			glTexImage2D(GL_TEXTURE_2D, 0, texture.format, width, height, 0, texture.format, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
 		else
 		{
-			std::cout << "Failed to load texture at : " << (m_directory + m_fileName) << std::endl;
-			return -1;
+			std::cout << "Failed to load texture at : " << (texture.path) << std::endl;
+            return;
 		}
 		stbi_image_free(data);
-		return 0;
 	}
 
-	void Texture2D::Bind()
-	{
-		glBindTexture(GL_TEXTURE_2D, id);
-	}
 
-	int TextureCubeMap::Load(std::vector<std::string> _paths, bool _flipVertically)
+    //TODO(martin) : error handling ?
+    //CHECK(martin) : check if working properly
+	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically)
 	{
-		int result = 0;
-		m_paths = _paths;
+        TextureCubeMap texture{};
+        texture.paths = _paths;
 
-		glGenTextures(1, &id);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+		glGenTextures(1, &texture.id);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, texture.id);
 
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -115,27 +114,26 @@ namespace rain
 		int width, height, channelCount;
 		unsigned char* data;
 		stbi_set_flip_vertically_on_load(_flipVertically);
-		for (size_t i = 0; i < m_paths.size(); ++i)
+		for (size_t i = 0; i < texture.paths.size(); ++i)
 		{
-			data = stbi_load(m_paths[i].c_str(), &width, &height, &channelCount, 0);
+			data = stbi_load(texture.paths[i].c_str(), &width, &height, &channelCount, 0);
 			if (data)
 			{
-				m_format = TextureUtils::ChannelCountToFormat(channelCount);
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, m_format, width, height, 0, m_format, GL_UNSIGNED_BYTE, data);
+                texture.format = TextureUtils::ChannelCountToFormat(channelCount);
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, texture.format, width, height, 0, texture.format, GL_UNSIGNED_BYTE, data);
 				stbi_image_free(data);
 			}
 			else
 			{
-				result = -1;
-				std::cout << "Failed to load Cubemap texture at path: " << m_paths[i] << std::endl;
+				std::cout << "Failed to load Cubemap texture at path: " << texture.paths[i] << std::endl;
 			}
 		}
-		return result;
+		return texture;
 	}
 
+    void BindTexture(GLenum _type, GLuint _id)
+    {
+        glBindTexture(_type, _id);
+    }
 
-	void TextureCubeMap::Bind()
-	{
-		glBindTexture(GL_TEXTURE_CUBE_MAP, id);
-	}
 }

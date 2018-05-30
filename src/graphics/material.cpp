@@ -33,7 +33,7 @@ namespace rain
         m_shader->init(vertexpath, fragmentpath);
         m_shader->use();
 
-        m_shaderVariables = m_shader->GetGLSLVariables();
+        m_shaderVariables = m_shader->GetGLSLVariablesFancy();
 
 		std::ifstream file(datapath);
 

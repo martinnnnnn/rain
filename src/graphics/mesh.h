@@ -1,9 +1,10 @@
 #pragma once
 
 
-#include <glm/glm.hpp>
 #include <vector>
 #include <string>
+#include <glm/glm.hpp>
+#include <assimp/scene.h>
 
 #include "utility/incl_3d.h"
 #include "graphics/texture.h"
@@ -19,27 +20,43 @@ namespace rain
 		glm::vec2 textCoords;
 	};
 
-	//struct texture
-	//{
-	//	GLuint id;
-	//	std::string type;
- //       std::string path;
-	//};
-
-	class Mesh
+	struct Mesh
 	{
-	public:
+        std::string name;
 		std::vector<vertex> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<Texture2D> textures;
-
-		Mesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture2D> _textures);
-		void Draw(Shader* _shader);
-
-
-	private:
 		GLuint m_vao;
 		GLuint m_vbo;
 		GLuint m_ebo;
+        Mesh* parent;
 	};
+
+    struct Material
+    {
+        Shader* shader;
+        std::string shaderPath;
+        std::string dataPath;
+        std::vector<GLSL::Variable> shaderVariables;
+    };
+
+    
+    struct Model
+    {
+        Mesh* mesh;
+        Material material;
+        std::vector<Texture2D> textures;
+    };
+
+    Mesh* InitMesh(std::vector<vertex> _vertices, std::vector<unsigned int> _indices, std::vector<Texture2D> _textures);
+    void DrawMesh(Mesh* _mesh, Shader* _shader);
+
+    // 
+    Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath);
+    Material LoadMaterialData(Shader* _shader, const std::string& _materialPath);
+    void SetDefaultValues(Material* material);
+    
+    std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);
+    const aiScene* OpenAssimpScene(const std::string& _path);
+    Mesh* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
+    std::vector<Texture2D> LoadMeshTextures(aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath);
 }

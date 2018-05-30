@@ -10,22 +10,9 @@
 
 namespace rain
 {
-    Model::Model(const std::string& _path)
-    {
-        loadModel(_path);
-    }
 
-    void Model::Draw(Shader* _shader)
+    std::vector<Mesh> loadMeshes(const std::string& _path)
     {
-        for (size_t i = 0; i < m_meshes.size(); ++i)
-        {
-            m_meshes[i].Draw(_shader);
-        }
-    }
-
-    void Model::loadModel(const std::string& _path)
-    {
-        m_path = _path;
         Assimp::Importer import;
         const aiScene *scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -35,24 +22,27 @@ namespace rain
             return;
         }
 
-        processNode(scene->mRootNode, scene);
+        return processNode(scene->mRootNode, scene);
     }
 
-    void Model::processNode(aiNode* _node, const aiScene* _scene)
+    std::vector<Mesh> processNode(aiNode* _node, const aiScene* _scene)
     {
+        std::vector<Mesh> meshes;
         for (unsigned int i = 0; i < _node->mNumMeshes; i++)
         {
             aiMesh *mesh = _scene->mMeshes[_node->mMeshes[i]];
-            m_meshes.push_back(processMesh(mesh, _scene));
+            meshes.push_back(processMesh(mesh, _scene));
         }
 
         for (unsigned int i = 0; i < _node->mNumChildren; i++)
         {
-            processNode(_node->mChildren[i], _scene);
+            std::vector<Mesh> childMeshes = processNode(_node->mChildren[i], _scene);
+            meshes.insert(meshes.end(), childMeshes.begin(), childMeshes.end());
         }
+        return meshes;
     }
 
-    Mesh Model::processMesh(aiMesh* _mesh, const aiScene* _scene)
+    Mesh processMesh(aiMesh* _mesh, const aiScene* _scene)
     {
         std::vector<vertex> vertices;
         std::vector<unsigned int> indices;
@@ -120,21 +110,5 @@ namespace rain
         }
 
         return Mesh(vertices, indices, textures);
-    }
-
-    std::vector<Texture2D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
-    {
-        std::vector<Texture2D> textures;
-        //for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
-        //{
-        //    aiString str;
-        //    mat->GetTexture(type, i, &str);
-        //    Texture2D tex();
-        //    tex.id = TextureFromFile(str.C_Str(), m_directory);
-        //    tex.type = typeName;
-        //    tex.path = str.C_Str();
-        //    textures.push_back(tex);
-        //}
-        return textures;
     }
 }
