@@ -13,31 +13,35 @@
 
 namespace rain
 {
-    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
+    std::vector<Model> SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
     {
         //TODO(martin) : use name instead of taking the first model in the scene
-        Model model = GetModelsFromAssimpScene(_modelPath)[0];
-        InitMesh(model.mesh);
-        model.material = LoadMaterial(_materialDataPath, _shaderPath);
+        std::vector<Model> models = GetModelsFromAssimpScene(_modelPath);
 
-        //TODO(martin) : not optimized - should be improved
-        for (size_t i = 0; i < model.textures.size(); ++i)
+        for (size_t k = 0; k < models.size(); ++k)
         {
-            std::string textureType = TextureUtils::Texture2DTypeToString(model.textures[i].type);
-            std::cout << "texture type : " << textureType << std::endl;
-            for (size_t j = 0; j < model.material.shaderVariables.size(); ++j)
+            InitMesh(models[k].mesh);
+            models[k].material = LoadMaterial(_materialDataPath, _shaderPath);
+
+            //TODO(martin) : not optimized - should be improved
+            for (size_t i = 0; i < models[k].textures.size(); ++i)
             {
-                std::cout << "shader variable : " << model.material.shaderVariables[j].name << std::endl;
-                if (model.material.shaderVariables[j].name.find("mat") == std::string::npos)
-                    continue;
-                if (model.material.shaderVariables[j].name.find(textureType) != std::string::npos)
+                std::string textureType = TextureUtils::Texture2DTypeToString(models[k].textures[i].type);
+                std::cout << "texture type : " << textureType << std::endl;
+                for (size_t j = 0; j < models[k].material.shaderVariables.size(); ++j)
                 {
-                    model.material.shaderVariables[j].textureName = model.textures[i].path;
-                    break;
+                    std::cout << "shader variable : " << models[k].material.shaderVariables[j].name << std::endl;
+                    if (models[k].material.shaderVariables[j].name.find("mat") == std::string::npos)
+                        continue;
+                    if (models[k].material.shaderVariables[j].name.find(textureType) != std::string::npos)
+                    {
+                        models[k].material.shaderVariables[j].textureName = models[k].textures[i].path;
+                        break;
+                    }
                 }
             }
         }
-        return model;
+        return models;
     }
 
 

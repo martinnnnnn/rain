@@ -47,7 +47,7 @@ namespace rain
         std::vector<Texture2D> textures;
     };
 
-    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
+    std::vector<Model> SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
 
 
 
