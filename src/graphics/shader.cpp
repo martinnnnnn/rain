@@ -123,7 +123,13 @@ namespace rain
         {
             glGetActiveAttrib(id, i, bufSize, &length, &size, &glslType, name);
 
-            variables.push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, glslType, name, size));
+            GLSL::Variable var;
+            var.variableType = GLSL::Type::ATTRIBUTE;
+            var.glslType = glslType;
+            var.name = name;
+            var.size = size;
+
+            variables.push_back(var);
         }
 
         // retrieving uniforms
@@ -132,7 +138,13 @@ namespace rain
         {
             glGetActiveUniform(id, i, bufSize, &length, &size, &glslType, name);
 
-            variables.push_back(GLSL::Variable(GLSL::Type::UNIFORM, glslType, name, size));
+            GLSL::Variable var;
+            var.variableType = GLSL::Type::UNIFORM;
+            var.glslType = glslType;
+            var.name = name;
+            var.size = size;
+
+            variables.push_back(var);
         }
 
         return variables;
@@ -165,7 +177,13 @@ namespace rain
                 splitedName = elements[1];
                 key = elements[0];
             }
-            variables[key].push_back(GLSL::Variable(GLSL::Type::ATTRIBUTE, glslType, splitedName, size));
+            GLSL::Variable var;
+            var.variableType = GLSL::Type::ATTRIBUTE;
+            var.glslType = glslType;
+            var.name = name;
+            var.size = size;
+
+            variables[key].push_back(var);
         }
 
         // retrieving uniforms
@@ -184,7 +202,14 @@ namespace rain
                 splitedName = elements[1];
                 key = elements[0];
             }
-            variables[key].push_back(GLSL::Variable(GLSL::Type::UNIFORM, glslType, splitedName, size));
+
+            GLSL::Variable var;
+            var.variableType = GLSL::Type::UNIFORM;
+            var.glslType = glslType;
+            var.name = name;
+            var.size = size;
+
+            variables[key].push_back(var);
         }
 
         return variables;

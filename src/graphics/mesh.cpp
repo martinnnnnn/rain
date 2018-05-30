@@ -8,6 +8,7 @@
 
 #include "core/file_system.h"
 #include "utility/gl_utils.h"
+#include "utility/json_utils.h"
 
 
 namespace rain
@@ -138,6 +139,7 @@ namespace rain
 
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path)
     {
+        //TODO(martin) : error handling
         // loading scene
         const aiScene* scene = OpenAssimpScene(_path);
         aiNode* node = scene->mRootNode;
@@ -167,7 +169,7 @@ namespace rain
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-            return;
+            return nullptr;
         }
 
         return scene;
@@ -271,18 +273,26 @@ namespace rain
     {
         // TODO(martin) : change this draw method once material struct is setup
         _model->material.shader->use();
-        for (unsigned int i = 0; i < _model->textures.size(); ++i)
+
+        for (size_t i = 0; i < _model->material.shaderVariables.size(); ++i)
         {
-            glActiveTexture(GL_TEXTURE0 + i);
-            
-            _model->material.shaderVariables;
-            _model->material.shader->setParameter("", (int)i);
-            glBindTexture(GL_TEXTURE_2D, _mesh->textures[i].id);
+            GLSL::Variable variable = _model->material.shaderVariables[i];
+            for (auto texture : _model->textures)
+            {
+                if (texture.path == variable.textureName)
+                {
+                    glActiveTexture(GL_TEXTURE0 + i);
+                    _model->material.shader->setParameter(variable.name, (int)i);
+                    glBindTexture(GL_TEXTURE_2D, texture.id);
+                    continue;
+                }
+            }
         }
+
         glActiveTexture(GL_TEXTURE0);
 
-        glBindVertexArray(_mesh->m_vao);
-        glDrawElements(GL_TRIANGLES, _mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(_model->mesh->m_vao);
+        glDrawElements(GL_TRIANGLES, _model->mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 }

@@ -88,7 +88,7 @@ namespace rain
 		else
 		{
 			std::cout << "Failed to load texture at : " << (texture.path) << std::endl;
-            return;
+            return Texture2D{};
 		}
 		stbi_image_free(data);
 	}

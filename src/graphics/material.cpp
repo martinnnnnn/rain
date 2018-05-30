@@ -16,7 +16,7 @@
 
 namespace rain
 {
-    Material::Material(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _createDefaultIfMissing) :
+    /*Material::Material(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _createDefaultIfMissing) :
         m_shaderPath(_shaderPath)
     {
         Init(_shaderPath, _textures, _createDefaultIfMissing);
@@ -35,31 +35,31 @@ namespace rain
 
         m_shaderVariables = m_shader->GetGLSLVariablesFancy();
 
-		std::ifstream file(datapath);
+        std::ifstream file(datapath);
 
-		if (file.fail())
-		{
-			writeShaderDefaultValueFile(datapath);
-		}
-		else
-		{
-			if (_eraseDefault)
-			{
-				writeShaderDefaultValueFile(datapath);
-			}
-			else
-			{
-				readShaderDefaultValueFile(file);
-			}
-		}
-		
-	}
+        if (file.fail())
+        {
+            writeShaderDefaultValueFile(datapath);
+        }
+        else
+        {
+            if (_eraseDefault)
+            {
+                writeShaderDefaultValueFile(datapath);
+            }
+            else
+            {
+                readShaderDefaultValueFile(file);
+            }
+        }
 
-	void Material::writeShaderDefaultValueFile(const std::string& _datafilePath)
-	{
-		std::ofstream outfile(_datafilePath);
+    }
 
-		nlohmann::json jsonVariables;
+    void Material::writeShaderDefaultValueFile(const std::string& _datafilePath)
+    {
+        std::ofstream outfile(_datafilePath);
+
+        nlohmann::json jsonVariables;
 
         for (auto it : m_shaderVariables)
         {
@@ -102,12 +102,12 @@ namespace rain
                 }
             }
         }
-		outfile << jsonVariables.dump(4);
-		outfile.close();
-	}
+        outfile << jsonVariables.dump(4);
+        outfile.close();
+    }
 
-	void Material::readShaderDefaultValueFile(std::ifstream& _inputFile)
-	{
+    void Material::readShaderDefaultValueFile(std::ifstream& _inputFile)
+    {
         nlohmann::json jsonVariables;
         _inputFile >> jsonVariables;
 
@@ -155,5 +155,5 @@ namespace rain
                 }
             }
         }
-	}
+    }*/
 }

@@ -12,8 +12,5 @@
 
 namespace rain
 {
-    class Shader;
-
-    
 
 }
