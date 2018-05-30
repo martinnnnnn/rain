@@ -27,8 +27,8 @@ namespace rain
 
     int GameEngine::Init(const std::string& _path)
     {
-        m_screenWidth = 800;
-        m_screenHeight = 600;
+        m_screenWidth = 1920;
+        m_screenHeight = 1800;
         m_resourcesRootPath = _path;
 
         std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
@@ -41,7 +41,7 @@ namespace rain
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
+        glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
         m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
         if (m_window == NULL)
@@ -87,8 +87,8 @@ namespace rain
 
     int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
-        m_screenWidth = 800;
-        m_screenHeight = 600;
+        m_screenWidth = 1920;
+        m_screenHeight = 1080;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
         if (_args["root"] != "")
         {
@@ -112,7 +112,7 @@ namespace rain
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_SAMPLES, 4);
-        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
+        glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
         m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
         if (m_window == NULL)

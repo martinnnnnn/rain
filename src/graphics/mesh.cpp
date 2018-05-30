@@ -27,10 +27,8 @@ namespace rain
             for (size_t i = 0; i < models[k].textures.size(); ++i)
             {
                 std::string textureType = TextureUtils::Texture2DTypeToString(models[k].textures[i].type);
-                std::cout << "texture type : " << textureType << std::endl;
                 for (size_t j = 0; j < models[k].material.shaderVariables.size(); ++j)
                 {
-                    std::cout << "shader variable : " << models[k].material.shaderVariables[j].name << std::endl;
                     if (models[k].material.shaderVariables[j].name.find("mat") == std::string::npos)
                         continue;
                     if (models[k].material.shaderVariables[j].name.find(textureType) != std::string::npos)
@@ -236,7 +234,7 @@ namespace rain
         mesh->vertices.reserve(_aiMesh->mNumVertices);
         for (unsigned int i = 0; i < _aiMesh->mNumVertices; ++i)
         {
-            vertex vert;
+            Vertex vert;
             vert.position.x = _aiMesh->mVertices[i].x;
             vert.position.y = _aiMesh->mVertices[i].y;
             vert.position.z = _aiMesh->mVertices[i].z;
@@ -288,7 +286,6 @@ namespace rain
                     material->GetTexture(i, j, &str);
                     Texture2D tex = LoadTexture2D(_directoryPath + str.C_Str(), (Texture2DType)i);
                     textures.push_back(tex);
-                    std::cout << TextureUtils::Texture2DTypeToString((Texture2DType)i) << " " << str.C_Str() << std::endl;
                 }
             }
         }
@@ -305,19 +302,19 @@ namespace rain
         glBindVertexArray(_mesh->m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, _mesh->m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(Vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh->m_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh->indices.size() * sizeof(unsigned int), &_mesh->indices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, normal));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, textCoords));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, textCoords));
 
         glBindVertexArray(0);
     }
@@ -332,14 +329,13 @@ namespace rain
             GLSL::Variable variable = _model->material.shaderVariables[i];
             for (size_t j = 0; j < _model->textures.size(); ++j)
             {
-                //std::cout << variable.textureName << " " << textIndex << std::endl;
                 if (_model->textures[j].path == variable.textureName)
                 {
                     glActiveTexture(GL_TEXTURE0 + textIndex);
                     textIndex++;
                     _model->material.shader->setParameter(variable.textureName, (int)j);
                     glBindTexture(GL_TEXTURE_2D, _model->textures[j].id);
-                    //continue;
+                    continue;
                 }
             }
         }

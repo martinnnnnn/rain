@@ -218,10 +218,6 @@
         "glsl_type": "sampler2D",
         "value": 0
     },
-    "mat.emissive": {
-        "glsl_type": "sampler2D",
-        "value": 0
-    },
     "mat.shininess": {
         "glsl_type": "float",
         "value": 0
@@ -271,10 +267,6 @@
             0.0,
             0.0
         ]
-    },
-    "skybox": {
-        "glsl_type": "samplerCube",
-        "value": 0
     },
     "view": {
         "glsl_type": "mat4",

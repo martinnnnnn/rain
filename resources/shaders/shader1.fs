@@ -60,11 +60,11 @@ void main()
 	vec3 outColor = CalcLight(light1);
 	outColor += CalcLight(light2);
 	outColor += CalcLight(light3);
-    outColor += texture(skybox, R).rgb * texture(mat.specular, fs_in.TextCoord).rgb;
+    //outColor += texture(skybox, R).rgb * texture(mat.specular, fs_in.TextCoord).rgb;
     float ratio = 1.00 / 2.42;
     I = normalize(fs_in.Position - viewPos);
     R = refract(I, normalize(fs_in.Normal), ratio);
-    outColor += texture(skybox, R).rgb, 1.0 * (-texture(mat.specular, fs_in.TextCoord).rgb);
+    //outColor += texture(skybox, R).rgb, 1.0 * (-texture(mat.specular, fs_in.TextCoord).rgb);
 
 	FragColor = vec4(outColor, 1);
 } 
@@ -112,5 +112,5 @@ vec3 CalcLight(Light light)
 	specularLight *= attenuation * intensity;
 	emissiveLight *= attenuation * intensity;	
 
-	return ambientLight + diffuseLight + specularLight + emissiveLight;
+	return ambientLight + diffuseLight + specularLight /*+ emissiveLight*/;
 }

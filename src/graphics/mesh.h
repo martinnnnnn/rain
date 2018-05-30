@@ -14,7 +14,7 @@ namespace rain
 {
 	class Shader;
 
-	struct vertex
+	struct Vertex
 	{
 		glm::vec3 position;
 		glm::vec3 normal;
@@ -24,7 +24,7 @@ namespace rain
 	struct Mesh
 	{
         std::string name;
-		std::vector<vertex> vertices;
+		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		GLuint m_vao;
 		GLuint m_vbo;
