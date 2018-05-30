@@ -9,7 +9,7 @@
 #include "core/file_system.h"
 #include "utility/gl_utils.h"
 #include "utility/json_utils.h"
-
+#include "utility/first_time_mcr.h"
 
 namespace rain
 {
@@ -21,14 +21,18 @@ namespace rain
         model.material = LoadMaterial(_materialDataPath, _shaderPath);
 
         //TODO(martin) : not optimized - should be improved
-        for (size_t j = 0; j < model.textures.size(); ++j)
+        for (size_t i = 0; i < model.textures.size(); ++i)
         {
-            for (auto shaderVariable : model.material.shaderVariables)
+            std::string textureType = TextureUtils::Texture2DTypeToString(model.textures[i].type);
+            std::cout << "texture type : " << textureType << std::endl;
+            for (size_t j = 0; j < model.material.shaderVariables.size(); ++j)
             {
-                std::string textureType = TextureUtils::Texture2DTypeToString(model.textures[j].type);
-                if (shaderVariable.name.find(textureType) != std::string::npos)
+                std::cout << "shader variable : " << model.material.shaderVariables[j].name << std::endl;
+                if (model.material.shaderVariables[j].name.find("mat") == std::string::npos)
+                    continue;
+                if (model.material.shaderVariables[j].name.find(textureType) != std::string::npos)
                 {
-                    shaderVariable.textureName = model.textures[j].path;
+                    model.material.shaderVariables[j].textureName = model.textures[i].path;
                     break;
                 }
             }
@@ -187,8 +191,6 @@ namespace rain
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
         }
 
-
-
         //TODO(martin) : error handling
         // loading scene
         //const aiScene* scene = OpenAssimpScene(_path);
@@ -282,6 +284,7 @@ namespace rain
                     material->GetTexture(i, j, &str);
                     Texture2D tex = LoadTexture2D(_directoryPath + str.C_Str(), (Texture2DType)i);
                     textures.push_back(tex);
+                    std::cout << TextureUtils::Texture2DTypeToString((Texture2DType)i) << " " << str.C_Str() << std::endl;
                 }
             }
         }
@@ -317,29 +320,30 @@ namespace rain
 
     void Draw(Model* _model)
     {
-        // TODO(martin) : change this draw method once material struct is setup
         _model->material.shader->use();
 
+        int textIndex = 0;
         for (size_t i = 0; i < _model->material.shaderVariables.size(); ++i)
         {
             GLSL::Variable variable = _model->material.shaderVariables[i];
-            for (auto texture : _model->textures)
+            for (size_t j = 0; j < _model->textures.size(); ++j)
             {
-                if (texture.path == variable.textureName)
+                //std::cout << variable.textureName << " " << textIndex << std::endl;
+                if (_model->textures[j].path == variable.textureName)
                 {
-                    glActiveTexture(GL_TEXTURE0 + i);
-                    _model->material.shader->setParameter(variable.name, (int)i);
-                    glBindTexture(GL_TEXTURE_2D, texture.id);
-                    continue;
+                    glActiveTexture(GL_TEXTURE0 + textIndex);
+                    textIndex++;
+                    _model->material.shader->setParameter(variable.textureName, (int)j);
+                    glBindTexture(GL_TEXTURE_2D, _model->textures[j].id);
+                    //continue;
                 }
             }
         }
 
-        glActiveTexture(GL_TEXTURE0);
-
         glBindVertexArray(_model->mesh->m_vao);
         glDrawElements(GL_TRIANGLES, _model->mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+        glActiveTexture(GL_TEXTURE0);
     }
 }
 
