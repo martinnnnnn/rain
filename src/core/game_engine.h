@@ -22,6 +22,7 @@ namespace rain
     {
     public:
 
+        int Init(const std::string& _path);
         int Init(std::unordered_map<std::string, std::string> _args);
         void Run();
         
@@ -31,6 +32,7 @@ namespace rain
         Camera* GetCamera();
         float GetDeltaTime();
         std::string GetResourcesRoot();
+        void SetResourcesRoot(const std::string& _path);
         void SetUpdateCallback(std::function<void(void)> _function);
         glm::vec2 GetWindowSize();
     private:

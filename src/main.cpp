@@ -63,10 +63,9 @@ using namespace nlohmann;
 
 #define DLLEXPORT extern "C" __declspec(dllexport)
 
-DLLEXPORT void LoadGame()
+DLLEXPORT void LoadGame(const char* path)
 {
-	std::unordered_map<std::string, std::string> maps;
-	int retval = Rain::Init(maps);
+	int retval = Rain::Engine()->Init(path);
 	if (retval != 0)
 	{
 		std::cout << "Couldn't launch the game." << std::endl;

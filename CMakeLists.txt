@@ -95,6 +95,6 @@ target_link_libraries(rainlib assimp glfw
 #### RUNTIME OUTPUT DIRECTORY ####
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
-set_target_properties(rainlib PROPERTIES LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin/lib")
+set_target_properties(rainlib PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 
 message(STATUS "> end of generation")

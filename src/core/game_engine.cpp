@@ -25,12 +25,72 @@ namespace rain
 
     }
 
+    int GameEngine::Init(const std::string& _path)
+    {
+        m_screenWidth = 800;
+        m_screenHeight = 600;
+        m_resourcesRootPath = _path;
+
+        std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
+
+        m_fileSystem = new FileSystem();
+        m_fileSystem->Init(m_resourcesRootPath);
+
+        glfwInit();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
+        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
+
+        m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
+        if (m_window == NULL)
+        {
+            std::cout << "Failed to create GLFW window" << std::endl;
+            glfwTerminate();
+            return -1;
+        }
+
+        //glfwSwapInterval(1); // Enable vsync
+        //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        //glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+
+        //glfwSetWindowPos(m_window, 600, 600);
+        glfwMakeContextCurrent(m_window);
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cout << "Failed to initialize GLAD" << std::endl;
+            return -1;
+        }
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        //glEnable(GL_CULL_FACE);
+        //glFrontFace(GL_CW);
+
+        glEnable(GL_MULTISAMPLE);
+
+        glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
+        glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
+
+        glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
+
+        m_inputEngine = new InputEngine(m_window);
+        m_cameraController = new CameraController();
+        m_cameraController->Init(m_inputEngine);
+
+        initUI();
+        return 0;
+    }
+
+
     int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
         m_screenWidth = 800;
         m_screenHeight = 600;
         m_resourcesRootPath = Rain::GetExePath() + "/resources/";
-		m_resourcesRootPath = "F:/__MARTIN/__INFO/__PROJECTS/rain/resources";
+		m_resourcesRootPath = "ERROR";
         if (_args["root"] != "")
         {
             m_resourcesRootPath = _args["root"];
@@ -227,6 +287,11 @@ namespace rain
     std::string GameEngine::GetResourcesRoot()
     {
         return m_resourcesRootPath;
+    }
+
+    void GameEngine::SetResourcesRoot(const std::string& _path)
+    {
+        m_resourcesRootPath = _path;
     }
 
     float GameEngine::GetDeltaTime()
