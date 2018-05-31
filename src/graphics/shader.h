@@ -28,7 +28,7 @@ namespace rain
             GLSL::Type variableType;
             GLenum glslType;
             std::string name;
-            std::string textureName;
+            GLuint textureId;
             GLint size;
             union Value
             {

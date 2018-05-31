@@ -33,7 +33,7 @@ namespace rain
                         continue;
                     if (models[k].material.shaderVariables[j].name.find(textureType) != std::string::npos)
                     {
-                        models[k].material.shaderVariables[j].textureName = models[k].textures[i].path;
+                        models[k].material.shaderVariables[j].textureId = models[k].textures[i].id;
                         break;
                     }
                 }
@@ -329,11 +329,11 @@ namespace rain
             GLSL::Variable* variable = &_model->material.shaderVariables[i];
             for (size_t j = 0; j < _model->textures.size(); ++j)
             {
-                if (_model->textures[j].path == variable->textureName)
+                if (_model->textures[j].id == variable->textureId)
                 {
                     glActiveTexture(GL_TEXTURE0 + textIndex);
                     textIndex++;
-                    _model->material.shader->setParameter(variable->textureName, (int)j);
+                    _model->material.shader->setParameter(variable->name, (int)j);
                     glBindTexture(GL_TEXTURE_2D, _model->textures[j].id);
                     continue;
                 }
