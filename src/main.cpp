@@ -6,11 +6,9 @@
 #include <vector>
 #include <iterator>
 #include <unordered_map>
-
-#include "utility/incl_3d.h"
-
 #include <nlohmann/json.hpp>
 
+#include "utility/incl_3d.h"
 #include "rain.h"
 #include "graphics/shader.h"
 #include "core/game_engine.h"

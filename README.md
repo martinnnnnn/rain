@@ -22,6 +22,8 @@ The CMake script creates a solution containing quite a few projects on windows, 
 
 `root="D:root/to/the/repo/rain/resources"`
 
+One more thing : when building, Assimp looks for a file "config" that it generates itself. For some reason, it can't find it while building - although it is added as a include dir in CMake - so I'm manually copying `rain/build/external/assimp/include/assimp/config.h` to `rain/external/assimp/include/assimp/`. Not ideal and the error should probably be looked at in the future, but it works as is for now.
+
 It should then work !
 
 ## Python binding
