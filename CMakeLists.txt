@@ -86,15 +86,19 @@ target_link_libraries(${PROJECT_NAME} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
+
+#### OUTPUT DIRECTORY ####
+message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
+
+#### LIB FOR EDITOR ####
+project(rainlib)
 add_definitions(-DEXPMODULE)
-add_library(rainlib SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
-target_link_libraries(rainlib assimp glfw
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+target_link_libraries(${PROJECT_NAME} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
-#### RUNTIME OUTPUT DIRECTORY ####
-message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
-set_target_properties(rainlib PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 
 message(STATUS "> end of generation")

@@ -13,7 +13,7 @@ namespace rain
         m_inputEngine = _inputEngine;
         m_camera = new Camera();
         m_transform = new Transform();
-        m_movementSpeed = 5;
+        m_movementSpeed = 40;
         return 0;
     }
 

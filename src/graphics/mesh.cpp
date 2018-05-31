@@ -326,14 +326,14 @@ namespace rain
         int textIndex = 0;
         for (size_t i = 0; i < _model->material.shaderVariables.size(); ++i)
         {
-            GLSL::Variable variable = _model->material.shaderVariables[i];
+            GLSL::Variable* variable = &_model->material.shaderVariables[i];
             for (size_t j = 0; j < _model->textures.size(); ++j)
             {
-                if (_model->textures[j].path == variable.textureName)
+                if (_model->textures[j].path == variable->textureName)
                 {
                     glActiveTexture(GL_TEXTURE0 + textIndex);
                     textIndex++;
-                    _model->material.shader->setParameter(variable.textureName, (int)j);
+                    _model->material.shader->setParameter(variable->textureName, (int)j);
                     glBindTexture(GL_TEXTURE_2D, _model->textures[j].id);
                     continue;
                 }
