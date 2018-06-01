@@ -116,6 +116,9 @@ set_target_properties(Bullet2FileLoader PROPERTIES FOLDER "bullet")
 set_target_properties(BulletInverseDynamics PROPERTIES FOLDER "bullet")
 set_target_properties(BulletSoftBody PROPERTIES FOLDER "bullet")
 
+set_target_properties(zlib PROPERTIES FOLDER "assimp")
+set_target_properties(IrrXML PROPERTIES FOLDER "assimp")
+set_target_properties(zlibstatic PROPERTIES FOLDER "assimp")
 set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "assimp")
 
 
