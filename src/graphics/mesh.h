@@ -58,12 +58,10 @@ namespace rain
     Material LoadMaterialData(const std::string& _dataPath, Shader* _shader);
     void WriteDefault(Material* _material);
     void SetDefaultValues(Material* material);
-	//Texture2DData LoadTexture2DToRAM(const std::string& _path);
 
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);
     const aiScene* OpenAssimpScene(const std::string& _path);
     Mesh* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
 	std::vector<Texture2D> FindTextures(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const TextureContainer* _textureContainer);
- //   std::vector<Texture2D> LoadTextures(aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath);
-	//std::vector<Texture2D> LoadTexturesWithData(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const std::unordered_map<std::string, Texture2DData>& datas);
+	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath);
 }

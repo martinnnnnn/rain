@@ -190,6 +190,7 @@ namespace rain
         return material;
     }
 
+	//TODO(martin) : error handling
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path)
     {
         Assimp::Importer import;
@@ -199,66 +200,18 @@ namespace rain
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
         }
 
-        //TODO(martin) : error handling
-        // loading scene
         //const aiScene* scene = OpenAssimpScene(_path);
 
-        // reserving space for models
         std::vector<Model> models;
         models.reserve(scene->mNumMeshes);
 
-
 		std::string directoryPath = File::GetDirectory(_path);
 
-		// retrieve vector<string> path
 		std::unordered_set<std::string> filePaths;
-		for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
-		{
-			aiMesh* mesh = scene->mMeshes[i];
-			if (mesh->mMaterialIndex < 0)
-				continue;
-			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-			for (aiTextureType texType = (aiTextureType)0x0; texType < AI_TEXTURE_TYPE_MAX;)
-			{
-				texType = (aiTextureType)((int)texType + 1);
-				unsigned int textureCount = material->GetTextureCount(texType);
-
-				for (unsigned int j = 0; j < textureCount; ++j)
-				{
-					aiString str;
-					material->GetTexture(texType, j, &str);
-					filePaths.emplace(directoryPath + str.C_Str());
-					//filePaths.push_back(str.C_Str());
-					std::cout << str.C_Str() << std::endl;
-				}
-			}
-		}
+		GetTexturesPath(filePaths, scene, directoryPath);
 
 		TextureContainer textureContainer = {};
 		LoadTextureData(&textureContainer, filePaths);
-
-
-		//std::vector<std::future<Texture2DData>> futureDatas;
-		//// load image ascync: path -> [ filename, data, width, height, format ]
-		//for (auto it : filePaths)
-		//{
-		//	futureDatas.push_back(std::async(&LoadTexture2DToRAM, it));
-		//}
-
-		////for (size_t i = 0; i < filePaths.size(); ++i)
-		////{
-		////	futureDatas.push_back(std::async(&LoadTextureAscync, filePaths[i]));
-		////}
-		//std::unordered_map<std::string, Texture2DData> datas;
-		//for (size_t i = 0; i < futureDatas.size(); ++i)
-		//{
-		//	Texture2DData data = futureDatas[i].get();
-		//	datas[data.fileName] = data;
-		//}
-
-
-
 
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
         {
@@ -271,50 +224,13 @@ namespace rain
 			model.mesh = LoadMeshData(aimesh, scene);
 
 			model.textures = FindTextures(aimesh, scene, directoryPath, &textureContainer);
-			//model.textures = LoadTextures(aimesh, scene, directoryPath);
 			models.push_back(model);
         }
-
-		//for (auto it : datas)
-		//{
-		//	stbi_image_free(it.second.data);
-		//}
 
         return models;
     }
 
 
-
-	//Texture2DData LoadTexture2DToRAM(const std::string& _path)
-	//{
-	//	Texture2DData textureData = {};
-	//	textureData.fileName = File::GetFileName(_path);
-
-	//	int channelCount;
-	//	textureData.data = stbi_load((_path).c_str(), &textureData.width, &textureData.height, &channelCount, 0);
-	//	if (textureData.data)
-	//	{
-	//		textureData.format = TextureUtils::ChannelCountToFormat(channelCount);
-	//	}
-	//	else
-	//	{
-	//		std::cout << "Failed to load texture at : " << (_path) << std::endl;
-	//	}
-	//	return textureData;
-	//}
-
-	//void LoadMeshAscync(const aiScene* _scene, int _index, const std::string& _path, std::vector<Model>* _models)
-	//{
-	//	aiMesh* aimesh = _scene->mMeshes[_index];
-
-	//	Model model{};
-	//	model.path = _path;
-
-	//	model.mesh = LoadMeshData(aimesh, _scene);
-	//	thelock.lock();
-	//	_models->push_back(model);
-	//	thelock.unlock();
-	//}
 
 
     const aiScene* OpenAssimpScene(const std::string& _path)
@@ -369,68 +285,6 @@ namespace rain
         return mesh;
     }
 
-
-	/*
-	
-	std::string filename
-	unsigned char* data
-	int width
-	int height
-	
-
-	*/
-
-
-	
-	//void LoadTextureThread(const aiScene* _aiScene, const unsigned int _index, const std::string& _directoryPath, std::unordered_map<std::string, Texture2DData>& _textures)
-	//{
-	//	Texture2DData textureData = {};
-	//	std::string filepath = _directoryPath + _aiScene->mTextures[_index]->mFilename.C_Str();
-	//	int channelCount;
-
-	//	textureData.data = stbi_load((filepath).c_str(), &textureData.width, &textureData.height, &channelCount, 0);
-	//	if (textureData.data)
-	//	{
-	//		textureData.format = TextureUtils::ChannelCountToFormat(channelCount);
-	//	}
-	//	else
-	//	{
-	//		std::cout << "Failed to load texture at : " << (filepath) << std::endl;
-	//		return;
-	//	}
-	//	std::cout << _aiScene->mTextures[_index]->mFilename.C_Str() << std::endl;
-	//	_textures[_aiScene->mTextures[_index]->mFilename.C_Str()] = textureData;
-	//	stbi_image_free(textureData.data);
-	//}
-
-
-
-  //  std::vector<Texture2D> LoadTextures(aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath)
-  //  {
-  //      std::vector<Texture2D> textures;
-
-		//if (_aiMesh->mMaterialIndex < 0)
-		//	return textures;
-
-		//aiMaterial* material = _aiScene->mMaterials[_aiMesh->mMaterialIndex];
-
-		//for (aiTextureType i = (aiTextureType)0x0; i < AI_TEXTURE_TYPE_MAX;)
-		//{
-		//	i = (aiTextureType)((int)i + 1);
-		//	unsigned int textureCount = material->GetTextureCount(i);
-
-		//	for (unsigned int j = 0; j < textureCount; ++j)
-		//	{
-		//		aiString str;
-		//		material->GetTexture(i, j, &str);
-		//		Texture2D tex = Load2DTexture(_directoryPath + str.C_Str(), (Texture2DType)i);
-		//		textures.push_back(tex);
-		//	}
-		//}
-
-  //      return textures;
-  //  }
-
 	std::vector<Texture2D> FindTextures(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const TextureContainer* _textureContainer)
 	{
 		std::vector<Texture2D> textures;
@@ -458,57 +312,6 @@ namespace rain
 
 		return textures;
 	}
-
-	//std::vector<Texture2D> LoadTexturesWithData(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const std::unordered_map<std::string, Texture2DData>& datas)
-	//{
-	//	std::vector<Texture2D> textures;
-
-	//	if (_aiMesh->mMaterialIndex < 0)
-	//		return textures;
-
-	//	aiMaterial* material = _aiScene->mMaterials[_aiMesh->mMaterialIndex];
-
-	//	for (aiTextureType i = (aiTextureType)0x0; i < AI_TEXTURE_TYPE_MAX;)
-	//	{
-	//		i = (aiTextureType)((int)i + 1);
-	//		unsigned int textureCount = material->GetTextureCount(i);
-
-	//		for (unsigned int j = 0; j < textureCount; ++j)
-	//		{
-	//			aiString str;
-	//			material->GetTexture(i, j, &str);
-
-	//			Texture2DData correspondingData = datas.at(File::GetFileName(str.C_Str()));
-
-	//			Texture2D tex = Load2DTextureWithData(_directoryPath + str.C_Str(), (Texture2DType)i, correspondingData);
-	//			textures.push_back(tex);
-	//		}
-	//	}
-
-	//	return textures;
-	//}
-
-	//void ThreadedLoadMeshTextures(std::vector<Texture2D>* _textures, aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath)
-	//{
-	//	if (_aiMesh->mMaterialIndex >= 0)
-	//	{
-	//		_textures->reserve(_aiMesh->mMaterialIndex);
-	//		aiMaterial* material = _aiScene->mMaterials[_aiMesh->mMaterialIndex];
-
-	//		for (aiTextureType i = (aiTextureType)0x0; i < AI_TEXTURE_TYPE_MAX;)
-	//		{
-	//			i = (aiTextureType)((int)i + 1);
-	//			unsigned int textureCount = material->GetTextureCount(i);
-	//			for (unsigned int j = 0; j < textureCount; ++j)
-	//			{
-	//				aiString str;
-	//				material->GetTexture(i, j, &str);
-	//				Texture2D tex = Load2DTexture(_directoryPath + str.C_Str(), (Texture2DType)i);
-	//				_textures->push_back(tex);
-	//			}
-	//		}
-	//	}
-	//}
 
 
     void InitMesh(Mesh* _mesh)
@@ -563,24 +366,29 @@ namespace rain
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
     }
+
+	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath)
+	{
+		for (unsigned int i = 0; i < _scene->mNumMeshes; ++i)
+		{
+			aiMesh* mesh = _scene->mMeshes[i];
+			if (mesh->mMaterialIndex < 0)
+				continue;
+			aiMaterial* material = _scene->mMaterials[mesh->mMaterialIndex];
+
+			for (aiTextureType texType = (aiTextureType)0x0; texType < AI_TEXTURE_TYPE_MAX;)
+			{
+				texType = (aiTextureType)((int)texType + 1);
+				unsigned int textureCount = material->GetTextureCount(texType);
+
+				for (unsigned int j = 0; j < textureCount; ++j)
+				{
+					aiString str;
+					material->GetTexture(texType, j, &str);
+					_filePaths.emplace(_directoryPath + str.C_Str());
+					std::cout << str.C_Str() << std::endl;
+				}
+			}
+		}
+	}
 }
-
-
-
-
-//std::vector<aiMesh*> GetMeshes(aiNode* _node, const aiScene* _scene)
-//{
-//    std::vector<Mesh> meshes;
-//    for (unsigned int i = 0; i < _node->mNumMeshes; i++)
-//    {
-//        aiMesh *mesh = _scene->mMeshes[_node->mMeshes[i]];
-//        meshes.push_back(processMesh(mesh, _scene));
-//    }
-
-//    for (unsigned int i = 0; i < _node->mNumChildren; i++)
-//    {
-//        std::vector<Mesh> childMeshes = processNode(_node->mChildren[i], _scene);
-//        meshes.insert(meshes.end(), childMeshes.begin(), childMeshes.end());
-//    }
-//    return meshes;
-//}
