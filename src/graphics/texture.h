@@ -67,5 +67,4 @@ namespace rain
 	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically = false);
     void BindTexture(GLenum _type, GLuint _id);
-
 }

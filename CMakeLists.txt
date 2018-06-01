@@ -107,6 +107,18 @@ target_link_libraries(${PROJECT_NAME} assimp glfw
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "rain")
 
+set_target_properties(Bullet3Common PROPERTIES FOLDER "bullet")
+set_target_properties(Bullet3Collision PROPERTIES FOLDER "bullet")
+set_target_properties(Bullet3Dynamics PROPERTIES FOLDER "bullet")
+set_target_properties(Bullet3Geometry PROPERTIES FOLDER "bullet")
+set_target_properties(Bullet3OpenCL_clew PROPERTIES FOLDER "bullet")
+set_target_properties(Bullet2FileLoader PROPERTIES FOLDER "bullet")
+set_target_properties(BulletInverseDynamics PROPERTIES FOLDER "bullet")
+set_target_properties(BulletSoftBody PROPERTIES FOLDER "bullet")
+
+set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "assimp")
+
+
 project(rain)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
