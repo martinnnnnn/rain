@@ -412,8 +412,8 @@ void sandboxInit()
     Material test;
     //test.Init(rootpath + std::vector<"/shaders/shader1", false);
 
-    //Model model(rootpath + "/models/nanosuit/nanosuit.obj");
-    models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+	//models = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+	models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 }
 
 

@@ -61,7 +61,7 @@ namespace rain
     }
 
     //TODO(martin) : error handling
-	Texture2D LoadTexture2D(const std::string& _path, Texture2DType _type, bool _flipVertically)
+	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
         Texture2D texture{};
         texture.path = _path;
@@ -94,6 +94,27 @@ namespace rain
         return texture;
 	}
 
+	Texture2D Load2DTextureWithData(const std::string& _path, Texture2DType _type, const Texture2DData& data)
+	{
+		Texture2D texture{};
+		texture.path = _path;
+		texture.type = _type;
+		texture.format = data.format;
+		
+		glGenTextures(1, &texture.id);
+		glBindTexture(GL_TEXTURE_2D, texture.id);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+		glTexImage2D(GL_TEXTURE_2D, 0, data.format, data.width, data.height, 0, data.format, GL_UNSIGNED_BYTE, data.data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		return texture;
+	}
 
     //TODO(martin) : error handling
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically)

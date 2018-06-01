@@ -69,7 +69,6 @@ macro(GroupSources curdir)
         else()
             string(REPLACE "/" "\\" groupname ${curdir})
             string(REPLACE "src" "src" groupname ${groupname})
-			message(STATUS ">>> creating source groupe : ${groupname}")
             source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
 
         endif()
@@ -86,6 +85,12 @@ target_link_libraries(${PROJECT_NAME} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
+set_target_properties(assimp PROPERTIES FOLDER "assimp")
+set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
+set_target_properties(BulletCollision PROPERTIES FOLDER "bullet")
+set_target_properties(LinearMath PROPERTIES FOLDER "bullet")
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "rain")
+
 
 #### OUTPUT DIRECTORY ####
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
@@ -100,5 +105,9 @@ target_link_libraries(${PROJECT_NAME} assimp glfw
                       BulletDynamics BulletCollision LinearMath)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
+set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "rain")
+
+project(rain)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 message(STATUS "> end of generation")

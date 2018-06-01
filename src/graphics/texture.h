@@ -40,6 +40,16 @@ namespace rain
         GLint format;
 	};
 
+	struct Texture2DData
+	{
+		std::string fileName;
+		unsigned char* data;
+		int width;
+		int height;
+		GLuint format;
+		bool loaded;
+	};
+
 	struct TextureCubeMap
 	{
         GLuint id;
@@ -48,7 +58,8 @@ namespace rain
         GLint format;
 	};
 
-    Texture2D LoadTexture2D(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
+	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
+	Texture2D Load2DTextureWithData(const std::string& _path, Texture2DType _type, const Texture2DData& data);
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically = false);
     void BindTexture(GLenum _type, GLuint _id);
 
