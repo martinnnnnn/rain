@@ -16,144 +16,142 @@
 
 namespace rain
 {
-    /*Material::Material(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _createDefaultIfMissing) :
-        m_shaderPath(_shaderPath)
-    {
-        Init(_shaderPath, _textures, _createDefaultIfMissing);
-    }
+	Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath)
+	{
+		Material material;
 
-    void Material::Init(const std::string& _shaderPath, std::vector<Texture*> _textures, bool _eraseDefault)
-    {
-        m_shaderPath = _shaderPath;
-        std::string vertexpath = m_shaderPath + ".vs";
-        std::string fragmentpath = m_shaderPath + ".fs";
-        std::string datapath = m_shaderPath + ".json";
+		material.dataPath = _dataPath;
+		std::string vertexpath = _shaderPath + ".vs";
+		std::string fragmentpath = _shaderPath + ".fs";
 
-        m_shader = new Shader();
-        m_shader->init(vertexpath, fragmentpath);
-        m_shader->use();
+		material.shader = new Shader();
+		material.shader->init(vertexpath, fragmentpath);
+		material.shader->use();
+		material.shaderVariables = material.shader->GetGLSLVariablesSimple();
 
-        m_shaderVariables = m_shader->GetGLSLVariablesFancy();
+		WriteDefault(&material);
+		SetDefaultValues(&material);
 
-        std::ifstream file(datapath);
+		return material;
+	}
 
-        if (file.fail())
-        {
-            writeShaderDefaultValueFile(datapath);
-        }
-        else
-        {
-            if (_eraseDefault)
-            {
-                writeShaderDefaultValueFile(datapath);
-            }
-            else
-            {
-                readShaderDefaultValueFile(file);
-            }
-        }
+	void WriteDefault(Material* _material)
+	{
+		std::ofstream outfile(_material->dataPath);
 
-    }
+		nlohmann::json jsonVariables;
 
-    void Material::writeShaderDefaultValueFile(const std::string& _datafilePath)
-    {
-        std::ofstream outfile(_datafilePath);
+		for (size_t i = 0; i < _material->shaderVariables.size(); ++i)
+		{
+			nlohmann::json json;
+			json["glsl_type"] = GLUtils::GLTypeToString(_material->shaderVariables[i].glslType);
+			switch (_material->shaderVariables[i].glslType)
+			{
+			case GL_FLOAT:
+				json["value"] = 0;
+				break;
+			case GL_FLOAT_VEC2:
+				json["value"] = glm::vec2(0);
+				break;
+			case GL_FLOAT_VEC3:
+				json["value"] = glm::vec3(0);
+				break;
+			case GL_FLOAT_MAT4:
+				json["value"] = glm::mat4(0);
+				break;
+			case GL_SAMPLER_2D:
+				json["value"] = 0;
+				break;
+			case GL_SAMPLER_CUBE:
+				json["value"] = 0;
+				break;
+			default:
+				json["value"] = 0;
+				break;
+			}
+			jsonVariables[_material->shaderVariables[i].name] = json;
+		}
+		outfile << jsonVariables.dump(4);
+		outfile.close();
+	}
 
-        nlohmann::json jsonVariables;
+	void SetDefaultValues(Material* _material)
+	{
+		//TODO(martin) : get rid of std for file reading
+		std::ifstream file(_material->dataPath);
+		if (file.fail())
+		{
+			//TODO(martin) : handle error better
+			return;
+		}
 
-        for (auto it : m_shaderVariables)
-        {
-            std::vector<GLSL::Variable> variables = it.second;
-            for (size_t i = 0; i < variables.size(); ++i)
-            {
-                nlohmann::json json;
-                json["glsl_type"] = GLUtils::GLTypeToString(variables[i].glslType);
-                switch (variables[i].glslType)
-                {
-                case GL_FLOAT:
-                    json["value"] = 0;
-                    break;
-                case GL_FLOAT_VEC2:
-                    json["value"] = glm::vec2(0);
-                    break;
-                case GL_FLOAT_VEC3:
-                    json["value"] = glm::vec3(0);
-                    break;
-                case GL_FLOAT_MAT4:
-                    json["value"] = glm::mat4(0);
-                    break;
-                case GL_SAMPLER_2D:
-                    json["value"] = 0;
-                    break;
-                case GL_SAMPLER_CUBE:
-                    json["value"] = 0;
-                    break;
-                default:
-                    json["value"] = 0;
-                    break;
-                }
-                if (it.first == "")
-                {
-                    jsonVariables[variables[i].name] = json;
-                }
-                else
-                {
-                    jsonVariables[it.first][variables[i].name] = json;
-                }
-            }
-        }
-        outfile << jsonVariables.dump(4);
-        outfile.close();
-    }
+		nlohmann::json jsonVariables;
+		file >> jsonVariables;
 
-    void Material::readShaderDefaultValueFile(std::ifstream& _inputFile)
-    {
-        nlohmann::json jsonVariables;
-        _inputFile >> jsonVariables;
+		for (size_t i = 0; i < _material->shaderVariables.size(); ++i)
+		{
+			if (_material->shaderVariables[i].variableType == GLSL::Type::UNIFORM)
+			{
+				nlohmann::json obj = jsonVariables[_material->shaderVariables[i].name];
 
-        for (auto it : m_shaderVariables)
-        {
-            std::vector<GLSL::Variable> variables = it.second;
-            for (size_t i = 0; i < variables.size(); ++i)
-            {
-                if (variables[i].variableType == GLSL::Type::UNIFORM)
-                {
-                    nlohmann::json obj;
-                    if (it.first == "")
-                    {
-                        obj = jsonVariables[variables[i].name];
-                    }
-                    else
-                    {
-                        obj = jsonVariables[it.first][variables[i].name];
-                    }
-                    GLenum glslType = GLUtils::StringToGLType(obj["glsl_type"].get<std::string>());
-                    switch (glslType)
-                    {
-                    case GL_FLOAT:
-                        m_shaderVariables[it.first][i].value.m_float = obj["value"].get<float>();
-                        break;
-                    case GL_FLOAT_VEC2:
-                        m_shaderVariables[it.first][i].value.m_vec2 = obj["value"].get<glm::vec2>();
-                        break;
-                    case GL_FLOAT_VEC3:
-                        m_shaderVariables[it.first][i].value.m_vec3 = obj["value"].get<glm::vec3>();
-                        break;
-                    case GL_FLOAT_MAT4:
-                        m_shaderVariables[it.first][i].value.m_mat4 = obj["value"].get<glm::mat4>();
-                        break;
-                    case GL_SAMPLER_2D:
-                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
-                        break;
-                    case GL_SAMPLER_CUBE:
-                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
-                        break;
-                    default:
-                        m_shaderVariables[it.first][i].value.m_int = obj["value"].get<int>();
-                        break;
-                    }
-                }
-            }
-        }
-    }*/
+				GLenum glslType = GLUtils::StringToGLType(obj["glsl_type"].get<std::string>());
+				switch (glslType)
+				{
+				case GL_FLOAT:
+				{
+					_material->shaderVariables[i].value.m_float = obj["value"].get<float>();
+				} break;
+
+				case GL_FLOAT_VEC2:
+				{
+					_material->shaderVariables[i].value.m_vec2 = obj["value"].get<glm::vec2>();
+				} break;
+
+				case GL_FLOAT_VEC3:
+				{
+					_material->shaderVariables[i].value.m_vec3 = obj["value"].get<glm::vec3>();
+				} break;
+
+				case GL_FLOAT_MAT4:
+				{
+					_material->shaderVariables[i].value.m_mat4 = obj["value"].get<glm::mat4>();
+				} break;
+
+				case GL_SAMPLER_2D:
+				{
+					_material->shaderVariables[i].value.m_int = obj["value"].get<int>();
+				} break;
+
+				case GL_SAMPLER_CUBE:
+				{
+					_material->shaderVariables[i].value.m_int = obj["value"].get<int>();
+				} break;
+
+				default:
+				{
+					_material->shaderVariables[i].value.m_int = obj["value"].get<int>();
+				}
+				}
+			}
+		}
+	}
+
+	Material LoadMaterialData(const std::string& _dataPath, Shader* _shader)
+	{
+		if (!_shader)
+		{
+			//TODO(martin) : handle error
+			return Material{};
+		}
+		Material material;
+
+		material.dataPath = _dataPath;
+		material.shader = _shader;
+		material.shader->use();
+		material.shaderVariables = material.shader->GetGLSLVariablesSimple();
+
+		SetDefaultValues(&material);
+
+		return material;
+	}
 }

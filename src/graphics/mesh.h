@@ -9,12 +9,11 @@
 
 #include "utility/incl_3d.h"
 #include "graphics/texture.h"
-#include "shader.h"
+#include "graphics/shader.h"
+#include "graphics/material.h"
 
 namespace rain
 {
-	class Shader;
-
 	struct Vertex
 	{
 		glm::vec3 position;
@@ -24,7 +23,7 @@ namespace rain
 
 	struct Mesh
 	{
-        std::string name;
+		std::string name;
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
 		GLuint m_vao;
@@ -32,14 +31,6 @@ namespace rain
 		GLuint m_ebo;
 	};
 
-    struct Material
-    {
-        Shader* shader;
-        std::string dataPath;
-        std::vector<GLSL::Variable> shaderVariables;
-    };
-
-    
     struct Model
     {
         std::string path;
@@ -53,11 +44,6 @@ namespace rain
 
     void InitMesh(Mesh* _mesh);
     void Draw(Model* _model);
-
-    Material LoadMaterial(const std::string& _dataPath, const std::string& _shaderPath);
-    Material LoadMaterialData(const std::string& _dataPath, Shader* _shader);
-    void WriteDefault(Material* _material);
-    void SetDefaultValues(Material* material);
 
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);
     const aiScene* OpenAssimpScene(const std::string& _path);

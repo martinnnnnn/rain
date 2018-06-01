@@ -45,17 +45,6 @@ namespace rain
 		int height;
 	};
 
-	struct Texture2DData
-	{
-		std::string fileName;
-		unsigned char* data;
-		int width;
-		int height;
-		GLuint format;
-		bool loaded;
-	};
-
-
 	struct TextureContainer
 	{
 		std::unordered_map<std::string, Texture2D> textures;
