@@ -2,7 +2,13 @@
 
 
 #include <stb_image.h>
+#include <thread>
+#include <mutex>
+#include <future>
+#include <vector>
 
+
+#include "core/file_system.h"
 
 namespace rain
 {
@@ -60,6 +66,60 @@ namespace rain
         }
     }
 
+
+	void LoadTextureData(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths)
+	{
+		std::vector<std::future<Texture2D>> futureDatas;
+		// load image ascync: path -> [ filename, data, width, height, format ]
+		for (auto it : _filePaths)
+		{
+			futureDatas.push_back(std::async(&LoadTexture2DToRAM, it));
+		}
+
+		for (size_t i = 0; i < futureDatas.size(); ++i)
+		{
+			Texture2D texture = futureDatas[i].get();
+			_texManager->textures[File::GetFileName(texture.path)] = texture;
+			Load2DTextureWithData(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
+		}
+	}
+
+	Texture2D LoadTexture2DToRAM(const std::string& _path)
+	{
+		Texture2D texture = {};
+		texture.path = _path;
+
+		int channelCount;
+		texture.data = stbi_load((_path).c_str(), &texture.width, &texture.height, &channelCount, 0);
+		if (texture.data)
+		{
+			texture.format = TextureUtils::ChannelCountToFormat(channelCount);
+		}
+		else
+		{
+			std::cout << "Failed to load texture at : " << (_path) << std::endl;
+		}
+		return texture;
+	}
+
+	void Load2DTextureWithData(const std::string& _path, Texture2D& _texture)
+	{
+		glGenTextures(1, &_texture.id);
+		glBindTexture(GL_TEXTURE_2D, _texture.id);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+		glTexImage2D(GL_TEXTURE_2D, 0, _texture.format, _texture.width, _texture.height, 0, _texture.format, GL_UNSIGNED_BYTE, _texture.data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(_texture.data);
+	}
+
+
+
     //TODO(martin) : error handling
 	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically)
 	{
@@ -94,27 +154,13 @@ namespace rain
         return texture;
 	}
 
-	Texture2D Load2DTextureWithData(const std::string& _path, Texture2DType _type, const Texture2DData& data)
+
+	Texture2D FindTexture(const TextureContainer* _texContainer, const std::string _fileName)
 	{
-		Texture2D texture{};
-		texture.path = _path;
-		texture.type = _type;
-		texture.format = data.format;
-		
-		glGenTextures(1, &texture.id);
-		glBindTexture(GL_TEXTURE_2D, texture.id);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-		glTexImage2D(GL_TEXTURE_2D, 0, data.format, data.width, data.height, 0, data.format, GL_UNSIGNED_BYTE, data.data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		return texture;
+		return _texContainer->textures.at(_fileName);
 	}
+
+
 
     //TODO(martin) : error handling
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically)

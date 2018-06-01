@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <unordered_set>
+#include <unordered_map>
 
 #include "utility/incl_3d.h"
 
@@ -38,6 +40,9 @@ namespace rain
         std::string path;
         Texture2DType type;
         GLint format;
+		unsigned char* data;
+		int width;
+		int height;
 	};
 
 	struct Texture2DData
@@ -50,6 +55,13 @@ namespace rain
 		bool loaded;
 	};
 
+
+	struct TextureContainer
+	{
+		std::unordered_map<std::string, Texture2D> textures;
+	};
+
+
 	struct TextureCubeMap
 	{
         GLuint id;
@@ -58,8 +70,12 @@ namespace rain
         GLint format;
 	};
 
+	void LoadTextureData(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths);
+	Texture2D LoadTexture2DToRAM(const std::string& _path);
+	void Load2DTextureWithData(const std::string& _path, Texture2D& _texture);
+	Texture2D FindTexture(const TextureContainer* _texContainer, const std::string _fileName);
+
 	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
-	Texture2D Load2DTextureWithData(const std::string& _path, Texture2DType _type, const Texture2DData& data);
 	TextureCubeMap LoadTextureCubeMap(std::vector<std::string> _paths, bool _flipVertically = false);
     void BindTexture(GLenum _type, GLuint _id);
 
