@@ -1,10 +1,11 @@
 #include "input_engine.h"
 
 #include "utility/first_time_mcr.h"
+#include "utility/incl_3d.h"
 
 namespace rain
 {
-    InputEngine::InputEngine(GLFWwindow* _window) :
+	InputEngine::InputEngine(GLFWwindow* _window) :
         m_window(_window)
     {
     }
@@ -47,4 +48,25 @@ namespace rain
     {
         return m_offset;
     }
+
+	glm::vec2 GetMouseOffset()
+	{
+
+	}
+
+	glm::vec2 GetMousePosition(GLFWwindow* _window)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(_window, &xpos, &ypos);
+		return glm::vec2(xpos, ypos);
+	}
+
+	bool IsKeyPressed(GLFWwindow* _window, int _keyCode)
+	{
+		if (glfwGetKey(_window, _keyCode) == GLFW_PRESS)
+		{
+			return true;
+		}
+		return false;
+	}
 }
