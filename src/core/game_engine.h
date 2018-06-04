@@ -14,6 +14,7 @@ struct GLFWwindow;
 
 namespace rain
 {
+    struct Input;
     class CameraController;
     class Camera;
     class InputEngine;
@@ -76,7 +77,8 @@ namespace rain
     {
         std::string dataPath;
         GFXContext gfxContext;
-        InputEngine* inputEngine;
+        //InputEngine* inputEngine;
+        Input* input;
         CameraController* cameraController;
         float deltaTime;
         float lastFrame;

@@ -659,7 +659,8 @@ void sandboxUpdate()
 
 void checkInputs()
 {
-    if (game->inputEngine->IsKeyPressed(GLFW_KEY_ENTER))
+    if (IsKeyPressed(game->input, GLFW_KEY_ENTER))
+    //if (game->inputEngine->IsKeyPressed(GLFW_KEY_ENTER))
     {
         if (!wireframe)
         {
@@ -671,7 +672,8 @@ void checkInputs()
         }
         wireframe = !wireframe;
     }
-    if (game->inputEngine->IsKeyPressed(GLFW_KEY_R))
+    if (IsKeyPressed(game->input, GLFW_KEY_R))
+    //if (game->inputEngine->IsKeyPressed(GLFW_KEY_R))
     {
         loadShaders();
     }

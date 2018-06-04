@@ -22,7 +22,7 @@ namespace rain
         CameraController() : 
             m_camera(nullptr)
             , m_transform(nullptr)
-            , m_inputEngine(nullptr)
+            //, m_inputEngine(nullptr)
         {}
 
         int Init(Game* _game);
@@ -33,7 +33,7 @@ namespace rain
     private:
         Camera* m_camera;
         Transform* m_transform;
-        InputEngine* m_inputEngine;
+        //InputEngine* m_inputEngine;
         float m_movementSpeed;
         Game* game;
     };

@@ -361,7 +361,9 @@ namespace rain
             game->dataPath = arguments["root"];
         }
         game->gfxContext = InitWindow("Rain Engine", 1920, 1080);
-        game->inputEngine = new InputEngine(game->gfxContext.window);
+        game->input = new Input();
+        game->input->window = game->gfxContext.window;
+        //game->inputEngine = new InputEngine(game->gfxContext.window);
         game->cameraController = new CameraController();
         game->cameraController->Init(game);
 
@@ -373,7 +375,8 @@ namespace rain
         while (!glfwWindowShouldClose(_game->gfxContext.window))
         {
             // inputs relative to window
-            if (_game->inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+            if (IsKeyPressed(_game->input, GLFW_KEY_ESCAPE))
+            //if (_game->inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
             {
                 glfwSetWindowShouldClose(_game->gfxContext.window, true);
             }
@@ -384,10 +387,10 @@ namespace rain
             _game->lastFrame = currentFrame;
 
             // input
-            _game->inputEngine->Tick();
+            ComputeMouseOffset(_game->input);
 
             // objects
-            if (_game->inputEngine->IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
+            if (IsKeyPressed(_game->input, GLFW_KEY_LEFT_CONTROL))
             {
                 glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 _game->cameraController->Tick();

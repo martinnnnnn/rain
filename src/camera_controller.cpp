@@ -12,7 +12,7 @@ namespace rain
     int CameraController::Init(Game* _game)
     {
         game = _game;
-        m_inputEngine = game->inputEngine;
+        //m_inputEngine = game->inputEngine;
         m_camera = new Camera(game);
         m_transform = new Transform();
         m_movementSpeed = 200;
@@ -27,25 +27,30 @@ namespace rain
         glm::vec3 front = m_camera->Front;
         glm::vec3 right = m_camera->Right;
 
-        if (m_inputEngine->IsKeyPressed(GLFW_KEY_W))
+        if (IsKeyPressed(game->input, GLFW_KEY_W))
+        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_W))
         {
             movement += front * velocity;
         }
-        if (m_inputEngine->IsKeyPressed(GLFW_KEY_S))
+        if (IsKeyPressed(game->input, GLFW_KEY_S))
+        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_S))
         {
             movement -= front * velocity;
         }
-        if (m_inputEngine->IsKeyPressed(GLFW_KEY_A))
+        if (IsKeyPressed(game->input, GLFW_KEY_A))
+        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_A))
         {
             movement -= right * velocity;
         }
-        if (m_inputEngine->IsKeyPressed(GLFW_KEY_D))
+        if (IsKeyPressed(game->input, GLFW_KEY_D))
+        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_D))
         {
             movement += right * velocity;
         }
         m_transform->Translate(movement);
 
-        glm::vec2 mouseOffset = m_inputEngine->GetMouseOffset();
+        glm::vec2 mouseOffset = game->input->mouseOffset;
+        std::cout << "(" << mouseOffset.x << "," << mouseOffset.y << ")" << std::endl;
         mouseOffset.x *= 0.1f;
         mouseOffset.y *= 0.1f;
 

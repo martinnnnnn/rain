@@ -22,7 +22,8 @@ namespace rain
     void Camera::Tick()
     {
     
-        processMouseMouvement(game->inputEngine->GetMouseOffset());
+        processMouseMouvement(game->input->mouseOffset);
+        //processMouseMouvement(game->inputEngine->GetMouseOffset());
     }
 
     void Camera::processMouseMouvement(const glm::vec2& _mouseOffset)
