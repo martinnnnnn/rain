@@ -13,14 +13,14 @@ namespace rain
 {
 
     struct Input;
-    struct CameraS;
+    struct Camera;
 
     struct Game
     {
         std::string dataPath;
         GFXContext gfxContext;
         Input* input;
-        CameraS* camera;
+        Camera* camera;
         float deltaTime;
         float lastFrame;
     };

@@ -11,7 +11,6 @@
 #include "utility/incl_3d.h"
 #include "rain.h"
 #include "graphics/shader.h"
-#include "core/game_engine.h"
 #include "graphics/camera.h"
 #include "core/transform.h"
 #include "input/input.h"
@@ -484,7 +483,7 @@ void sandboxUpdate()
     checkInputs();
 
     // recup mat view, mat proj
-    CameraS* _camera = game->camera;
+    Camera* _camera = game->camera;
     Transform* camTransform = &_camera->transform;
 
     glm::mat4 proj = _camera->projectionMatrix;
