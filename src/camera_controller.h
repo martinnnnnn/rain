@@ -22,7 +22,6 @@ namespace rain
 
         CameraController() : 
             m_camera(nullptr)
-            //, m_transform(nullptr)
         {}
 
         int Init(Game* _game);
@@ -32,7 +31,6 @@ namespace rain
 
     private:
         Camera* m_camera;
-        //Transform* m_transform;
         TransformS transform;
         float m_movementSpeed;
         Game* game;

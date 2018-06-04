@@ -68,25 +68,7 @@ using namespace nlohmann;
 
 DLLEXPORT void LoadGame(const char* path)
 {
-	//int retval = Rain::Engine()->Init(path);
-	//if (retval != 0)
-	//{
-	//	std::cout << "Couldn't launch the game." << std::endl;
-	//	system("PAUSE");
-	//	return;
-	//}
-	//Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
-	//camTransform->Translate(glm::vec3(0, 0, 5));
 
-	//Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-	//rootpath = Rain::ResourcesRoot();
-	//wireframe = false;
-
-	//sandboxInit();
-	//loadShaders();
-
-
-	//Rain::Run();
 }
 
 
@@ -95,7 +77,7 @@ int main(int argc, char** argv)
     game = InitGame(argc, argv);
     TransformS* camTransform = game->cameraController->GetTransform();
     Translate(*camTransform, glm::vec3(0, 0, 5));
-    //camTransform->Translate(glm::vec3(0, 0, 5));
+
     rootpath = game->dataPath;
     wireframe = false;
 
@@ -103,27 +85,6 @@ int main(int argc, char** argv)
     loadShaders();
 
     RunGame(game, sandboxUpdate);
-    //int retval = Rain::Init(String::GetArguments(argc, argv));
-    //if (retval != 0)
-    //{
-    //    std::cout << "Couldn't launch the game." << std::endl;
-    //    system("PAUSE");
-    //    return -1;
-    //}
-    //Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
-    //camTransform->Translate(glm::vec3(0, 0, 5));
-
-    //Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-    //rootpath = Rain::ResourcesRoot();
-    //wireframe = false;
-
-    //sandboxInit();
-    //loadShaders();
-
-
-    //Rain::Run();
-
-
 
     return 0;
 }
@@ -522,21 +483,17 @@ void sandboxUpdate()
 
     // recup mat view, mat proj
     CameraController* camController = game->cameraController;
-    //CameraController* camController = Rain::Engine()->GetCameraController();
     Camera* camera = camController->GetCamera();
     TransformS* camTransform = camController->GetTransform();
 
     glm::mat4 proj = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix(camTransform->position);
     glm::mat4 modelmat = glm::mat4(1);
-    //modelTransform = {};
-    //modelTransform.Translate(glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4));
+
     static int angle = 0;
     angle = (++angle) % 10;
     Scale(modelTransform, glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
     Rotate(modelTransform, glm::vec3(0.2, 0.7, 0.1), angle);
-    //modelTransform.ChangeScale(glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
-    //modelTransform.Rotate(glm::vec3(0.2,0.7,0.1), angle);
 
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);

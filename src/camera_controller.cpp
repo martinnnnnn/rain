@@ -41,7 +41,6 @@ namespace rain
             movement += right * velocity;
         }
         Translate(transform, movement);
-        //m_transform->Translate(movement);
     }
                              
 
