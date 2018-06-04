@@ -67,10 +67,10 @@ namespace rain
     }
 
 
-	void LoadTextureData(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths)
+	void LoadTexturesAsync(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths)
 	{
 		std::vector<std::future<Texture2D>> futureDatas;
-		// load image ascync: path -> [ filename, data, width, height, format ]
+
 		for (auto it : _filePaths)
 		{
 			futureDatas.push_back(std::async(&LoadTexture2DToRAM, it));
@@ -80,43 +80,43 @@ namespace rain
 		{
 			Texture2D texture = futureDatas[i].get();
 			_texManager->textures[File::GetFileName(texture.path)] = texture;
-			Load2DTextureWithData(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
+			Load2DTextureToGC(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
 		}
 	}
 
-	Texture2D LoadTexture2DToRAM(const std::string& _path)
-	{
-		Texture2D texture = {};
-		texture.path = _path;
+    Texture2D LoadTexture2DToRAM(const std::string& _path)
+    {
+        Texture2D texture = {};
+        texture.path = _path;
 
-		int channelCount;
-		texture.data = stbi_load((_path).c_str(), &texture.width, &texture.height, &channelCount, 0);
-		if (texture.data)
-		{
-			texture.format = TextureUtils::ChannelCountToFormat(channelCount);
-		}
-		else
-		{
-			std::cout << "Failed to load texture at : " << (_path) << std::endl;
-		}
-		return texture;
-	}
+        int channelCount;
+        texture.data = stbi_load((_path).c_str(), &texture.width, &texture.height, &channelCount, 0);
+        if (texture.data)
+        {
+            texture.format = TextureUtils::ChannelCountToFormat(channelCount);
+        }
+        else
+        {
+            std::cout << "Failed to load texture at : " << (_path) << std::endl;
+        }
+        return texture;
+    }
 
-	void Load2DTextureWithData(const std::string& _path, Texture2D& _texture)
-	{
-		glGenTextures(1, &_texture.id);
-		glBindTexture(GL_TEXTURE_2D, _texture.id);
+    void Load2DTextureToGC(const std::string& _path, Texture2D& _texture)
+    {
+        glGenTextures(1, &_texture.id);
+        glBindTexture(GL_TEXTURE_2D, _texture.id);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
-		glTexImage2D(GL_TEXTURE_2D, 0, _texture.format, _texture.width, _texture.height, 0, _texture.format, GL_UNSIGNED_BYTE, _texture.data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(_texture.data);
-	}
+        glTexImage2D(GL_TEXTURE_2D, 0, _texture.format, _texture.width, _texture.height, 0, _texture.format, GL_UNSIGNED_BYTE, _texture.data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(_texture.data);
+    }
 
 
 

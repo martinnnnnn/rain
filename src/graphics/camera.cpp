@@ -3,26 +3,26 @@
 
 #include "rain.h"
 #include "input/input_engine.h"
-
+#include "core/game_engine.h"
 
 namespace rain
 {
-    Camera::Camera()
+    Camera::Camera(Game* _game)
     {
         m_worldUp = glm::vec3(0.0, 1.0, 0.0);
         Front = glm::vec3(0.0, 0.0, -1.0f);
         m_yaw = -90.0;
         m_pitch = 0.0f;
-    
+        game = _game;
         updateCameraVectors();
-        updateProjectionMatrix(Rain::GetWindowSize());
+        updateProjectionMatrix(glm::vec2(game->gfxContext.width, game->gfxContext.height));
     }
 
 
     void Camera::Tick()
     {
     
-        processMouseMouvement(Rain::Input()->GetMouseOffset());
+        processMouseMouvement(game->inputEngine->GetMouseOffset());
     }
 
     void Camera::processMouseMouvement(const glm::vec2& _mouseOffset)

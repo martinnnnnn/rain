@@ -5,13 +5,15 @@
 #include "input/input_engine.h"
 #include "graphics/camera.h"
 #include "core/transform.h"
+#include "core/game_engine.h"
 
 namespace rain
 {
-    int CameraController::Init(InputEngine* _inputEngine)
+    int CameraController::Init(Game* _game)
     {
-        m_inputEngine = _inputEngine;
-        m_camera = new Camera();
+        game = _game;
+        m_inputEngine = game->inputEngine;
+        m_camera = new Camera(game);
         m_transform = new Transform();
         m_movementSpeed = 200;
         return 0;
@@ -19,8 +21,8 @@ namespace rain
 
     void CameraController::Tick()
     {
-        float deltaTime = Rain::GetDeltaTime();
-        float velocity = m_movementSpeed * deltaTime;
+        //float deltaTime = Rain::GetDeltaTime();
+        float velocity = m_movementSpeed * game->deltaTime;
         glm::vec3 movement(0.0f, 0.0f, 0.0f);
         glm::vec3 front = m_camera->Front;
         glm::vec3 right = m_camera->Right;
@@ -43,7 +45,7 @@ namespace rain
         }
         m_transform->Translate(movement);
 
-        glm::vec2 mouseOffset = Rain::Input()->GetMouseOffset();
+        glm::vec2 mouseOffset = m_inputEngine->GetMouseOffset();
         mouseOffset.x *= 0.1f;
         mouseOffset.y *= 0.1f;
 

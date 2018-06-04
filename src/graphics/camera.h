@@ -6,10 +6,11 @@
 
 namespace rain
 {
+    struct Game;
     class Camera
     {
     public:
-        Camera();
+        Camera(Game* _game);
 
         void Tick();
         glm::mat4 GetViewMatrix(const glm::vec3& _position);
@@ -27,6 +28,7 @@ namespace rain
 	    glm::vec3 m_up;
         float m_yaw;
         float m_pitch;
+        Game* game;
 
     };
 }

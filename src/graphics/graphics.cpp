@@ -49,6 +49,7 @@ namespace rain
 		glViewport(0, 0, (GLsizei)context.width, (GLsizei)context.height);
 		glfwSetFramebufferSizeCallback(context.window, framebuffer_size_callback);
 
+        return context;
 	terminate:
 		context = {};
 		return context;

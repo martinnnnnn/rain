@@ -23,6 +23,8 @@
 #include <stb_image.h>
 #include "graphics/model.h"
 #include "graphics/mesh.h"
+#include "graphics/texture.h"
+#include "utility/string_utils.h"
 
 using namespace rain;
 
@@ -43,21 +45,21 @@ GLuint boxVAO;
 GLuint lightVBO;
 GLuint lightVAO;
 GLuint uboMatrices;
-GLuint container2Diffuse;
-GLuint container2Specular;
-GLuint container2Emissive;
+Texture2D container2Diffuse;
+Texture2D container2Specular;
+Texture2D container2Emissive;
 GLuint skyboxVAO;
 GLuint skyboxTexture;
 glm::vec3 lightPos;
 std::vector<glm::vec3> cubePositions;
 std::vector<Model> models;
+Game* game;
 
 void sandboxInit();
 void sandboxUpdate();
 void checkInputs();
 void loadShaders();
 
-GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically = false);
 using namespace nlohmann;
 
 
@@ -65,49 +67,59 @@ using namespace nlohmann;
 
 DLLEXPORT void LoadGame(const char* path)
 {
-	int retval = Rain::Engine()->Init(path);
-	if (retval != 0)
-	{
-		std::cout << "Couldn't launch the game." << std::endl;
-		system("PAUSE");
-		return;
-	}
-	Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
-	camTransform->Translate(glm::vec3(0, 0, 5));
+	//int retval = Rain::Engine()->Init(path);
+	//if (retval != 0)
+	//{
+	//	std::cout << "Couldn't launch the game." << std::endl;
+	//	system("PAUSE");
+	//	return;
+	//}
+	//Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
+	//camTransform->Translate(glm::vec3(0, 0, 5));
 
-	Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-	rootpath = Rain::ResourcesRoot();
-	wireframe = false;
+	//Rain::Engine()->SetUpdateCallback(sandboxUpdate);
+	//rootpath = Rain::ResourcesRoot();
+	//wireframe = false;
 
-	sandboxInit();
-	loadShaders();
+	//sandboxInit();
+	//loadShaders();
 
 
-	Rain::Run();
+	//Rain::Run();
 }
 
 
 int main(int argc, char** argv)
 {
-    int retval = Rain::Init(Rain::GetArguments(argc, argv));
-    if (retval != 0)
-    {
-        std::cout << "Couldn't launch the game." << std::endl;
-        system("PAUSE");
-        return -1;
-    }
-    Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
+    game = InitGame(argc, argv);
+    Transform* camTransform = game->cameraController->GetTransform();
     camTransform->Translate(glm::vec3(0, 0, 5));
-
-    Rain::Engine()->SetUpdateCallback(sandboxUpdate);
-    rootpath = Rain::ResourcesRoot();
+    rootpath = game->dataPath;
     wireframe = false;
 
-	sandboxInit();
+    sandboxInit();
     loadShaders();
 
+    RunGame(game, sandboxUpdate);
+    //int retval = Rain::Init(String::GetArguments(argc, argv));
+    //if (retval != 0)
+    //{
+    //    std::cout << "Couldn't launch the game." << std::endl;
+    //    system("PAUSE");
+    //    return -1;
+    //}
+    //Transform* camTransform = Rain::Engine()->GetCameraController()->GetTransform();
+    //camTransform->Translate(glm::vec3(0, 0, 5));
 
-    Rain::Run();
+    //Rain::Engine()->SetUpdateCallback(sandboxUpdate);
+    //rootpath = Rain::ResourcesRoot();
+    //wireframe = false;
+
+    //sandboxInit();
+    //loadShaders();
+
+
+    //Rain::Run();
 
 
 
@@ -163,8 +175,8 @@ void sandboxInit()
 
     GLuint indices[] =
     {
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
+        0, 1, 3,
+        1, 2, 3 
     };
 
     cubePositions = 
@@ -211,10 +223,10 @@ void sandboxInit()
 
     glBindVertexArray(0);
 
-    container2Diffuse = loadTexture2D("/images/container2.png", GL_RGB, GL_RGBA, true);
-    container2Specular = loadTexture2D("/images/container2_specular.png", GL_RGB, GL_RGBA, true);
-    container2Emissive = loadTexture2D("/images/matrix.jpg", GL_RGB, GL_RGB, true);
-
+    container2Diffuse = Load2DTexture(rootpath + "/images/container2.png", Texture2DType::DIFFUSE, true);
+    container2Specular = Load2DTexture(rootpath + "/images/container2_specular.png", Texture2DType::SPECULAR, true);
+    container2Emissive = Load2DTexture(rootpath + "/images/matrix.jpg", Texture2DType::EMISSIVE, true);
+    
     //----------------------------------------------------------
     // VAO & VBO & EBO for LIGHT
     glGenBuffers(1, &lightVBO);
@@ -257,7 +269,7 @@ void sandboxInit()
 
 	glGenTextures(1, &textureColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)Rain::GetWindowSize().x, (GLsizei)Rain::GetWindowSize().y, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei)game->gfxContext.width, (GLsizei)game->gfxContext.height, 0, GL_RGB, GL_UNSIGNED_INT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
@@ -265,7 +277,7 @@ void sandboxInit()
 	GLuint depthStencilBuffer;
 	glGenRenderbuffers(1, &depthStencilBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthStencilBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (GLsizei)Rain::GetWindowSize().x, (GLsizei)Rain::GetWindowSize().y);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (GLsizei)game->gfxContext.width, (GLsizei)game->gfxContext.height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthStencilBuffer);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -394,7 +406,8 @@ void sandboxInit()
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
     
-    glm::mat4 projection = Rain::Camera()->GetProjectionMatrix();
+    //glm::mat4 projection = Rain::Camera()->GetProjectionMatrix();
+    glm::mat4 projection = game->cameraController->GetCamera()->GetProjectionMatrix();
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -412,8 +425,8 @@ void sandboxInit()
     Material test;
     //test.Init(rootpath + std::vector<"/shaders/shader1", false);
 
-	//models = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
-	models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+	models = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+	//models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 }
 
 
@@ -506,7 +519,8 @@ void sandboxUpdate()
     checkInputs();
 
     // recup mat view, mat proj
-    CameraController* camController = Rain::Engine()->GetCameraController();
+    CameraController* camController = game->cameraController;
+    //CameraController* camController = Rain::Engine()->GetCameraController();
     Camera* camera = camController->GetCamera();
     Transform* camTransform = camController->GetTransform();
 
@@ -576,11 +590,11 @@ void sandboxUpdate()
     
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, container2Diffuse);
+    glBindTexture(GL_TEXTURE_2D, container2Diffuse.id);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, container2Specular);
+    glBindTexture(GL_TEXTURE_2D, container2Specular.id);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, container2Emissive);
+    glBindTexture(GL_TEXTURE_2D, container2Emissive.id);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
 
@@ -645,7 +659,7 @@ void sandboxUpdate()
 
 void checkInputs()
 {
-    if (Rain::Input()->IsKeyPressed(GLFW_KEY_ENTER))
+    if (game->inputEngine->IsKeyPressed(GLFW_KEY_ENTER))
     {
         if (!wireframe)
         {
@@ -657,38 +671,8 @@ void checkInputs()
         }
         wireframe = !wireframe;
     }
-    if (Rain::Input()->IsKeyPressed(GLFW_KEY_R))
+    if (game->inputEngine->IsKeyPressed(GLFW_KEY_R))
     {
         loadShaders();
     }
-}
-
-
-GLuint loadTexture2D(const std::string& path, GLuint _internalFormat, GLenum _format, bool flipVertically)
-{
-    GLuint id;
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_set_flip_vertically_on_load(flipVertically);
-   
-    int width, height, nrChannels;
-    unsigned char * data = stbi_load(std::string(rootpath + path).c_str(), &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, width, height, 0, _format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-
-    }
-    stbi_image_free(data);
-    return id;
 }

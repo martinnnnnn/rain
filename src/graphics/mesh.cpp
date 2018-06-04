@@ -52,25 +52,24 @@ namespace rain
 	//TODO(martin) : error handling
     std::vector<Model> GetModelsFromAssimpScene(const std::string& _path)
     {
+        std::vector<Model> models;
         Assimp::Importer import;
         const aiScene *scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+            return models;
         }
 
         //const aiScene* scene = OpenAssimpScene(_path);
 
-        std::vector<Model> models;
         models.reserve(scene->mNumMeshes);
-
 		std::string directoryPath = File::GetDirectory(_path);
-
 		std::unordered_set<std::string> filePaths;
 		GetTexturesPath(filePaths, scene, directoryPath);
 
 		TextureContainer textureContainer = {};
-		LoadTextureData(&textureContainer, filePaths);
+		LoadTexturesAsync(&textureContainer, filePaths);
 
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
         {
@@ -85,7 +84,6 @@ namespace rain
 			model.textures = FindTextures(aimesh, scene, directoryPath, &textureContainer);
 			models.push_back(model);
         }
-
         return models;
     }
 
@@ -245,7 +243,6 @@ namespace rain
 					aiString str;
 					material->GetTexture(texType, j, &str);
 					_filePaths.emplace(_directoryPath + str.C_Str());
-					std::cout << str.C_Str() << std::endl;
 				}
 			}
 		}

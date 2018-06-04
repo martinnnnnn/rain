@@ -6,6 +6,7 @@ namespace rain
     class Camera;
     class Transform;
     class InputEngine;
+    struct Game;
 
     class CameraController
     {
@@ -24,7 +25,7 @@ namespace rain
             , m_inputEngine(nullptr)
         {}
 
-        int Init(InputEngine* _inputEngine);
+        int Init(Game* _game);
         void Tick();
         Camera* GetCamera();
         Transform* GetTransform();
@@ -34,5 +35,6 @@ namespace rain
         Transform* m_transform;
         InputEngine* m_inputEngine;
         float m_movementSpeed;
+        Game* game;
     };
 }

@@ -49,10 +49,10 @@ namespace rain
         return m_offset;
     }
 
-	glm::vec2 GetMouseOffset()
-	{
+	//glm::vec2 GetMouseOffset()
+	//{
 
-	}
+	//}
 
 	glm::vec2 GetMousePosition(GLFWwindow* _window)
 	{

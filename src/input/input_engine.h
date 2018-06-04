@@ -23,7 +23,7 @@ namespace rain
         glm::vec2 m_offset;
     };
 
-	glm::vec2 GetMouseOffset();
+	//glm::vec2 GetMouseOffset();
 	glm::vec2 GetMousePosition(GLFWwindow* _window);
 	bool IsKeyPressed(GLFWwindow* _window, int _keyCode);
 

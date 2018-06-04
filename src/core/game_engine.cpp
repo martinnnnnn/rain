@@ -14,6 +14,7 @@ using namespace std::experimental::filesystem::v1;
 #include "graphics/camera.h"
 #include "input/input_engine.h"
 #include "file_system.h"
+#include "utility/string_utils.h"
 
 namespace rain
 {
@@ -27,131 +28,131 @@ namespace rain
 
     int GameEngine::Init(const std::string& _path)
     {
-        m_screenWidth = 800;
-        m_screenHeight = 600;
-        m_resourcesRootPath = _path;
+        //m_screenWidth = 800;
+        //m_screenHeight = 600;
+        //m_resourcesRootPath = _path;
 
-        std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
+        //std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 
-        m_fileSystem = new FileSystem();
-        m_fileSystem->Init(m_resourcesRootPath);
+        //m_fileSystem = new FileSystem();
+        //m_fileSystem->Init(m_resourcesRootPath);
 
-        glfwInit();
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_SAMPLES, 4);
-        glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
+        //glfwInit();
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        //glfwWindowHint(GLFW_SAMPLES, 4);
+        //glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
-        m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
-        if (m_window == NULL)
-        {
-            std::cout << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-            return -1;
-        }
+        //m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
+        //if (m_window == NULL)
+        //{
+        //    std::cout << "Failed to create GLFW window" << std::endl;
+        //    glfwTerminate();
+        //    return -1;
+        //}
 
-        //glfwSwapInterval(1); // Enable vsync
-        //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        //glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        ////glfwSwapInterval(1); // Enable vsync
+        ////const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        ////glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 
-        //glfwSetWindowPos(m_window, 600, 600);
-        glfwMakeContextCurrent(m_window);
+        ////glfwSetWindowPos(m_window, 600, 600);
+        //glfwMakeContextCurrent(m_window);
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            std::cout << "Failed to initialize GLAD" << std::endl;
-            return -1;
-        }
+        //if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        //{
+        //    std::cout << "Failed to initialize GLAD" << std::endl;
+        //    return -1;
+        //}
 
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        //glEnable(GL_CULL_FACE);
-        //glFrontFace(GL_CW);
+        //glEnable(GL_DEPTH_TEST);
+        //glDepthFunc(GL_LESS);
+        ////glEnable(GL_CULL_FACE);
+        ////glFrontFace(GL_CW);
 
-        glEnable(GL_MULTISAMPLE);
+        //glEnable(GL_MULTISAMPLE);
 
-        glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
-        glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
+        //glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
+        //glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
 
-        glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
+        //glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
 
-        m_inputEngine = new InputEngine(m_window);
-        m_cameraController = new CameraController();
-        m_cameraController->Init(m_inputEngine);
+        //m_inputEngine = new InputEngine(m_window);
+        //m_cameraController = new CameraController();
+        //m_cameraController->Init(m_inputEngine);
 
-        initUI();
+        //initUI();
         return 0;
     }
 
 
     int GameEngine::Init(std::unordered_map<std::string, std::string> _args)
     {
-        m_screenWidth = 1920;
-        m_screenHeight = 1080;
-        m_resourcesRootPath = Rain::GetExePath() + "/resources/";
-        if (_args["root"] != "")
-        {
-            m_resourcesRootPath = _args["root"];
-        }
-        if (_args["s_width"] != "")
-        {
-            m_screenWidth = stof(_args["s_width"]);
-        }
-        if (_args["s_height"] != "")
-        {
-            m_screenHeight = stof(_args["s_height"]);
-        }
-        std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
+  //      m_screenWidth = 1920;
+  //      m_screenHeight = 1080;
+  //      m_resourcesRootPath = Rain::GetExePath() + "/resources/";
+  //      if (_args["root"] != "")
+  //      {
+  //          m_resourcesRootPath = _args["root"];
+  //      }
+  //      if (_args["s_width"] != "")
+  //      {
+  //          m_screenWidth = stof(_args["s_width"]);
+  //      }
+  //      if (_args["s_height"] != "")
+  //      {
+  //          m_screenHeight = stof(_args["s_height"]);
+  //      }
+  //      std::cout << "root path : " << m_resourcesRootPath.c_str() << std::endl;
 	
-		m_fileSystem = new FileSystem();
-		m_fileSystem->Init(m_resourcesRootPath);
+		//m_fileSystem = new FileSystem();
+		//m_fileSystem->Init(m_resourcesRootPath);
 
-        glfwInit();
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_SAMPLES, 4);
-        glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
+  //      glfwInit();
+  //      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  //      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  //      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  //      glfwWindowHint(GLFW_SAMPLES, 4);
+  //      glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
-        m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
-        if (m_window == NULL)
-        {
-            std::cout << "Failed to create GLFW window" << std::endl;
-            glfwTerminate();
-            return -1;
-        }
+  //      m_window = glfwCreateWindow((int)m_screenWidth, (int)m_screenHeight, "Rain Engine", NULL, NULL);
+  //      if (m_window == NULL)
+  //      {
+  //          std::cout << "Failed to create GLFW window" << std::endl;
+  //          glfwTerminate();
+  //          return -1;
+  //      }
 
-		//glfwSwapInterval(1); // Enable vsync
-        //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-        //glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+		////glfwSwapInterval(1); // Enable vsync
+  //      //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+  //      //glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 
-        //glfwSetWindowPos(m_window, 600, 600);
-        glfwMakeContextCurrent(m_window);
+  //      //glfwSetWindowPos(m_window, 600, 600);
+  //      glfwMakeContextCurrent(m_window);
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            std::cout << "Failed to initialize GLAD" << std::endl;
-            return -1;
-        }
+  //      if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  //      {
+  //          std::cout << "Failed to initialize GLAD" << std::endl;
+  //          return -1;
+  //      }
 
-        glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		//glEnable(GL_CULL_FACE);
-		//glFrontFace(GL_CW);
+  //      glEnable(GL_DEPTH_TEST);
+		//glDepthFunc(GL_LESS);
+		////glEnable(GL_CULL_FACE);
+		////glFrontFace(GL_CW);
 
-        glEnable(GL_MULTISAMPLE);
+  //      glEnable(GL_MULTISAMPLE);
 
-        glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
-        glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
+  //      glViewport(0, 0, (GLsizei)m_screenWidth, (GLsizei)m_screenHeight);
+  //      glfwSetFramebufferSizeCallback(m_window, GameEngine::framebuffer_size_callback);
 
-        glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
+  //      glfwSetInputMode(m_window, GLFW_STICKY_KEYS, 1);
 
-        m_inputEngine = new InputEngine(m_window);
-        m_cameraController = new CameraController();
-        m_cameraController->Init(m_inputEngine);
+  //      m_inputEngine = new InputEngine(m_window);
+  //      m_cameraController = new CameraController();
+  //      m_cameraController->Init(m_inputEngine);
 
-		initUI();
+		//initUI();
         return 0;
     }
 
@@ -162,57 +163,57 @@ namespace rain
 
     void GameEngine::Run()
     {
-		show_demo_window = true;
-		show_another_window = false;
-		clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+		//show_demo_window = true;
+		//show_another_window = false;
+		//clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-        while (!glfwWindowShouldClose(m_window))
-        {
-			updateUI();
-			
+  //      while (!glfwWindowShouldClose(m_window))
+  //      {
+		//	updateUI();
+		//	
 
-            // inputs relative to window
-            if (m_inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
-            {
-                glfwSetWindowShouldClose(m_window, true);
-            }
+  //          // inputs relative to window
+  //          if (m_inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+  //          {
+  //              glfwSetWindowShouldClose(m_window, true);
+  //          }
 
-            // delta time update
-            float currentFrame = (float)glfwGetTime();
-            m_deltaTime = currentFrame - m_lastFrame;
-            m_lastFrame = currentFrame;
+  //          // delta time update
+  //          float currentFrame = (float)glfwGetTime();
+  //          m_deltaTime = currentFrame - m_lastFrame;
+  //          m_lastFrame = currentFrame;
 
-            // input
-            m_inputEngine->Tick();
+  //          // input
+  //          m_inputEngine->Tick();
 
-            // objects
-			if (Rain::Input()->IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
-			{
-				glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				m_cameraController->Tick();
-				GetCamera()->Tick();
-			}
-			else
-			{
-				glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			}
+  //          // objects
+		//	if (Rain::Input()->IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
+		//	{
+		//		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		//		m_cameraController->Tick();
+		//		GetCamera()->Tick();
+		//	}
+		//	else
+		//	{
+		//		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		//	}
 
-            glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-			glEnable(GL_STENCIL_TEST);
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-            // rendering
-            m_updateCallback();
+  //          glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+		//	glEnable(GL_STENCIL_TEST);
+		//	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+  //          glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  //          // rendering
+  //          m_updateCallback();
 
-			glDisable(GL_STENCIL_TEST);
+		//	glDisable(GL_STENCIL_TEST);
 
-			ImGui::Render();
-			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
-            glfwSwapBuffers(m_window);
-            glfwPollEvents();
-        }
+		//	ImGui::Render();
+		//	ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+  //          glfwSwapBuffers(m_window);
+  //          glfwPollEvents();
+  //      }
 
-        glfwTerminate();
+  //      glfwTerminate();
     }
 
 	void GameEngine::updateUI()
@@ -339,5 +340,80 @@ namespace rain
 		//IM_ASSERT(font != NULL);
 
 	}
+
+
+
+    Game InitGame(const std::string& _dataPath)
+    {
+        Game game = {};
+        game.dataPath = _dataPath;
+        game.gfxContext = InitWindow("Rain Engine", 1920, 1080);
+        
+        return game;
+    }
+
+    Game* InitGame(int argc, char** argv)
+    {
+        Game* game = new Game();
+        auto arguments = String::GetArguments(argc, argv);
+        if (arguments["root"] != "")
+        {
+            game->dataPath = arguments["root"];
+        }
+        game->gfxContext = InitWindow("Rain Engine", 1920, 1080);
+        game->inputEngine = new InputEngine(game->gfxContext.window);
+        game->cameraController = new CameraController();
+        game->cameraController->Init(game);
+
+        return game;
+    }
+
+    void RunGame(Game* _game, std::function<void(void)> _updateCallBack)
+    {
+        while (!glfwWindowShouldClose(_game->gfxContext.window))
+        {
+            // inputs relative to window
+            if (_game->inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+            {
+                glfwSetWindowShouldClose(_game->gfxContext.window, true);
+            }
+
+            // delta time update
+            float currentFrame = (float)glfwGetTime();
+            _game->deltaTime = currentFrame - _game->lastFrame;
+            _game->lastFrame = currentFrame;
+
+            // input
+            _game->inputEngine->Tick();
+
+            // objects
+            if (_game->inputEngine->IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
+            {
+                glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                _game->cameraController->Tick();
+                _game->cameraController->GetCamera()->Tick();
+            }
+            else
+            {
+                glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+
+            glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+            glEnable(GL_STENCIL_TEST);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            // rendering
+            _updateCallBack();
+
+            glDisable(GL_STENCIL_TEST);
+
+            //ImGui::Render();
+            //ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+            glfwSwapBuffers(_game->gfxContext.window);
+            glfwPollEvents();
+        }
+
+        glfwTerminate();
+    }
 }
 

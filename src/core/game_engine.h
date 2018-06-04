@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "imgui.h"
+#include "graphics/graphics.h"
 
 
 struct GLFWwindow;
@@ -68,6 +69,22 @@ namespace rain
         GameEngine();
         GameEngine(GameEngine const&) = delete;
         void operator=(GameEngine const&) = delete;
-
     };
+
+
+    struct Game
+    {
+        std::string dataPath;
+        GFXContext gfxContext;
+        InputEngine* inputEngine;
+        CameraController* cameraController;
+        float deltaTime;
+        float lastFrame;
+    };
+
+
+    Game InitGame(const std::string& _dataPath);
+    Game* InitGame(int argc, char** argv);
+    void RunGame(Game* _game, std::function<void(void)> _updateCallBack);
+
 }

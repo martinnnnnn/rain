@@ -59,9 +59,9 @@ namespace rain
         GLint format;
 	};
 
-	void LoadTextureData(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths);
-	Texture2D LoadTexture2DToRAM(const std::string& _path);
-	void Load2DTextureWithData(const std::string& _path, Texture2D& _texture);
+	void LoadTexturesAsync(TextureContainer* _texManager, const std::unordered_set<std::string>& _filePaths);
+    Texture2D LoadTexture2DToRAM(const std::string& _path);
+    void Load2DTextureToGC(const std::string& _path, Texture2D& _texture);
 	Texture2D FindTexture(const TextureContainer* _texContainer, const std::string _fileName);
 
 	Texture2D Load2DTexture(const std::string& _path, Texture2DType _type, bool _flipVertically = false);
