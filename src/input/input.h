@@ -7,7 +7,6 @@
 struct GLFWwindow;
 namespace rain
 {
-
     struct Input
     {
         GLFWwindow* window;
@@ -18,5 +17,4 @@ namespace rain
 	glm::vec2 GetMousePosition(Input* _input);
 	bool IsKeyPressed(Input* _input, int _keyCode);
     void ComputeMouseOffset(Input* _input);
-
 }

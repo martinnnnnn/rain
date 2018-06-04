@@ -4,10 +4,8 @@
 
 namespace rain
 {
-    class Light
+    struct Light
     {
-    public:
-
         enum class Type
         {
             DIRECTIONAL,

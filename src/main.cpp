@@ -529,7 +529,12 @@ void sandboxUpdate()
     glm::mat4 view = camera->GetViewMatrix(camTransform->Position);
     glm::mat4 modelmat = glm::mat4(1);
     //modelTransform = {};
-    modelTransform.Translate(glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4));
+    //modelTransform.Translate(glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4));
+    static int angle = 0;
+    angle = (++angle) % 10;
+    modelTransform.ChangeScale(glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
+    modelTransform.Rotate(glm::vec3(0.2,0.7,0.1), angle);
+
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
     glm::mat4 lightModel = glm::mat4(1);

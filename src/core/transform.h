@@ -2,6 +2,7 @@
 
 
 #include "utility/incl_3d.h"
+#include "utility/first_time_mcr.h"
 
 #include <iostream>
 
@@ -20,7 +21,7 @@ namespace rain
 
         Transform() :
             Position(),
-            Rotation(),
+            Rotation(glm::vec3(0)),
             Scale(1,1,1)
         {
 
@@ -36,9 +37,14 @@ namespace rain
             Scale += value;
         }
 
-        void Rotate(const glm::vec3& value)
+        void Rotate(const glm::vec3& axis, float _angle)
         {
-            Rotation += glm::quat(value);
+            Rotation = Rotation * glm::angleAxis(glm::radians(_angle), axis);
+        }
+
+        void SetRotation(const glm::vec3& axis, float _angle)
+        {
+            Rotation = glm::angleAxis(glm::radians(_angle), axis);
         }
 
         glm::mat4 GetModelMatrix()
@@ -61,4 +67,11 @@ namespace rain
         glm::vec3 Scale;
         glm::quat Rotation;
     };
+
+    void Translate(TransformS& _transform, const glm::vec3& _amount);
+    void Scale(TransformS& _transform, const glm::vec3& _amount);
+    void Rotate(TransformS& _transform, const glm::vec3& _amount);
+
+    glm::mat4 GetModelMatrix(const TransformS& _transform);
+
 }

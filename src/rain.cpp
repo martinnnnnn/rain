@@ -39,7 +39,7 @@ namespace rain
         {
             game->dataPath = arguments["root"];
         }
-        game->gfxContext = InitWindow("Rain Engine", 1920, 1080);
+        game->gfxContext = InitWindow("Rain Engine", 800, 600);
         game->input = new Input();
         game->input->window = game->gfxContext.window;
         //game->inputEngine = new InputEngine(game->gfxContext.window);
