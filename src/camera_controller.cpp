@@ -2,7 +2,7 @@
 
 
 #include "rain.h"
-#include "input/input_engine.h"
+#include "input/input.h"
 #include "graphics/camera.h"
 #include "core/transform.h"
 #include "core/game_engine.h"
@@ -12,7 +12,6 @@ namespace rain
     int CameraController::Init(Game* _game)
     {
         game = _game;
-        //m_inputEngine = game->inputEngine;
         m_camera = new Camera(game);
         m_transform = new Transform();
         m_movementSpeed = 200;
@@ -21,48 +20,28 @@ namespace rain
 
     void CameraController::Tick()
     {
-        //float deltaTime = Rain::GetDeltaTime();
         float velocity = m_movementSpeed * game->deltaTime;
         glm::vec3 movement(0.0f, 0.0f, 0.0f);
         glm::vec3 front = m_camera->Front;
         glm::vec3 right = m_camera->Right;
 
         if (IsKeyPressed(game->input, GLFW_KEY_W))
-        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_W))
         {
             movement += front * velocity;
         }
         if (IsKeyPressed(game->input, GLFW_KEY_S))
-        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_S))
         {
             movement -= front * velocity;
         }
         if (IsKeyPressed(game->input, GLFW_KEY_A))
-        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_A))
         {
             movement -= right * velocity;
         }
         if (IsKeyPressed(game->input, GLFW_KEY_D))
-        //if (m_inputEngine->IsKeyPressed(GLFW_KEY_D))
         {
             movement += right * velocity;
         }
         m_transform->Translate(movement);
-
-        glm::vec2 mouseOffset = game->input->mouseOffset;
-        std::cout << "(" << mouseOffset.x << "," << mouseOffset.y << ")" << std::endl;
-        mouseOffset.x *= 0.1f;
-        mouseOffset.y *= 0.1f;
-
-        static float m_yaw = -90.0;
-        static float m_pitch = 0.0f;
-        m_yaw += mouseOffset.x;
-        m_pitch += mouseOffset.y;
-
-        if (m_pitch > 89.0f)
-            m_pitch = 89.0f;
-        if (m_pitch < -89.0f)
-            m_pitch = -89.0f;
     }
                              
 

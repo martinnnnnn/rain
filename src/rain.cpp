@@ -1,69 +1,100 @@
 #include "rain.h"
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <windows.h>
 #include <iterator>
 
-#include "core/game_engine.h"
+#include <filesystem>
+using namespace std::experimental::filesystem::v1;
+
+#include "imgui.h"
+#include "imgui_impl_glfw_gl3.h"
+
+#include "utility/incl_3d.h"
+#include "camera_controller.h"
+#include "graphics/camera.h"
+#include "input/input.h"
+#include "core/file_system.h"
 #include "utility/string_utils.h"
 
 namespace rain
 {
-	//int Rain::Init(std::unordered_map<std::string, std::string> _args)
-	//{
-	//	return GameEngine::Get().Init(_args);
-	//}
 
-	//void Rain::Run()
-	//{
-	//	GameEngine::Get().Run();
-	//}
+    Game InitGame(const std::string& _dataPath)
+    {
+        Game game = {};
+        game.dataPath = _dataPath;
+        game.gfxContext = InitWindow("Rain Engine", 1920, 1080);
 
-	//GameEngine* Rain::Engine()
-	//{
-	//	return &(GameEngine::Get());
-	//}
+        return game;
+    }
 
-	//GLFWwindow* Rain::Window()
-	//{
-	//	return GameEngine::Get().Getwindow();
-	//}
+    Game* InitGame(int argc, char** argv)
+    {
+        Game* game = new Game();
+        auto arguments = String::GetArguments(argc, argv);
+        if (arguments["root"] != "")
+        {
+            game->dataPath = arguments["root"];
+        }
+        game->gfxContext = InitWindow("Rain Engine", 1920, 1080);
+        game->input = new Input();
+        game->input->window = game->gfxContext.window;
+        //game->inputEngine = new InputEngine(game->gfxContext.window);
+        game->cameraController = new CameraController();
+        game->cameraController->Init(game);
 
-	//Camera* Rain::Camera()
-	//{
-	//	return GameEngine::Get().GetCamera();
-	//}
+        return game;
+    }
 
-	//InputEngine* Rain::Input()
-	//{
-	//	return GameEngine::Get().GetInputEngine();
-	//}
+    void RunGame(Game* _game, std::function<void(void)> _updateCallBack)
+    {
+        while (!glfwWindowShouldClose(_game->gfxContext.window))
+        {
+            // inputs relative to window
+            if (IsKeyPressed(_game->input, GLFW_KEY_ESCAPE))
+                //if (_game->inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
+            {
+                glfwSetWindowShouldClose(_game->gfxContext.window, true);
+            }
 
-	//float Rain::GetDeltaTime()
-	//{
-	//	return GameEngine::Get().GetDeltaTime();
-	//}
+            // delta time update
+            float currentFrame = (float)glfwGetTime();
+            _game->deltaTime = currentFrame - _game->lastFrame;
+            _game->lastFrame = currentFrame;
 
-	//std::string Rain::GetExePath()
-	//{
-	//	char buffer[MAX_PATH];
-	//	GetModuleFileName(NULL, buffer, MAX_PATH);
-	//	std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-	//	return std::string(buffer).substr(0, pos);
-	//}
+            // input
+            ComputeMouseOffset(_game->input);
 
-	//std::string Rain::ResourcesRoot()
-	//{
-	//	return GameEngine::Get().GetResourcesRoot();
-	//}
+            // objects
+            if (IsKeyPressed(_game->input, GLFW_KEY_LEFT_CONTROL))
+            {
+                glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                _game->cameraController->Tick();
+                _game->cameraController->GetCamera()->Tick();
+            }
+            else
+            {
+                glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
 
-	//glm::vec2 Rain::GetWindowSize()
-	//{
-	//	return Engine()->GetWindowSize();
-	//}
+            glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+            glEnable(GL_STENCIL_TEST);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            // rendering
+            _updateCallBack();
 
+            glDisable(GL_STENCIL_TEST);
 
+            //ImGui::Render();
+            //ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+            glfwSwapBuffers(_game->gfxContext.window);
+            glfwPollEvents();
+        }
 
-
+        glfwTerminate();
+    }
 }

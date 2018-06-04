@@ -1,33 +1,32 @@
 #pragma once
 
-#include "utility/incl_3d.h"
 
 
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <functional>
+
+#include "graphics/graphics.h"
 
 namespace rain
 {
-    class InputEngine;
-    class GameEngine;
-    class Camera;
 
-    namespace Rain
+    struct Input;
+    class CameraController;
+
+    struct Game
     {
-        //int Init(std::unordered_map<std::string, std::string> _args);
-        //void Run();
-
-        //float GetDeltaTime();
-        //GameEngine* Engine();
-        //GLFWwindow* Window();
-        //Camera* Camera();
-        //InputEngine* Input();
-        //std::string ResourcesRoot();
-        //std::string GetExePath();
-        //glm::vec2 GetWindowSize();
-
-        // utility functions
-        
+        std::string dataPath;
+        GFXContext gfxContext;
+        Input* input;
+        CameraController* cameraController;
+        float deltaTime;
+        float lastFrame;
     };
+
+
+        Game InitGame(const std::string& _dataPath);
+        Game* InitGame(int argc, char** argv);
+        void RunGame(Game* _game, std::function<void(void)> _updateCallBack);
 }

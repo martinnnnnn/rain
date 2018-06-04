@@ -21,7 +21,7 @@ namespace rain
         Transform() :
             Position(),
             Rotation(),
-            Scale()
+            Scale(1,1,1)
         {
 
         }
@@ -50,6 +50,13 @@ namespace rain
             return translation * rotation * scale;
         }
 
+        glm::vec3 Position;
+        glm::vec3 Scale;
+        glm::quat Rotation;
+    };
+
+    struct TransformS
+    {
         glm::vec3 Position;
         glm::vec3 Scale;
         glm::quat Rotation;

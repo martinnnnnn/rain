@@ -15,7 +15,7 @@
 #include "graphics/camera.h"
 #include "camera_controller.h"
 #include "core/transform.h"
-#include "input/input_engine.h"
+#include "input/input.h"
 #include "graphics/light.h"
 #include "utility/gl_utils.h"
 #include "graphics/material.h"
@@ -54,6 +54,7 @@ glm::vec3 lightPos;
 std::vector<glm::vec3> cubePositions;
 std::vector<Model> models;
 Game* game;
+Transform modelTransform;
 
 void sandboxInit();
 void sandboxUpdate();
@@ -527,6 +528,8 @@ void sandboxUpdate()
     glm::mat4 proj = camera->GetProjectionMatrix();
     glm::mat4 view = camera->GetViewMatrix(camTransform->Position);
     glm::mat4 modelmat = glm::mat4(1);
+    //modelTransform = {};
+    modelTransform.Translate(glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4));
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
     glm::mat4 lightModel = glm::mat4(1);
@@ -569,7 +572,7 @@ void sandboxUpdate()
     for (size_t i = 0; i < models.size(); ++i)
     {
         models[i].material.shader->use();
-        models[i].material.shader->setParameter("model", modelmat);
+        models[i].material.shader->setParameter("model", modelTransform.GetModelMatrix());
         models[i].material.shader->setParameter("proj", proj);
         models[i].material.shader->setParameter("view", view);
         models[i].material.shader->setParameter("viewPos", camTransform->Position);

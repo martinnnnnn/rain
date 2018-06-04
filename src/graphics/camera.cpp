@@ -2,7 +2,7 @@
 
 
 #include "rain.h"
-#include "input/input_engine.h"
+#include "input/input.h"
 #include "core/game_engine.h"
 
 namespace rain
@@ -21,9 +21,8 @@ namespace rain
 
     void Camera::Tick()
     {
-    
         processMouseMouvement(game->input->mouseOffset);
-        //processMouseMouvement(game->inputEngine->GetMouseOffset());
+        updateCameraVectors();
     }
 
     void Camera::processMouseMouvement(const glm::vec2& _mouseOffset)
@@ -40,17 +39,15 @@ namespace rain
             m_pitch = 89.0f;
         if (m_pitch < -89.0f)
             m_pitch = -89.0f;
-
-        updateCameraVectors();
     }
 
     void Camera::updateCameraVectors()
     {
         glm::vec3 front
         {
-            cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch))
-            ,sin(glm::radians(m_pitch))
-            ,sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch))
+            cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch)),
+            sin(glm::radians(m_pitch)),
+            sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch))
         };
         Front = glm::normalize(front);
 
