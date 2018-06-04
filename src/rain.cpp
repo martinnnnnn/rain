@@ -41,9 +41,8 @@ namespace rain
         game->gfxContext = InitWindow("Rain Engine", 800, 600);
         game->input = new Input();
         game->input->window = game->gfxContext.window;
-        //game->inputEngine = new InputEngine(game->gfxContext.window);
-        game->camera = new Camera();
-        game->camera->Init(game);
+        game->camera = GetDefaultCamera(game);
+        //game->camera->Init(game);
 
         return game;
     }
@@ -54,7 +53,6 @@ namespace rain
         {
             // inputs relative to window
             if (IsKeyPressed(_game->input, GLFW_KEY_ESCAPE))
-                //if (_game->inputEngine->IsKeyPressed(GLFW_KEY_ESCAPE))
             {
                 glfwSetWindowShouldClose(_game->gfxContext.window, true);
             }
@@ -71,7 +69,8 @@ namespace rain
             if (IsKeyPressed(_game->input, GLFW_KEY_LEFT_CONTROL))
             {
                 glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                _game->camera->Tick();
+                UpdateCamera(*_game->camera);
+                //_game->camera->Tick();
             }
             else
             {

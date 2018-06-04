@@ -74,7 +74,8 @@ DLLEXPORT void LoadGame(const char* path)
 int main(int argc, char** argv)
 {
     game = InitGame(argc, argv);
-    Transform* camTransform = game->camera->GetTransform();
+    //Transform* camTransform = game->camera->GetTransform();
+    Transform* camTransform = &game->camera->transform;
     Translate(*camTransform, glm::vec3(0, 0, 5));
 
     rootpath = game->dataPath;
@@ -370,7 +371,8 @@ void sandboxInit()
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
     
     //glm::mat4 projection = Rain::Camera()->GetProjectionMatrix();
-    glm::mat4 projection = game->camera->GetProjectionMatrix();
+    glm::mat4 projection = game->camera->projectionMatrix;
+
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -482,11 +484,12 @@ void sandboxUpdate()
     checkInputs();
 
     // recup mat view, mat proj
-    Camera* _camera = game->camera;
-    Transform* camTransform = _camera->GetTransform();
+    CameraS* _camera = game->camera;
+    Transform* camTransform = &_camera->transform;
 
-    glm::mat4 proj = _camera->GetProjectionMatrix();
-    glm::mat4 view = _camera->GetViewMatrix(camTransform->position);
+    glm::mat4 proj = _camera->projectionMatrix;
+    glm::mat4 view = GetViewMatrix(*_camera);
+     //= _camera->GetViewMatrix(camTransform->position);
     glm::mat4 modelmat = glm::mat4(1);
 
     static int angle = 0;
@@ -542,7 +545,7 @@ void sandboxUpdate()
         models[i].material.shader->setParameter("viewPos", camTransform->position);
         models[i].material.shader->setParameter("pointLight.position", lightPos);
         models[i].material.shader->setParameter("spotLight.position", camTransform->position);
-        models[i].material.shader->setParameter("spotLight.direction", _camera->Front);
+        models[i].material.shader->setParameter("spotLight.direction", _camera->front);
         Draw(&models[i]);
     }
 
@@ -553,7 +556,7 @@ void sandboxUpdate()
     shaderProgram.setParameter("viewPos", camTransform->position);
 	shaderProgram.setParameter("pointLight.position", lightPos);
 	shaderProgram.setParameter("spotLight.position", camTransform->position);
-	shaderProgram.setParameter("spotLight.direction", _camera->Front);
+	shaderProgram.setParameter("spotLight.direction", _camera->front);
     
 
     glActiveTexture(GL_TEXTURE0);
@@ -601,7 +604,7 @@ void sandboxUpdate()
 
     glDepthFunc(GL_LEQUAL);
     skyboxShader.use();
-    skyboxShader.setParameter("view", glm::mat4(glm::mat3(_camera->GetViewMatrix(camTransform->position))));
+    skyboxShader.setParameter("view", glm::mat4(glm::mat3(view)));
     skyboxShader.setParameter("projection", proj);
 
     glBindVertexArray(skyboxVAO);
