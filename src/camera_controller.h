@@ -1,10 +1,11 @@
 #pragma once
 
+#include "core/transform.h"
 
 namespace rain
 {
     class Camera;
-    class Transform;
+    //class Transform;
     class InputEngine;
     struct Game;
 
@@ -21,17 +22,18 @@ namespace rain
 
         CameraController() : 
             m_camera(nullptr)
-            , m_transform(nullptr)
+            //, m_transform(nullptr)
         {}
 
         int Init(Game* _game);
         void Tick();
         Camera* GetCamera();
-        Transform* GetTransform();
+        TransformS* GetTransform();
 
     private:
         Camera* m_camera;
-        Transform* m_transform;
+        //Transform* m_transform;
+        TransformS transform;
         float m_movementSpeed;
         Game* game;
     };

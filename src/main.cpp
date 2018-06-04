@@ -54,7 +54,7 @@ glm::vec3 lightPos;
 std::vector<glm::vec3> cubePositions;
 std::vector<Model> models;
 Game* game;
-Transform modelTransform;
+TransformS modelTransform;
 
 void sandboxInit();
 void sandboxUpdate();
@@ -93,8 +93,9 @@ DLLEXPORT void LoadGame(const char* path)
 int main(int argc, char** argv)
 {
     game = InitGame(argc, argv);
-    Transform* camTransform = game->cameraController->GetTransform();
-    camTransform->Translate(glm::vec3(0, 0, 5));
+    TransformS* camTransform = game->cameraController->GetTransform();
+    Translate(*camTransform, glm::vec3(0, 0, 5));
+    //camTransform->Translate(glm::vec3(0, 0, 5));
     rootpath = game->dataPath;
     wireframe = false;
 
@@ -523,17 +524,19 @@ void sandboxUpdate()
     CameraController* camController = game->cameraController;
     //CameraController* camController = Rain::Engine()->GetCameraController();
     Camera* camera = camController->GetCamera();
-    Transform* camTransform = camController->GetTransform();
+    TransformS* camTransform = camController->GetTransform();
 
     glm::mat4 proj = camera->GetProjectionMatrix();
-    glm::mat4 view = camera->GetViewMatrix(camTransform->Position);
+    glm::mat4 view = camera->GetViewMatrix(camTransform->position);
     glm::mat4 modelmat = glm::mat4(1);
     //modelTransform = {};
     //modelTransform.Translate(glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4));
     static int angle = 0;
     angle = (++angle) % 10;
-    modelTransform.ChangeScale(glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
-    modelTransform.Rotate(glm::vec3(0.2,0.7,0.1), angle);
+    Scale(modelTransform, glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
+    Rotate(modelTransform, glm::vec3(0.2, 0.7, 0.1), angle);
+    //modelTransform.ChangeScale(glm::vec3(glm::sin(glfwGetTime()), glm::sin(glfwGetTime()), glm::sin(glfwGetTime())));
+    //modelTransform.Rotate(glm::vec3(0.2,0.7,0.1), angle);
 
 
     lightPos = glm::vec3(glm::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4);
@@ -577,12 +580,12 @@ void sandboxUpdate()
     for (size_t i = 0; i < models.size(); ++i)
     {
         models[i].material.shader->use();
-        models[i].material.shader->setParameter("model", modelTransform.GetModelMatrix());
+        models[i].material.shader->setParameter("model", GetModelMatrix(modelTransform));
         models[i].material.shader->setParameter("proj", proj);
         models[i].material.shader->setParameter("view", view);
-        models[i].material.shader->setParameter("viewPos", camTransform->Position);
+        models[i].material.shader->setParameter("viewPos", camTransform->position);
         models[i].material.shader->setParameter("pointLight.position", lightPos);
-        models[i].material.shader->setParameter("spotLight.position", camTransform->Position);
+        models[i].material.shader->setParameter("spotLight.position", camTransform->position);
         models[i].material.shader->setParameter("spotLight.direction", camera->Front);
         Draw(&models[i]);
     }
@@ -591,9 +594,9 @@ void sandboxUpdate()
     shaderProgram.setParameter("model", modelmat);
     shaderProgram.setParameter("proj", proj);
     shaderProgram.setParameter("view", view);
-    shaderProgram.setParameter("viewPos", camTransform->Position);
+    shaderProgram.setParameter("viewPos", camTransform->position);
 	shaderProgram.setParameter("pointLight.position", lightPos);
-	shaderProgram.setParameter("spotLight.position", camTransform->Position);
+	shaderProgram.setParameter("spotLight.position", camTransform->position);
 	shaderProgram.setParameter("spotLight.direction", camera->Front);
     
 
@@ -642,7 +645,7 @@ void sandboxUpdate()
 
     glDepthFunc(GL_LEQUAL);
     skyboxShader.use();
-    skyboxShader.setParameter("view", glm::mat4(glm::mat3(camera->GetViewMatrix(camTransform->Position))));
+    skyboxShader.setParameter("view", glm::mat4(glm::mat3(camera->GetViewMatrix(camTransform->position))));
     skyboxShader.setParameter("projection", proj);
 
     glBindVertexArray(skyboxVAO);

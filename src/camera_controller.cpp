@@ -13,7 +13,6 @@ namespace rain
     {
         game = _game;
         m_camera = new Camera(game);
-        m_transform = new Transform();
         m_movementSpeed = 200;
         return 0;
     }
@@ -41,7 +40,8 @@ namespace rain
         {
             movement += right * velocity;
         }
-        m_transform->Translate(movement);
+        Translate(transform, movement);
+        //m_transform->Translate(movement);
     }
                              
 
@@ -50,8 +50,8 @@ namespace rain
         return m_camera;
     }
 
-    Transform* CameraController::GetTransform()
+    TransformS* CameraController::GetTransform()
     {
-        return m_transform;
+        return &transform;
     }
 }
