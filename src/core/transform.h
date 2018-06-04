@@ -8,21 +8,21 @@
 
 namespace rain
 {
-    struct TransformS
+    struct Transform
     {
-        TransformS();
+        Transform();
 
         glm::vec3 position;
         glm::vec3 scale;
         glm::quat rotation;
     };
 
-    void Translate(TransformS& _transform, const glm::vec3& _amount);
-    void SetLocation(TransformS& _transform, const glm::vec3& _newLocation);
-    void Scale(TransformS& _transform, const glm::vec3& _amount);
-    void SetScale(TransformS& _transform, const glm::vec3& _newScale);
-    void Rotate(TransformS& _transform, const glm::vec3& _axis, float _angle);
-    void SetRotation(TransformS& _transform, const glm::vec3& _axis, float _angle);
+    void Translate(Transform& _transform, const glm::vec3& _amount);
+    void SetLocation(Transform& _transform, const glm::vec3& _newLocation);
+    void Scale(Transform& _transform, const glm::vec3& _amount);
+    void SetScale(Transform& _transform, const glm::vec3& _newScale);
+    void Rotate(Transform& _transform, const glm::vec3& _axis, float _angle);
+    void SetRotation(Transform& _transform, const glm::vec3& _axis, float _angle);
 
-    glm::mat4 GetModelMatrix(const TransformS& _transform);
+    glm::mat4 GetModelMatrix(const Transform& _transform);
 }

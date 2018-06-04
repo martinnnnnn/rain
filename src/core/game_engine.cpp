@@ -10,7 +10,6 @@ using namespace std::experimental::filesystem::v1;
 
 #include "utility/incl_3d.h"
 #include "rain.h"
-#include "camera_controller.h"
 #include "graphics/camera.h"
 #include "input/input.h"
 #include "file_system.h"

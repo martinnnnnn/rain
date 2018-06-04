@@ -13,7 +13,6 @@ using namespace std::experimental::filesystem::v1;
 #include "imgui_impl_glfw_gl3.h"
 
 #include "utility/incl_3d.h"
-#include "camera_controller.h"
 #include "graphics/camera.h"
 #include "input/input.h"
 #include "core/file_system.h"
@@ -43,8 +42,8 @@ namespace rain
         game->input = new Input();
         game->input->window = game->gfxContext.window;
         //game->inputEngine = new InputEngine(game->gfxContext.window);
-        game->cameraController = new CameraController();
-        game->cameraController->Init(game);
+        game->camera = new Camera();
+        game->camera->Init(game);
 
         return game;
     }
@@ -72,8 +71,7 @@ namespace rain
             if (IsKeyPressed(_game->input, GLFW_KEY_LEFT_CONTROL))
             {
                 glfwSetInputMode(_game->gfxContext.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                _game->cameraController->Tick();
-                _game->cameraController->GetCamera()->Tick();
+                _game->camera->Tick();
             }
             else
             {
