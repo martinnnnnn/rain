@@ -29,7 +29,7 @@ add_subdirectory(external/bullet)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP /GR-")
 # /W4 /Za
 
 #### INCLUDES ####
@@ -49,7 +49,7 @@ add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
 #### EXECUTABLE CREATION ####
 message(STATUS "> globing source files")
-file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.h" "src/*.hpp" "src/*.cpp")
+file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.h" "src/*.hpp" "src/*.cpp" "src/*.inl")
 file(GLOB GLAD_SOURCES external/glad/src/glad.c)
 file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 

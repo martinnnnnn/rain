@@ -23,6 +23,7 @@
 #include "graphics/mesh.h"
 #include "graphics/texture.h"
 #include "utility/string_utils.h"
+#include "core/entity.h"
 
 using namespace rain;
 
@@ -62,9 +63,9 @@ void loadShaders();
 using namespace nlohmann;
 
 
-#define DLLEXPORT extern "C" __declspec(dllexport)
+#define RAIN_DLLEXPORT extern "C" __declspec(dllexport)
 
-DLLEXPORT void LoadGame(const char* path)
+RAIN_DLLEXPORT void LoadGame(const char* path)
 {
 
 }
@@ -391,6 +392,13 @@ void sandboxInit()
 
 	models = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 	//models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+
+    Entity* t1 = new Entity();
+    CTransform* ctrans = CreateComponent<CTransform>(t1);
+    Translate(ctrans->transform, glm::vec3(5, 5, 5));
+    CModel* cmodel = new CModel();
+    AddComponent(t1, (uint32_t)Component::Type::MODEL, cmodel);
+    cmodel->model = &models;
 }
 
 
