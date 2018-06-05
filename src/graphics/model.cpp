@@ -10,7 +10,7 @@
 
 namespace rain
 {
-    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
+    Model LoadModel(const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
     {
         Model model = {};
         model.path = _modelPath;

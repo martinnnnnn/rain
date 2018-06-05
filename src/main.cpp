@@ -84,7 +84,6 @@ int main(int argc, char** argv)
     loadShaders();
 
     RunGame(game, sandboxUpdate);
-
     return 0;
 }
 
@@ -388,13 +387,13 @@ void sandboxInit()
 
 
     //model = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
-    model = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+    model = LoadModel(rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 
-    Entity* t1 = new Entity();
-    CTransform* ctrans = CreateComponent<CTransform>(t1);
-    Translate(ctrans->transform, glm::vec3(5, 5, 5));
-    CModel* cmodel = new CModel();
-    AddComponent<CModel>(t1, cmodel);
+    //Entity* t1 = new Entity();
+    //CTransform* ctrans = CreateComponent<CTransform>(t1);
+    //Translate(ctrans->transform, glm::vec3(5, 5, 5));
+    //CModel* cmodel = new CModel();
+    //AddComponent<CModel>(t1, cmodel);
 }
 
 

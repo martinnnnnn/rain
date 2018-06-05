@@ -11,15 +11,9 @@
 namespace rain
 {
 
-	struct CModel : Component
-	{
-        CModel() : Component(Type::MODEL) {}
-	};
-
-    struct CTransform : Component
+    struct CModel : Component
     {
-        CTransform() : Component(Type::TRANSFORM) {}
-        Transform transform;
+        CModel() : Component(Type::MODEL) {}
     };
 
 	struct Entity
@@ -42,8 +36,7 @@ namespace rain
 
     // ****
     // be careful : getcomponent performs a static_cast to type T
-    // no runtime check occurs
-    // make sure to give the right flag
+    // no runtime check occurs so make sure to give the right flag
     // TODO(martin): change this behavior to be more reliable ?
     // TODO(martin): add support for multiple components of the same type
     // ****

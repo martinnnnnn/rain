@@ -31,8 +31,6 @@ namespace rain
             return meshes;
         }
 
-        //const aiScene* scene = OpenAssimpScene(_path);
-
         meshes.reserve(scene->mNumMeshes);
 		std::string directoryPath = File::GetDirectory(_path);
 		std::unordered_set<std::string> filePaths;
@@ -52,21 +50,6 @@ namespace rain
 			meshes.push_back(staticMesh);
         }
         return meshes;
-    }
-
-
-
-
-    const aiScene* OpenAssimpScene(const std::string& _path)
-    {
-        Assimp::Importer import;
-        const aiScene *scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-            return nullptr;
-        }
-        return scene;
     }
 
     StaticMeshData* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene)

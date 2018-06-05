@@ -7,10 +7,12 @@ namespace rain
     {
         enum class Type
         {
-            NONE = (1 << 0),
-            TRANSFORM = (1 << 1),
-            MODEL = (1 << 2),
-            LIGHT = (1 << 3),
+            TRANSFORM = (1 << 0),
+            MODEL = (1 << 1),
+            LIGHT = (1 << 2),
+            SHADER = (1 << 3),
+            MATERIAL = (1 << 4),
+
             MAX_COUNT = (1 << 31)
         };
 
@@ -18,5 +20,6 @@ namespace rain
 
         Component(Type _type) : type(_type) {}
         virtual ~Component() {}
+
     };
 }

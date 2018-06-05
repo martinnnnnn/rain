@@ -4,9 +4,9 @@
 #include <vector>
 #include <string>
 #include <assimp/scene.h>
+#include <unordered_map>
 
 #include "graphics/mesh.h"
-
 
 namespace rain
 {
@@ -16,5 +16,10 @@ namespace rain
         std::vector<StaticMesh*> meshes;
     };
 
-    Model SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
+    struct ModelContainer
+    {
+        std::unordered_map<std::string, Model> models;
+    };
+
+    Model LoadModel(const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
 }

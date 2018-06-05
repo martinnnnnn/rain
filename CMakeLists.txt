@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 project(rain)
 message(STATUS "project name : ${PROJECT_NAME}")
+
+set(RAIN_EXE rain_exe)
+set(RAIN_LIB rain_lib)
+
 #### MODULES ####
 message(STATUS "> setting modules path")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -54,7 +58,7 @@ file(GLOB GLAD_SOURCES external/glad/src/glad.c)
 file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 
 message(STATUS "> adding files to exetutable")
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+add_executable(${RAIN_EXE} ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
 
 
 #### GROUP CREATION ####
@@ -81,7 +85,7 @@ source_group("libraries" FILES ${LIBS_SOURCES})
 
 #### LIBRARIES TO TARGET LINKING ####
 message(STATUS "> Linking libraries to target")
-target_link_libraries(${PROJECT_NAME} assimp glfw
+target_link_libraries(${RAIN_EXE} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
@@ -89,23 +93,23 @@ set_target_properties(assimp PROPERTIES FOLDER "assimp")
 set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
 set_target_properties(BulletCollision PROPERTIES FOLDER "bullet")
 set_target_properties(LinearMath PROPERTIES FOLDER "bullet")
-set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "rain")
+set_target_properties(${RAIN_EXE} PROPERTIES FOLDER "rain")
 
 
 #### OUTPUT DIRECTORY ####
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
+set_target_properties(${RAIN_EXE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
 
 #### LIB FOR EDITOR ####
-project(rainlib)
+#project(rainlib)
 add_definitions(-DEXPMODULE)
-add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
-target_link_libraries(${PROJECT_NAME} assimp glfw
+add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+target_link_libraries(${RAIN_LIB} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
-set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "rain")
+set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
+set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
 
 set_target_properties(Bullet3Common PROPERTIES FOLDER "bullet")
 set_target_properties(Bullet3Collision PROPERTIES FOLDER "bullet")
@@ -122,7 +126,7 @@ set_target_properties(zlibstatic PROPERTIES FOLDER "assimp")
 set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "assimp")
 
 
-project(rain)
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
+#project(rain)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${RAIN_EXE})
 
 message(STATUS "> end of generation")

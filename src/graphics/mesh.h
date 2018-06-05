@@ -20,7 +20,7 @@ namespace rain
 		glm::vec3 normal;
 		glm::vec2 textCoords;
 	};
-
+    
 	struct StaticMeshData
 	{
 		std::string name;
@@ -31,14 +31,6 @@ namespace rain
 		GLuint m_ebo;
 	};
 
-    //struct StaticMesh
-    //{
-    //    std::string path;
-    //    StaticMeshData* mesh;
-    //    std::vector<Texture2D> textures;
-    //    Material material;
-    //};
-
     struct StaticMesh
     {
         StaticMeshData* mesh;
@@ -46,14 +38,10 @@ namespace rain
         std::vector<Texture2D> textures;
     };
 
-
-
-
     void InitMesh(StaticMeshData* _mesh);
     void Draw(StaticMesh* _mesh);
 
     std::vector<StaticMesh*> GetMeshesFromAssimpScene(const std::string& _path);
-    const aiScene* OpenAssimpScene(const std::string& _path);
     StaticMeshData* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
 	std::vector<Texture2D> FindTextures(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const TextureContainer* _textureContainer);
 	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath);

@@ -47,6 +47,7 @@ namespace rain
 
 	struct TextureContainer
 	{
+        // [filename] -> texture data
 		std::unordered_map<std::string, Texture2D> textures;
 	};
 
