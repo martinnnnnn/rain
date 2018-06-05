@@ -6,6 +6,7 @@
 namespace rain
 {
     Transform::Transform() :
+        Component(Type::TRANSFORM),
         position(0,0,0),
         scale(1,1,1),
         rotation(glm::vec3(0,0,0))

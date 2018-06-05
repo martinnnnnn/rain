@@ -20,7 +20,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "graphics/model.h"
-#include "graphics/mesh.h"
 #include "graphics/texture.h"
 #include "utility/string_utils.h"
 #include "core/entity.h"
@@ -51,7 +50,7 @@ GLuint skyboxVAO;
 GLuint skyboxTexture;
 glm::vec3 lightPos;
 std::vector<glm::vec3> cubePositions;
-std::vector<Model> models;
+Model model;
 Game* game;
 Transform modelTransform;
 
@@ -387,18 +386,15 @@ void sandboxInit()
     lightshaderProgramYellow.init(rootpath + "/shaders/light_shader.vs", rootpath + "/shaders/light_shader_yellow.fs");
 	outlineShaderProgram.init(rootpath + "/shaders/shader1.vs", rootpath + "/shaders/outline.fs");
 
-    Material test;
-    //test.Init(rootpath + std::vector<"/shaders/shader1", false);
 
-	models = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
-	//models = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+    //model = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+    model = SetupModel("doesnt_matter", rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 
     Entity* t1 = new Entity();
     CTransform* ctrans = CreateComponent<CTransform>(t1);
     Translate(ctrans->transform, glm::vec3(5, 5, 5));
     CModel* cmodel = new CModel();
-    AddComponent(t1, (uint32_t)Component::Type::MODEL, cmodel);
-    cmodel->model = &models;
+    AddComponent<CModel>(t1, cmodel);
 }
 
 
@@ -413,35 +409,35 @@ void loadShaders()
     screenquadShader.use();
     screenquadShader.setParameter("screenTexture", 0);
 
-    for (size_t i = 0; i < models.size(); ++i)
+    for (size_t i = 0; i < model.meshes.size(); ++i)
     {
-        models[i].material.shader->use();
-        models[i].material.shader->setParameter("light1.type", 0);
-        models[i].material.shader->setParameter("light1.direction", -0.2f, -1.0f, -0.3f);
-        models[i].material.shader->setParameter("light1.ambient", 0.5f, 0.5f, 0.5f);
-        models[i].material.shader->setParameter("light1.diffuse", 0.1f, 0.1f, 0.1f);
-        models[i].material.shader->setParameter("light1.specular", 1.0f, 1.0f, 1.0f);
-        models[i].material.shader->setParameter("light2.type", 1);
-        models[i].material.shader->setParameter("light2.ambient", 0.1f, 0.1f, 0.1f);
-        models[i].material.shader->setParameter("light2.diffuse", 0.8f, 0.8f, 0.8f);
-        models[i].material.shader->setParameter("light2.specular", 1.0f, 1.0f, 1.0f);
-        models[i].material.shader->setParameter("light2.constant", 1.0f);
-        models[i].material.shader->setParameter("light2.linear", 0.09f);
-        models[i].material.shader->setParameter("light2.quadratic", 0.032f);
-        models[i].material.shader->setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        models[i].material.shader->setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        models[i].material.shader->setParameter("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
-        models[i].material.shader->setParameter("light3.ambient", 0.1f, 0.1f, 0.1f);
-        models[i].material.shader->setParameter("light3.diffuse", 0.8f, 0.8f, 0.8f);
-        models[i].material.shader->setParameter("light3.specular", 1.0f, 1.0f, 1.0f);
-        models[i].material.shader->setParameter("light3.constant", 1.0f);
-        models[i].material.shader->setParameter("light3.linear", 0.09f);
-        models[i].material.shader->setParameter("light3.quadratic", 0.032f);
-        models[i].material.shader->setParameter("mat.diffuse", 0);
-        models[i].material.shader->setParameter("mat.specular", 1);
-        models[i].material.shader->setParameter("mat.emissive", 2);
-        models[i].material.shader->setParameter("mat.shininess", 32.0f);
-        models[i].material.shader->setParameter("skybox", 3);
+        model.meshes[i]->material.shader->use();
+        model.meshes[i]->material.shader->setParameter("light1.type", 0);
+        model.meshes[i]->material.shader->setParameter("light1.direction", -0.2f, -1.0f, -0.3f);
+        model.meshes[i]->material.shader->setParameter("light1.ambient", 0.5f, 0.5f, 0.5f);
+        model.meshes[i]->material.shader->setParameter("light1.diffuse", 0.1f, 0.1f, 0.1f);
+        model.meshes[i]->material.shader->setParameter("light1.specular", 1.0f, 1.0f, 1.0f);
+        model.meshes[i]->material.shader->setParameter("light2.type", 1);
+        model.meshes[i]->material.shader->setParameter("light2.ambient", 0.1f, 0.1f, 0.1f);
+        model.meshes[i]->material.shader->setParameter("light2.diffuse", 0.8f, 0.8f, 0.8f);
+        model.meshes[i]->material.shader->setParameter("light2.specular", 1.0f, 1.0f, 1.0f);
+        model.meshes[i]->material.shader->setParameter("light2.constant", 1.0f);
+        model.meshes[i]->material.shader->setParameter("light2.linear", 0.09f);
+        model.meshes[i]->material.shader->setParameter("light2.quadratic", 0.032f);
+        model.meshes[i]->material.shader->setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        model.meshes[i]->material.shader->setParameter("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        model.meshes[i]->material.shader->setParameter("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
+        model.meshes[i]->material.shader->setParameter("light3.ambient", 0.1f, 0.1f, 0.1f);
+        model.meshes[i]->material.shader->setParameter("light3.diffuse", 0.8f, 0.8f, 0.8f);
+        model.meshes[i]->material.shader->setParameter("light3.specular", 1.0f, 1.0f, 1.0f);
+        model.meshes[i]->material.shader->setParameter("light3.constant", 1.0f);
+        model.meshes[i]->material.shader->setParameter("light3.linear", 0.09f);
+        model.meshes[i]->material.shader->setParameter("light3.quadratic", 0.032f);
+        model.meshes[i]->material.shader->setParameter("mat.diffuse", 0);
+        model.meshes[i]->material.shader->setParameter("mat.specular", 1);
+        model.meshes[i]->material.shader->setParameter("mat.emissive", 2);
+        model.meshes[i]->material.shader->setParameter("mat.shininess", 32.0f);
+        model.meshes[i]->material.shader->setParameter("skybox", 3);
     }
 
     shaderProgram.Reload();
@@ -543,17 +539,17 @@ void sandboxUpdate()
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 
-    for (size_t i = 0; i < models.size(); ++i)
+    for (size_t i = 0; i < model.meshes.size(); ++i)
     {
-        models[i].material.shader->use();
-        models[i].material.shader->setParameter("model", GetModelMatrix(modelTransform));
-        models[i].material.shader->setParameter("proj", proj);
-        models[i].material.shader->setParameter("view", view);
-        models[i].material.shader->setParameter("viewPos", camTransform->position);
-        models[i].material.shader->setParameter("pointLight.position", lightPos);
-        models[i].material.shader->setParameter("spotLight.position", camTransform->position);
-        models[i].material.shader->setParameter("spotLight.direction", _camera->front);
-        Draw(&models[i]);
+        model.meshes[i]->material.shader->use();
+        model.meshes[i]->material.shader->setParameter("model", GetModelMatrix(modelTransform));
+        model.meshes[i]->material.shader->setParameter("proj", proj);
+        model.meshes[i]->material.shader->setParameter("view", view);
+        model.meshes[i]->material.shader->setParameter("viewPos", camTransform->position);
+        model.meshes[i]->material.shader->setParameter("pointLight.position", lightPos);
+        model.meshes[i]->material.shader->setParameter("spotLight.position", camTransform->position);
+        model.meshes[i]->material.shader->setParameter("spotLight.direction", _camera->front);
+        Draw(model.meshes[i]);
     }
 
     shaderProgram.use();

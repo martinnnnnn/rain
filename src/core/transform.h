@@ -3,12 +3,13 @@
 
 #include "utility/incl_3d.h"
 #include "utility/first_time_mcr.h"
+#include "core/component.h"
 
 #include <iostream>
 
 namespace rain
 {
-    struct Transform
+    struct Transform : Component
     {
         Transform();
 

@@ -87,6 +87,6 @@ namespace rain
 
     void UpdateProjectionMatrix(Camera& _camera, float width, float height)
     {
-        _camera.projectionMatrix = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 1000.0f);
+        _camera.projectionMatrix = glm::perspective(glm::radians(45.0f), width / height, 0.1f, 10000.0f);
     }
 }

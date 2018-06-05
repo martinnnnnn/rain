@@ -21,7 +21,7 @@ namespace rain
 		glm::vec2 textCoords;
 	};
 
-	struct Mesh
+	struct StaticMeshData
 	{
 		std::string name;
 		std::vector<Vertex> vertices;
@@ -31,23 +31,30 @@ namespace rain
 		GLuint m_ebo;
 	};
 
-    struct Model
+    //struct StaticMesh
+    //{
+    //    std::string path;
+    //    StaticMeshData* mesh;
+    //    std::vector<Texture2D> textures;
+    //    Material material;
+    //};
+
+    struct StaticMesh
     {
-        std::string path;
-        Mesh* mesh;
+        StaticMeshData* mesh;
         Material material;
         std::vector<Texture2D> textures;
     };
 
-    std::vector<Model> SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
 
 
-    void InitMesh(Mesh* _mesh);
-    void Draw(Model* _model);
 
-    std::vector<Model> GetModelsFromAssimpScene(const std::string& _path);
+    void InitMesh(StaticMeshData* _mesh);
+    void Draw(StaticMesh* _mesh);
+
+    std::vector<StaticMesh*> GetMeshesFromAssimpScene(const std::string& _path);
     const aiScene* OpenAssimpScene(const std::string& _path);
-    Mesh* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
+    StaticMeshData* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
 	std::vector<Texture2D> FindTextures(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const TextureContainer* _textureContainer);
 	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath);
 }

@@ -4,6 +4,20 @@
 namespace rain
 {
     template<typename T>
+    bool AddComponent(Entity* _entity, T* _component)
+    {
+        static_assert(std::is_base_of<Component, T>::value, "You can only add objects from Component derived structs");
+        uint32_t flag = (uint32_t)_component->type;
+        if (GetBit(_entity->flags, flag))
+        {
+            return false;
+        }
+        TurnOnBit(_entity->flags, flag);
+        _entity->components.push_back(static_cast<Component*>(_component));
+        return true;
+    }
+
+    template<typename T>
     T* GetComponent(Entity* _entity, uint32_t _componentFlag)
     {
         if (GetBit(_entity->flags, _componentFlag))

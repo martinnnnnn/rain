@@ -19,51 +19,21 @@
 
 namespace rain
 {
-    std::vector<Model> SetupModel(const std::string& name, const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath)
-    {
-        //TODO(martin) : use name instead of taking the first model in the scene
-        std::vector<Model> models = GetModelsFromAssimpScene(_modelPath);
-
-        for (size_t k = 0; k < models.size(); ++k)
-        {
-            InitMesh(models[k].mesh);
-            models[k].material = LoadMaterial(_materialDataPath, _shaderPath);
-
-            //TODO(martin) : not optimized - should be improved
-            for (size_t i = 0; i < models[k].textures.size(); ++i)
-            {
-                std::string textureType = TextureUtils::Texture2DTypeToString(models[k].textures[i].type);
-                for (size_t j = 0; j < models[k].material.shaderVariables.size(); ++j)
-                {
-                    if (models[k].material.shaderVariables[j].name.find("mat") == std::string::npos)
-                        continue;
-                    if (models[k].material.shaderVariables[j].name.find(textureType) != std::string::npos)
-                    {
-                        models[k].material.shaderVariables[j].textureId = models[k].textures[i].id;
-                        break;
-                    }
-                }
-            }
-        }
-        return models;
-    }
-
-
 	//TODO(martin) : error handling
-    std::vector<Model> GetModelsFromAssimpScene(const std::string& _path)
+    std::vector<StaticMesh*> GetMeshesFromAssimpScene(const std::string& _path)
     {
-        std::vector<Model> models;
+        std::vector<StaticMesh*> meshes;
         Assimp::Importer import;
         const aiScene *scene = import.ReadFile(_path, aiProcess_Triangulate | aiProcess_FlipUVs);
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-            return models;
+            return meshes;
         }
 
         //const aiScene* scene = OpenAssimpScene(_path);
 
-        models.reserve(scene->mNumMeshes);
+        meshes.reserve(scene->mNumMeshes);
 		std::string directoryPath = File::GetDirectory(_path);
 		std::unordered_set<std::string> filePaths;
 		GetTexturesPath(filePaths, scene, directoryPath);
@@ -76,15 +46,12 @@ namespace rain
 
 			aiMesh* aimesh = scene->mMeshes[i];
 
-			Model model{};
-			model.path = _path;
-
-			model.mesh = LoadMeshData(aimesh, scene);
-
-			model.textures = FindTextures(aimesh, scene, directoryPath, &textureContainer);
-			models.push_back(model);
+			StaticMesh* staticMesh = new StaticMesh();
+            staticMesh->mesh = LoadMeshData(aimesh, scene);
+            staticMesh->textures = FindTextures(aimesh, scene, directoryPath, &textureContainer);
+			meshes.push_back(staticMesh);
         }
-        return models;
+        return meshes;
     }
 
 
@@ -102,9 +69,9 @@ namespace rain
         return scene;
     }
 
-    Mesh* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene)
+    StaticMeshData* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene)
     {
-        Mesh* mesh = new Mesh();
+        StaticMeshData* mesh = new StaticMeshData();
 
         // setting vertices
         mesh->vertices.reserve(_aiMesh->mNumVertices);
@@ -171,7 +138,7 @@ namespace rain
 	}
 
 
-    void InitMesh(Mesh* _mesh)
+    void InitMesh(StaticMeshData* _mesh)
     {
         glGenVertexArrays(1, &_mesh->m_vao);
         glGenBuffers(1, &_mesh->m_vbo);
@@ -197,29 +164,29 @@ namespace rain
         glBindVertexArray(0);
     }
 
-    void Draw(Model* _model)
+    void Draw(StaticMesh* _mesh)
     {
-        _model->material.shader->use();
+        _mesh->material.shader->use();
 
         int textIndex = 0;
-        for (size_t i = 0; i < _model->material.shaderVariables.size(); ++i)
+        for (size_t i = 0; i < _mesh->material.shaderVariables.size(); ++i)
         {
-            GLSL::Variable* variable = &_model->material.shaderVariables[i];
-            for (size_t j = 0; j < _model->textures.size(); ++j)
+            GLSL::Variable* variable = &_mesh->material.shaderVariables[i];
+            for (size_t j = 0; j < _mesh->textures.size(); ++j)
             {
-                if (_model->textures[j].id == variable->textureId)
+                if (_mesh->textures[j].id == variable->textureId)
                 {
                     glActiveTexture(GL_TEXTURE0 + textIndex);
                     textIndex++;
-                    _model->material.shader->setParameter(variable->name, (int)j);
-                    glBindTexture(GL_TEXTURE_2D, _model->textures[j].id);
+                    _mesh->material.shader->setParameter(variable->name, (int)j);
+                    glBindTexture(GL_TEXTURE_2D, _mesh->textures[j].id);
                     continue;
                 }
             }
         }
 
-        glBindVertexArray(_model->mesh->m_vao);
-        glDrawElements(GL_TRIANGLES, _model->mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(_mesh->mesh->m_vao);
+        glDrawElements(GL_TRIANGLES, _mesh->mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
     }

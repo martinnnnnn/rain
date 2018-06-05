@@ -116,6 +116,7 @@ namespace rain
         glTexImage2D(GL_TEXTURE_2D, 0, _texture.format, _texture.width, _texture.height, 0, _texture.format, GL_UNSIGNED_BYTE, _texture.data);
         glGenerateMipmap(GL_TEXTURE_2D);
         stbi_image_free(_texture.data);
+        _texture.data = NULL;
     }
 
 
@@ -151,13 +152,22 @@ namespace rain
             return Texture2D{};
 		}
 		stbi_image_free(data);
+
         return texture;
 	}
 
 
 	Texture2D FindTexture(const TextureContainer* _texContainer, const std::string _fileName)
 	{
-		return _texContainer->textures.at(_fileName);
+        try
+        {
+		    return _texContainer->textures.at(_fileName);
+        }
+        catch (std::out_of_range e)
+        {
+            //TODO(martin): should actually return a "universal" texture to prevent errors
+            return Texture2D{};
+        }
 	}
 
 
