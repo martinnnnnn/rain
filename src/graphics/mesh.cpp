@@ -183,9 +183,10 @@ namespace rain
 				continue;
 			aiMaterial* material = _scene->mMaterials[mesh->mMaterialIndex];
 
-			for (aiTextureType texType = (aiTextureType)0x0; texType < AI_TEXTURE_TYPE_MAX;)
+			for (aiTextureType texType = aiTextureType_NONE;
+                texType < AI_TEXTURE_TYPE_MAX;
+                texType = static_cast<aiTextureType>(texType + 0x1))
 			{
-				texType = (aiTextureType)((int)texType + 1);
 				unsigned int textureCount = material->GetTextureCount(texType);
 
 				for (unsigned int j = 0; j < textureCount; ++j)

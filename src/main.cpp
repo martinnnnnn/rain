@@ -53,6 +53,7 @@ std::vector<glm::vec3> cubePositions;
 Model model;
 Game* game;
 Transform modelTransform;
+bool vsync;
 
 void sandboxInit();
 void sandboxUpdate();
@@ -66,8 +67,31 @@ using namespace nlohmann;
 
 RAIN_DLLEXPORT void LoadGame(const char* path)
 {
+    vsync = true;
+    game = InitGame(path);
+    //Transform* camTransform = game->camera->GetTransform();
+    Transform* camTransform = &game->camera->transform;
+    Translate(*camTransform, glm::vec3(0, 0, 5));
 
+    rootpath = game->dataPath;
+    wireframe = false;
+
+    sandboxInit();
+    loadShaders();
+
+    RunGame(game, sandboxUpdate);
 }
+
+RAIN_DLLEXPORT void EnableVsync()
+{
+    vsync = true;
+}
+
+RAIN_DLLEXPORT void DisableVsync()
+{
+    vsync = false;
+}
+
 
 
 int main(int argc, char** argv)
@@ -84,6 +108,8 @@ int main(int argc, char** argv)
     loadShaders();
 
     RunGame(game, sandboxUpdate);
+    glfwSwapInterval(0);
+
     return 0;
 }
 
@@ -387,7 +413,8 @@ void sandboxInit()
 
 
     //model = SetupModel("doesnt_matter", rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
-    model = LoadModel(rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+    model = LoadModel(rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
+    //model = LoadModel(rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 
     //Entity* t1 = new Entity();
     //CTransform* ctrans = CreateComponent<CTransform>(t1);
@@ -483,6 +510,14 @@ void loadShaders()
 
 void sandboxUpdate()
 {
+    if (vsync)
+    {
+        glfwSwapInterval(1);
+    }
+    else
+    {
+        glfwSwapInterval(0);
+    }
     checkInputs();
 
     // recup mat view, mat proj
@@ -636,11 +671,14 @@ void checkInputs()
     {
         if (!wireframe)
         {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            std::cout << "keypressed" << std::endl;
+            glfwSwapInterval(1);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
         else
         {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            //glfwSwapInterval(1);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         wireframe = !wireframe;
     }

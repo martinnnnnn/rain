@@ -103,6 +103,7 @@ set_target_properties(${RAIN_EXE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_S
 #### LIB FOR EDITOR ####
 #project(rainlib)
 add_definitions(-DEXPMODULE)
+
 add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
 target_link_libraries(${RAIN_LIB} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
@@ -111,6 +112,8 @@ target_link_libraries(${RAIN_LIB} assimp glfw
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
 
+
+#### GROUPING PROJECTS BY LIBRARY ####
 set_target_properties(Bullet3Common PROPERTIES FOLDER "bullet")
 set_target_properties(Bullet3Collision PROPERTIES FOLDER "bullet")
 set_target_properties(Bullet3Dynamics PROPERTIES FOLDER "bullet")

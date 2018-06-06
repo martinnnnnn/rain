@@ -20,9 +20,10 @@ namespace rain
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 		glfwWindowHint(GLFW_DECORATED, 0); // <- borderless window, nice to create a windowed full screen mode or lol like client
 
-		context.window = glfwCreateWindow(context.width, context.height, "Rain Engine", NULL, NULL);
+		context.window = glfwCreateWindow(context.width, context.height, "Rain Engine", /*glfwGetPrimaryMonitor() <- to go full screen */NULL, NULL);
 		if (context.window == NULL)
 		{
 			std::cout << "Failed to create GLFW window" << std::endl;
@@ -44,8 +45,8 @@ namespace rain
 		//glEnable(GL_CULL_FACE);
 		//glFrontFace(GL_CW);
 
-		glEnable(GL_MULTISAMPLE);
-
+		//glEnable(GL_MULTISAMPLE);
+        glfwSwapInterval(1);
 		glViewport(0, 0, (GLsizei)context.width, (GLsizei)context.height);
 		glfwSetFramebufferSizeCallback(context.window, framebuffer_size_callback);
 

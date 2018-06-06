@@ -82,6 +82,7 @@ namespace rain
 		if (file.fail())
 		{
 			//TODO(martin) : handle error better
+            _material = nullptr;
 			return;
 		}
 
