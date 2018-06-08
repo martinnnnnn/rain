@@ -1,3 +1,6 @@
+#include "win32_graphics.h"
+
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++}
 {					OPENGL MDI APP DEMO VERSION 1.0					        }
 {       Writen by Leon de Boer, Perth, Western Australia, 2016.				}
@@ -9,73 +12,14 @@
 {        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND		}
 {++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-/*==========================================================================
-BACKGROUND TO CODE
 
-This code is is C syntax rather than C++ or C# code and contains no objects
-or sophisticated elements. That is not because those techniques don't have
-merit or a place but simply because this code is targetted as a learning
-tool to the widest audience. Anyone proficient in C++ or C# could easily
-convert this code to those formats.
 
-==========================================================================*/
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-#define _WIN32_WINNT_WIN10 0x0A00
-#include <windows.h>		// Standard windows headers
-#include <tchar.h>			// Unicode support	.. we will use TCHAR rather than char	
-#include <commctrl.h>		// Common controls dialogs unit
-#include <gl\gl.h>			// Header File For The OpenGL32 Library
-#include <gl\glu.h>			// Header File For The GLu32 Library
-
-// This is the lazy adding libraries via #pragma rather than in linker includes in visual studio
-// If you are not on visual studio you will need to comment out the #pragma statements and
-// add the libraries to the includes in your compiler linker 
-#pragma comment(lib,"comctl32.lib") 
-#pragma comment(lib,"OpenGl32.lib")
-#pragma comment(lib,"GLU32.lib")
-
-/***************************************************************************
-APP SPECIFIC INTERNAL CONSTANTS
-***************************************************************************/
-
-/*--------------------------------------------------------------------------}
-;{                   MAIN MENU COMMAND VALUE CONSTANTS			            }
-;{-------------------------------------------------------------------------*/
-#define IDC_BMPLOAD 101									// App menu to load bitmap
-#define IDC_EXIT 105									// App menu command to exit application
-#define IDC_TIMERSTART 201								// App menu to start timer
-#define IDC_TIMERSTOP 202								// App menu to stop timer
-#define IDC_MDICHILD 301								// Create a new MDI child
-#define IDC_CASCADE 26									// Cascade MDI children
-#define IDC_TILE	27									// Tile MDI children
-
-/*--------------------------------------------------------------------------}
-;{                         MDI CLIENT CONSTANTS					            }
-;{-------------------------------------------------------------------------*/
-#define ID_MDI_CLIENT 1									// MDI client id
-#define ID_MDI_FIRSTCHILD 50000							// MDI child first id
-
-/*--------------------------------------------------------------------------}
-;{                      APPLICATION STRING CONSTANTS			            }
-;{-------------------------------------------------------------------------*/
 static const TCHAR* MDICHILD_CLASSNAME = _T("OpenGl_MDI_Child");
 static const TCHAR* DATABASE_PROPERTY = _T("OurDataStructure");
 
-/*--------------------------------------------------------------------------}
-;{                         APPLICATION GLOBAL VARIABLES			            }
-;{-------------------------------------------------------------------------*/
 static HWND AppMDIClient = 0;							// Application MDI client handle
 static char* OpenGLVersion = 0;							// OpenGL version string is always ansi never unicode
 
-                                                        /*--------------------------------------------------------------------------}
-                                                        ;{                         MDI CLIENT DATA STRUCT				            }
-                                                        ;{-------------------------------------------------------------------------*/
-
-                                                        /*---------------------------------------------------------------------------
-                                                        MDICHILD DATA RECORD DEFINITION
-                                                        ---------------------------------------------------------------------------*/
 typedef struct OpenGLData {
     HGLRC Rc;											// Our render context
     GLuint glTexture;									// Our texture to draw
@@ -83,13 +27,6 @@ typedef struct OpenGLData {
     GLfloat	yrot;										// Y Rotation
 } GLDATABASE;
 
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-COMMON DIALOG CALL ROUTINES
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
-/*--------------------------------------------------------------------------
-This uses file open common control from windows to select a file.
---------------------------------------------------------------------------*/
 int OpenFileDialog(TCHAR* Name, unsigned short NameBufSize, TCHAR* String, TCHAR* Ext, TCHAR* Title, HWND Wnd) {
     int i;
     TCHAR FileName[256], DefExt[256], Filter[400];
@@ -343,7 +280,8 @@ MDI CHILD LEVEL ROUTINES
 /*--------------------------------------------------------------------------
 OpenGL MDICHILD handler
 --------------------------------------------------------------------------*/
-static LRESULT CALLBACK OpenGLMDIChildHandler(HWND Wnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK OpenGLMDIChildHandler(HWND Wnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
     switch (Msg) {
     case WM_CREATE: {											// WM_CREATE MESSAGE
                                                                 // Drag and drop functionality added
@@ -432,178 +370,182 @@ APPLICATION LEVEL ROUTINES
 /*--------------------------------------------------------------------------
 Application handler
 --------------------------------------------------------------------------*/
-static LRESULT CALLBACK AppHandler(HWND Wnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
-    switch (Msg) {
-    case WM_CREATE: {											// WM_CREATE MESSAGE
-                                                                // Drag and drop functionality added
-        DragAcceptFiles(Wnd, TRUE);
-
-        // We are going to manually build a menu for the application
-        // You could do this by resource file but this is another way
-
-        HMENU SubMenu, Menu;
-        Menu = CreateMenu();									// Create main menu item
-                                                                // Create a submenu and populate it
-        SubMenu = CreatePopupMenu();							// Create a submenu popup
-        AppendMenu(SubMenu, MF_STRING, IDC_BMPLOAD, _T("&Load Bitmap"));
-        AppendMenu(SubMenu, MF_SEPARATOR, 0, NULL);
-        AppendMenu(SubMenu, MF_STRING, IDC_EXIT, _T("E&xit"));
-        // Append the above popup submenu into our menu
-        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&File"));
-        // Create another submenu and populate it
-        SubMenu = CreatePopupMenu();
-        AppendMenu(SubMenu, MF_STRING, IDC_TIMERSTART, _T("&Start Timer"));
-        AppendMenu(SubMenu, MF_STRING, IDC_TIMERSTOP, _T("Stop &Timer"));
-        // Append the above popup submenu into our menu
-        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&Timers"));
-        // Create another submenu and populate it
-        SubMenu = CreatePopupMenu();
-        AppendMenu(SubMenu, MF_STRING, IDC_MDICHILD, _T("&New OpenGL window"));
-        AppendMenu(SubMenu, MF_SEPARATOR, 0, NULL);
-        AppendMenu(SubMenu, MF_STRING, IDC_TILE, _T("&Tile"));
-        AppendMenu(SubMenu, MF_STRING, IDC_CASCADE, _T("&Cascade"));
-        // Append the above popup submenu into our menu
-        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&Windows"));
-        // Set the main menu item as our windows menu
-        SetMenu(Wnd, Menu);
-
-        // We now need an MDICLIENT for our MDI clients to work in
-        // This is like an invisible plane which is inserted into
-        // the normal windows working area that the MDI clients use
-
-        CLIENTCREATESTRUCT ccs;
-        ccs.hWindowMenu = GetSubMenu(GetMenu(Wnd), 0);			// Menu handle for menu item in our case bottom of Window menu 
-        ccs.idFirstChild = ID_MDI_FIRSTCHILD;					// Id of the first mdi child window
-        AppMDIClient = CreateWindowEx(0, _T("mdiclient"), NULL,
-            WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN |
-            WS_VSCROLL | WS_HSCROLL,
-            0, 0, 0, 0, Wnd,
-            (HMENU)ID_MDI_CLIENT, GetModuleHandle(0),
-            (void*)(&ccs));									// Create MDI client child window
-        return (0);												// Return message handled
-    }
-    case WM_DESTROY:											// WM_DESTROY MESSAGE
-        PostQuitMessage(0);										// Post quit message
-        return (0);												// Return message handled
-    case WM_COMMAND: {
-        switch LOWORD(wParam) {
-        case IDC_BMPLOAD: {                                 // Menu item: File-->Load Bitmap
-            TCHAR FileName[256];
-            int i = OpenFileDialog(&FileName[0], _countof(FileName),
-                _T("BMP file:"), _T("BMP"), _T("BMP FILE TO LOAD"), Wnd);
-            if (i != 0) {
-                // Fetch the active MDI child
-                HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
-                // No child selected so make one
-                if (Child == 0) {
-                    Child = CreateWindowEx(WS_EX_MDICHILD,
-                        MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
-                        WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-                        CW_USEDEFAULT, CW_USEDEFAULT,
-                        CW_USEDEFAULT, CW_USEDEFAULT,
-                        AppMDIClient, NULL, GetModuleHandle(0),
-                        NULL);							// Create the MDI Child
-                }
-                if (Child != 0) {
-                    // Fetch that childs data base
-                    GLDATABASE* db = (GLDATABASE*)GetProp(Child, DATABASE_PROPERTY);
-                    if (db != 0) {
-                        // Now check if texture exists and if so delete it
-                        if (db->glTexture) {
-                            HDC Dc = GetWindowDC(Child); // Get a window context
-                            wglMakeCurrent(Dc, db->Rc);	 // Make sure our render context current
-                            glDeleteTextures(1, &db->glTexture);
-                            ReleaseDC(Child, Dc);		 // Release the window context
-                            db->glTexture = 0;
-                        }
-                        // Create new texture
-                        db->glTexture = BMP2GLTexture(&FileName[0], Child, db);
-                        InvalidateRect(Child, 0, TRUE);	// Force redraw of window
-                    }
-                }
-            }
-        }
-                          break;
-        case IDC_MDICHILD: {								// Menu item: Window-->New OpenGL Window
-            CreateWindowEx(WS_EX_MDICHILD,
-                MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
-                WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-                CW_USEDEFAULT, CW_USEDEFAULT,
-                CW_USEDEFAULT, CW_USEDEFAULT,
-                AppMDIClient, NULL, GetModuleHandle(0),
-                NULL);										// Create the MDI Child
-        }
-                           break;
-        case IDC_TIMERSTART: {								// Menu item: Timer-->Start timer
-                                                            // Fetch the active MDI child
-            HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
-            if (Child != 0)								// If we have active child set a timer in it
-                SetTimer(Child,							 // handle to child window 
-                    1,									// timer identifier 
-                    100,								// 100 ms interval 
-                    0);									// timer callback null
-        }
-                             break;
-        case IDC_TIMERSTOP: {								// Menu item: Timer-->Stop timer
-                                                            // Fetch the active MDI child
-            HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
-            if (Child != 0) KillTimer(Child, 1);		// If child valid kill the timer
-        }
-                            break;
-        case IDC_EXIT:										// Menu item: File-->Exit
-            DestroyWindow(Wnd);
-            break;
-        case IDC_TILE:										// Menu item: Window-->Tile
-            SendMessage(AppMDIClient, WM_MDITILE, 0, 0);
-            break;
-        case IDC_CASCADE:									// Menu item: Window-->cascade
-            SendMessage(AppMDIClient, WM_MDICASCADE, 0, 0);
-            break;
-        };// End of switch wParam case
-
-          //must call DefFrameProc to ensure that min/max/close default behaviour
-          //of mdi child windows can occur.
-        return DefFrameProc(Wnd, AppMDIClient, WM_COMMAND, wParam, lParam);
-    }
-    case WM_DROPFILES: {										// WM_DROPFILES ... Added for drag and drop support
-        TCHAR szFilename[MAX_PATH];
-        DragQueryFile((HDROP)wParam, 0, &szFilename[0], MAX_PATH);
-        DragFinish((HDROP)wParam);
-        if (_tcsstr(szFilename, _T(".bmp")) || _tcsstr(szFilename, _T(".BMP"))) {
-            HWND Child = CreateWindowEx(WS_EX_MDICHILD,
-                MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
-                WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
-                CW_USEDEFAULT, CW_USEDEFAULT,
-                CW_USEDEFAULT, CW_USEDEFAULT,
-                AppMDIClient, NULL, GetModuleHandle(0),
-                NULL);										// Create the MDI Child
-            GLDATABASE* db = (GLDATABASE*)GetProp(Child, DATABASE_PROPERTY);
-            if (db != 0) {
-                // Now check if texture exists and if so delete it
-                if (db->glTexture) {
-                    HDC Dc = GetWindowDC(Wnd);					// Get a window context
-                    wglMakeCurrent(Dc, db->Rc);					// Make sure our render context current
-                    glDeleteTextures(1, &db->glTexture);
-                    ReleaseDC(Wnd, Dc);							// Release the window context
-                    db->glTexture = 0;
-                }
-                // Create new texture
-                db->glTexture = BMP2GLTexture(&szFilename[0], Child, db);
-                InvalidateRect(Child, 0, TRUE);				// Force redraw of window
-            }
-        }
-        return 0;
-    }
-    default:
-        return DefFrameProc(Wnd, AppMDIClient, Msg, wParam, lParam);// Default handler
-    };// end switch case
-    return (0);
-};
+//static LRESULT CALLBACK AppHandler(HWND Wnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
+//    switch (Msg) {
+//    case WM_CREATE: {											// WM_CREATE MESSAGE
+//                                                                // Drag and drop functionality added
+//        DragAcceptFiles(Wnd, TRUE);
+//
+//        // We are going to manually build a menu for the application
+//        // You could do this by resource file but this is another way
+//
+//
+//
+//        HMENU SubMenu, Menu;
+//        Menu = CreateMenu();									// Create main menu item
+//                                                                // Create a submenu and populate it
+//        SubMenu = CreatePopupMenu();							// Create a submenu popup
+//        AppendMenu(SubMenu, MF_STRING, IDC_BMPLOAD, _T("&Load Bitmap"));
+//        AppendMenu(SubMenu, MF_SEPARATOR, 0, NULL);
+//        AppendMenu(SubMenu, MF_STRING, IDC_EXIT, _T("E&xit"));
+//        // Append the above popup submenu into our menu
+//        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&File"));
+//        // Create another submenu and populate it
+//        SubMenu = CreatePopupMenu();
+//        AppendMenu(SubMenu, MF_STRING, IDC_TIMERSTART, _T("&Start Timer"));
+//        AppendMenu(SubMenu, MF_STRING, IDC_TIMERSTOP, _T("Stop &Timer"));
+//        // Append the above popup submenu into our menu
+//        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&Timers"));
+//        // Create another submenu and populate it
+//        SubMenu = CreatePopupMenu();
+//        AppendMenu(SubMenu, MF_STRING, IDC_MDICHILD, _T("&New OpenGL window"));
+//        AppendMenu(SubMenu, MF_SEPARATOR, 0, NULL);
+//        AppendMenu(SubMenu, MF_STRING, IDC_TILE, _T("&Tile"));
+//        AppendMenu(SubMenu, MF_STRING, IDC_CASCADE, _T("&Cascade"));
+//        // Append the above popup submenu into our menu
+//        AppendMenu(Menu, MF_POPUP, (UINT_PTR)SubMenu, _T("&Windows"));
+//        // Set the main menu item as our windows menu
+//        SetMenu(Wnd, Menu);
+//
+//        // We now need an MDICLIENT for our MDI clients to work in
+//        // This is like an invisible plane which is inserted into
+//        // the normal windows working area that the MDI clients use
+//
+//        CLIENTCREATESTRUCT ccs;
+//        ccs.hWindowMenu = GetSubMenu(GetMenu(Wnd), 0);			// Menu handle for menu item in our case bottom of Window menu 
+//        ccs.idFirstChild = ID_MDI_FIRSTCHILD;					// Id of the first mdi child window
+//        AppMDIClient = CreateWindowEx(0, _T("mdiclient"), NULL,
+//            WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN |
+//            WS_VSCROLL | WS_HSCROLL,
+//            0, 0, 0, 0, Wnd,
+//            (HMENU)ID_MDI_CLIENT, GetModuleHandle(0),
+//            (void*)(&ccs));									// Create MDI client child window
+//        return (0);												// Return message handled
+//    }
+//    case WM_DESTROY:											// WM_DESTROY MESSAGE
+//        PostQuitMessage(0);										// Post quit message
+//        return (0);												// Return message handled
+//    case WM_COMMAND: {
+//        switch LOWORD(wParam) {
+//        case IDC_BMPLOAD: {                                 // Menu item: File-->Load Bitmap
+//            TCHAR FileName[256];
+//            int i = OpenFileDialog(&FileName[0], _countof(FileName),
+//                _T("BMP file:"), _T("BMP"), _T("BMP FILE TO LOAD"), Wnd);
+//            if (i != 0) {
+//                // Fetch the active MDI child
+//                HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
+//                // No child selected so make one
+//                if (Child == 0) {
+//                    Child = CreateWindowEx(WS_EX_MDICHILD,
+//                        MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
+//                        WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+//                        CW_USEDEFAULT, CW_USEDEFAULT,
+//                        CW_USEDEFAULT, CW_USEDEFAULT,
+//                        AppMDIClient, NULL, GetModuleHandle(0),
+//                        NULL);							// Create the MDI Child
+//                }
+//                if (Child != 0) {
+//                    // Fetch that childs data base
+//                    GLDATABASE* db = (GLDATABASE*)GetProp(Child, DATABASE_PROPERTY);
+//                    if (db != 0) {
+//                        // Now check if texture exists and if so delete it
+//                        if (db->glTexture) {
+//                            HDC Dc = GetWindowDC(Child); // Get a window context
+//                            wglMakeCurrent(Dc, db->Rc);	 // Make sure our render context current
+//                            glDeleteTextures(1, &db->glTexture);
+//                            ReleaseDC(Child, Dc);		 // Release the window context
+//                            db->glTexture = 0;
+//                        }
+//                        // Create new texture
+//                        db->glTexture = BMP2GLTexture(&FileName[0], Child, db);
+//                        InvalidateRect(Child, 0, TRUE);	// Force redraw of window
+//                    }
+//                }
+//            }
+//        }
+//                          break;
+//        case IDC_MDICHILD: {								// Menu item: Window-->New OpenGL Window
+//            CreateWindowEx(WS_EX_MDICHILD,
+//                MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
+//                WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+//                CW_USEDEFAULT, CW_USEDEFAULT,
+//                CW_USEDEFAULT, CW_USEDEFAULT,
+//                AppMDIClient, NULL, GetModuleHandle(0),
+//                NULL);										// Create the MDI Child
+//        }
+//                           break;
+//        case IDC_TIMERSTART: {								// Menu item: Timer-->Start timer
+//                                                            // Fetch the active MDI child
+//            HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
+//            if (Child != 0)								// If we have active child set a timer in it
+//                SetTimer(Child,							 // handle to child window 
+//                    1,									// timer identifier 
+//                    100,								// 100 ms interval 
+//                    0);									// timer callback null
+//        }
+//                             break;
+//        case IDC_TIMERSTOP: {								// Menu item: Timer-->Stop timer
+//                                                            // Fetch the active MDI child
+//            HWND Child = (HWND)SendMessage(AppMDIClient, WM_MDIGETACTIVE, 0, 0);
+//            if (Child != 0) KillTimer(Child, 1);		// If child valid kill the timer
+//        }
+//                            break;
+//        case IDC_EXIT:										// Menu item: File-->Exit
+//            DestroyWindow(Wnd);
+//            break;
+//        case IDC_TILE:										// Menu item: Window-->Tile
+//            SendMessage(AppMDIClient, WM_MDITILE, 0, 0);
+//            break;
+//        case IDC_CASCADE:									// Menu item: Window-->cascade
+//            SendMessage(AppMDIClient, WM_MDICASCADE, 0, 0);
+//            break;
+//        };// End of switch wParam case
+//
+//          //must call DefFrameProc to ensure that min/max/close default behaviour
+//          //of mdi child windows can occur.
+//        return DefFrameProc(Wnd, AppMDIClient, WM_COMMAND, wParam, lParam);
+//    }
+//    case WM_DROPFILES: {										// WM_DROPFILES ... Added for drag and drop support
+//        TCHAR szFilename[MAX_PATH];
+//        DragQueryFile((HDROP)wParam, 0, &szFilename[0], MAX_PATH);
+//        DragFinish((HDROP)wParam);
+//        if (_tcsstr(szFilename, _T(".bmp")) || _tcsstr(szFilename, _T(".BMP"))) {
+//            HWND Child = CreateWindowEx(WS_EX_MDICHILD,
+//                MDICHILD_CLASSNAME, _T("OpenGL MDI Client"),
+//                WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+//                CW_USEDEFAULT, CW_USEDEFAULT,
+//                CW_USEDEFAULT, CW_USEDEFAULT,
+//                AppMDIClient, NULL, GetModuleHandle(0),
+//                NULL);										// Create the MDI Child
+//            GLDATABASE* db = (GLDATABASE*)GetProp(Child, DATABASE_PROPERTY);
+//            if (db != 0) {
+//                // Now check if texture exists and if so delete it
+//                if (db->glTexture) {
+//                    HDC Dc = GetWindowDC(Wnd);					// Get a window context
+//                    wglMakeCurrent(Dc, db->Rc);					// Make sure our render context current
+//                    glDeleteTextures(1, &db->glTexture);
+//                    ReleaseDC(Wnd, Dc);							// Release the window context
+//                    db->glTexture = 0;
+//                }
+//                // Create new texture
+//                db->glTexture = BMP2GLTexture(&szFilename[0], Child, db);
+//                InvalidateRect(Child, 0, TRUE);				// Force redraw of window
+//            }
+//        }
+//        return 0;
+//    }
+//    default:
+//        return DefFrameProc(Wnd, AppMDIClient, Msg, wParam, lParam);// Default handler
+//    };// end switch case
+//    return (0);
+//};
 
 
 /*--------------------------------------------------------------------------
 Application entry point
 --------------------------------------------------------------------------*/
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     TCHAR* AppClassName = _T("Windows Cipher");
@@ -617,30 +559,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Initialize the common controls dll, specifying the type of control(s) required 
     INITCOMMONCONTROLSEX iccx;
     iccx.dwSize = sizeof(INITCOMMONCONTROLSEX);
-    iccx.dwICC = ICC_COOL_CLASSES | ICC_BAR_CLASSES | ICC_DATE_CLASSES;
+    iccx.dwICC = ICC_COOL_CLASSES | ICC_BAR_CLASSES | ICC_DATE_CLASSES | ICC_STANDARD_CLASSES;
     InitCommonControlsEx(&iccx);
 
     MDIChildBrush = CreateSolidBrush(RGB(0, 0x2b, 0x36));			// Create MDI client brush
 
                                                                     // MDI child class registration
-    ZeroMemory(&WndClass, sizeof(WNDCLASSEX));						// Clear the class record
-    WndClass.cbSize = sizeof(WNDCLASSEX);							// Size of this record
-    WndClass.style = CS_HREDRAW | CS_VREDRAW;						// Set class styles
-    WndClass.lpfnWndProc = OpenGLMDIChildHandler;					// Handler for this class
-    WndClass.cbClsExtra = 0;										// No extra class data
-    WndClass.cbWndExtra = 0;										// No extra window data
-    WndClass.hInstance = GetModuleHandle(NULL);						// This instance
-    WndClass.hIcon = LoadIcon(0, IDI_APPLICATION);					// Set icon
-    WndClass.hCursor = LoadCursor(0, IDC_ARROW);					// Set cursor
-    WndClass.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);	// Set background brush
-    WndClass.lpszMenuName = NULL;									// No menu yet
-    WndClass.lpszClassName = MDICHILD_CLASSNAME;					// Set class name
-    RegisterClassEx(&WndClass);										// Register the class
+    //ZeroMemory(&WndClass, sizeof(WNDCLASSEX));						// Clear the class record
+    //WndClass.cbSize = sizeof(WNDCLASSEX);							// Size of this record
+    //WndClass.style = CS_HREDRAW | CS_VREDRAW;						// Set class styles
+    //WndClass.lpfnWndProc = OpenGLMDIChildHandler;					// Handler for this class
+    //WndClass.cbWndExtra = 0;										// No extra window data
+    //WndClass.hInstance = GetModuleHandle(NULL);						// This instance
+    //WndClass.hIcon = LoadIcon(0, IDI_APPLICATION);					// Set icon
+    //WndClass.hCursor = LoadCursor(0, IDC_ARROW);					// Set cursor
+    //WndClass.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);	// Set background brush
+    //WndClass.lpszMenuName = NULL;									// No menu yet
+    //WndClass.lpszClassName = MDICHILD_CLASSNAME;					// Set class name
+    //RegisterClassEx(&WndClass);										// Register the class
 
                                                                     // Application class registration
     ZeroMemory(&WndClass, sizeof(WNDCLASSEX));						// Clear the class record
     WndClass.cbSize = sizeof(WNDCLASSEX);							// Size of this record
-    WndClass.lpfnWndProc = AppHandler;								// Handler for this class
+    WndClass.lpfnWndProc = OpenGLMDIChildHandler;								// Handler for this class
     WndClass.cbClsExtra = 0;										// No extra class data
     WndClass.cbWndExtra = 0;										// No extra window data
     WndClass.hInstance = GetModuleHandle(NULL);						// This instance
