@@ -10,6 +10,7 @@
 #include "core/transform.h"
 #include "ecs/component.h"
 
+
 namespace rain
 {
 
@@ -43,7 +44,8 @@ namespace rain
 
     struct Entities
     {
-        std::vector<Entity*> entities;
+        Entity* entities;
+        unsigned int size;
     };
 
     Entity* GetEntity(Entities* _entities, const std::string& _name);
