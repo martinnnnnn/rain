@@ -26,9 +26,8 @@ namespace rain
         double xpos, ypos;
         glfwGetCursorPos(_input->window, &xpos, &ypos);
 
-        if (FIRST_TIME_HERE)
+        if (_input->mouseLastPos.x == -1 || _input->mouseLastPos.y == -1)
         {
-            
             _input->mouseLastPos.x = (float)xpos;
             _input->mouseLastPos.y = (float)ypos;
         }

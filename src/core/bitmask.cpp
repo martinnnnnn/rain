@@ -4,27 +4,32 @@
 
 namespace rain
 {
-    bool GetBit(uint32_t& _mask, const uint32_t bit)
+    bool GetBit(uint64_t& _mask, const uint64_t bit)
     {
         return ((_mask&(1 << bit)) != 0);
     }
 
-    void TurnOnBit(uint32_t& _mask, const uint32_t bit)
+    bool GetBits(uint64_t& _mask, const uint64_t bits)
+    {
+        return ((_mask& bits) == bits);
+    }
+
+    void TurnOnBit(uint64_t& _mask, const uint64_t bit)
     {
         _mask |= 1 << bit;
     }
 
-    void TurnOnBits(uint32_t& _mask, const uint32_t bits)
+    void TurnOnBits(uint64_t& _mask, const uint64_t bits)
     {
         _mask |= bits;
     }
 
-    void ClearBit(uint32_t& _mask, const uint32_t bit)
+    void ClearBit(uint64_t& _mask, const uint64_t bit)
     {
         _mask &= ~(1 << bit);
     }
 
-    void ToggleBit(uint32_t& _mask, const uint32_t bit)
+    void ToggleBit(uint64_t& _mask, const uint64_t bit)
     {
         _mask ^= 1 << bit;
     }
@@ -32,7 +37,7 @@ namespace rain
     // compares 2 bitmasks,
     // if relevantBits is specified, only checks for the relevant bits
     // if not, checks if the bitfields are equal
-    bool IsAMatch(uint32_t& _mask1, uint32_t& _mask2, uint32_t _relevantBits)
+    bool IsAMatch(uint64_t& _mask1, uint64_t& _mask2, uint64_t _relevantBits)
     {
         if (_relevantBits)
         {

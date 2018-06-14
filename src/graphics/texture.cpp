@@ -7,7 +7,6 @@
 #include <future>
 #include <vector>
 
-
 #include "core/file_system.h"
 
 namespace rain
@@ -71,17 +70,17 @@ namespace rain
 	{
 		std::vector<std::future<Texture2D>> futureDatas;
 
-		for (auto it : _filePaths)
-		{
-			futureDatas.push_back(std::async(&LoadTexture2DToRAM, it));
-		}
+        for (auto it : _filePaths)
+        {
+            futureDatas.push_back(std::async(&LoadTexture2DToRAM, it));
+        }
 
-		for (size_t i = 0; i < futureDatas.size(); ++i)
-		{
-			Texture2D texture = futureDatas[i].get();
-			_texManager->textures[File::GetFileName(texture.path)] = texture;
-			Load2DTextureToGC(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
-		}
+        for (size_t i = 0; i < futureDatas.size(); ++i)
+        {
+            Texture2D texture = futureDatas[i].get();
+            _texManager->textures[File::GetFileName(texture.path)] = texture;
+            Load2DTextureToGC(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
+        }
 	}
 
     Texture2D LoadTexture2DToRAM(const std::string& _path)

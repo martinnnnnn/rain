@@ -3,7 +3,7 @@
 
 #include "utility/incl_3d.h"
 #include "utility/first_time_mcr.h"
-#include "core/component.h"
+#include "ecs/component.h"
 
 #include <iostream>
 
@@ -11,12 +11,23 @@ namespace rain
 {
     struct Transform : Component
     {
-        Transform();
+        //Transform();
 
         glm::vec3 position;
         glm::vec3 scale;
         glm::quat rotation;
     };
+
+    struct Movement : Component
+    {
+        glm::vec3 direction;
+        float speed;
+    };
+
+    Transform* GetNewHeapTransform();
+    Transform GetNewStackTransform();
+    Movement* GetNewMovement();
+
 
     void Translate(Transform& _transform, const glm::vec3& _amount);
     void SetLocation(Transform& _transform, const glm::vec3& _newLocation);

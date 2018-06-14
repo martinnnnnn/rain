@@ -2,12 +2,14 @@
 
 #include "rain.h"
 #include "input/input.h"
+#include "core/transform.h"
 
 namespace rain
 {
     Camera* GetDefaultCamera(Game* _game)
     {
         Camera* camera = new Camera();
+        camera->transform = GetNewStackTransform();
         camera->game = _game;
         camera->movementSpeed = 100;
         camera->worldUp = glm::vec3(0.0, 1.0, 0.0);;

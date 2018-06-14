@@ -43,7 +43,10 @@ namespace rain
             game->dataPath = arguments["root"];
         }
         game->gfxContext = InitWindow("Rain Engine", 800, 600);
-        game->input = new Input();
+        //game->input = new Input();
+        game->input = (Input*)malloc(sizeof(Input));
+        game->input->mouseLastPos = glm::vec2(-1, -1);
+        game->input->mouseOffset = glm::vec2(0, 0);
         game->input->window = game->gfxContext.window;
         game->camera = GetDefaultCamera(game);
         //game->camera->Init(game);
