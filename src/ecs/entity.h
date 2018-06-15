@@ -27,6 +27,8 @@ namespace rain
 		std::vector<Component*> components;
 	};
 
+    Entity* CreateEntity(int _id, char* _name = "", uint64_t _flags = 0);
+
     template<typename T>
     bool AddComponent(Entity* _entity, T* _component);
     template<typename T>
@@ -42,14 +44,18 @@ namespace rain
     T* GetComponent(Entity* _entity, uint64_t _componentFlag);
 
 
-    struct Entities
+    struct EntityContainer
     {
-        Entity* entities;
-        unsigned int size;
+        std::vector<Entity*> entities;
     };
 
-    Entity* GetEntity(Entities* _entities, const std::string& _name);
-    Entity* GetEntity(Entities* _entities, const int _id);
+
+    Entity* GetFreeEntity(EntityContainer* _container);
+    void ReleaseEntity(EntityContainer* _container, Entity* _entity);
+
+
+    Entity* GetEntity(EntityContainer* _container, const std::string& _name);
+    Entity* GetEntity(EntityContainer* _container, const int _id);
 
 
 }

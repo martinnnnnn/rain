@@ -5,33 +5,61 @@
 
 namespace rain
 {
-
-
-    Entity* GetEntity(Entities* _entities, const std::string& _name)
+    Entity* CreateEntity(int _id, char* _name = "", uint64_t _flags = 0)
     {
-        Entity* entity = nullptr;
-        for (size_t i = 0; i < _entities->entities.size(); ++i)
+        Entity* entity = (Entity*)malloc(sizeof(Entity));
+        bzero(entity, sizeof(Entity));
+
+        entity->id = _id;
+        entity->name = _name;
+        entity->flags = _flags;
+
+        for (uint64_t i = 0; i < (uint64_t)Component::Type::MAX_COUNT; ++i)
         {
-            if (_entities->entities[i]->name == _name)
-            {
-                entity = _entities->entities[i];
-                break;
-            }
+            if (GetBits(_flags, i);
         }
-        return entity;
+
+        if (_flags)
+        {
+            CreateComponent<Transform>(entity);
+        }
+
     }
 
-    Entity* GetEntity(Entities* _entities, const int _id)
+
+    Entity* GetFreeEntity(EntityContainer* _container)
     {
-        Entity* entity = nullptr;
-        for (size_t i = 0; i < _entities->entities.size(); ++i)
+        Entity* entity = (Entity*)malloc(sizeof(Entity));
+        bzero(entity, sizeof(Entity));
+    }
+
+    void ReleaseEntity(EntityContainer* _container, Entity* _entity)
+    {
+
+    }
+
+
+    Entity* GetEntity(EntityContainer* _container, const std::string& _name)
+    {
+        for (size_t i = 0; i < _container->entities.size(); ++i)
         {
-            if (_entities->entities[i]->id == _id)
+            if (_container->entities[i]->name == _name)
             {
-                entity = _entities->entities[i];
-                break;
+                return _container->entities[i];
             }
         }
-        return entity;
+        return nullptr;
+    }
+
+    Entity* GetEntity(EntityContainer* _container, const int _id)
+    {
+        for (size_t i = 0; i < _container->entities.size(); ++i)
+        {
+            if (_container->entities[i]->id == _id)
+            {
+                return _container->entities[i];
+            }
+        }
+        return nullptr;
     }
 }
