@@ -1,8 +1,8 @@
-#include "component.h"
-
-
-
-namespace rain
-{
-
-}
+//#include "component.h"
+//
+//
+//
+//namespace rain
+//{
+//
+//}

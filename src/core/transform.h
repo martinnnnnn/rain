@@ -9,7 +9,7 @@
 
 namespace rain
 {
-    struct Transform : Component
+    struct Transform /*: Component*/
     {
         //Transform();
 
@@ -18,7 +18,7 @@ namespace rain
         glm::quat rotation;
     };
 
-    struct Movement : Component
+    struct Movement /*: Component*/
     {
         glm::vec3 direction;
         float speed;

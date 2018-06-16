@@ -17,7 +17,7 @@ namespace rain
     Transform* GetNewHeapTransform()
     {
         Transform* t = (Transform*)malloc(sizeof(Transform));
-        t->type = Component::Type::TRANSFORM;
+        //t->type = Component::Type::TRANSFORM;
         t->position = glm::vec3(0, 0, 0);
         t->scale = glm::vec3(1, 1, 1);
         t->rotation = glm::quat(glm::vec3(0, 0, 0));
@@ -27,7 +27,7 @@ namespace rain
     Transform GetNewStackTransform()
     {
         Transform t = {};
-        t.type = Component::Type::TRANSFORM;
+        //t.type = Component::Type::TRANSFORM;
         t.position = glm::vec3(0, 0, 0);
         t.scale = glm::vec3(1, 1, 1);
         t.rotation = glm::quat(glm::vec3(0, 0, 0));
@@ -37,7 +37,7 @@ namespace rain
     Movement* GetNewMovement()
     {
         Movement* mov = (Movement*)malloc(sizeof(Movement));
-        mov->type = Component::Type::MOVEMENT;
+        //mov->type = Component::Type::MOVEMENT;
         mov->direction = glm::vec3(0, 0, 0);
         mov->speed = 0.0f;
         return mov;
