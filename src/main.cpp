@@ -735,6 +735,8 @@
 #include <iostream>
 #include <stdint.h>
 #include <ctime>
+#include <time.h>
+#include <stdlib.h>
 
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
@@ -851,6 +853,11 @@ Component* CreateTransform()
 	transform->rotation = { 0, 0, 0 };
 	transform->scale = { 1, 1, 1 };
 	return transform;
+}
+
+void PrintTransform(Transform* _transform)
+{
+	std::cout << std::endl << "(" << _transform->position.x << "," << _transform->position.y << "," << _transform->position.z << ")" << std::endl;
 }
 
 struct Script : Component
@@ -1235,7 +1242,9 @@ void SystemPhysicsUpdate(System* _system)
 		Physics* physics = (Physics*)FindComponent(_system->entities[i], Component::Type::PHYSICS);
 		Transform* transform = (Transform*)FindComponent(_system->entities[i], Component::Type::TRANSFORM);
 
-		transform->position += (physics->direction * physics->speed) + (physics->friction);
+		transform->position = transform->position + ((physics->direction * physics->speed) + (physics->friction));
+
+		PrintTransform(transform);
 	}
 }
 
@@ -1243,11 +1252,11 @@ void SystemPhysicsUpdate(System* _system)
 
 void EntityTests();
 void EntityContainerTest();
+void SystemTest();
 
 int main(void)
 {
-	// CONTAINER CREATION
-	EntityContainer* container1 = CreateEntityContainer(1000000, 100, 1000000);
+
 
 	
 	system("PAUSE"); return 0;
@@ -1424,6 +1433,37 @@ void EntityContainerTest()
 	std::cout << std::endl << "after remove : " << container->size << "," << container->capacity << std::endl;
 }
 
+void SystemTest()
+{
+	srand(time(NULL));
+	// CONTAINER CREATION
+	EntityContainer* container1 = CreateEntityContainer(10000000, 100, 10000000);
+	for (int i = 0; i < 10; i++)
+	{
+		AddComponent(container1->entities[i], CreateTransform());
+		AddComponent(container1->entities[i], CreatePhysics());
+		Physics* physics = (Physics*)FindComponent(container1->entities[i], Component::Type::PHYSICS);
+		if (physics)
+		{
+			int r = rand() % 100;
+			physics->weight = rand() % 100;
+			physics->friction = rand() % 200 + 100;
+			physics->grounded = (rand() % 2) ? true : false;
+			physics->direction = { (float)(rand() % 10), (float)(rand() % 10), (float)(rand() % 10) };
+			physics->speed = rand() % 5;
+		}
+	}
+
+	// SYSTEM CREATION
+	u64 requirements = (1 << (u32)Component::Type::PHYSICS);
+	System* system1 = CreateSystem(requirements, 100, 100);
+
+	// SYSTEM ADD
+	CheckForAddEntities(system1, container1->entities, container1->size);
+
+	// SYSTEM UPDATE
+	SystemPhysicsUpdate(system1);
+}
 //std::clock_t start;
 //double duration;
 //
