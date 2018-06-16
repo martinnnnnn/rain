@@ -734,6 +734,7 @@
 #include <vector>
 #include <iostream>
 #include <stdint.h>
+#include <ctime>
 
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
@@ -1031,7 +1032,7 @@ struct EntityContainer
 	u32 resizeStep;
 };
 
-EntityContainer* CreateEntityContainer(u32 _capacity, u32 _resizeStep = 10)
+EntityContainer* CreateEntityContainer(u32 _capacity, u32 _resizeStep = 10, u32 _size = 0)
 {
 	EntityContainer* container = (EntityContainer*)malloc(sizeof(EntityContainer));
 	container->size = 0;
@@ -1042,8 +1043,46 @@ EntityContainer* CreateEntityContainer(u32 _capacity, u32 _resizeStep = 10)
 	{
 		container->entities = (Entity**)calloc(container->capacity, sizeof(Entity*));
 	}
+
+	if (_size > 0)
+	{
+		Entity* entities = (Entity*)calloc(_size, sizeof(Entity));
+
+		for (u32 i = 0; i < _size; ++i)
+		{
+			entities[container->size].id = container->size;
+			container->entities[container->size] = &entities[container->size];
+			container->size++;
+		}
+	}
+
 	return container;
 }
+
+//EntityContainer* CreateEntityContainer(u32 _size, u32 _resizeStep = 10)
+//{
+//	EntityContainer* container = (EntityContainer*)malloc(sizeof(EntityContainer));
+//	container->size = 0;
+//	container->resizeStep = _resizeStep;
+//	container->capacity = _size + _resizeStep;
+//
+//	if (container->capacity > 0)
+//	{
+//		container->entities = (Entity**)calloc(container->capacity, sizeof(Entity*));
+//	}
+//
+//	if (_size > 0)
+//	{
+//		Entity* entities = (Entity*)calloc(_size, sizeof(Entity));
+//		for (u32 i = 0; i < _size; ++i)
+//		{
+//			container->entities[container->size] = entities + container->size;
+//			container->size++;
+//		}
+//	}
+//
+//	return container;
+//}
 
 void AddEntity(EntityContainer* _container, Entity* _entity)
 {
@@ -1065,6 +1104,7 @@ void AddEntity(EntityContainer* _container, Entity* _entity)
 	_container->entities[_container->size] = _entity;
 	_container->size++;
 }
+
 
 void RemoveEntity(EntityContainer* _container, Entity* _ent)
 {
@@ -1206,9 +1246,8 @@ void EntityContainerTest();
 
 int main(void)
 {
-	
-
-	EntityContainerTest();
+	// CONTAINER CREATION
+	EntityContainer* container1 = CreateEntityContainer(1000000, 100, 1000000);
 
 	
 	system("PAUSE"); return 0;
@@ -1384,3 +1423,11 @@ void EntityContainerTest()
 	}
 	std::cout << std::endl << "after remove : " << container->size << "," << container->capacity << std::endl;
 }
+
+//std::clock_t start;
+//double duration;
+//
+//start = std::clock();
+//duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+//
+//std::cout << "duration 2: " << duration << '\n';
