@@ -21,8 +21,7 @@ namespace rain
 
     Resource* LoadResource(ResourceManager* _manager, const char* _path)
     {
-        RAIN_ASSERT_EQ(_manager != nullptr, "You can't request resource from an empty ResourceManager.")
-        
+        RAIN_ASSERT_EQ(_manager != nullptr, "You can't load resources from an empty ResourceManager.");
         if (_manager->size == _manager->capacity)
         {
             bool wasEmpty = (_manager->capacity == 0);
@@ -47,6 +46,7 @@ namespace rain
 
     Resource* GetResource(ResourceManager* _manager, u32 _id)
     {
+        RAIN_ASSERT_EQ(_manager != nullptr, "You can't request resources from an empty ResourceManager.");
         for (u32 i = 0; i < _manager->size; ++i)
         {
             Resource* resource = *(_manager->resources + i);
@@ -61,6 +61,7 @@ namespace rain
 
     Resource* GetResource(ResourceManager* _manager, const char* _name)
     {
+        RAIN_ASSERT_EQ(_manager != nullptr, "You can't request resources from an empty ResourceManager.");
         for (u32 i = 0; i < _manager->size; ++i)
         {
             Resource* resource = *(_manager->resources + i);
