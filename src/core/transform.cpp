@@ -5,42 +5,11 @@
 
 namespace rain
 {
-    /*Transform::Transform() :
-        position(0,0,0),
-        scale(1,1,1),
-        rotation(glm::vec3(0,0,0))
+    Transform::Transform() :
+        position(0, 0, 0),
+        scale(1, 1, 1),
+        rotation(glm::vec3(0, 0, 0))
     {
-
-    }
-*/
-
-    Transform* GetNewHeapTransform()
-    {
-        Transform* t = (Transform*)malloc(sizeof(Transform));
-        //t->type = Component::Type::TRANSFORM;
-        t->position = glm::vec3(0, 0, 0);
-        t->scale = glm::vec3(1, 1, 1);
-        t->rotation = glm::quat(glm::vec3(0, 0, 0));
-        return t;
-    }
-
-    Transform GetNewStackTransform()
-    {
-        Transform t = {};
-        //t.type = Component::Type::TRANSFORM;
-        t.position = glm::vec3(0, 0, 0);
-        t.scale = glm::vec3(1, 1, 1);
-        t.rotation = glm::quat(glm::vec3(0, 0, 0));
-        return t;
-    }
-
-    Movement* GetNewMovement()
-    {
-        Movement* mov = (Movement*)malloc(sizeof(Movement));
-        //mov->type = Component::Type::MOVEMENT;
-        mov->direction = glm::vec3(0, 0, 0);
-        mov->speed = 0.0f;
-        return mov;
     }
 
     void Translate(Transform& _transform, const glm::vec3& _amount)

@@ -7,7 +7,6 @@
 #include <unordered_map>
 
 #include "shader.h"
-#include "ecs/component.h"
 
 namespace rain
 {

@@ -107,6 +107,7 @@ namespace rain
 			i = (aiTextureType)((int)i + 1);
 			unsigned int textureCount = material->GetTextureCount(i);
 
+            //std::cout << "texturecount for this mesh :" << textureCount << std::endl;
 			for (unsigned int j = 0; j < textureCount; ++j)
 			{
 				aiString str;

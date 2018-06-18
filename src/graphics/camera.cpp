@@ -9,9 +9,9 @@ namespace rain
     Camera* GetDefaultCamera(Game* _game)
     {
         Camera* camera = new Camera();
-        camera->transform = GetNewStackTransform();
+        camera->transform = Transform();
         camera->game = _game;
-        camera->movementSpeed = 100;
+        camera->movementSpeed = 20;
         camera->worldUp = glm::vec3(0.0, 1.0, 0.0);;
         camera->front = glm::vec3(0.0, 0.0, -1.0f);
         camera->yaw = 0.0f;
