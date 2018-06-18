@@ -23,6 +23,7 @@
 #include "graphics/texture.h"
 #include "utility/string_utils.h"
 #include "core/memory.h"
+#include "memory/mem_resource_manager.h"
 
 using namespace rain;
 
@@ -133,9 +134,10 @@ void runEngine(int argc, char** argv)
     rootpath = game->dataPath;
     wireframe = false;
 
+    LoadResource(nullptr, "hello");
+
     sandboxInit();
     loadShaders();
-
     RunGame(game, sandboxUpdate);
     glfwSwapInterval(0);
 }

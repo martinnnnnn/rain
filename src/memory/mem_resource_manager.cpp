@@ -3,6 +3,7 @@
 
 #include "stdlib.h"
 
+#include "assert/rain_assert.h"
 
 namespace rain
 {
@@ -20,6 +21,8 @@ namespace rain
 
     Resource* LoadResource(ResourceManager* _manager, const char* _path)
     {
+        RAIN_ASSERT_EQ(_manager != nullptr, "You can't request resource from an empty ResourceManager.")
+        
         if (_manager->size == _manager->capacity)
         {
             bool wasEmpty = (_manager->capacity == 0);
@@ -60,9 +63,10 @@ namespace rain
     {
         for (u32 i = 0; i < _manager->size; ++i)
         {
-            if ((_manager->resources + i)->name == _name)
+            Resource* resource = *(_manager->resources + i);
+            if (resource->name == _name)
             {
-                return (_manager->resources + 1);
+                return resource;
             }
         }
         return nullptr;
