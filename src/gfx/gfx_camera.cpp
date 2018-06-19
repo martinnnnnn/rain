@@ -9,7 +9,7 @@ namespace rain
     Camera* GetDefaultCamera(Game* _game)
     {
         Camera* camera = new Camera();
-        camera->transform = Transform();
+        camera->transform = CreateTransform();
         camera->game = _game;
         camera->movementSpeed = 20;
         camera->worldUp = glm::vec3(0.0, 1.0, 0.0);;
@@ -64,7 +64,7 @@ namespace rain
         SetRotation(_camera.transform, glm::vec3(0, -1, 0), _camera.yaw);
         Rotate(_camera.transform, glm::vec3(-1, 0, 0), _camera.pitch);
 
-        glm::mat4 rotMat = glm::mat4_cast(_camera.transform.rotation);
+        glm::mat4 rotMat = glm::mat4_cast(_camera.transform->rotation);
 
         _camera.front = glm::normalize(rotMat[2]);
 
@@ -74,7 +74,7 @@ namespace rain
 
     glm::mat4 GetViewMatrix(Camera& _camera)
     {
-        return glm::lookAt(_camera.transform.position, _camera.transform.position + _camera.front, _camera.up);
+        return glm::lookAt(_camera.transform->position, _camera.transform->position + _camera.front, _camera.up);
     }
 
     glm::mat4 GetProjectionMatrix(Camera& _camera)

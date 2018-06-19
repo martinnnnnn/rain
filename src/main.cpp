@@ -53,7 +53,7 @@ glm::vec3 lightPos;
 std::vector<glm::vec3> cubePositions;
 Model model;
 Game* game;
-Transform modelTransform;
+Transform* modelTransform;
 bool vsync;
 
 //Entity* entity;
@@ -75,8 +75,8 @@ RAIN_DLLEXPORT void LoadGame(const char* path)
     vsync = true;
     game = InitGame(path);
     //Transform* camTransform = game->camera->GetTransform();
-    Transform* camTransform = &game->camera->transform;
-    Translate(*camTransform, glm::vec3(0, 0, 5));
+    Transform* camTransform = game->camera->transform;
+    Translate(camTransform, glm::vec3(0, 0, 5));
 
     rootpath = game->dataPath;
     wireframe = false;
@@ -127,8 +127,8 @@ int main(int argc, char** argv)
 void runEngine(int argc, char** argv)
 {
     game = InitGame(argc, argv);
-    Transform* camTransform = &game->camera->transform;
-    Translate(*camTransform, glm::vec3(0, 0, 5));
+    Transform* camTransform = game->camera->transform;
+    Translate(camTransform, glm::vec3(0, 0, 5));
 
     rootpath = game->dataPath;
     wireframe = false;
@@ -141,6 +141,7 @@ void runEngine(int argc, char** argv)
 
 void sandboxInit()
 {
+    modelTransform = CreateTransform();
     Scale(modelTransform, glm::vec3(0.3, 0.3, 0.3));
 
     float vertices[] = {
@@ -554,7 +555,7 @@ void sandboxUpdate()
 
     // recup mat view, mat proj
     Camera* _camera = game->camera;
-    Transform* camTransform = &_camera->transform;
+    Transform* camTransform = _camera->transform;
 
     glm::mat4 proj = _camera->projectionMatrix;
     glm::mat4 view = GetViewMatrix(*_camera);

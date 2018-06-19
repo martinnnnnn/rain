@@ -22,7 +22,7 @@ namespace rain
         glm::vec3 right;
         float yaw;
         float pitch;
-        Transform transform;
+        Transform* transform;
         float movementSpeed;
         glm::vec3 worldUp;
         glm::vec3 up;
