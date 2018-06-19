@@ -21,7 +21,7 @@ namespace rain
 
     Resource* LoadResource(ResourceManager* _manager, const char* _path)
     {
-        RAIN_ASSERT_EQ(_manager != nullptr, "You can't load resources from an empty ResourceManager.");
+        RAIN_ASSERT_EQ(_manager != nullptr, "You can't load resources to an empty ResourceManager.");
         if (_manager->size == _manager->capacity)
         {
             bool wasEmpty = (_manager->capacity == 0);

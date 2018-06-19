@@ -16,30 +16,30 @@
 namespace rain
 {
 
-    Component* CreateTransform()
+    Component* CreateTransformTest()
     {
         TransformTest* transform = (TransformTest*)malloc(sizeof(TransformTest));
-        transform->type = Component::Type::TRANSFORM;
+        transform->componentType = ComponentType::TRANSFORM;
         transform->position = { 0, 0, 0 };
         transform->rotation = { 0, 0, 0 };
         transform->scale = { 1, 1, 1 };
         return transform;
     }
 
-    Component* CreateScript(void(*Init)(void), void(*Update)(void), void(*Shutdown)(void))
+    Component* CreateScriptTest(void(*Init)(void), void(*Update)(void), void(*Shutdown)(void))
     {
         ScriptTest* script = (ScriptTest*)malloc(sizeof(ScriptTest));
-        script->type = Component::Type::SCRIPT;
+        script->componentType = ComponentType::SCRIPT;
         script->Init = Init;
         script->Update = Update;
         script->Shutdown = Shutdown;
         return script;
     }
 
-    Component* CreatePhysics()
+    Component* CreatePhysicsTest()
     {
         PhysicsTest* physics = (PhysicsTest*)malloc(sizeof(PhysicsTest));
-        physics->type = Component::Type::PHYSICS;
+        physics->componentType = ComponentType::PHYSICS;
         physics->friction = 0;
         physics->grounded = false;
         physics->weight = 0;
@@ -48,10 +48,10 @@ namespace rain
         return physics;
     }
 
-    Component* CreateModel()
+    Component* CreateModelTest()
     {
         ModelTest* model = (ModelTest*)malloc(sizeof(ModelTest));
-        model->type = Component::Type::MODEL;
+        model->componentType = ComponentType::MODEL;
         model->indices = nullptr;
         model->vertices = nullptr;
         model->size = 0;
@@ -75,16 +75,23 @@ namespace rain
         puts("");
     }
 
+    void PrintTransformTest(TransformTest* _transform)
+    {
+        printf("position:(%f,%f,%f)", _transform->position.x, _transform->position.y, _transform->position.z);
+        printf("rotation:(%f,%f,%f)", _transform->rotation.x, _transform->rotation.y, _transform->rotation.z);
+        printf("scale:(%f,%f,%f)", _transform->scale.x, _transform->scale.y, _transform->scale.z);
+    }
+
     void SystemPhysicsUpdate(System* _system)
     {
         for (u32 i = 0; i < _system->size; ++i)
         {
-            Physics* physics = (Physics*)FindComponent(_system->entities[i], Component::Type::PHYSICS);
-            TransformS* transform = (TransformS*)FindComponent(_system->entities[i], Component::Type::TRANSFORM);
+            PhysicsTest* physics = (PhysicsTest*)FindComponent(_system->entities[i], ComponentType::PHYSICS);
+            TransformTest* transform = (TransformTest*)FindComponent(_system->entities[i], ComponentType::TRANSFORM);
 
             transform->position = transform->position + ((physics->direction * physics->speed) + (physics->friction));
 
-            PrintTransform(transform);
+            PrintTransformTest(transform);
         }
     }
 
@@ -96,9 +103,9 @@ namespace rain
 
         // ENTITY TEST ADD COMPONENT
         Component* comp1 = (TransformTest*)calloc(1, sizeof(TransformTest));
-        comp1->type = Component::Type::TRANSFORM;
+        comp1->componentType = ComponentType::TRANSFORM;
         TransformTest* comp2 = (TransformTest*)malloc(sizeof(TransformTest));
-        comp2->type = Component::Type::TRANSFORM;
+        comp2->componentType = ComponentType::TRANSFORM;
         comp2->scale = { 1, 1, 1 };
         comp2->position = { 0, 0, 0 };
         comp2->rotation = { 0, 90, 0 };
@@ -129,7 +136,7 @@ namespace rain
 
 
         // ENTITY TEST FIND COMPONENT
-        TransformTest* tran1 = (TransformTest*)FindComponent(ent1, Component::Type::TRANSFORM);
+        TransformTest* tran1 = (TransformTest*)FindComponent(ent1, ComponentType::TRANSFORM);
         if (tran1)
         {
             std::cout << std::endl << "found transform in ent1 : "
@@ -142,7 +149,7 @@ namespace rain
             std::cout << std::endl << "ERROR :: FINDCOMPONENT transform in ent1 failed" << std::endl;
         }
 
-        TransformTest* tran2 = (TransformTest*)FindComponent(ent2, Component::Type::TRANSFORM);
+        TransformTest* tran2 = (TransformTest*)FindComponent(ent2, ComponentType::TRANSFORM);
         if (tran2)
         {
             std::cout << std::endl << "found transform in ent2 : "
@@ -157,13 +164,13 @@ namespace rain
 
         // ENTITY TEST REMOVE COMPONENT
         PhysicsTest* comp3 = (PhysicsTest*)calloc(1, sizeof(PhysicsTest));
-        comp3->type = Component::Type::PHYSICS;
+        comp3->componentType = ComponentType::PHYSICS;
         comp3->grounded = true;
         comp3->weight = 127;
         comp3->friction = 42;
 
         AddComponent(ent1, comp3);
-        PhysicsTest* phy1 = (PhysicsTest*)FindComponent(ent1, Component::Type::PHYSICS);
+        PhysicsTest* phy1 = (PhysicsTest*)FindComponent(ent1, ComponentType::PHYSICS);
         if (phy1)
         {
             std::cout << std::endl << "found physics in ent1 : "
@@ -173,8 +180,8 @@ namespace rain
         {
             std::cout << std::endl << "ERROR :: FINDCOMPONENT physics in ent1 failed" << std::endl;
         }
-        RemoveComponent(ent1, Component::Type::PHYSICS);
-        PhysicsTest* phy2 = (PhysicsTest*)FindComponent(ent1, Component::Type::PHYSICS);
+        RemoveComponent(ent1, ComponentType::PHYSICS);
+        PhysicsTest* phy2 = (PhysicsTest*)FindComponent(ent1, ComponentType::PHYSICS);
         if (phy2)
         {
             std::cout << std::endl << "ERROR :: physics still in ent1" << std::endl;
@@ -186,15 +193,15 @@ namespace rain
 
         // ENTITY TEST FITS REQUIREMENTS
         comp3 = (PhysicsTest*)calloc(1, sizeof(PhysicsTest));
-        comp3->type = Component::Type::PHYSICS;
+        comp3->componentType = ComponentType::PHYSICS;
         comp3->grounded = true;
         comp3->weight = 127;
         comp3->friction = 42;
         AddComponent(ent1, comp3);
-        u64 mask1 = (1 << (u64)Component::Type::TRANSFORM) | (1 << (u64)Component::Type::PHYSICS);
-        u64 mask2 = (1 << (u64)Component::Type::TRANSFORM) | (1 << (u64)Component::Type::MODEL);
-        u64 mask3 = (1 << (u64)Component::Type::TRANSFORM) | (1 << (u64)Component::Type::PHYSICS) | (1 << (u64)Component::Type::MODEL);
-        u64 mask4 = (1 << (u64)Component::Type::TRANSFORM);
+        u64 mask1 = (1 << (u64)ComponentType::TRANSFORM) | (1 << (u64)ComponentType::PHYSICS);
+        u64 mask2 = (1 << (u64)ComponentType::TRANSFORM) | (1 << (u64)ComponentType::MODEL);
+        u64 mask3 = (1 << (u64)ComponentType::TRANSFORM) | (1 << (u64)ComponentType::PHYSICS) | (1 << (u64)ComponentType::MODEL);
+        u64 mask4 = (1 << (u64)ComponentType::TRANSFORM);
         u64 mask5 = 0;
 
         bool fits1 = FitsRequirements(ent1, mask1);
@@ -239,27 +246,27 @@ namespace rain
 
     void SystemTest()
     {
-        srand(time(NULL));
+        srand((u32)time(NULL));
         // CONTAINER CREATION
         EntityContainer* container1 = CreateEntityContainer(10000000, 100, 10000000);
         for (int i = 0; i < 10; i++)
         {
-            AddComponent(container1->entities[i], CreateTransform());
-            AddComponent(container1->entities[i], CreatePhysics());
-            PhysicsTest* physics = (PhysicsTest*)FindComponent(container1->entities[i], Component::Type::PHYSICS);
+            AddComponent(container1->entities[i], CreateTransformTest());
+            AddComponent(container1->entities[i], CreatePhysicsTest());
+            PhysicsTest* physics = (PhysicsTest*)FindComponent(container1->entities[i], ComponentType::PHYSICS);
             if (physics)
             {
                 int r = rand() % 100;
-                physics->weight = rand() % 100;
-                physics->friction = rand() % 200 + 100;
+                physics->weight = (float)(rand() % 100);
+                physics->friction = (float)(rand() % 200 + 100);
                 physics->grounded = (rand() % 2) ? true : false;
                 physics->direction = { (float)(rand() % 10), (float)(rand() % 10), (float)(rand() % 10) };
-                physics->speed = rand() % 5;
+                physics->speed = (float)(rand() % 5);
             }
         }
 
         // SYSTEM CREATION
-        u64 requirements = (1 << (u32)Component::Type::PHYSICS);
+        u64 requirements = (1 << (u32)ComponentType::PHYSICS);
         System* system1 = CreateSystem(requirements, 100, 100);
 
         // SYSTEM ADD

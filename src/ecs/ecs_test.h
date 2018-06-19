@@ -40,14 +40,14 @@ namespace rain
         u32 size;
     };
     
-    Component* CreateTransform();
-    Component* CreatePhysics();
-    Component* CreateScript(void(*Init)(void), void(*Update)(void), void(*Shutdown)(void));
-    Component* CreateModel();
+    Component* CreateTransformTest();
+    Component* CreatePhysicsTest();
+    Component* CreateScriptTest(void(*Init)(void), void(*Update)(void), void(*Shutdown)(void));
+    Component* CreateModelTest();
 
 
     void PrintBit(size_t const size, void const * const ptr);
-    
+    void PrintTransformTest(TransformTest* _transform);
 
     void SystemPhysicsUpdate(System* _system);
 
