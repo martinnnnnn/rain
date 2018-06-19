@@ -23,7 +23,7 @@ namespace rain
 
     void AddComponent(Entity* _entity, Component* _component)
     {
-        u64 flag = ((u64)1 << (u64)_component->type);
+        u64 flag = ((u64)1 << (u64)_component->componentType);
         if ((_entity->flags & flag) == 0)
         {
             _entity->flags |= flag;
@@ -48,7 +48,7 @@ namespace rain
         }
     }
 
-    void RemoveComponent(Entity* _entity, Component::Type _type)
+    void RemoveComponent(Entity* _entity, ComponentType _type)
     {
         u64 flag = ((u64)1 << (u64)_type);
         if ((_entity->flags & flag) != 0)
@@ -58,7 +58,7 @@ namespace rain
 
             while (iter < end)
             {
-                if ((*iter)->type == _type)
+                if ((*iter)->componentType == _type)
                 {
                     free(*iter);
                     *iter = *(_entity->components + (_entity->size - 1));
@@ -72,7 +72,7 @@ namespace rain
         }
     }
 
-    Component* FindComponent(Entity* _entity, Component::Type _type)
+    Component* FindComponent(Entity* _entity, ComponentType _type)
     {
         u64 flag = ((u64)1 << (u32)_type);
         if ((_entity->flags & flag) != 0)
@@ -82,7 +82,7 @@ namespace rain
 
             while (iter < end)
             {
-                if ((*iter)->type == _type)
+                if ((*iter)->componentType == _type)
                 {
                     return *iter;
                 }

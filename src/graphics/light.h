@@ -1,19 +1,20 @@
 #pragma once
 
 #include "utility/incl_3d.h"
+#include "ecs/ecs_component.h"
 
 namespace rain
 {
-    struct Light
+    enum class LightType
     {
-        enum class Type
-        {
-            DIRECTIONAL,
-            POINT,
-            SPOT
-        };
+        DIRECTIONAL,
+        POINT,
+        SPOT
+    };
 
-        Type Type;
+    struct Light : Component
+    {
+        LightType lighttype;
 
         glm::vec3 ambient;
         glm::vec3 direction;
