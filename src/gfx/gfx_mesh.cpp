@@ -1,4 +1,4 @@
-#include "graphics/mesh.h"
+#include "gfx/gfx_mesh.h"
 
 #include <fstream>
 #include <iostream>

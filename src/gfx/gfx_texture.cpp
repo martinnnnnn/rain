@@ -1,4 +1,4 @@
-#include "texture.h"
+#include "gfx/gfx_texture.h"
 
 
 #include <stb_image.h>

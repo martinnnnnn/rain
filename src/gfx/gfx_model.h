@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <unordered_map>
 
-#include "graphics/mesh.h"
+#include "gfx/gfx_mesh.h"
 
 namespace rain
 {

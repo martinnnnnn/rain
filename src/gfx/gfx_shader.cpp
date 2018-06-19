@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "gfx/gfx_shader.h"
 
 
 #include <fstream>

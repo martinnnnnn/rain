@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "gfx/gfx_camera.h"
 
 #include "rain.h"
 #include "input/input.h"

@@ -13,7 +13,7 @@ using namespace std::experimental::filesystem::v1;
 #include "imgui_impl_glfw_gl3.h"
 
 #include "utility/incl_3d.h"
-#include "graphics/camera.h"
+#include "gfx/gfx_camera.h"
 #include "input/input.h"
 #include "core/file_system.h"
 #include "utility/string_utils.h"

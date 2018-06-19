@@ -1,4 +1,4 @@
-#include "material.h"
+#include "gfx/gfx_material.h"
 
 #include <nlohmann/json.hpp>
 #include <iostream>
@@ -8,7 +8,7 @@
 
 #include "utility/gl_utils.h"
 #include "rain.h"
-#include "graphics/shader.h"
+#include "gfx/gfx_shader.h"
 #include "utility/incl_3d.h"
 #include "utility/json_utils.h"
 

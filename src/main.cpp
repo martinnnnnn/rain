@@ -10,17 +10,17 @@
 
 #include "utility/incl_3d.h"
 #include "rain.h"
-#include "graphics/shader.h"
-#include "graphics/camera.h"
+#include "gfx/gfx_shader.h"
+#include "gfx/gfx_camera.h"
 #include "core/transform.h"
 #include "input/input.h"
-#include "graphics/light.h"
+#include "gfx/gfx_light.h"
 #include "utility/gl_utils.h"
-#include "graphics/material.h"
+#include "gfx/gfx_material.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include "graphics/model.h"
-#include "graphics/texture.h"
+#include "gfx/gfx_model.h"
+#include "gfx/gfx_texture.h"
 #include "utility/string_utils.h"
 #include "core/memory.h"
 #include "memory/mem_resource_manager.h"
@@ -133,8 +133,6 @@ void runEngine(int argc, char** argv)
 
     rootpath = game->dataPath;
     wireframe = false;
-
-    LoadResource(nullptr, "hello");
 
     sandboxInit();
     loadShaders();

@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <functional>
 
-#include "graphics/graphics.h"
+#include "gfx/gfx_graphics.h"
 
 namespace rain
 {

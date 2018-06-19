@@ -8,9 +8,9 @@
 #include <mutex>
 
 #include "utility/incl_3d.h"
-#include "graphics/texture.h"
-#include "graphics/shader.h"
-#include "graphics/material.h"
+#include "gfx/gfx_texture.h"
+#include "gfx/gfx_shader.h"
+#include "gfx/gfx_material.h"
 
 namespace rain
 {

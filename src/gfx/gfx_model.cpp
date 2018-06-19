@@ -1,4 +1,4 @@
-#include "graphics/model.h"
+#include "gfx/gfx_model.h"
 
 #include <iostream>
 

@@ -6,7 +6,7 @@
 #include <fstream>
 #include <unordered_map>
 
-#include "shader.h"
+#include "gfx/gfx_shader.h"
 
 namespace rain
 {
