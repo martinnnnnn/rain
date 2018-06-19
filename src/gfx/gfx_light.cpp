@@ -5,6 +5,16 @@
 
 namespace rain
 {
+
+    Light* CreateLight(LightType _lightType)
+    {
+        Light* light = (Light*)calloc(1,sizeof(Light));
+        light->componentType = ComponentType::LIGHT;
+        light->lightType = _lightType;
+        return light;
+    }
+
+
     //LightPool* CreateLightPool(u32 _capacity, u32 _resizeStep)
     //{
     //    LightPool* pool = (LightPool*)malloc(sizeof(LightPool));

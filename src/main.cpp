@@ -24,6 +24,7 @@
 #include "utility/string_utils.h"
 #include "core/memory.h"
 #include "memory/mem_resource_manager.h"
+#include "scene/sc_scene.h"
 
 using namespace rain;
 
@@ -69,55 +70,18 @@ void loadShaders();
 RAIN_DLLEXPORT void LoadGame(const char* path)
 {
 
-
-
-
-    vsync = true;
-    game = InitGame(path);
-    //Transform* camTransform = game->camera->GetTransform();
-    Transform* camTransform = game->camera->transform;
-    Translate(camTransform, glm::vec3(0, 0, 5));
-
-    rootpath = game->dataPath;
-    wireframe = false;
-
-    sandboxInit();
-    loadShaders();
-
-    RunGame(game, sandboxUpdate);
-}
-
-RAIN_DLLEXPORT void OpenWindow(void* wndHandle)
-{
-    ////TCHAR* AppClassName = _T("Windows Cipher");
-    //HACCEL hAccel = 0;												// no accelerator table in this example.
-    //MSG Msg;
-    //RECT R;
-    //HWND Wnd = (HWND)wndHandle;											
-    //
-    //SetClassLongPtr(Wnd, GCL_WNDPROC, reinterpret_cast<LONG_PTR>(OpenGLMDIChildHandler));
-    //GetClientRect(GetDesktopWindow(), &R);							
-    //while (GetMessage(&Msg, 0, 0, 0))
-    //{
-    //    TranslateMessage(&Msg);									
-    //    DispatchMessage(&Msg);									
-    //};
-}
-
-RAIN_DLLEXPORT void EnableVsync()
-{
-    vsync = true;
-}
-
-RAIN_DLLEXPORT void DisableVsync()
-{
-    vsync = false;
 }
 
 void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+    Scene* scene = (Scene*)calloc(1,sizeof(Scene));
+    std::string path = PROJECT_SOURCE_DIR;
+    path.append("/hello.txt");
+    SerializeScene(scene, path.c_str());
+
+    
     runEngine(argc, argv);
 
 
