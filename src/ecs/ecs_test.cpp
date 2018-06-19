@@ -75,6 +75,19 @@ namespace rain
         puts("");
     }
 
+    void SystemPhysicsUpdate(System* _system)
+    {
+        for (u32 i = 0; i < _system->size; ++i)
+        {
+            Physics* physics = (Physics*)FindComponent(_system->entities[i], Component::Type::PHYSICS);
+            TransformS* transform = (TransformS*)FindComponent(_system->entities[i], Component::Type::TRANSFORM);
+
+            transform->position = transform->position + ((physics->direction * physics->speed) + (physics->friction));
+
+            PrintTransform(transform);
+        }
+    }
+
     void EntityTests()
     {
         // ENTITY TEST CREATION

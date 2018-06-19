@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/ecs_component.h"
+#include "ecs/ecs_system.h"
 
 namespace rain
 {
@@ -47,6 +48,8 @@ namespace rain
 
     void PrintBit(size_t const size, void const * const ptr);
     
+
+    void SystemPhysicsUpdate(System* _system);
 
     // TODO(martin) : make real tests
     void EntityTests();
