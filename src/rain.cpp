@@ -39,8 +39,16 @@ namespace rain
     {
         Game* game = new Game();
         auto arguments = String::GetArguments(argc, argv);
-        RAIN_ASSERT_EQ(arguments["root"] != "", "The resource path is missing. Where's the data ? Add 'root=path/to/resource/directory' as a command line argument.");
-        game->dataPath = arguments["root"];
+        //RAIN_ASSERT_EQ(arguments["root"] != "", "The resource path is missing. Where's the data ? Add 'root=path/to/resource/directory' as a command line argument.");
+        if (arguments["root"] != "")
+        {
+            game->dataPath = arguments["root"];
+        }
+        else
+        {
+            game->dataPath = PROJECT_SOURCE_DIR;
+            game->dataPath.append("/resources");
+        }
         game->gfxContext = InitWindow("Rain Engine", 800, 600);
         //game->input = new Input();
         game->input = (Input*)malloc(sizeof(Input));

@@ -32,15 +32,29 @@ namespace rain
         float outerCutOff;
     };
 
-    struct LightPool
-    {
-        Light** lights;
-        u32 size;
-        u32 capacity;
-        u32 resizeStep;
-    };
+    //struct LightPoolElement
+    //{
+    //    union Elem
+    //    {
+    //        Light* light;
+    //        LightPoolElement* next;
+    //    };
 
-    LightPool* CreateLightPool(u32 _capacity = 100, u32 _resizeStep = 10);
+    //    Elem element;
+    //};
+
+    //struct LightPool
+    //{
+    //    LightPoolElement** lights;
+    //    LightPoolElement* first;
+    //    u32 capacity;
+    //    u32 resizeStep;
+    //};
+
+    //LightPool* CreateLightPool(u32 _capacity = 100, u32 _resizeStep = 10);
+
+    //Light* GetLight(LightPool* _pool);
+    //void FreeLight(LightPool* _pool, LightPoolElement* _element);
 }
 
 

@@ -126,15 +126,12 @@ int main(int argc, char** argv)
 
 void runEngine(int argc, char** argv)
 {
-    
     game = InitGame(argc, argv);
     Transform* camTransform = &game->camera->transform;
     Translate(*camTransform, glm::vec3(0, 0, 5));
 
     rootpath = game->dataPath;
     wireframe = false;
-
-    LightPool* pool = CreateLightPool();
 
     sandboxInit();
     loadShaders();
