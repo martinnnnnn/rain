@@ -69,49 +69,6 @@ void loadShaders();
 RAIN_DLLEXPORT void LoadGame(const char* path)
 {
 
-
-
-
-    vsync = true;
-    game = InitGame(path);
-    //Transform* camTransform = game->camera->GetTransform();
-    Transform* camTransform = game->camera->transform;
-    Translate(camTransform, glm::vec3(0, 0, 5));
-
-    rootpath = game->dataPath;
-    wireframe = false;
-
-    sandboxInit();
-    loadShaders();
-
-    RunGame(game, sandboxUpdate);
-}
-
-RAIN_DLLEXPORT void OpenWindow(void* wndHandle)
-{
-    ////TCHAR* AppClassName = _T("Windows Cipher");
-    //HACCEL hAccel = 0;												// no accelerator table in this example.
-    //MSG Msg;
-    //RECT R;
-    //HWND Wnd = (HWND)wndHandle;											
-    //
-    //SetClassLongPtr(Wnd, GCL_WNDPROC, reinterpret_cast<LONG_PTR>(OpenGLMDIChildHandler));
-    //GetClientRect(GetDesktopWindow(), &R);							
-    //while (GetMessage(&Msg, 0, 0, 0))
-    //{
-    //    TranslateMessage(&Msg);									
-    //    DispatchMessage(&Msg);									
-    //};
-}
-
-RAIN_DLLEXPORT void EnableVsync()
-{
-    vsync = true;
-}
-
-RAIN_DLLEXPORT void DisableVsync()
-{
-    vsync = false;
 }
 
 void runEngine(int argc, char** argv);
