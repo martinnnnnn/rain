@@ -17,6 +17,8 @@ using namespace std::experimental::filesystem::v1;
 #include "input/input.h"
 #include "core/file_system.h"
 #include "utility/string_utils.h"
+#include "assert/rain_assert.h"
+
 
 namespace rain
 {
@@ -29,7 +31,6 @@ namespace rain
         game->input = new Input();
         game->input->window = game->gfxContext.window;
         game->camera = GetDefaultCamera(game);
-        //game->camera->Init(game);
         InitUI(game->gfxContext.window);
         return game;
     }
@@ -38,10 +39,8 @@ namespace rain
     {
         Game* game = new Game();
         auto arguments = String::GetArguments(argc, argv);
-        if (arguments["root"] != "")
-        {
-            game->dataPath = arguments["root"];
-        }
+        RAIN_ASSERT_EQ(arguments["root"] != "", "The resource path is missing. Where's the data ? Add 'root=path/to/resource/directory' as a command line argument.");
+        game->dataPath = arguments["root"];
         game->gfxContext = InitWindow("Rain Engine", 800, 600);
         //game->input = new Input();
         game->input = (Input*)malloc(sizeof(Input));

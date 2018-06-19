@@ -134,6 +134,8 @@ void runEngine(int argc, char** argv)
     rootpath = game->dataPath;
     wireframe = false;
 
+    LightPool* pool = CreateLightPool();
+
     sandboxInit();
     loadShaders();
     RunGame(game, sandboxUpdate);
