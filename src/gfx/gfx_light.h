@@ -1,12 +1,17 @@
 #pragma once
 
+#include <stdlib.h>
+
 #include "utility/incl_3d.h"
 #include "ecs/ecs_component.h"
+#include "core/types.h"
+
 
 namespace rain
 {
     enum class LightType
     {
+        UNKNOWN = 0,
         DIRECTIONAL,
         POINT,
         SPOT
@@ -14,7 +19,7 @@ namespace rain
 
     struct Light : Component
     {
-        LightType lighttype;
+        LightType lightType;
 
         glm::vec3 ambient;
         glm::vec3 direction;
@@ -26,6 +31,16 @@ namespace rain
         float cutOff;
         float outerCutOff;
     };
+
+    struct LightPool
+    {
+        Light** lights;
+        u32 size;
+        u32 capacity;
+        u32 resizeStep;
+    };
+
+    LightPool* CreateLightPool(u32 _capacity = 100, u32 _resizeStep = 10);
 }
 
 

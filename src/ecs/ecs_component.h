@@ -16,6 +16,7 @@ namespace rain
         SCRIPT,
         PHYSICS,
         MODEL,
+        LIGHT,
         MAX_COUNT
     };
     
