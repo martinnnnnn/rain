@@ -72,4 +72,60 @@ namespace rain
             iter++;
         }
     }
+
+
+    Container* CreateContainer(u32 _capacity, u32 _resizeStep, u32 size)
+    {
+        Container* container = (Container*)malloc(sizeof(Container));
+        container->size = 0;
+        container->resizeStep = _resizeStep;
+        container->capacity = _capacity;
+
+        if (container->capacity > 0)
+        {
+            container->elements = (void**)calloc(container->capacity, sizeof(void*));
+        }
+
+        return container;
+    }
+
+    void AddElement(Container* _container, void* _element)
+    {
+        if (_container->size == _container->capacity)
+        {
+            bool wasEmpty = (_container->capacity == 0);
+            _container->capacity += _container->resizeStep;
+            if (wasEmpty)
+            {
+                _container->elements = (void**)calloc(_container->capacity, sizeof(void*));
+            }
+            else
+            {
+                void** temp = (void**)realloc(_container->elements, _container->capacity * sizeof(void*));
+                _container->elements = temp;
+            }
+        }
+
+        _container->elements[_container->size] = _element;
+        _container->size++;
+    }
+
+    void RemoveElement(Container* _container, void* _element)
+    {
+        void** end = _container->elements + _container->size;
+        void** iter = _container->elements;
+
+        while (iter < end)
+        {
+            if ((*iter) == _element)
+            {
+                free(*iter);
+                *iter = *(_container->elements + (_container->size - 1));
+                _container->elements[_container->size - 1] = NULL;
+                _container->size--;
+                return;
+            }
+            iter++;
+        }
+    }
 }

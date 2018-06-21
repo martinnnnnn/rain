@@ -25,6 +25,7 @@
 #include "core/memory.h"
 #include "memory/mem_resource_manager.h"
 #include "scene/sc_scene.h"
+#include "ecs/ecs.h"
 
 using namespace rain;
 
@@ -76,11 +77,6 @@ void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-    Scene* scene = (Scene*)calloc(1,sizeof(Scene));
-    std::string path = PROJECT_SOURCE_DIR;
-    path.append("/hello.txt");
-    SerializeScene(scene, path.c_str());
-
     
     runEngine(argc, argv);
 

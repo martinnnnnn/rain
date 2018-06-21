@@ -26,11 +26,11 @@ namespace rain
         
         
 
-        for (u32 i = 0; i < _scene->entityContainer->size; ++i)
-        {
-            Entity* entity = _scene->entityContainer->entities[i];
-            fprintf(fp, "---");
-        }
+        //for (u32 i = 0; i < _scene->entityContainer->size; ++i)
+        //{
+        //    Entity* entity = _scene->entityContainer->entities[i];
+        //    fprintf(fp, "---");
+        //}
 
         fclose(fp);
         return;
