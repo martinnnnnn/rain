@@ -24,6 +24,8 @@
 #include "utility/string_utils.h"
 #include "core/memory.h"
 #include "memory/mem_resource_manager.h"
+#include "scene/sc_scene.h"
+#include "ecs/ecs.h"
 
 using namespace rain;
 
@@ -75,6 +77,7 @@ void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+    
     runEngine(argc, argv);
 
 

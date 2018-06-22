@@ -32,6 +32,8 @@ namespace rain
         float outerCutOff;
     };
 
+    Light* CreateLight();
+
     //struct LightPoolElement
     //{
     //    union Elem

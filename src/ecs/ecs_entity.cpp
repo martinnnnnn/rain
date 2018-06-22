@@ -8,15 +8,18 @@ namespace rain
     {
         Entity* entity = (Entity*)calloc(1, sizeof(Entity));
         entity->id = _id;
-        entity->sizeStep = _sizeStep;
-
         entity->name = (char*)malloc((sizeof(_name) + 1));
         strcpy_s(entity->name, sizeof(entity->name) + 1, _name);
-        entity->capacity = _capacity;
-        if (entity->capacity > 0)
-        {
-            entity->components = (Component**)calloc(entity->capacity, sizeof(Component*));
-        }
+
+        entity->components = CreateVector(_capacity, _sizeStep);
+
+        //entity->sizeStep = _sizeStep;
+
+        //entity->capacity = _capacity;
+        //if (entity->capacity > 0)
+        //{
+        //    entity->components = (Component**)calloc(entity->capacity, sizeof(Component*));
+        //}
 
         return entity;
     }
@@ -28,45 +31,33 @@ namespace rain
         {
             _entity->flags |= flag;
 
-            if (_entity->size == _entity->capacity)
-            {
-                bool wasEmpty = _entity->capacity == 0;
-                _entity->capacity += _entity->sizeStep;
-                if (wasEmpty)
-                {
-                    _entity->components = (Component**)calloc(_entity->capacity, sizeof(Component*));
-                }
-                else
-                {
-                    Component** temp = (Component**)realloc(_entity->components, _entity->capacity * sizeof(Component*));
-                    _entity->components = temp;
-                }
-            }
-
-            _entity->components[_entity->size] = _component;
-            _entity->size++;
+            Vector* comps = _entity->components;
+            AddItem(_entity->components, (void*)_component);
         }
     }
 
-    void RemoveComponent(Entity* _entity, ComponentType _type)
+    Component* RemoveComponent(Entity* _entity, ComponentType _type)
     {
         u64 flag = ((u64)1 << (u64)_type);
         if ((_entity->flags & flag) != 0)
         {
-            Component** end = _entity->components + _entity->size;
-            Component** iter = _entity->components;
-
+            Vector* components = _entity->components;
+            Component** end = (Component**)components->items + components->size;
+            Component** iter = (Component**)components->items;
+            u32 index = 0;
             while (iter < end)
             {
                 if ((*iter)->componentType == _type)
                 {
+
+
                     free(*iter);
                     *iter = *(_entity->components + (_entity->size - 1));
                     _entity->components[_entity->size - 1] = NULL;
                     _entity->size--;
                     return;
                 }
-                iter++;
+                iter++; index++;
             }
 
         }
