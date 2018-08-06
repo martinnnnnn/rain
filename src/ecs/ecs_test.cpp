@@ -298,7 +298,7 @@ namespace rain
             AddEntity(container, ent);
         }
 
-        std::cout << std::endl << "after add : " << container->size << "," << container->capacity << std::endl;
+        std::cout << std::endl << "after add : expected(20, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
 
         // REMOVING ENTITIES
         for (u32 i = 0; i < 18;)
@@ -306,7 +306,7 @@ namespace rain
             RemoveEntity(container, tempvec[i]);
             i += 2;
         }
-        std::cout << std::endl << "after remove : " << container->size << "," << container->capacity << std::endl;
+        std::cout << std::endl << "after remove : expected(11, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
     }
 
     void SystemTest()

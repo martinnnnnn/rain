@@ -44,49 +44,35 @@ namespace rain
         {
             RemoveItem<Component*>(&_entity->components, &comp);
         }
-
-
-
-        //u64 flag = ((u64)1 << (u64)_type);
-        //if ((_entity->flags & flag) != 0)
-        //{
-        //    //RemoveItem<Component*>(&_entity->components, );
-        //    //Vector<Component*>* components = &_entity->components;
-
-        //    Component** end = _entity->components.items + _entity->components.size;
-        //    Component** iter = _entity->components.items;
-        //    u32 index = 0;
-        //    while (iter < end)
-        //    {
-        //        if ((*iter)->componentType == _type)
-        //        {
-        //            free(*iter);
-        //            *iter = *(_entity->components.items + (_entity->components.size - 1));
-        //            _entity->components[_entity->size - 1] = NULL;
-        //            _entity->size--;
-        //            return;
-        //        }
-        //        iter++; index++;
-        //    }
-        //}
     }
+
+    bool CheckComp(Component* _comp, ComponentType _type)
+    {
+        return _comp->componentType == _type;
+    }
+
 
     Component* FindComponent(Entity* _entity, ComponentType _type)
     {
         u64 flag = ((u64)1 << (u32)_type);
         if ((_entity->flags & flag) != 0)
         {
-            Component** end = _entity->components.items + _entity->components.size;
-            Component** iter = _entity->components.items;
+            Component** comp = FindItem<Component*, ComponentType>(&_entity->components, _type, CheckComp);
+            if (comp)
+                return *comp;
+            return nullptr;
 
-            while (iter < end)
-            {
-                if ((*iter)->componentType == _type)
-                {
-                    return *iter;
-                }
-                iter++;
-            }
+            //Component** end = _entity->components.items + _entity->components.size;
+            //Component** iter = _entity->components.items;
+
+            //while (iter < end)
+            //{
+            //    if ((*iter)->componentType == _type)
+            //    {
+            //        return *iter;
+            //    }
+            //    iter++;
+            //}
         }
 
         return nullptr;

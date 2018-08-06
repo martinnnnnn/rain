@@ -56,12 +56,17 @@ void AddItem(Vector<T>* _vector, T _item)
 template<typename T>
 void RemoveItem(Vector<T>* _vector, T* _item)
 {
+    if (!_item || !_vector)
+    {
+        return;
+    }
+
     T* end = _vector->items + _vector->size;
     T* iter = _vector->items;
 
     while (iter < end)
     {
-        if (iter == _item)
+        if (*iter == *_item)
         {
             *iter = *(_vector->items + (_vector->size - 1));
             _vector->items[_vector->size - 1] = NULL;
