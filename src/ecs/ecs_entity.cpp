@@ -42,7 +42,7 @@ namespace rain
         Component* comp = FindComponent(_entity, _type);
         if (comp)
         {
-            RemoveItem<Component*>(&_entity->components, comp);
+            RemoveItem<Component*>(&_entity->components, &comp);
         }
 
 

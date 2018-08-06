@@ -6,6 +6,7 @@
 #include <ctime>
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "ecs/ecs_component.h"
 #include "ecs/ecs_entity.h"
@@ -94,6 +95,69 @@ namespace rain
             PrintTransformTest(transform);
         }
     }
+
+
+    std::string bts(bool _value)
+    {
+        switch (_value)
+        {
+        case true:
+            return "true";
+        case false:
+            return "false";
+        }
+    }
+
+    bool CompareInt(int a, int b)
+    {
+        return a == b;
+    }
+
+    void VectorTest()
+    {
+        auto equals = [](int a, int b) { return a == b; };
+        int toRemove = 3;
+
+        Vector<int> v;
+        InitVector(&v, 5, 2);
+        AddItem(&v, 4);
+        AddItem(&v, toRemove);
+        RemoveItem(&v, FindItem<int, int>(&v, toRemove, equals));
+        AddItem(&v, 2);
+        AddItem(&v, 2);
+        AddItem(&v, 15);
+        AddItem(&v, 13);
+        AddItem(&v, 2);
+
+
+        int* result = FindItem<int, int>(&v, 5, CompareInt);
+        RemoveItem(&v, result);
+        result = FindItem<int, int>(&v, 6, CompareInt);
+        RemoveItem(&v, result);
+        result = FindItem<int, int>(&v, 2, CompareInt);
+        RemoveItem(&v, result);
+
+        result = FindItem<int, int>(&v, 5, equals);
+        RemoveItem(&v, result);
+        result = FindItem<int, int>(&v, 6, equals);
+        RemoveItem(&v, result);
+        result = FindItem<int, int>(&v, 2, equals);
+        RemoveItem(&v, result);
+
+
+        std::cout << "Vector test " << std::endl;
+        std::cout << "expected : [4,2,2,2,]" << std::endl;
+        std::cout << "result : [";
+        for (u32 i = 0; i < v.size; ++i)
+        {
+            std::cout << v.items[i] << ",";
+        }
+        std::cout << "]\n";
+    }
+
+
+
+
 
     void EntityTests()
     {
@@ -210,7 +274,8 @@ namespace rain
         bool fits4 = FitsRequirements(ent1, mask4);
         bool fits5 = FitsRequirements(ent1, mask5);
 
-        std::cout << std::endl << "1 (true) : " << (fits1 ? "true" : "false")
+        std::cout 
+            << std::endl << "1 (true) : " << (fits1 ? "true" : "false")
             << std::endl << "2 (false) : " << (fits2 ? "true" : "false")
             << std::endl << "3 (false) : " << (fits3 ? "true" : "false")
             << std::endl << "4 (true) : " << (fits4 ? "true" : "false")

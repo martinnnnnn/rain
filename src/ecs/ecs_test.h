@@ -52,6 +52,8 @@ namespace rain
     void SystemPhysicsUpdate(System* _system);
 
     // TODO(martin) : make real tests
+
+    void VectorTest();
     void EntityTests();
     void EntityContainerTest();
     void SystemTest();

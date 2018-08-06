@@ -78,6 +78,7 @@ void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+    VectorTest();
     EntityTests();
     EntityContainerTest();
     SystemTest();

@@ -7,7 +7,6 @@
 
 namespace rain
 {
-    // TODO(martin): add stepcount
     struct Entity
     {
         u64 id;
