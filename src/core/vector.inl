@@ -18,7 +18,7 @@ Vector<T>* CreateVector(u32 _capacity, u32 _resizeStep)
 }
 
 template<typename T>
-void InitVector(Vector<T>* _vector, u32 _capacity, u32 _resiteStep)
+void InitVector(Vector<T>* _vector, u32 _capacity, u32 _resizeStep)
 {
     _vector->size = 0;
     _vector->resizeStep = _resizeStep;
@@ -26,7 +26,7 @@ void InitVector(Vector<T>* _vector, u32 _capacity, u32 _resiteStep)
 
     if (_vector->capacity > 0)
     {
-        _vector->items = (T**)calloc(vector->capacity, sizeof(T*));
+        _vector->items = (T*)calloc(_vector->capacity, sizeof(T));
     }
 }
 
@@ -39,11 +39,11 @@ void AddItem(Vector<T>* _vector, T _item)
         _vector->capacity += _vector->resizeStep;
         if (wasEmpty)
         {
-            _vector->items = (void**)calloc(_vector->capacity, sizeof(void*));
+            _vector->items = (T*)calloc(_vector->capacity, sizeof(T));
         }
         else
         {
-            void** temp = (void**)realloc(_vector->items, _vector->capacity * sizeof(void*));
+            T* temp = (T*)realloc(_vector->items, _vector->capacity * sizeof(T));
             _vector->items = temp;
         }
     }
@@ -55,8 +55,8 @@ void AddItem(Vector<T>* _vector, T _item)
 template<typename T>
 void RemoveItem(Vector<T>* _vector, T _item)
 {
-    void** end = _vector->items + _vector->size;
-    void** iter = _vector->items;
+    T* end = _vector->items + _vector->size;
+    T* iter = _vector->items;
 
     while (iter < end)
     {

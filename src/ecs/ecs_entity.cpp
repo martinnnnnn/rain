@@ -37,29 +37,38 @@ namespace rain
         }
     }
 
-    Component* RemoveComponent(Entity* _entity, ComponentType _type)
+    void RemoveComponent(Entity* _entity, ComponentType _type)
     {
-        u64 flag = ((u64)1 << (u64)_type);
-        if ((_entity->flags & flag) != 0)
+        Component* comp = FindComponent(_entity, _type);
+        if (comp)
         {
-            Vector<Component*>* components = &_entity->components;
-            Component** end = /*(Component**)*/_entity->components.items + components->size;
-            Component** iter = /*(Component**)*/components->items;
-            u32 index = 0;
-            while (iter < end)
-            {
-                if ((*iter)->componentType == _type)
-                {
-                    free(*iter);
-                    *iter = *(_entity->components.items + (_entity->components.size - 1));
-                    _entity->components[_entity->size - 1] = NULL;
-                    _entity->size--;
-                    return;
-                }
-                iter++; index++;
-            }
-
+            RemoveItem<Component*>(&_entity->components, comp);
         }
+
+
+
+        //u64 flag = ((u64)1 << (u64)_type);
+        //if ((_entity->flags & flag) != 0)
+        //{
+        //    //RemoveItem<Component*>(&_entity->components, );
+        //    //Vector<Component*>* components = &_entity->components;
+
+        //    Component** end = _entity->components.items + _entity->components.size;
+        //    Component** iter = _entity->components.items;
+        //    u32 index = 0;
+        //    while (iter < end)
+        //    {
+        //        if ((*iter)->componentType == _type)
+        //        {
+        //            free(*iter);
+        //            *iter = *(_entity->components.items + (_entity->components.size - 1));
+        //            _entity->components[_entity->size - 1] = NULL;
+        //            _entity->size--;
+        //            return;
+        //        }
+        //        iter++; index++;
+        //    }
+        //}
     }
 
     Component* FindComponent(Entity* _entity, ComponentType _type)
@@ -67,8 +76,8 @@ namespace rain
         u64 flag = ((u64)1 << (u32)_type);
         if ((_entity->flags & flag) != 0)
         {
-            Component** end = _entity->components + _entity->size;
-            Component** iter = _entity->components;
+            Component** end = _entity->components.items + _entity->components.size;
+            Component** iter = _entity->components.items;
 
             while (iter < end)
             {

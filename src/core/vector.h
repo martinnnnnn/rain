@@ -7,7 +7,7 @@ namespace rain
     template<typename T>
     struct Vector
     {
-        T** items;
+        T* items;
         u32 size;
         u32 capacity;
         u32 resizeStep;
@@ -15,7 +15,7 @@ namespace rain
 
 
     template<typename T>
-    void InitVector(Vector<T>* _vector, u32 _capacity, u32 _resiteStep = 10);
+    void InitVector(Vector<T>* _vector, u32 _capacity, u32 _resizeStep = 10);
 
     template<typename T>
     Vector<T>* CreateVector(u32 _capacity, u32 _resizeStep = 10);

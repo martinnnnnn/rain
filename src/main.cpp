@@ -26,6 +26,7 @@
 #include "memory/mem_resource_manager.h"
 #include "scene/sc_scene.h"
 #include "ecs/ecs.h"
+#include "ecs/ecs_test.h"
 
 using namespace rain;
 
@@ -77,7 +78,11 @@ void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-    
+    EntityTests();
+    EntityContainerTest();
+    SystemTest();
+
+
     runEngine(argc, argv);
 
 

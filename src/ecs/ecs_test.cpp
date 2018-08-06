@@ -117,9 +117,9 @@ namespace rain
             << std::endl << "-> name : " << ent1->name
             << std::endl << "-> flags : " << std::endl;
         PrintBit(sizeof(ent1->flags), &ent1->flags);
-        std::cout << "-> components ? : " << (ent1->components != nullptr)
-            << std::endl << "-> size : " << ent1->size
-            << std::endl << "-> capacity : " << ent1->capacity
+        std::cout << "-> components ? : " /*<< (ent1->components != nullptr)*/
+            << std::endl << "-> size : " << ent1->components.size
+            << std::endl << "-> capacity : " << ent1->components.capacity
             << std::endl << std::endl;
 
         std::cout << "Entity creation : "
@@ -127,9 +127,9 @@ namespace rain
             << std::endl << "-> name : " << ent2->name
             << std::endl << "-> flags : " << std::endl;
         PrintBit(sizeof(ent2->flags), &ent2->flags);
-        std::cout << "-> components ? : " << (ent2->components != nullptr)
-            << std::endl << "-> size : " << ent2->size
-            << std::endl << "-> capacity : " << ent2->capacity
+        std::cout << "-> components ? : " /*<< (ent2->components != nullptr)*/
+            << std::endl << "-> size : " << ent2->components.size
+            << std::endl << "-> capacity : " << ent2->components.capacity
             << std::endl << std::endl;
 
 
