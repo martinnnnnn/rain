@@ -13,14 +13,11 @@ namespace rain
         u64 id;
         char* name;
         u64 flags;
-        Vector* components;
-        //Component** components;
-        //u32 size;
-        //u32 capacity;
-        //u32 sizeStep;
+        Vector<Component*> components;
     };
 
     Entity* CreateEntity(u64 _id, const char* _name, u32 _capacity = 0, u32 _sizeStep = 10);
+    void InitEntity(Entity* _entity, u64 _id, const char* _name, u32 _capacity, u32 _sizeStep);
     void AddComponent(Entity* _entity, Component* _component);
     Component* RemoveComponent(Entity* _entity, ComponentType _type);
     Component* FindComponent(Entity* _entity, ComponentType _type);

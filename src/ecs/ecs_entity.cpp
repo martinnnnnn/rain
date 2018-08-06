@@ -11,17 +11,18 @@ namespace rain
         entity->name = (char*)malloc((sizeof(_name) + 1));
         strcpy_s(entity->name, sizeof(entity->name) + 1, _name);
 
-        entity->components = CreateVector(_capacity, _sizeStep);
-
-        //entity->sizeStep = _sizeStep;
-
-        //entity->capacity = _capacity;
-        //if (entity->capacity > 0)
-        //{
-        //    entity->components = (Component**)calloc(entity->capacity, sizeof(Component*));
-        //}
+        InitVector<Component*>(&entity->components, _capacity, _sizeStep);
 
         return entity;
+    }
+
+    void InitEntity(Entity* _entity, u64 _id, const char* _name, u32 _capacity, u32 _sizeStep)
+    {
+        _entity->id = _id;
+        _entity->name = (char*)malloc((sizeof(_name) + 1));
+        strcpy_s(_entity->name, sizeof(_entity->name) + 1, _name);
+
+        InitVector<Component*>(&_entity->components, _capacity, _sizeStep);
     }
 
     void AddComponent(Entity* _entity, Component* _component)
@@ -31,8 +32,8 @@ namespace rain
         {
             _entity->flags |= flag;
 
-            Vector* comps = _entity->components;
-            AddItem(_entity->components, (void*)_component);
+            //Vector<Component*>* comps = _entity->components;
+            AddItem<Component*>(&_entity->components, _component);
         }
     }
 
@@ -41,18 +42,16 @@ namespace rain
         u64 flag = ((u64)1 << (u64)_type);
         if ((_entity->flags & flag) != 0)
         {
-            Vector* components = _entity->components;
-            Component** end = (Component**)components->items + components->size;
-            Component** iter = (Component**)components->items;
+            Vector<Component*>* components = &_entity->components;
+            Component** end = /*(Component**)*/_entity->components.items + components->size;
+            Component** iter = /*(Component**)*/components->items;
             u32 index = 0;
             while (iter < end)
             {
                 if ((*iter)->componentType == _type)
                 {
-
-
                     free(*iter);
-                    *iter = *(_entity->components + (_entity->size - 1));
+                    *iter = *(_entity->components.items + (_entity->components.size - 1));
                     _entity->components[_entity->size - 1] = NULL;
                     _entity->size--;
                     return;
