@@ -15,6 +15,7 @@ namespace rain
         Vector<Component*> components;
     };
 
+    Entity** CreateEntities(u32 _count, u64 _flags, u32 _capacity = 10, u32 _sizeStep = 5);
     Entity* CreateEntity(u64 _id, const char* _name, u32 _capacity = 0, u32 _sizeStep = 10);
     void InitEntity(Entity* _entity, u64 _id, const char* _name, u32 _capacity, u32 _sizeStep);
     void AddComponent(Entity* _entity, Component* _component);

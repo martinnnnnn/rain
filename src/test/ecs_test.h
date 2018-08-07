@@ -53,7 +53,6 @@ namespace rain
 
     // TODO(martin) : make real tests
 
-    void VectorTest();
     void EntityTests();
     //void EntityContainerTest();
     //void SystemTest();

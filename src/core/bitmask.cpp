@@ -34,9 +34,6 @@ namespace rain
         _mask ^= 1 << bit;
     }
 
-    // compares 2 bitmasks,
-    // if relevantBits is specified, only checks for the relevant bits
-    // if not, checks if the bitfields are equal
     bool IsAMatch(uint64_t& _mask1, uint64_t& _mask2, uint64_t _relevantBits)
     {
         if (_relevantBits)

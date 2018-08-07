@@ -113,52 +113,6 @@ namespace rain
         return a == b;
     }
 
-    void VectorTest()
-    {
-        auto equals = [](int a, int b) { return a == b; };
-        int toRemove = 3;
-
-        Vector<int> v;
-        InitVector(&v, 5, 2);
-        AddItem(&v, 4);
-        AddItem(&v, toRemove);
-        RemoveItem(&v, FindItem<int, int>(&v, toRemove, equals));
-        AddItem(&v, 2);
-        AddItem(&v, 2);
-        AddItem(&v, 15);
-        AddItem(&v, 13);
-        AddItem(&v, 2);
-
-
-        int* result = FindItem<int, int>(&v, 5, CompareInt);
-        RemoveItem(&v, result);
-        result = FindItem<int, int>(&v, 6, CompareInt);
-        RemoveItem(&v, result);
-        result = FindItem<int, int>(&v, 2, CompareInt);
-        RemoveItem(&v, result);
-
-        result = FindItem<int, int>(&v, 5, equals);
-        RemoveItem(&v, result);
-        result = FindItem<int, int>(&v, 6, equals);
-        RemoveItem(&v, result);
-        result = FindItem<int, int>(&v, 2, equals);
-        RemoveItem(&v, result);
-
-
-        std::cout << "Vector test " << std::endl;
-        std::cout << "expected : [4,2,2,2,]" << std::endl;
-        std::cout << "result : [";
-        for (u32 i = 0; i < v.size; ++i)
-        {
-            std::cout << v.items[i] << ",";
-        }
-        std::cout << "]\n";
-    }
-
-
-
-
-
     void EntityTests()
     {
         // ENTITY TEST CREATION

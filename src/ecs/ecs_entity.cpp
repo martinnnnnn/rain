@@ -16,6 +16,19 @@ namespace rain
         return entity;
     }
 
+    Entity** CreateEntities(u32 _count, u64 _flags, u32 _capacity = 10, u32 _sizeStep = 5)
+    {
+        Entity** entities = (Entity**)malloc(sizeof(Entity) * _count);
+        for (int i = 0; i < _count; ++i)
+        {
+            entities[i] = (Entity*)calloc(1, sizeof(Entity));
+            entities[i]->id = 0;
+            entities[i]->name = "default name";
+            InitVector<Component*>(&entities[i]->components, _capacity, _sizeStep);
+        }
+        return entities;
+    }
+
     void InitEntity(Entity* _entity, u64 _id, const char* _name, u32 _capacity, u32 _sizeStep)
     {
         _entity->id = _id;

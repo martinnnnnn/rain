@@ -6,12 +6,7 @@
 
 namespace rain
 {
-	//struct Bitmask
-	//{
-	//	uint64_t bits;
-	//};
-
-    // TODO(martin): refactor to make it clearer that getbit requires a shift value whereas getbits takes in a bitmask that will be tested directly, without any bitshit.
+    // TODO(martin): refactor to make it clearer that getbit requires a shift value whereas getbits takes in a bitmask that will be tested directly, without any bitshift.
     // TODO(martin): same for turnonbit / turnonbits
     bool GetBit(uint64_t& _mask, const uint64_t bit);
     bool GetBits(uint64_t& _mask, const uint64_t bits);

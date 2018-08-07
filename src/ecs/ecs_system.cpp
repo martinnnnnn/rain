@@ -60,36 +60,14 @@ namespace rain
 
     void AddEntities(System* _system, Entity** _entities, u32 _size)
     {
-        /*u32 resize = _system->size;
+        // TODO(martin) : handle missing requirement better ?
         for (u32 i = 0; i < _size; ++i)
         {
-            if (FitsRequirements(_entities[i], _system->requirements))
+            if (!FitsRequirements(_entities[i], _system->requirements))
             {
-                resize++;
+                return;
             }
         }
-
-        bool wasEmpty = (_system->capacity == 0);
-        while (resize >= _system->capacity)
-        {
-            _system->capacity += _system->resizeStep;
-        }
-        if (wasEmpty)
-        {
-            _system->entities = (Entity**)calloc(_system->capacity, sizeof(Entity*));
-        }
-        else
-        {
-            Entity** temp = (Entity**)realloc(_system->entities, _system->capacity * sizeof(Entity*));
-            _system->entities = temp;
-        }
-        for (u32 i = 0; i < _size; ++i)
-        {
-            if (FitsRequirements(_entities[i], _system->requirements))
-            {
-                _system->entities[_system->size] = _entities[i];
-                _system->size++;
-            }
-        }*/
+        AddRangeItems<Entity*>(&_system->entities, _entities, _size);
     }
 }
