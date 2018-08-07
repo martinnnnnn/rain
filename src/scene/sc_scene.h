@@ -10,7 +10,7 @@ namespace rain
     {
         char* name;
         char* path;
-        EntityContainer* entityContainer;
+        //EntityContainer* entityContainer;
     };
 
     void SerializeScene(Scene* _scene, const char* _path = "");

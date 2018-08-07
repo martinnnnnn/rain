@@ -55,6 +55,6 @@ namespace rain
 
     void VectorTest();
     void EntityTests();
-    void EntityContainerTest();
-    void SystemTest();
+    //void EntityContainerTest();
+    //void SystemTest();
 }

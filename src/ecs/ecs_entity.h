@@ -21,7 +21,6 @@ namespace rain
     void RemoveComponent(Entity* _entity, ComponentType _type);
     Component* FindComponent(Entity* _entity, ComponentType _type);
     bool FitsRequirements(Entity* _entity, u64 _bitmask);
-
 }
 
 

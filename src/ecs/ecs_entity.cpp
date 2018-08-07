@@ -60,7 +60,6 @@ namespace rain
             Component** comp = FindItem<Component*, ComponentType>(&_entity->components, _type, CheckComp);
             if (comp)
                 return *comp;
-            return nullptr;
 
             //Component** end = _entity->components.items + _entity->components.size;
             //Component** iter = _entity->components.items;

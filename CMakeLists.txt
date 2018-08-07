@@ -4,6 +4,7 @@ message(STATUS "project name : ${PROJECT_NAME}")
 
 set(RAIN_EXE rain_exe)
 set(RAIN_LIB rain_lib)
+#set(RAIN_TEST rain_test)
 
 #### MODULES ####
 message(STATUS "> setting modules path")
@@ -100,8 +101,7 @@ set_target_properties(${RAIN_EXE} PROPERTIES FOLDER "rain")
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
 set_target_properties(${RAIN_EXE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
 
-#### LIB FOR EDITOR ####
-#project(rainlib)
+#### LIB ####
 add_definitions(-DEXPMODULE)
 
 add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
@@ -111,6 +111,17 @@ target_link_libraries(${RAIN_LIB} assimp glfw
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
+
+#### TEST ####
+#add_definitions(-DEXPMODULE)
+#
+#add_library(${RAIN_TEST} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+#target_link_libraries(${RAIN_TEST} assimp glfw
+#                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
+#                      BulletDynamics BulletCollision LinearMath)
+#
+#set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
+#set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
 
 
 #### GROUPING PROJECTS BY LIBRARY ####

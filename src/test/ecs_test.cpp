@@ -1,4 +1,4 @@
-#include "ecs/ecs_test.h"
+#include "test/ecs_test.h"
 
 
 
@@ -10,7 +10,6 @@
 
 #include "ecs/ecs_component.h"
 #include "ecs/ecs_entity.h"
-#include "ecs_entity_container.h"
 #include "ecs/ecs_system.h"
 
 
@@ -85,7 +84,7 @@ namespace rain
 
     void SystemPhysicsUpdate(System* _system)
     {
-        for (u32 i = 0; i < _system->size; ++i)
+        /*for (u32 i = 0; i < _system->size; ++i)
         {
             PhysicsTest* physics = (PhysicsTest*)FindComponent(_system->entities[i], ComponentType::PHYSICS);
             TransformTest* transform = (TransformTest*)FindComponent(_system->entities[i], ComponentType::TRANSFORM);
@@ -93,7 +92,7 @@ namespace rain
             transform->position = transform->position + ((physics->direction * physics->speed) + (physics->friction));
 
             PrintTransformTest(transform);
-        }
+        }*/
     }
 
 
@@ -106,6 +105,7 @@ namespace rain
         case false:
             return "false";
         }
+        return "";
     }
 
     bool CompareInt(int a, int b)
@@ -284,61 +284,61 @@ namespace rain
         std::cout << std::endl;
     }
 
-    void EntityContainerTest()
-    {
-        // CONTAINER CREATION
-        EntityContainer* container = CreateEntityContainer(10, 7);
-        // ADDING ENTITIES
-        std::vector<Entity*> tempvec;
+    //void EntityContainerTest()
+    //{
+    //    // CONTAINER CREATION
+    //    EntityContainer* container = CreateEntityContainer(10, 7);
+    //    // ADDING ENTITIES
+    //    std::vector<Entity*> tempvec;
 
-        for (u32 i = 0; i < 20; i++)
-        {
-            Entity* ent = CreateEntity(i, "ent");
-            tempvec.push_back(ent);
-            AddEntity(container, ent);
-        }
+    //    for (u32 i = 0; i < 20; i++)
+    //    {
+    //        Entity* ent = CreateEntity(i, "ent");
+    //        tempvec.push_back(ent);
+    //        AddEntity(container, ent);
+    //    }
 
-        std::cout << std::endl << "after add : expected(20, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
+    //    std::cout << std::endl << "after add : expected(20, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
 
-        // REMOVING ENTITIES
-        for (u32 i = 0; i < 18;)
-        {
-            RemoveEntity(container, tempvec[i]);
-            i += 2;
-        }
-        std::cout << std::endl << "after remove : expected(11, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
-    }
+    //    // REMOVING ENTITIES
+    //    for (u32 i = 0; i < 18;)
+    //    {
+    //        RemoveEntity(container, tempvec[i]);
+    //        i += 2;
+    //    }
+    //    std::cout << std::endl << "after remove : expected(11, 24) ; result(" << container->size << ", " << container->capacity << ")" << std::endl;
+    //}
 
-    void SystemTest()
-    {
-        srand((u32)time(NULL));
-        // CONTAINER CREATION
-        EntityContainer* container1 = CreateEntityContainer(10000000, 100, 10000000);
-        for (int i = 0; i < 10; i++)
-        {
-            AddComponent(container1->entities[i], CreateTransformTest());
-            AddComponent(container1->entities[i], CreatePhysicsTest());
-            PhysicsTest* physics = (PhysicsTest*)FindComponent(container1->entities[i], ComponentType::PHYSICS);
-            if (physics)
-            {
-                int r = rand() % 100;
-                physics->weight = (float)(rand() % 100);
-                physics->friction = (float)(rand() % 200 + 100);
-                physics->grounded = (rand() % 2) ? true : false;
-                physics->direction = { (float)(rand() % 10), (float)(rand() % 10), (float)(rand() % 10) };
-                physics->speed = (float)(rand() % 5);
-            }
-        }
+    //void SystemTest()
+    //{
+    //    srand((u32)time(NULL));
+    //    // CONTAINER CREATION
+    //    EntityContainer* container1 = CreateEntityContainer(10000000, 100, 10000000);
+    //    for (int i = 0; i < 10; i++)
+    //    {
+    //        AddComponent(container1->entities[i], CreateTransformTest());
+    //        AddComponent(container1->entities[i], CreatePhysicsTest());
+    //        PhysicsTest* physics = (PhysicsTest*)FindComponent(container1->entities[i], ComponentType::PHYSICS);
+    //        if (physics)
+    //        {
+    //            int r = rand() % 100;
+    //            physics->weight = (float)(rand() % 100);
+    //            physics->friction = (float)(rand() % 200 + 100);
+    //            physics->grounded = (rand() % 2) ? true : false;
+    //            physics->direction = { (float)(rand() % 10), (float)(rand() % 10), (float)(rand() % 10) };
+    //            physics->speed = (float)(rand() % 5);
+    //        }
+    //    }
 
-        // SYSTEM CREATION
-        u64 requirements = (1 << (u32)ComponentType::PHYSICS);
-        System* system1 = CreateSystem(requirements, 100, 100);
+    //    // SYSTEM CREATION
+    //    u64 requirements = (1 << (u32)ComponentType::PHYSICS);
+    //    System* system1 = CreateSystem(requirements, 100, 100);
 
-        // SYSTEM ADD
-        CheckForAddEntities(system1, container1->entities, container1->size);
+    //    // SYSTEM ADD
+    //    CheckForAddEntities(system1, container1->entities, container1->size);
 
-        // SYSTEM UPDATE
-    }
+    //    // SYSTEM UPDATE
+    //}
     //std::clock_t start;
     //double duration;
     //
