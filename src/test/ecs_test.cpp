@@ -116,8 +116,8 @@ namespace rain
     void EntityTests()
     {
         // ENTITY TEST CREATION
-        Entity* ent1 = CreateEntity(1, "ent1", 0);
-        Entity* ent2 = CreateEntity(2, "ent2", 1);
+        Entity* ent1 = CreateEntity(1, 0);
+        Entity* ent2 = CreateEntity(2, 1);
 
         // ENTITY TEST ADD COMPONENT
         Component* comp1 = (TransformTest*)calloc(1, sizeof(TransformTest));
@@ -132,7 +132,6 @@ namespace rain
 
         std::cout << "Entity creation : "
             << std::endl << "-> id : " << ent1->id
-            << std::endl << "-> name : " << ent1->name
             << std::endl << "-> flags : " << std::endl;
         PrintBit(sizeof(ent1->flags), &ent1->flags);
         std::cout << "-> components ? : " /*<< (ent1->components != nullptr)*/
@@ -142,7 +141,6 @@ namespace rain
 
         std::cout << "Entity creation : "
             << std::endl << "-> id : " << ent2->id
-            << std::endl << "-> name : " << ent2->name
             << std::endl << "-> flags : " << std::endl;
         PrintBit(sizeof(ent2->flags), &ent2->flags);
         std::cout << "-> components ? : " /*<< (ent2->components != nullptr)*/

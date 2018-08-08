@@ -1,6 +1,6 @@
 #include "test/vector_test.h"
 
-#include "core/vector.h"
+#include "core/containers/vector.h"
 #include <iostream>
 
 namespace rain

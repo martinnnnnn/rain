@@ -2,7 +2,7 @@
 
 
 #include "core/types.h"
-#include "core/vector.h"
+#include "core/containers/vector.h"
 #include "ecs/ecs_component.h"
 
 namespace rain

@@ -27,6 +27,7 @@
 #include "scene/sc_scene.h"
 #include "ecs/ecs.h"
 #include "test/vector_test.h"
+#include "test/physics_test.h"
 
 using namespace rain;
 
@@ -86,13 +87,12 @@ int main(int argc, char** argv)
     TestVectorFind();
     TestVectorRemove();
 
+    TestPhysicsMovement();
 
     //VectorTest();
     //EntityTests();
     //EntityContainerTest();
-    //SystemTest();
-
-    runEngine(argc, argv);
+    //SystemTest();    runEngine(argc, argv);
 
     return 0;
 }

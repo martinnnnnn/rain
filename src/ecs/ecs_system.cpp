@@ -1,6 +1,6 @@
 #include "ecs_system.h"
 
-
+#include "core/containers/vector.h"
 
 
 namespace rain
@@ -23,27 +23,6 @@ namespace rain
     void RemoveEntity(System* _system, Entity* _entity)
     {
         RemoveItem<Entity*>(&_system->entities, &_entity);
-    }
-
-    bool CheckEntityName(Entity* _entity, const char* _name)
-    {
-        return strcmp(_entity->name, _name);
-    }
-
-    bool CheckEntityId(Entity* _entity, u32 _id)
-    {
-        return _entity->id == _id;
-    }
-
-    Entity* FindEntity(System* _system, const char* _name)
-    {
-        auto equals = [](Entity* _ent, const char* _name) { return strcmp(_ent->name, _name); };
-
-        Entity** comp = FindItem<Entity*, const char*>(&_system->entities, _name, CheckEntityName);
-        if (comp)
-            return *comp;
-
-        return nullptr;
     }
 
     Entity* FindEntity(System* _system, u32 _entityId)

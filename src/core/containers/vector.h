@@ -12,8 +12,8 @@ namespace rain
         u32 capacity;
         u32 resizeStep;
 
-        T& operator[](u32 idx) { return items[idx]; }
-        const T& operator[](u32 idx) const { return items[idx]; }
+        //T& operator[](u32 idx) { return items[idx]; }
+        //const T& operator[](u32 idx) const { return items[idx]; }
     };
 
     template<typename T>
