@@ -3,12 +3,13 @@
 
 #include "utility/incl_3d.h"
 #include "core/transform.h"
+#include "ecs/ecs_component.h"
 
 namespace rain
 {
     struct Game;
 
-    struct Camera
+    struct Camera : public Component
     {
         enum class Direction
         {

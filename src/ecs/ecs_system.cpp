@@ -15,7 +15,7 @@ namespace rain
         return system;
     }
 
-    void InitEntity(System* _system, u32 _capacity, u32 _resizeStep)
+    void InitSystem(System* _system, u32 _capacity, u32 _resizeStep)
     {
         InitVector<Entity*>(&_system->entities, _capacity, _resizeStep);
     }
@@ -57,17 +57,19 @@ namespace rain
         return nullptr;
     }
 
-
-    void AddEntities(System* _system, Entity** _entities, u32 _size)
+    // adds every entity with the right requirements
+    void AddEntities(System* _system, Vector<Entity*>* _entities)
     {
-        // TODO(martin) : handle missing requirement better ?
-        for (u32 i = 0; i < _size; ++i)
+        Vector<Entity*> toAdd;
+        InitVector<Entity*>(&toAdd, _entities->capacity, 0);
+
+        for (u32 i = 0; i < _entities->size; ++i)
         {
-            if (!FitsRequirements(_entities[i], _system->requirements))
+            if (FitsRequirements(_entities->items[i], _system->requirements))
             {
-                return;
+                AddItem<Entity*>(&toAdd, _entities->items[i]);
             }
         }
-        AddRangeItems<Entity*>(&_system->entities, _entities, _size);
+        AddRangeItems<Entity*>(&_system->entities, toAdd.items, toAdd.size);
     }
 }

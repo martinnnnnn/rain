@@ -4,36 +4,31 @@
 
 namespace rain
 {
-    Entity* CreateEntity(u64 _id, const char* _name, u32 _capacity, u32 _sizeStep)
+    Entity* CreateEntity(u64 _id, u32 _capacity, u32 _sizeStep)
     {
         Entity* entity = (Entity*)calloc(1, sizeof(Entity));
         entity->id = _id;
-        entity->name = (char*)malloc((sizeof(_name) + 1));
-        strcpy_s(entity->name, sizeof(entity->name) + 1, _name);
 
         InitVector<Component*>(&entity->components, _capacity, _sizeStep);
 
         return entity;
     }
 
-    Entity** CreateEntities(u32 _count, u64 _flags, u32 _capacity = 10, u32 _sizeStep = 5)
+    Entity** CreateEntities(u32 _count, u64 _flags, u32 _capacity, u32 _sizeStep)
     {
         Entity** entities = (Entity**)malloc(sizeof(Entity) * _count);
-        for (int i = 0; i < _count; ++i)
+        for (u32 i = 0; i < _count; ++i)
         {
             entities[i] = (Entity*)calloc(1, sizeof(Entity));
             entities[i]->id = 0;
-            entities[i]->name = "default name";
             InitVector<Component*>(&entities[i]->components, _capacity, _sizeStep);
         }
         return entities;
     }
 
-    void InitEntity(Entity* _entity, u64 _id, const char* _name, u32 _capacity, u32 _sizeStep)
+    void InitEntity(Entity* _entity, u64 _id, u32 _capacity, u32 _sizeStep)
     {
         _entity->id = _id;
-        _entity->name = (char*)malloc((sizeof(_name) + 1));
-        strcpy_s(_entity->name, sizeof(_entity->name) + 1, _name);
 
         InitVector<Component*>(&_entity->components, _capacity, _sizeStep);
     }

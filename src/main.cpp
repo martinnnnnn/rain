@@ -92,16 +92,14 @@ int main(int argc, char** argv)
     //EntityContainerTest();
     //SystemTest();
 
-
     runEngine(argc, argv);
-
 
     return 0;
 }
 
 void runEngine(int argc, char** argv)
 {
-    game = InitGame(argc, argv);
+    game = CreateGame(argc, argv);
     Transform* camTransform = game->camera->transform;
     Translate(camTransform, glm::vec3(0, 0, 5));
 
@@ -417,16 +415,6 @@ void sandboxInit()
     model = LoadModel(rootpath + "/models/nanosuit/nanosuit.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
     //model = LoadModel(rootpath + "/models/sponza_obj/sponza.obj", rootpath + "/shaders/shader1.json", rootpath + "/shaders/shader1");
 
-
-    //entity = (Entity*)malloc(sizeof(Entity));
-    //bzero(entity, sizeof(Entity));
-    //entity->name = "ent1";
-    //Transform* t1 = GetNewHeapTransform();
-    //AddComponent<Transform>(entity, t1);
-    //Movement* m1 = GetNewMovement();
-    //m1->direction = glm::vec3(1, 0, 0);
-    //m1->speed = 3;
-    //AddComponent<Movement>(entity, m1);
 }
 
 

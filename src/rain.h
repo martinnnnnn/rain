@@ -25,10 +25,9 @@ namespace rain
         float lastFrame;
     };
 
-
-        Game* InitGame(const std::string& _dataPath);
-        Game* InitGame(int argc, char** argv);
-        void RunGame(Game* _game, std::function<void(void)> _updateCallBack);
-        void InitUI(GLFWwindow* _window);
-        void UpdateUI();
+    Game* CreateGame(const std::string& _dataPath);
+    Game* CreateGame(int _argc, char** _argv);
+    void RunGame(Game* _game, std::function<void(void)> _updateCallBack);
+    void InitUI(GLFWwindow* _window);
+    void UpdateUI();
 }

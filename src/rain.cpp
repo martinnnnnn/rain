@@ -22,8 +22,7 @@ using namespace std::experimental::filesystem::v1;
 
 namespace rain
 {
-
-    Game* InitGame(const std::string& _dataPath)
+    Game* CreateGame(const std::string& _dataPath)
     {
         Game* game = new Game();
         game->dataPath = _dataPath;
@@ -35,7 +34,7 @@ namespace rain
         return game;
     }
 
-    Game* InitGame(int argc, char** argv)
+    Game* CreateGame(int argc, char** argv)
     {
         Game* game = new Game();
         auto arguments = String::GetArguments(argc, argv);

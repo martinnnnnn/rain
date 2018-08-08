@@ -17,6 +17,8 @@ namespace rain
         PHYSICS,
         MODEL,
         LIGHT,
+        CAMERA,
+        NAME,
         MAX_COUNT
     };
     
