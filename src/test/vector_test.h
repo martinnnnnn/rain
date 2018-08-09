@@ -10,11 +10,13 @@ namespace rain
         float c;
     };
 
-    void TestVectorCreate();
-    void TestVectorInit();
-    void TestVectorAdd();
-    void TestVectorAddRange();
-    void TestVectorFind();
-    void TestVectorRemove();
+    void RunTestVector();
+
+    //void TestVectorCreate();
+    //void TestVectorInit();
+    //void TestVectorAdd();
+    //void TestVectorAddRange();
+    //void TestVectorFind();
+    //void TestVectorRemove();
 
 }

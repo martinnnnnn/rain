@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <mutex>
 
+#include "core/types.h"
 #include "utility/incl_3d.h"
 #include "gfx/gfx_texture.h"
 #include "gfx/gfx_shader.h"
@@ -45,4 +46,8 @@ namespace rain
     StaticMeshData* LoadMeshData(aiMesh* _aiMesh, const aiScene* _scene);
 	std::vector<Texture2D> FindTextures(const aiMesh* _aiMesh, const aiScene* _aiScene, const std::string& _directoryPath, const TextureContainer* _textureContainer);
 	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath);
+
+
+    u32 InitDebugCube(const f32* _vertices);
+    void DrawDebugCube(u32 _vao);
 }

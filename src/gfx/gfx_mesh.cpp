@@ -176,6 +176,7 @@ namespace rain
         glActiveTexture(GL_TEXTURE0);
     }
 
+
 	void GetTexturesPath(std::unordered_set<std::string>& _filePaths, const aiScene* _scene, const std::string& _directoryPath)
 	{
 		for (unsigned int i = 0; i < _scene->mNumMeshes; ++i)

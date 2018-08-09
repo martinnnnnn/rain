@@ -2,11 +2,16 @@
 
 #include "core/containers/vector.h"
 #include <iostream>
+#include "test.h"
 
 namespace rain
 {
+    
+
     void TestVectorCreate()
     {
+
+
         std::cout << std::endl;
         std::cout << "------------------------------"
             << std::endl << "----- TEST VECTOR CREATE -----"
@@ -25,6 +30,13 @@ namespace rain
             std::cout << i << ",";
         }
         std::cout << "]" << std::endl;
+
+        Test test;
+        TestIntro(&test, "TEST VECTOR CREATE");
+        TestEQ(&test, v1->size == 0, "CreateVector<int>() size");
+        TestEQ(&test, v1->capacity == 5, "CreateVector<int>() capacity");
+        TestEQ(&test, v1->resizeStep == 2, "CreateVector<int>() step");
+        TestRecap(&test);
     }
 
     void TestVectorInit()
@@ -204,5 +216,15 @@ namespace rain
             std::cout << v1.items[i] << ",";
         }
         std::cout << "]" << std::endl;
+    }
+
+    void RunTestVector()
+    {
+        TestVectorCreate();
+        TestVectorInit();
+        TestVectorAdd();
+        TestVectorAddRange();
+        TestVectorFind();
+        TestVectorRemove();
     }
 }
