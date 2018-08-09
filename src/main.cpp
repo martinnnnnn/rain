@@ -79,7 +79,6 @@ void runEngine(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
-
     TestVectorCreate();
     TestVectorInit();
     TestVectorAdd();
@@ -92,7 +91,9 @@ int main(int argc, char** argv)
     //VectorTest();
     //EntityTests();
     //EntityContainerTest();
-    //SystemTest();    runEngine(argc, argv);
+    //SystemTest();
+
+    runEngine(argc, argv);
 
     return 0;
 }
