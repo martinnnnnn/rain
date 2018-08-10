@@ -86,13 +86,6 @@ int main(int argc, char** argv)
     if (runtests)
     {
         RunTestVector();
-        /*TestVectorCreate();
-        TestVectorInit();
-        TestVectorAdd();
-        TestVectorAddRange();
-        TestVectorFind();
-        TestVectorRemove();*/
-        //TestPhysicsMovement();
     }
 
     //VectorTest();

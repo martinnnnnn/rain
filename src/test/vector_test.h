@@ -12,11 +12,10 @@ namespace rain
 
     void RunTestVector();
 
-    //void TestVectorCreate();
-    //void TestVectorInit();
-    //void TestVectorAdd();
-    //void TestVectorAddRange();
-    //void TestVectorFind();
-    //void TestVectorRemove();
-
+    void TestVectorCreate();
+    void TestVectorInit();
+    void TestVectorAdd();
+    void TestVectorAddRange();
+    void TestVectorFind();
+    void TestVectorRemove();
 }
