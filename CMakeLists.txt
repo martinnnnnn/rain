@@ -59,8 +59,8 @@ file(GLOB GLAD_SOURCES external/glad/src/glad.c)
 file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 
 message(STATUS "> adding files to exetutable")
-add_executable(${RAIN_EXE} ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
-# WIN32
+add_executable(${RAIN_EXE} WIN32 ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+# 
 
 #### GROUP CREATION ####
 macro(GroupSources curdir)
