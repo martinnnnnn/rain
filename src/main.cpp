@@ -88,7 +88,6 @@ int main(int argc, char** argv)
         RunTestVector();
     }
 
-    //VectorTest();
     //EntityTests();
     //EntityContainerTest();
     //SystemTest();
