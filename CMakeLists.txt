@@ -88,7 +88,8 @@ source_group("libraries" FILES ${LIBS_SOURCES})
 message(STATUS "> Linking libraries to target")
 target_link_libraries(${RAIN_EXE} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
-                      BulletDynamics BulletCollision LinearMath)
+                      BulletDynamics BulletCollision LinearMath
+                      d3d12.lib dxgi.lib dxguid.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
 set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
@@ -107,7 +108,8 @@ add_definitions(-DEXPMODULE)
 add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
 target_link_libraries(${RAIN_LIB} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
-                      BulletDynamics BulletCollision LinearMath)
+                      BulletDynamics BulletCollision LinearMath
+                      d3d12.lib dxgi.lib dxguid.lib)
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")

@@ -17,8 +17,8 @@
 //#include "gfx/gfx_light.h"
 //#include "utility/gl_utils.h"
 //#include "gfx/gfx_material.h"
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 //#include "gfx/gfx_model.h"
 //#include "gfx/gfx_texture.h"
 //#include "utility/string_utils.h"
