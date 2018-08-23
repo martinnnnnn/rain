@@ -91,7 +91,7 @@ message(STATUS "> Linking libraries to target")
 target_link_libraries(${RAIN_EXE} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib D3Dcompiler_47.lib)
+                      d3d12.lib dxgi.lib dxguid.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
 set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")

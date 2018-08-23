@@ -1,5 +1,115 @@
 #include "win32_functional.h"
 
+// The number of swap chain back buffers.
+const uint8_t g_NumFrames = 3;
+// Use WARP adapter
+bool g_UseWarp = false;
+
+uint32_t g_ClientWidth = 1280;
+uint32_t g_ClientHeight = 720;
+
+// Set to true once the DX12 objects have been initialized.
+bool g_IsInitialized = false;
+
+// Window handle.
+HWND g_hWnd;
+// Window rectangle (used to toggle fullscreen state).
+RECT g_WindowRect;
+
+// DirectX 12 Objects
+ComPtr<ID3D12Device2> g_Device;
+ComPtr<ID3D12CommandQueue> g_CommandQueue;
+ComPtr<IDXGISwapChain4> g_SwapChain;
+ComPtr<ID3D12Resource> g_BackBuffers[g_NumFrames];
+ComPtr<ID3D12GraphicsCommandList> g_CommandList;
+ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
+ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
+UINT g_RTVDescriptorSize;
+UINT g_CurrentBackBufferIndex;
+
+// Synchronization objects
+ComPtr<ID3D12Fence> g_Fence;
+uint64_t g_FenceValue = 0;
+uint64_t g_FrameFenceValues[g_NumFrames] = {};
+HANDLE g_FenceEvent;
+
+// By default, enable V-Sync.
+// Can be toggled with the V key.
+bool g_VSync = true;
+bool g_TearingSupported = false;
+// By default, use windowed mode.
+// Can be toggled with the Alt+Enter or F11
+bool g_Fullscreen = false;
+
+
+void StartDirectX12(HINSTANCE hInstance)
+{
+    // Windows 10 Creators update adds Per Monitor V2 DPI awareness context.
+    // Using this awareness context allows the client area of the window 
+    // to achieve 100% scaling while still allowing non-client window content to 
+    // be rendered in a DPI sensitive fashion.
+    SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+    // Window class name. Used for registering / creating the window.
+    const wchar_t* windowClassName = L"DX12WindowClass";
+    ParseCommandLineArguments();
+
+    EnableDebugLayer();
+
+    g_TearingSupported = CheckTearingSupport();
+
+    RegisterWindowClass(hInstance, windowClassName);
+    g_hWnd = CreateWindow(windowClassName, hInstance, L"Rain Engine -- DirectX 12",
+        g_ClientWidth, g_ClientHeight);
+
+    // Initialize the global window rect variable.
+    ::GetWindowRect(g_hWnd, &g_WindowRect);
+
+    ComPtr<IDXGIAdapter4> dxgiAdapter4 = GetAdapter(g_UseWarp);
+
+    g_Device = CreateDevice(dxgiAdapter4);
+
+    g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+    g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,
+        g_ClientWidth, g_ClientHeight, g_NumFrames);
+
+    g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+
+    g_RTVDescriptorHeap = CreateDescriptorHeap(g_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, g_NumFrames);
+    g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+    UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
+
+    for (int i = 0; i < g_NumFrames; ++i)
+    {
+        g_CommandAllocators[i] = CreateCommandAllocator(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+    }
+    g_CommandList = CreateCommandList(g_Device,
+        g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+    g_Fence = CreateFence(g_Device);
+    g_FenceEvent = CreateEventHandle();
+
+    g_IsInitialized = true;
+
+    ::ShowWindow(g_hWnd, SW_SHOW);
+
+    MSG msg = {};
+    while (msg.message != WM_QUIT)
+    {
+        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        {
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
+        }
+    }
+
+    // Make sure the command queue has finished all commands before closing.
+    Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
+
+    ::CloseHandle(g_FenceEvent);
+}
 
 
 void ParseCommandLineArguments()
@@ -580,77 +690,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         return ::DefWindowProcW(hwnd, message, wParam, lParam);
     }
-
-    return 0;
-}
-
-int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow)
-{
-    // Windows 10 Creators update adds Per Monitor V2 DPI awareness context.
-    // Using this awareness context allows the client area of the window 
-    // to achieve 100% scaling while still allowing non-client window content to 
-    // be rendered in a DPI sensitive fashion.
-    SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-
-    // Window class name. Used for registering / creating the window.
-    const wchar_t* windowClassName = L"DX12WindowClass";
-    ParseCommandLineArguments();
-
-    EnableDebugLayer();
-
-    g_TearingSupported = CheckTearingSupport();
-
-    RegisterWindowClass(hInstance, windowClassName);
-    g_hWnd = CreateWindow(windowClassName, hInstance, L"Rain Engine -- DirectX 12",
-        g_ClientWidth, g_ClientHeight);
-
-    // Initialize the global window rect variable.
-    ::GetWindowRect(g_hWnd, &g_WindowRect);
-
-    ComPtr<IDXGIAdapter4> dxgiAdapter4 = GetAdapter(g_UseWarp);
-
-    g_Device = CreateDevice(dxgiAdapter4);
-
-    g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-    g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,
-        g_ClientWidth, g_ClientHeight, g_NumFrames);
-
-    g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
-
-    g_RTVDescriptorHeap = CreateDescriptorHeap(g_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, g_NumFrames);
-    g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-
-    UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
-
-    for (int i = 0; i < g_NumFrames; ++i)
-    {
-        g_CommandAllocators[i] = CreateCommandAllocator(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-    }
-    g_CommandList = CreateCommandList(g_Device,
-        g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-    g_Fence = CreateFence(g_Device);
-    g_FenceEvent = CreateEventHandle();
-
-    g_IsInitialized = true;
-
-    ::ShowWindow(g_hWnd, SW_SHOW);
-
-    MSG msg = {};
-    while (msg.message != WM_QUIT)
-    {
-        if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-        }
-    }
-
-    // Make sure the command queue has finished all commands before closing.
-    Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
-
-    ::CloseHandle(g_FenceEvent);
 
     return 0;
 }
