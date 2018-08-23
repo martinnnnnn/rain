@@ -1,9 +1,11 @@
-#include <DX12LibPCH.h>
+#include "win32_dx12.h"
 
 #include "win32_application.h"
 #include "win32_command_queue.h"
 #include "win32_window.h"
 #include "win32_game.h"
+
+#include <cassert>
 
 Window::Window(HWND hWnd, const std::wstring& windowName, int clientWidth, int clientHeight, bool vSync)
     : m_hWnd(hWnd)

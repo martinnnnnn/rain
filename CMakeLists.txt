@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10.1)
 project(rain)
 message(STATUS "project name : ${PROJECT_NAME}")
 
@@ -47,7 +47,9 @@ include_directories(src/
                     external/glfw/include/
                     external/stb/
                     external/json/
-                    external/imgui/)
+                    external/imgui/
+                    "C:/Program\ Files\ (x86)/Windows\ Kits/10/Include/10.0.17134.0/um"
+                    "C:/Program\ Files\ (x86)/Windows\ Kits/10/Include/10.0.17134.0/shared")
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
@@ -89,7 +91,7 @@ message(STATUS "> Linking libraries to target")
 target_link_libraries(${RAIN_EXE} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib)
+                      d3d12.lib dxgi.lib dxguid.lib D3Dcompiler_47.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
 set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
@@ -109,7 +111,7 @@ add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_S
 target_link_libraries(${RAIN_LIB} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib)
+                      d3d12.lib dxgi.lib dxguid.lib D3Dcompiler_47.lib)
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
@@ -146,3 +148,4 @@ set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "ass
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${RAIN_EXE})
 
 message(STATUS "> end of generation")
+message(${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})

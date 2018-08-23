@@ -1,4 +1,4 @@
-#include "win32_high_definition_clock.h"
+#include "win32_high_resolution_clock.h"
 
 
 #include "win32_dx12.h"

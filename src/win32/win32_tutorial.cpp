@@ -120,3 +120,58 @@ bool Tutorial2::LoadContent()
     UpdateBufferResource(commandList.Get(),
         &m_VertexBuffer, &intermediateVertexBuffer,
         _countof(g_Vertices), sizeof(VertexPosColor), g_Vertices);
+
+    // Create the vertex buffer view.
+    m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
+    m_VertexBufferView.SizeInBytes = sizeof(g_Vertices);
+    m_VertexBufferView.StrideInBytes = sizeof(VertexPosColor);
+
+    // Upload index buffer data.
+    ComPtr<ID3D12Resource> intermediateIndexBuffer;
+    UpdateBufferResource(commandList.Get(),
+        &m_IndexBuffer, &intermediateIndexBuffer,
+        _countof(g_Indicies), sizeof(WORD), g_Indicies);
+
+    // Create index buffer view.
+    m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
+    m_IndexBufferView.Format = DXGI_FORMAT_R16_UINT;
+    m_IndexBufferView.SizeInBytes = sizeof(g_Indicies);
+
+    // Create the descriptor heap for the depth-stencil view.
+    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+    dsvHeapDesc.NumDescriptors = 1;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    ThrowIfFailed(device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_DSVHeap)));
+
+    //// Load the vertex shader.
+//ComPtr<ID3DBlob> vertexShaderBlob;
+//ThrowIfFailed(D3DReadFileToBlob(L"VertexShader.cso", &vertexShaderBlob));
+
+//// Load the pixel shader.
+//ComPtr<ID3DBlob> pixelShaderBlob;
+//ThrowIfFailed(D3DReadFileToBlob(L"PixelShader.cso", &pixelShaderBlob));
+
+//#if defined(_DEBUG)
+//    // Enable better shader debugging with the graphics debugging tools.
+//    UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+//#else
+//    UINT compileFlags = 0;
+//#endif
+    ComPtr<ID3DBlob> vertexShaderBlob;
+    ThrowIfFailed(D3DCompileFromFile(L"D:/_MARTIN/programming/_projects/rain_engine/resources/engine/dx12/shaders/vertex_shader.hlsl"  , nullptr, nullptr, "main", "vs_5_0", 0, 0, &vertexShaderBlob, nullptr));
+    ComPtr<ID3DBlob> pixelShaderBlob;
+    ThrowIfFailed(D3DCompileFromFile(L"D:/_MARTIN/programming/_projects/rain_engine/resources/engine/dx12/shaders/fragment_shader.hlsl", nullptr, nullptr, "main", "ps_5_0", 0, 0, &pixelShaderBlob, nullptr));
+
+    // Create the vertex input layout
+    D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+    };
+
+
+
+
+    return true;
+}
