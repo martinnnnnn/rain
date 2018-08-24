@@ -13,7 +13,7 @@ enum class GFX_API
     DIRECTX12
 };
 
-GFX_API api = GFX_API::OPENGL;
+GFX_API api = GFX_API::DIRECTX12;
 
 void StartOpenGL();
 void StartDirectX12(HINSTANCE hInstance);

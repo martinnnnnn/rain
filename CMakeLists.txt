@@ -37,6 +37,9 @@ message(STATUS "> setting cxx flags")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP /GR-")
 # /W4 /Za
 
+file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _progFilePath)
+message("${_progFilePath}/Windows Kits/10/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+
 #### INCLUDES ####
 message(STATUS "> including directories")
 include_directories(src/
@@ -91,7 +94,7 @@ message(STATUS "> Linking libraries to target")
 target_link_libraries(${RAIN_EXE} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib)
+                      d3d12.lib dxgi.lib dxguid.lib D3DCompiler.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
 set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
@@ -111,7 +114,7 @@ add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_S
 target_link_libraries(${RAIN_LIB} assimp glfw
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                       BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib D3Dcompiler_47.lib)
+                      d3d12.lib dxgi.lib dxguid.lib D3DCompiler.lib)
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
