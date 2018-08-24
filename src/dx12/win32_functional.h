@@ -46,7 +46,7 @@ using namespace Microsoft::WRL;
 // Window callback function.
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void StartDirectX12(HINSTANCE hInstance);
+void StartDirectX12Functional(HINSTANCE hInstance);
 
 void ParseCommandLineArguments();
 

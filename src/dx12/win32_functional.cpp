@@ -44,7 +44,7 @@ bool g_TearingSupported = false;
 bool g_Fullscreen = false;
 
 
-void StartDirectX12(HINSTANCE hInstance)
+void StartDirectX12Functional(HINSTANCE hInstance)
 {
     // Windows 10 Creators update adds Per Monitor V2 DPI awareness context.
     // Using this awareness context allows the client area of the window 
