@@ -103,7 +103,7 @@ protected:
      */
     virtual void OnWindowDestroy();
 
-    std::shared_ptr<Window> m_pWindow;
+    Window* m_pWindow;
 
 private:
     std::wstring m_Name;

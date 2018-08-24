@@ -7,8 +7,8 @@ set(RAIN_LIB rain_lib)
 #set(RAIN_TEST rain_test)
 
 #### MODULES ####
-message(STATUS "> setting modules path")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+# message(STATUS "> setting modules path")
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 #### GLFW ####
 option(GLFW_BUILD_DOCS OFF)
@@ -23,36 +23,44 @@ option(ASSIMP_BUILD_SAMPLES OFF)
 option(ASSIMP_BUILD_TESTS OFF)
 add_subdirectory(external/assimp)
 
-#### BULLET BUILDING ####
-message(STATUS "> building bullet")
-option(BUILD_BULLET2_DEMOS OFF)
-option(BUILD_CPU_DEMOS OFF)
-option(BUILD_EXTRAS OFF)
-option(BUILD_OPENGL3_DEMOS OFF)
-option(BUILD_UNIT_TESTS OFF)
-add_subdirectory(external/bullet)
+# #### BULLET BUILDING ####
+# message(STATUS "> building bullet")
+# option(BUILD_BULLET2_DEMOS OFF)
+# option(BUILD_CPU_DEMOS OFF)
+# option(BUILD_EXTRAS OFF)
+# option(BUILD_OPENGL3_DEMOS OFF)
+# option(BUILD_UNIT_TESTS OFF)
+# add_subdirectory(external/bullet)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP /GR-")
 # /W4 /Za
 
-file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _progFilePath)
-message("${_progFilePath}/Windows Kits/10/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+set(WINKIT "C:/Program Files (x86)/Windows Kits/10") 
+#file(TO_CMAKE_PATH "$ENV{ProgramFiles}" _progFilePath)
+
+
+
+#### SETTING RIGHT DX12 PATHS ####
+set(DX12_INCLUDEPATH
+    ${WINKIT}/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um
+    ${WINKIT}/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/shared)
+
+set(DX12_LIBPATH ${PROJECT_SOURCE_DIR}/libs)
 
 #### INCLUDES ####
 message(STATUS "> including directories")
 include_directories(src/
                     external/assimp/include/
-                    external/bullet/src/
+                    # external/bullet/src/
                     external/glad/include/
                     external/glm/
                     external/glfw/include/
                     external/stb/
                     external/json/
                     external/imgui/
-                    "C:/Program\ Files\ (x86)/Windows\ Kits/10/Include/10.0.17134.0/um"
-                    "C:/Program\ Files\ (x86)/Windows\ Kits/10/Include/10.0.17134.0/shared")
+                    ${DX12_INCLUDEPATH})
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
@@ -63,8 +71,13 @@ file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.h" "src/*.hpp" "src/*.cpp" "src/*.
 file(GLOB GLAD_SOURCES external/glad/src/glad.c)
 file(GLOB IMGUI_SOURCES external/imgui/*.cpp)
 
+file(GLOB_RECURSE HLSL_VS_SHADER_SOURCES "resources/engine/dx12/shaders/vertex/*.hlsl")
+file(GLOB_RECURSE HLSL_PS_SHADER_SOURCES "resources/engine/dx12/shaders/fragment/*.hlsl")
+set_source_files_properties( ${HLSL_VS_SHADER_SOURCES} PROPERTIES VS_SHADER_TYPE Vertex VS_SHADER_MODEL 5.0 VS_SHADER_ENTRYPOINT main )
+set_source_files_properties( ${HLSL_PS_SHADER_SOURCES} PROPERTIES VS_SHADER_TYPE Pixel VS_SHADER_MODEL 5.0 VS_SHADER_ENTRYPOINT main )
+
 message(STATUS "> adding files to exetutable")
-add_executable(${RAIN_EXE} WIN32 ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
+add_executable(${RAIN_EXE} WIN32 ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES} ${HLSL_VS_SHADER_SOURCES} ${HLSL_PS_SHADER_SOURCES})
 # 
 
 #### GROUP CREATION ####
@@ -91,15 +104,34 @@ source_group("libraries" FILES ${LIBS_SOURCES})
 
 #### LIBRARIES TO TARGET LINKING ####
 message(STATUS "> Linking libraries to target")
-target_link_libraries(${RAIN_EXE} assimp glfw
-                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
-                      BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib D3DCompiler.lib)
+find_library(d3d12lib
+    NAMES d3d12
+    HINTS "${DX12_LIBPATH}"
+)
+find_library(dxgilib
+    NAMES dxgi
+    HINTS "${DX12_LIBPATH}"
+)
+find_library(dxguidlib
+    NAMES dxguid
+    HINTS "${DX12_LIBPATH}"
+)
+find_library(d3dcompilerlib
+    NAMES d3dcompiler
+    HINTS "${DX12_LIBPATH}"
+)
+
+target_link_libraries(${RAIN_EXE} 
+                        assimp
+                        glfw
+                        ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
+                        #BulletDynamics BulletCollision LinearMath
+                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} Shlwapi.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
-set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
-set_target_properties(BulletCollision PROPERTIES FOLDER "bullet")
-set_target_properties(LinearMath PROPERTIES FOLDER "bullet")
+# set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
+# set_target_properties(BulletCollision PROPERTIES FOLDER "bullet")
+# set_target_properties(LinearMath PROPERTIES FOLDER "bullet")
 set_target_properties(${RAIN_EXE} PROPERTIES FOLDER "rain")
 
 
@@ -111,10 +143,12 @@ set_target_properties(${RAIN_EXE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_S
 add_definitions(-DEXPMODULE)
 
 add_library(${RAIN_LIB} SHARED ${PROJECT_SOURCE_FILES} ${GLAD_SOURCES} ${IMGUI_SOURCES})
-target_link_libraries(${RAIN_LIB} assimp glfw
-                      ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
-                      BulletDynamics BulletCollision LinearMath
-                      d3d12.lib dxgi.lib dxguid.lib D3DCompiler.lib)
+target_link_libraries(${RAIN_LIB}
+                        assimp
+                        glfw
+                        ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
+                        # BulletDynamics BulletCollision LinearMath
+                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} Shlwapi.lib)
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
@@ -132,14 +166,14 @@ set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
 
 
 #### GROUPING PROJECTS BY LIBRARY ####
-set_target_properties(Bullet3Common PROPERTIES FOLDER "bullet")
-set_target_properties(Bullet3Collision PROPERTIES FOLDER "bullet")
-set_target_properties(Bullet3Dynamics PROPERTIES FOLDER "bullet")
-set_target_properties(Bullet3Geometry PROPERTIES FOLDER "bullet")
-set_target_properties(Bullet3OpenCL_clew PROPERTIES FOLDER "bullet")
-set_target_properties(Bullet2FileLoader PROPERTIES FOLDER "bullet")
-set_target_properties(BulletInverseDynamics PROPERTIES FOLDER "bullet")
-set_target_properties(BulletSoftBody PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet3Common PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet3Collision PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet3Dynamics PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet3Geometry PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet3OpenCL_clew PROPERTIES FOLDER "bullet")
+# set_target_properties(Bullet2FileLoader PROPERTIES FOLDER "bullet")
+# set_target_properties(BulletInverseDynamics PROPERTIES FOLDER "bullet")
+# set_target_properties(BulletSoftBody PROPERTIES FOLDER "bullet")
 
 set_target_properties(zlib PROPERTIES FOLDER "assimp")
 set_target_properties(IrrXML PROPERTIES FOLDER "assimp")

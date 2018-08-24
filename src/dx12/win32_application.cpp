@@ -13,9 +13,8 @@
 
 constexpr wchar_t WINDOW_CLASS_NAME[] = L"DX12RenderWindowClass";
 
-using WindowPtr = std::shared_ptr<Window>;
-using WindowMap = std::map< HWND, WindowPtr >;
-using WindowNameMap = std::map< std::wstring, WindowPtr >;
+using WindowMap = std::map< HWND, Window* >;
+using WindowNameMap = std::map< std::wstring, Window* >;
 
 static Application* gs_pSingelton = nullptr;
 static WindowMap gs_Windows;
@@ -75,9 +74,9 @@ Application::Application(HINSTANCE hInst)
     }
     if (m_d3d12Device)
     {
-        m_DirectCommandQueue = std::make_shared<CommandQueue>(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
-        m_ComputeCommandQueue = std::make_shared<CommandQueue>(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
-        m_CopyCommandQueue = std::make_shared<CommandQueue>(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_COPY);
+        m_DirectCommandQueue = new CommandQueue(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+        m_ComputeCommandQueue = new CommandQueue(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_COMPUTE);
+        m_CopyCommandQueue = new CommandQueue(m_d3d12Device, D3D12_COMMAND_LIST_TYPE_COPY);
 
         m_TearingSupported = CheckTearingSupport();
     }
@@ -230,7 +229,7 @@ bool Application::IsTearingSupported() const
     return m_TearingSupported;
 }
 
-std::shared_ptr<Window> Application::CreateRenderWindow(const std::wstring& windowName, int clientWidth, int clientHeight, bool vSync)
+Window* Application::CreateRenderWindow(const std::wstring& windowName, int clientWidth, int clientHeight, bool vSync)
 {
     // First check if a window with the given name already exists.
     WindowNameMap::iterator windowIter = gs_WindowByName.find(windowName);
@@ -254,7 +253,7 @@ std::shared_ptr<Window> Application::CreateRenderWindow(const std::wstring& wind
         return nullptr;
     }
 
-    WindowPtr pWindow = std::make_shared<MakeWindow>(hWnd, windowName, clientWidth, clientHeight, vSync);
+    Window* pWindow = new MakeWindow(hWnd, windowName, clientWidth, clientHeight, vSync);
 
     gs_Windows.insert(WindowMap::value_type(hWnd, pWindow));
     gs_WindowByName.insert(WindowNameMap::value_type(windowName, pWindow));
@@ -262,23 +261,23 @@ std::shared_ptr<Window> Application::CreateRenderWindow(const std::wstring& wind
     return pWindow;
 }
 
-void Application::DestroyWindow(std::shared_ptr<Window> window)
+void Application::DestroyWindow(Window* window)
 {
     if (window) window->Destroy();
 }
 
 void Application::DestroyWindow(const std::wstring& windowName)
 {
-    WindowPtr pWindow = GetWindowByName(windowName);
+    Window* pWindow = GetWindowByName(windowName);
     if (pWindow)
     {
         DestroyWindow(pWindow);
     }
 }
 
-std::shared_ptr<Window> Application::GetWindowByName(const std::wstring& windowName)
+Window* Application::GetWindowByName(const std::wstring& windowName)
 {
-    std::shared_ptr<Window> window;
+    Window* window;
     WindowNameMap::iterator iter = gs_WindowByName.find(windowName);
     if (iter != gs_WindowByName.end())
     {
@@ -288,8 +287,32 @@ std::shared_ptr<Window> Application::GetWindowByName(const std::wstring& windowN
     return window;
 }
 
+//int Application::Run(std::shared_ptr<Game> pGame)
+//{
+//    if (!pGame->Initialize()) return 1;
+//    if (!pGame->LoadContent()) return 2;
+//
+//    MSG msg = { 0 };
+//    while (msg.message != WM_QUIT)
+//    {
+//        if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+//        {
+//            TranslateMessage(&msg);
+//            DispatchMessage(&msg);
+//        }
+//    }
+//
+//    // Flush any commands in the commands queues before quiting.
+//    Flush();
+//
+//    pGame->UnloadContent();
+//    pGame->Destroy();
+//
+//    return static_cast<int>(msg.wParam);
+//}
 
-int Application::Run(std::shared_ptr<Game> pGame)
+
+int Application::Run(Game* pGame)
 {
     if (!pGame->Initialize()) return 1;
     if (!pGame->LoadContent()) return 2;
@@ -323,9 +346,9 @@ Microsoft::WRL::ComPtr<ID3D12Device2> Application::GetDevice() const
     return m_d3d12Device;
 }
 
-std::shared_ptr<CommandQueue> Application::GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const
+CommandQueue* Application::GetCommandQueue(D3D12_COMMAND_LIST_TYPE type) const
 {
-    std::shared_ptr<CommandQueue> commandQueue;
+    CommandQueue* commandQueue;
     switch (type)
     {
     case D3D12_COMMAND_LIST_TYPE_DIRECT:
@@ -377,7 +400,7 @@ static void RemoveWindow(HWND hWnd)
     WindowMap::iterator windowIter = gs_Windows.find(hWnd);
     if (windowIter != gs_Windows.end())
     {
-        WindowPtr pWindow = windowIter->second;
+        Window* pWindow = windowIter->second;
         gs_WindowByName.erase(pWindow->GetWindowName());
         gs_Windows.erase(windowIter);
     }
@@ -417,7 +440,7 @@ MouseButtonEventArgs::MouseButton DecodeMouseButton(UINT messageID)
 
 static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    WindowPtr pWindow;
+    Window* pWindow = nullptr;
     {
         WindowMap::iterator iter = gs_Windows.find(hwnd);
         if (iter != gs_Windows.end())

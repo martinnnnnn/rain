@@ -59,11 +59,8 @@ void Window::Hide()
 
 void Window::Destroy()
 {
-    if (auto pGame = m_pGame.lock())
-    {
         // Notify the registered game that the window is being destroyed.
-        pGame->OnWindowDestroy();
-    }
+    m_pGame->OnWindowDestroy();
     if (m_hWnd)
     {
         DestroyWindow(m_hWnd);
@@ -160,7 +157,7 @@ void Window::ToggleFullscreen()
 }
 
 
-void Window::RegisterCallbacks(std::shared_ptr<Game> pGame)
+void Window::RegisterCallbacks(Game* pGame)
 {
     m_pGame = pGame;
 
@@ -171,76 +168,52 @@ void Window::OnUpdate(UpdateEventArgs&)
 {
     m_UpdateClock.Tick();
 
-    if (auto pGame = m_pGame.lock())
-    {
-        m_FrameCounter++;
+    m_FrameCounter++;
 
-        UpdateEventArgs updateEventArgs(m_UpdateClock.GetDeltaSeconds(), m_UpdateClock.GetTotalSeconds());
-        pGame->OnUpdate(updateEventArgs);
-    }
+    UpdateEventArgs updateEventArgs(m_UpdateClock.GetDeltaSeconds(), m_UpdateClock.GetTotalSeconds());
+    m_pGame->OnUpdate(updateEventArgs);
 }
 
 void Window::OnRender(RenderEventArgs&)
 {
     m_RenderClock.Tick();
 
-    if (auto pGame = m_pGame.lock())
-    {
-        RenderEventArgs renderEventArgs(m_RenderClock.GetDeltaSeconds(), m_RenderClock.GetTotalSeconds());
-        pGame->OnRender(renderEventArgs);
-    }
+    RenderEventArgs renderEventArgs(m_RenderClock.GetDeltaSeconds(), m_RenderClock.GetTotalSeconds());
+    m_pGame->OnRender(renderEventArgs);
 }
 
 void Window::OnKeyPressed(KeyEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnKeyPressed(e);
-    }
+    m_pGame->OnKeyPressed(e);
 }
 
 void Window::OnKeyReleased(KeyEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnKeyReleased(e);
-    }
+    m_pGame->OnKeyReleased(e);
 }
 
 // The mouse was moved
 void Window::OnMouseMoved(MouseMotionEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnMouseMoved(e);
-    }
+    m_pGame->OnMouseMoved(e);
 }
 
 // A button on the mouse was pressed
 void Window::OnMouseButtonPressed(MouseButtonEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnMouseButtonPressed(e);
-    }
+     m_pGame->OnMouseButtonPressed(e);
 }
 
 // A button on the mouse was released
 void Window::OnMouseButtonReleased(MouseButtonEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnMouseButtonReleased(e);
-    }
+    m_pGame->OnMouseButtonReleased(e);
 }
 
 // The mouse wheel was moved.
 void Window::OnMouseWheel(MouseWheelEventArgs& e)
 {
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnMouseWheel(e);
-    }
+    m_pGame->OnMouseWheel(e);
 }
 
 void Window::OnResize(ResizeEventArgs& e)
@@ -268,10 +241,7 @@ void Window::OnResize(ResizeEventArgs& e)
         UpdateRenderTargetViews();
     }
 
-    if (auto pGame = m_pGame.lock())
-    {
-        pGame->OnResize(e);
-    }
+    m_pGame->OnResize(e);
 }
 
 Microsoft::WRL::ComPtr<IDXGISwapChain4> Window::CreateSwapChain()

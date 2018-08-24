@@ -101,7 +101,7 @@ protected:
 
     // Register a Game with this window. This allows
     // the window to callback functions in the Game class.
-    void RegisterCallbacks(std::shared_ptr<Game> pGame);
+    void RegisterCallbacks(Game* pGame);
 
     // Update and Draw can only be called by the application.
     virtual void OnUpdate(UpdateEventArgs& e);
@@ -148,7 +148,7 @@ private:
     HighResolutionClock m_RenderClock;
     uint64_t m_FrameCounter;
 
-    std::weak_ptr<Game> m_pGame;
+    Game* m_pGame;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain4> m_dxgiSwapChain;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> m_d3d12RTVDescriptorHeap;

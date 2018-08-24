@@ -48,7 +48,7 @@ public:
     * window instance is returned. If a window with the given name already exists, that window will be
     * returned.
     */
-    std::shared_ptr<Window> CreateRenderWindow(const std::wstring& windowName, int clientWidth, int clientHeight, bool vSync = true);
+    Window* CreateRenderWindow(const std::wstring& windowName, int clientWidth, int clientHeight, bool vSync = true);
 
     /**
     * Destroy a window given the window name.
@@ -57,19 +57,19 @@ public:
     /**
     * Destroy a window given the window reference.
     */
-    void DestroyWindow(std::shared_ptr<Window> window);
+    void DestroyWindow(Window* window);
 
     /**
     * Find a window by the window name.
     */
-    std::shared_ptr<Window> GetWindowByName(const std::wstring& windowName);
+    Window* GetWindowByName(const std::wstring& windowName);
 
     /**
     * Run the application loop and message pump.
     * @return The error code if an error occurred.
     */
-    int Run(std::shared_ptr<Game> pGame);
-
+    //int Run(std::shared_ptr<Game> pGame);
+    int Run(Game* pGame);
     /**
     * Request to quit the application and close all windows.
     * @param exitCode The error code to return to the invoking process.
@@ -86,7 +86,7 @@ public:
      * - D3D12_COMMAND_LIST_TYPE_COMPUTE: Can be used for dispatch or copy commands.
      * - D3D12_COMMAND_LIST_TYPE_COPY   : Can be used for copy commands.
      */
-    std::shared_ptr<CommandQueue> GetCommandQueue(D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT) const;
+    CommandQueue* GetCommandQueue(D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT) const;
 
     // Flush all command queues.
     void Flush();
@@ -115,9 +115,9 @@ private:
     Microsoft::WRL::ComPtr<IDXGIAdapter4> m_dxgiAdapter;
     Microsoft::WRL::ComPtr<ID3D12Device2> m_d3d12Device;
 
-    std::shared_ptr<CommandQueue> m_DirectCommandQueue;
-    std::shared_ptr<CommandQueue> m_ComputeCommandQueue;
-    std::shared_ptr<CommandQueue> m_CopyCommandQueue;
+    CommandQueue* m_DirectCommandQueue;
+    CommandQueue* m_ComputeCommandQueue;
+    CommandQueue* m_CopyCommandQueue;
 
     bool m_TearingSupported;
 

@@ -49,20 +49,20 @@ protected:
 private:
     // Helper functions
     // Transition a resource
-    void TransitionResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+    void TransitionResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
         Microsoft::WRL::ComPtr<ID3D12Resource> resource,
         D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState);
 
     // Clear a render target view.
-    void ClearRTV(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+    void ClearRTV(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
         D3D12_CPU_DESCRIPTOR_HANDLE rtv, FLOAT* clearColor);
 
     // Clear the depth of a depth-stencil view.
-    void ClearDepth(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+    void ClearDepth(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
         D3D12_CPU_DESCRIPTOR_HANDLE dsv, FLOAT depth = 1.0f);
 
     // Create a GPU buffer.
-    void UpdateBufferResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList2> commandList,
+    void UpdateBufferResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
         ID3D12Resource** pDestinationResource, ID3D12Resource** pIntermediateResource,
         size_t numElements, size_t elementSize, const void* bufferData,
         D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE);
