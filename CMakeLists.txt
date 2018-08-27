@@ -129,6 +129,10 @@ find_library(freeglutdlib
     NAMES freeglutd
     HINTS "${DX12_LIBPATH}"
 )
+find_library(glulib
+    NAMES GlU32
+    HINTS "${DX12_LIBPATH}"
+)
 
 
 target_link_libraries(${RAIN_EXE} 
@@ -136,7 +140,7 @@ target_link_libraries(${RAIN_EXE}
                         glfw
                         ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                         #BulletDynamics BulletCollision LinearMath
-                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} ${opengllib} ${freeglutdlib} Shlwapi.lib)
+                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} ${opengllib} ${glulib} Shlwapi.lib)
 
 set_target_properties(assimp PROPERTIES FOLDER "assimp")
 # set_target_properties(BulletDynamics PROPERTIES FOLDER "bullet")
@@ -158,7 +162,7 @@ target_link_libraries(${RAIN_LIB}
                         glfw
                         ${GLFW_LIBRARIES} ${GLAD_LIBRARIES}
                         # BulletDynamics BulletCollision LinearMath
-                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} ${opengllib} ${freeglutdlib} Shlwapi.lib)
+                        ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} ${opengllib} ${glulib} Shlwapi.lib)
 
 set_target_properties(${RAIN_LIB} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/lib")
 set_target_properties(${RAIN_LIB} PROPERTIES FOLDER "rain")
