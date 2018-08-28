@@ -277,7 +277,7 @@ void Application::DestroyWindow(const std::wstring& windowName)
 
 Window* Application::GetWindowByName(const std::wstring& windowName)
 {
-    Window* window;
+    Window* window = nullptr;
     WindowNameMap::iterator iter = gs_WindowByName.find(windowName);
     if (iter != gs_WindowByName.end())
     {

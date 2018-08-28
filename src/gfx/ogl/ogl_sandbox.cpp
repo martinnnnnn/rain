@@ -1,4 +1,4 @@
-#include "opengl_sandbox.h"
+#include "ogl_sandbox.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -181,6 +181,7 @@ namespace rain
             0,0,PFD_MAIN_PLANE,0,0,0,0
         };
 
+        int indexPixelFormat = 0;
         // Choose the closest pixel format available
         if (!(indexPixelFormat = ChoosePixelFormat(hdc, &pfd)))
         {

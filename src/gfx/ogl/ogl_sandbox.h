@@ -26,8 +26,6 @@ int screenmode = 0;
 
 bool quit = false;
 
-int indexPixelFormat = 0;
-
 namespace rain
 {
 	void RenderFrame(void);
