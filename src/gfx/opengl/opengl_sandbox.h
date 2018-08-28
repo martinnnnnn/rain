@@ -13,8 +13,8 @@
 #define SCRHEIGHT		480					
 #define SCRDEPTH		16					
 
-#define WNDCLASSNAME	"GLClass"			
-#define WNDNAME			"OpenGL base code"	
+#define WNDCLASSNAME	L"GLClass"			
+#define WNDNAME			L"OpenGL base code"	
 
 HDC hdc;
 HWND hwnd;
@@ -35,9 +35,7 @@ namespace rain
 	void SysShutdown(void);
 	void SysSetDisplayMode(int width, int height, int depth);
 	void CreateWnd(HINSTANCE &hinst, int width, int height, int depth, int type);
-	void SetGLFormat(void);
 	void Resize(int width, int height);
-	void InitOpenGL(void);
 	int StartOpenGLRenderer(HINSTANCE hinstance);
 	LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 }
