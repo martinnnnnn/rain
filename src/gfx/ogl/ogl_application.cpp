@@ -3,18 +3,37 @@
 #include "ogl_window.h"
 
 
+
+
+int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
+{
+    rain::OGLApplication application;
+    rain::OGLInitApplication(&application, hinstance);
+    rain::OGLRunApplication(&application);
+    return 0;
+}
+
+
 namespace rain
 {
 
-    void InitApplication(OGLApplication* _application, HINSTANCE _hinstance)
+    void OGLInitApplication(OGLApplication* _application, HINSTANCE _hinstance)
     {
-        _application->window = (OGLWindow*)malloc(sizeof(OGLWindow));
-        OGLRegisterWndClass(_application->window, _hinstance);
-        OGLCreateWindow(_application->window);
-        OGLCreateRenderContext(_application->window);
+        _application->window = (OGLWindow*)calloc(1, sizeof(OGLWindow));
+        OGL_WINDOW_DESC desc;
+        desc.hinstance = _hinstance;
+        desc.width = 800;
+        desc.height = 600;
+        desc.depth = 16;
+        desc.fullscreen = false;
+        desc.WndClassName = L"rain";
+        desc.WndName = L"Rain Engine";
+        
+        OGLInitWindow(&desc, _application->window);
+
     }
 
-    void OGLRunAppication(OGLApplication* _application)
+    void OGLRunApplication(OGLApplication* _application)
     {
         MSG msg;
         OGLWindow* window = _application->window;
@@ -47,3 +66,4 @@ namespace rain
 
     }
 }
+

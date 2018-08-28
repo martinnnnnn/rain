@@ -106,146 +106,147 @@ namespace rain
 		glLoadIdentity();
 	}
 
-	LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
-	{
-		switch (msg)
-		{
-        case WM_PAINT:
-        {
-            RenderFrame();
+	//LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+	//{
+	//	switch (msg)
+	//	{
+ //       case WM_PAINT:
+ //       {
+ //           RenderFrame();
 
-            SwapBuffers(hdc);
-            break;
-        }
-		case WM_DESTROY:
-		{
-			SysShutdown();
-			break;
-		}
+ //           SwapBuffers(hdc);
+ //           break;
+ //       }
+	//	case WM_DESTROY:
+	//	{
+	//		SysShutdown();
+	//		break;
+	//	}
 
-		case WM_SIZE:
-		{
-			Resize(LOWORD(lparam), HIWORD(lparam));
+	//	case WM_SIZE:
+	//	{
+	//		Resize(LOWORD(lparam), HIWORD(lparam));
 
-			screenw = LOWORD(lparam);
-			screenh = HIWORD(lparam);
-			break;
-		}
-		}
+	//		screenw = LOWORD(lparam);
+	//		screenh = HIWORD(lparam);
+	//		break;
+	//	}
+	//	}
 
-		return DefWindowProc(hwnd, msg, wparam, lparam);
-	}
+	//	return DefWindowProc(hwnd, msg, wparam, lparam);
+	//}
 
 	int StartOpenGLRenderer(HINSTANCE hinstance)
 	{
-		MSG msg;
-		WNDCLASSEXW ex;
+		//MSG msg;
+		//WNDCLASSEXW ex;
 
-		ex.cbSize = sizeof(WNDCLASSEXW);
-		ex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-		ex.lpfnWndProc = rain::WinProc;
-		ex.cbClsExtra = 0;
-		ex.cbWndExtra = 0;
-		ex.hInstance = hinstance;
-		ex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		ex.hCursor = LoadCursor(NULL, IDC_ARROW);
-		ex.hbrBackground = NULL;
-		ex.lpszMenuName = NULL;
-		ex.lpszClassName = WNDCLASSNAME;
-		ex.hIconSm = NULL;
+		//ex.cbSize = sizeof(WNDCLASSEXW);
+		//ex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+		//ex.lpfnWndProc = rain::WinProc;
+		//ex.cbClsExtra = 0;
+		//ex.cbWndExtra = 0;
+		//ex.hInstance = hinstance;
+		//ex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		//ex.hCursor = LoadCursor(NULL, IDC_ARROW);
+		//ex.hbrBackground = NULL;
+		//ex.lpszMenuName = NULL;
+		//ex.lpszClassName = WNDCLASSNAME;
+		//ex.hIconSm = NULL;
 
-		if (!RegisterClassExW(&ex))
-		{
-			MessageBox(NULL, "Failed to register the window class", "Window Reg Error", MB_OK);
-			return 1;
-		}
+		//if (!RegisterClassExW(&ex))
+		//{
+		//	MessageBox(NULL, "Failed to register the window class", "Window Reg Error", MB_OK);
+		//	return 1;
+		//}
 
-		CreateWnd(hinstance, screenw, screenh, SCRDEPTH, WINDOWED);
+		//CreateWnd(hinstance, screenw, screenh, SCRDEPTH, WINDOWED);
 
-        if ((hdc = GetDC(hwnd)) == NULL)
-        {
-            MessageBox(hwnd, "Failed to Get the Window Device Context", "Device Context Error", MB_OK);
-            SysShutdown();
-            return 1;
-        }
+  //      if ((hdc = GetDC(hwnd)) == NULL)
+  //      {
+  //          MessageBox(hwnd, "Failed to Get the Window Device Context", "Device Context Error", MB_OK);
+  //          SysShutdown();
+  //          return 1;
+  //      }
 
-        PIXELFORMATDESCRIPTOR pfd =
-        {
-            sizeof(PIXELFORMATDESCRIPTOR),
-            1,
-            PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-            PFD_TYPE_RGBA,
-            SCRDEPTH,
-            0,0,0,0,0,0,0,0,0,0,0,0,0, // useles parameters
-            16,
-            0,0,PFD_MAIN_PLANE,0,0,0,0
-        };
+  //      PIXELFORMATDESCRIPTOR pfd =
+  //      {
+  //          sizeof(PIXELFORMATDESCRIPTOR),
+  //          1,
+  //          PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+  //          PFD_TYPE_RGBA,
+  //          SCRDEPTH,
+  //          0,0,0,0,0,0,0,0,0,0,0,0,0, // useles parameters
+  //          16,
+  //          0,0,PFD_MAIN_PLANE,0,0,0,0
+  //      };
 
-        int indexPixelFormat = 0;
-        // Choose the closest pixel format available
-        if (!(indexPixelFormat = ChoosePixelFormat(hdc, &pfd)))
-        {
-            MessageBox(hwnd, "Failed to find pixel format", "Pixel Format Error", MB_OK);
-            SysShutdown();
-        }
+  //      int indexPixelFormat = 0;
+  //      // Choose the closest pixel format available
+  //      if (!(indexPixelFormat = ChoosePixelFormat(hdc, &pfd)))
+  //      {
+  //          MessageBox(hwnd, "Failed to find pixel format", "Pixel Format Error", MB_OK);
+  //          SysShutdown();
+  //      }
 
-        // Set the pixel format for the provided window DC
-        if (!SetPixelFormat(hdc, indexPixelFormat, &pfd))
-        {
-            MessageBox(hwnd, "Failed to Set Pixel Format", "Pixel Format Error", MB_OK);
-            SysShutdown();
-        }
+  //      // Set the pixel format for the provided window DC
+  //      if (!SetPixelFormat(hdc, indexPixelFormat, &pfd))
+  //      {
+  //          MessageBox(hwnd, "Failed to Set Pixel Format", "Pixel Format Error", MB_OK);
+  //          SysShutdown();
+  //      }
 
-        if ((hglrc = wglCreateContext(hdc)) == NULL)
-        {
-            MessageBox(hwnd, "Failed to Create the OpenGL Rendering Context", "OpenGL Rendering Context Error", MB_OK);
-            SysShutdown();
-            return 1;
-        }
+  //      if ((hglrc = wglCreateContext(hdc)) == NULL)
+  //      {
+  //          MessageBox(hwnd, "Failed to Create the OpenGL Rendering Context", "OpenGL Rendering Context Error", MB_OK);
+  //          SysShutdown();
+  //          return 1;
+  //      }
 
-        if ((wglMakeCurrent(hdc, hglrc)) == false)
-        {
-            MessageBox(hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
-            SysShutdown();
-        }
+  //      if ((wglMakeCurrent(hdc, hglrc)) == false)
+  //      {
+  //          MessageBox(hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
+  //          SysShutdown();
+  //      }
 
-        Resize(SCRWIDTH, SCRHEIGHT);
+  //      Resize(SCRWIDTH, SCRHEIGHT);
 
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClearDepth(1.0f);
+  //      glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  //      glClearDepth(1.0f);
 
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
+  //      glEnable(GL_DEPTH_TEST);
+  //      glDepthFunc(GL_LEQUAL);
 
-        glShadeModel(GL_SMOOTH);
+  //      glShadeModel(GL_SMOOTH);
 
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+  //      glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 
-        ShowWindow(hwnd, SW_SHOW);
-        UpdateWindow(hwnd);
+  //      ShowWindow(hwnd, SW_SHOW);
+  //      UpdateWindow(hwnd);
 
-		while (!quit)
-		{
-			if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-			{
-				if (msg.message == WM_QUIT)
-					quit = true;
+		//while (!quit)
+		//{
+		//	if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+		//	{
+		//		if (msg.message == WM_QUIT)
+		//			quit = true;
 
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-            InvalidateRect(hwnd, NULL, TRUE);
-			
+		//		TranslateMessage(&msg);
+		//		DispatchMessage(&msg);
+		//	}
+  //          InvalidateRect(hwnd, NULL, TRUE);
+		//	
 
-			if (GetAsyncKeyState(VK_ESCAPE))
-				SysShutdown();
-		}
-		return msg.lParam;
+		//	if (GetAsyncKeyState(VK_ESCAPE))
+		//		SysShutdown();
+		//}
+		//return msg.lParam;
+    return 0;
 	}
 }
 
 
-int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
-{
-	return rain::StartOpenGLRenderer(hinstance);
-}
+//int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
+//{
+//	return rain::StartOpenGLRenderer(hinstance);
+//}

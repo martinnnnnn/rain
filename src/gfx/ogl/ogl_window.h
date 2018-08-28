@@ -10,7 +10,7 @@ namespace rain
         HINSTANCE hinstance;
         u32 width;
         u32 height;
-        u32 depth;
+        BYTE depth;
         bool fullscreen;
         wchar_t* WndClassName;
         wchar_t* WndName;
@@ -24,7 +24,7 @@ namespace rain
         HGLRC hglrc;
         u32 width;
         u32 height;
-        u32 depth;
+        BYTE depth;
         bool fullscreen;
         wchar_t* WndClassName;
         wchar_t* WndName;
@@ -32,8 +32,8 @@ namespace rain
 
     LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-    void OGLInitWindow(OGL_WINDOW_DESC _winDesc, OGLWindow* _window);
-    int OGLRegisterWndClass(OGL_WINDOW_DESC _winDesc, OGLWindow* _window);
+    void OGLInitWindow(OGL_WINDOW_DESC* _winDesc, OGLWindow* _window);
+    int OGLRegisterWndClass(OGL_WINDOW_DESC* _winDesc, OGLWindow* _window);
     int OGLCreateWindow(OGLWindow* _window);
     int OGLCreateRenderContext(OGLWindow* _window);
     void OGLInitOpenGL();
@@ -41,4 +41,8 @@ namespace rain
     void OGLResizeWindow(OGLWindow* _window, int _width, int _height);
     void OGLShowWindow(OGLWindow* _window);
     void OGLRefreshWindow(OGLWindow* _window);
+
+    void OGLRender(OGLWindow* _window);
+
+    static void OGLRemoveWindow(HWND hWnd);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Windows.h>
 
 namespace rain
 {
@@ -10,12 +11,9 @@ namespace rain
         OGLWindow* window;
     };
 
-    void InitApplication(OGLApplication* _application)
-    {
-
-    }
-    void OGLRunAppication(OGLApplication* _application);
+    void OGLInitApplication(OGLApplication* _application, HINSTANCE _hinstance);
+    void OGLRunApplication(OGLApplication* _application);
     void OGLUpdate(OGLApplication* _application);
     void OGLRender(OGLApplication* _application);
-
 }
+

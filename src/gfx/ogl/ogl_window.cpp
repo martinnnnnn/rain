@@ -1,9 +1,15 @@
 #include "ogl_window.h"
 
+#include <time.h>
+#include <stdlib.h>
 #include <gl/gl.h>
 #include <GL/GLU.h>
 
 #include <map>
+
+
+
+
 
 namespace rain
 {
@@ -14,28 +20,44 @@ namespace rain
     static OGLWindowNameMap s_OGLWindowsByName;
 
 
-    void InitWindow(OGL_WINDOW_DESC _winDesc, OGLWindow* _window)
+    void OGLInitWindow(OGL_WINDOW_DESC* _winDesc, OGLWindow* _window)
     {
         OGLRegisterWndClass(_winDesc, _window);
         OGLCreateWindow(_window);
         OGLCreateRenderContext(_window);
         OGLInitOpenGL();
+        OGLShowWindow(_window);
     }
 
-    int OGLRegisterWndClass(OGL_WINDOW_DESC _winDesc, OGLWindow* _window)
+    void OGLRender(OGLWindow* _window)
     {
-        _window->hinstance = _winDesc.hinstance;
-        _window->width = _winDesc.width;
-        _window->height = _winDesc.depth;
-        _window->fullscreen = _winDesc.fullscreen;
-        _window->WndClassName = (wchar_t*)malloc((sizeof(_winDesc.WndClassName) + 1));
-        wcsncpy(_window->WndClassName, _winDesc.WndClassName, sizeof(_window->WndClassName) + 1);
-        _window->WndName = (wchar_t*)malloc((sizeof(_winDesc.WndName) + 1));
-        wcsncpy(_window->WndName, _winDesc.WndName, sizeof(_window->WndName) + 1);
+        static bool once = false;
+        if (!once)
+        {
+            once = true;
+            srand((unsigned int)time(NULL));
+        }
+        glClearColor((float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, (float)rand() / (float)RAND_MAX, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
-        MSG msg;
+    int OGLRegisterWndClass(OGL_WINDOW_DESC* _winDesc, OGLWindow* _window)
+    {
+        _window->hinstance = _winDesc->hinstance;
+        _window->width = _winDesc->width;
+        _window->height = _winDesc->height;
+        _window->depth = _winDesc->depth;
+        _window->fullscreen = _winDesc->fullscreen;
+        _window->WndClassName = (wchar_t*)malloc((wcslen(_winDesc->WndClassName) + 1) * sizeof(wchar_t));
+        _window->WndName = (wchar_t*)malloc((wcslen(_winDesc->WndName) + 1) * sizeof(wchar_t));
+        //auto wtf = (wcslen(_winDesc->WndClassName) + 1) * sizeof(wchar_t);
+        //auto tfw = (wcslen(_winDesc->WndName) + 1) * sizeof(wchar_t);
+        //auto haha = wcslen(_window->WndClassName);
+        //auto hehe = wcslen(_window->WndName);
+        wcsncpy_s(_window->WndClassName, wcslen(_window->WndClassName), _winDesc->WndClassName, _TRUNCATE);
+        wcsncpy_s(_window->WndName, wcslen(_window->WndName), _winDesc->WndName, _TRUNCATE);
+
         WNDCLASSEXW ex;
-
         ex.cbSize = sizeof(WNDCLASSEXW);
         ex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
         ex.lpfnWndProc = WinProc;
@@ -108,6 +130,10 @@ namespace rain
             OGLShutdown(_window);
             return 1;
         }
+
+        s_OGLWindows.insert(OGLWindowMap::value_type(_window->hwnd, _window));
+        s_OGLWindowsByName.insert(OGLWindowNameMap::value_type(_window->WndClassName, _window));
+
         return 0;
     }
 
@@ -205,119 +231,49 @@ namespace rain
         InvalidateRect(_window->hwnd, NULL, TRUE);
     }
 
-
-    //    CreateWnd(hinstance, screenw, screenh, SCRDEPTH, WINDOWED);
-
-    //    if ((hdc = GetDC(hwnd)) == NULL)
-    //    {
-    //        MessageBox(hwnd, "Failed to Get the Window Device Context", "Device Context Error", MB_OK);
-    //        SysShutdown();
-    //        return 1;
-    //    }
-
-    //    PIXELFORMATDESCRIPTOR pfd =
-    //    {
-    //        sizeof(PIXELFORMATDESCRIPTOR),
-    //        1,
-    //        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-    //        PFD_TYPE_RGBA,
-    //        SCRDEPTH,
-    //        0,0,0,0,0,0,0,0,0,0,0,0,0, // useles parameters
-    //        16,
-    //        0,0,PFD_MAIN_PLANE,0,0,0,0
-    //    };
-
-    //    int indexPixelFormat = 0;
-    //    // Choose the closest pixel format available
-    //    if (!(indexPixelFormat = ChoosePixelFormat(hdc, &pfd)))
-    //    {
-    //        MessageBox(hwnd, "Failed to find pixel format", "Pixel Format Error", MB_OK);
-    //        SysShutdown();
-    //    }
-
-    //    // Set the pixel format for the provided window DC
-    //    if (!SetPixelFormat(hdc, indexPixelFormat, &pfd))
-    //    {
-    //        MessageBox(hwnd, "Failed to Set Pixel Format", "Pixel Format Error", MB_OK);
-    //        SysShutdown();
-    //    }
-
-    //    if ((hglrc = wglCreateContext(hdc)) == NULL)
-    //    {
-    //        MessageBox(hwnd, "Failed to Create the OpenGL Rendering Context", "OpenGL Rendering Context Error", MB_OK);
-    //        SysShutdown();
-    //        return 1;
-    //    }
-
-    //    if ((wglMakeCurrent(hdc, hglrc)) == false)
-    //    {
-    //        MessageBox(hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
-    //        SysShutdown();
-    //    }
-
-    //    Resize(SCRWIDTH, SCRHEIGHT);
-
-    //    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    //    glClearDepth(1.0f);
-
-    //    glEnable(GL_DEPTH_TEST);
-    //    glDepthFunc(GL_LEQUAL);
-
-    //    glShadeModel(GL_SMOOTH);
-
-    //    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-
-    //    ShowWindow(hwnd, SW_SHOW);
-    //    UpdateWindow(hwnd);
-
-    //    while (!quit)
-    //    {
-    //        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-    //        {
-    //            if (msg.message == WM_QUIT)
-    //                quit = true;
-
-    //            TranslateMessage(&msg);
-    //            DispatchMessage(&msg);
-    //        }
-    //        InvalidateRect(hwnd, NULL, TRUE);
-
-
-    //        if (GetAsyncKeyState(VK_ESCAPE))
-    //            SysShutdown();
-    //    }
-    //    return msg.lParam;
-    //}
-    //}
-
+    static void OGLRemoveWindow(HWND hWnd)
+    {
+        OGLWindowMap::iterator iter = s_OGLWindows.find(hWnd);
+        if (iter != s_OGLWindows.end())
+        {
+            OGLWindow* window = iter->second;
+            s_OGLWindowsByName.erase(window->WndClassName);
+            s_OGLWindows.erase(iter);
+        }
+    }
 
     LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     {
+        OGLWindow* window = nullptr;
+        {
+            OGLWindowMap::iterator iter = s_OGLWindows.find(hwnd);
+            if (iter != s_OGLWindows.end())
+            {
+                window = iter->second;
+            }
+        }
         switch (msg)
         {
         case WM_PAINT:
         {
-            RenderFrame();
+            OGLRender(window);
 
-            SwapBuffers(hdc);
+            SwapBuffers(window->hdc);
             break;
         }
         case WM_DESTROY:
         {
-            SysShutdown();
+            OGLShutdown(window);
             break;
         }
 
         case WM_SIZE:
         {
-            Resize(LOWORD(lparam), HIWORD(lparam));
-
-            screenw = LOWORD(lparam);
-            screenh = HIWORD(lparam);
+            OGLResizeWindow(window, LOWORD(lparam), HIWORD(lparam));
             break;
         }
         }
 
-        return DefWindowProc(hwnd, msg, wparam, lparam);
+        return DefWindowProcW(hwnd, msg, wparam, lparam);
     }
 }

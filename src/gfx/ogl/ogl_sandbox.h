@@ -35,6 +35,6 @@ namespace rain
 	void CreateWnd(HINSTANCE &hinst, int width, int height, int depth, int type);
 	void Resize(int width, int height);
 	int StartOpenGLRenderer(HINSTANCE hinstance);
-	LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	//LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 }
 
