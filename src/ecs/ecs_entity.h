@@ -30,7 +30,7 @@ struct EntityTrait<u16>
 
     static constexpr version_type get_version(const entity_type _entity)
     {
-        return _entity & version_mask << entity_shift;
+        return _entity & (version_mask << entity_shift);
     }
 };
 
@@ -56,7 +56,7 @@ struct EntityTrait<u32>
 
     static constexpr version_type get_version(const entity_type _entity)
     {
-        return _entity & version_mask << entity_shift;
+        return _entity & (version_mask << entity_shift);
     }
 };
 
@@ -82,6 +82,6 @@ struct EntityTrait<u64>
 
     static constexpr version_type get_version(const entity_type _entity)
     {
-        return _entity & version_mask << entity_shift;
+        return _entity & (version_mask << entity_shift);
     }
 };

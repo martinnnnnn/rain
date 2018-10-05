@@ -1,6 +1,6 @@
 #pragma once
 
-template<typename T>
+template<typename Entity>
 class Singleton
 {
 protected:
@@ -13,9 +13,9 @@ protected:
     virtual ~Singleton() = default;
 
 public:
-    static T& Get() noexcept(std::is_nothrow_constructible<T>::value)
+    static Entity& Get() noexcept(std::is_nothrow_constructible<Entity>::value)
     {
-        static T instance;
+        static Entity instance;
 
         return instance;
     }

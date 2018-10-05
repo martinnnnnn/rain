@@ -25,55 +25,55 @@ class Renderer;
 
 
 
-class TBD
-{
-public:
-    using component_ids = TypeId<struct TDBComponentTypeIDs>;
-
-    //creates an entity
-    EntityID create()
-    {
-
-    }
-
-
-    template<typename Component, typename... Args>
-    Component& assign(EntityID _entity, Args &&... args)
-    {
-        assert(contains(_entity));
-        create_pool<Component>();
-        return pool<Component>().construct(_entity, std::forward<Args>(args)...);
-    }
-
-    bool contains() { return true; }
-
-private:
-
-    template<typename Component>
-    void create_pool()
-    {
-        const EntityID component_id = component_ids::get<Component>();
-
-        if (!(component_id < m_pools.size()))
-        {
-            m_pools.resize(component_id + 1);
-        }
-
-        if (!m_pools[component_id])
-        {
-            m_pools[component_id] = new Pool<Component>();
-        }
-    }
-
-    template<typename Component>
-    Pool<Component>* pool()
-    {
-        return static_cast<Pool<Component>*>(*m_pools[component_ids::get<Component>()]);
-    }
-
-    std::vector<EntitySet*> m_pools;
-    std::vector<EntityID> m_entities;
-};
+//class TBD
+//{
+//public:
+//    using component_ids = TypeId<struct TDBComponentTypeIDs>;
+//
+//    //creates an entity
+//    EntityID create()
+//    {
+//
+//    }
+//
+//
+//    template<typename Component, typename... Args>
+//    Component& assign(EntityID _entity, Args &&... args)
+//    {
+//        assert(contains(_entity));
+//        create_pool<Component>();
+//        return pool<Component>().construct(_entity, std::forward<Args>(args)...);
+//    }
+//
+//    bool contains() { return true; }
+//
+//private:
+//
+//    template<typename Component>
+//    void create_pool()
+//    {
+//        const EntityID component_id = component_ids::get<Component>();
+//
+//        if (!(component_id < m_pools.size()))
+//        {
+//            m_pools.resize(component_id + 1);
+//        }
+//
+//        if (!m_pools[component_id])
+//        {
+//            m_pools[component_id] = new Pool<Component>();
+//        }
+//    }
+//
+//    template<typename Component>
+//    Pool<Component>* pool()
+//    {
+//        return static_cast<Pool<Component>*>(*m_pools[component_ids::get<Component>()]);
+//    }
+//
+//    std::vector<EntitySet*> m_pools;
+//    std::vector<EntityID> m_entities;
+//};
 
 
 

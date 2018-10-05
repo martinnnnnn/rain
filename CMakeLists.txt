@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.1)
-project(pls)
+project(rain)
 message(STATUS "project name : ${PROJECT_NAME}")
 
 set(RAIN_EXE rain_exe)

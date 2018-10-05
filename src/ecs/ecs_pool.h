@@ -12,8 +12,8 @@ template<typename Entity, typename Item>
 class Pool : public SparseSet<Entity>
 {
     using entity_trait = EntityTrait<Entity>;
-    using entity_type = entity_trait::entity_type;
-    using version_type = entity_trait::version_type;
+    using entity_type = typename entity_trait::entity_type;
+    using version_type = typename entity_trait::version_type;
 
 public:
 
