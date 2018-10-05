@@ -16,10 +16,5 @@ namespace rain
         std::vector<StaticMesh*> meshes;
     };
 
-    struct ModelContainer
-    {
-        std::unordered_map<std::string, Model> models;
-    };
-
     Model LoadModel(const std::string& _modelPath, const std::string& _materialDataPath, const std::string& _shaderPath);
 }

@@ -79,7 +79,7 @@ namespace rain
         {
             Texture2D texture = futureDatas[i].get();
             _texManager->textures[File::GetFileName(texture.path)] = texture;
-            Load2DTextureToGC(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
+            Load2DTextureToGPU(texture.path, _texManager->textures[File::GetFileName(texture.path)]);
         }
 	}
 
@@ -101,7 +101,7 @@ namespace rain
         return texture;
     }
 
-    void Load2DTextureToGC(const std::string& _path, Texture2D& _texture)
+    void Load2DTextureToGPU(const std::string& _path, Texture2D& _texture)
     {
         glGenTextures(1, &_texture.id);
         glBindTexture(GL_TEXTURE_2D, _texture.id);

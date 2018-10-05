@@ -32,7 +32,12 @@ namespace rain
         float outerCutOff;
     };
 
-    Light* CreateLight();
+
+
+    Light* CreateLight(LightType _lightType);
+    void InitLight(Light* _light, LightType _lightType);
+
+
 
     //struct LightPoolElement
     //{

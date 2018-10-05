@@ -42,7 +42,6 @@ namespace rain
 
         for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
         {
-
 			aiMesh* aimesh = scene->mMeshes[i];
 
 			StaticMesh* staticMesh = new StaticMesh();
@@ -152,8 +151,9 @@ namespace rain
     void Draw(StaticMesh* _mesh)
     {
         _mesh->material.shader->use();
+        
 
-        int textIndex = 0;
+        int textureIndex = 0;
         for (size_t i = 0; i < _mesh->material.shaderVariables.size(); ++i)
         {
             GLSL::Variable* variable = &_mesh->material.shaderVariables[i];
@@ -161,8 +161,7 @@ namespace rain
             {
                 if (_mesh->textures[j].id == variable->textureId)
                 {
-                    glActiveTexture(GL_TEXTURE0 + textIndex);
-                    textIndex++;
+                    glActiveTexture(GL_TEXTURE0 + ++textureIndex);
                     _mesh->material.shader->setParameter(variable->name, (int)j);
                     glBindTexture(GL_TEXTURE_2D, _mesh->textures[j].id);
                     continue;

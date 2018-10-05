@@ -20,6 +20,7 @@ namespace rain
 
         std::string TypeToString(Type value);
 
+
         struct Variable
         {
             //Variable(GLSL::Type _variableType, GLenum _glslType, char* _name, GLint _size) : variableType(_variableType), glslType(_glslType), name(_name), size(_size) {}

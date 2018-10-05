@@ -7,7 +7,7 @@
 
 #include <map>
 
-
+#include "ogl_renderer.h"
 
 
 
@@ -50,10 +50,6 @@ namespace rain
         _window->fullscreen = _winDesc->fullscreen;
         _window->WndClassName = (wchar_t*)malloc((wcslen(_winDesc->WndClassName) + 1) * sizeof(wchar_t));
         _window->WndName = (wchar_t*)malloc((wcslen(_winDesc->WndName) + 1) * sizeof(wchar_t));
-        //auto wtf = (wcslen(_winDesc->WndClassName) + 1) * sizeof(wchar_t);
-        //auto tfw = (wcslen(_winDesc->WndName) + 1) * sizeof(wchar_t);
-        //auto haha = wcslen(_window->WndClassName);
-        //auto hehe = wcslen(_window->WndName);
         wcsncpy_s(_window->WndClassName, wcslen(_window->WndClassName), _winDesc->WndClassName, _TRUNCATE);
         wcsncpy_s(_window->WndName, wcslen(_window->WndName), _winDesc->WndName, _TRUNCATE);
 

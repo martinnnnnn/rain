@@ -7,7 +7,7 @@ namespace rain
 	std::unordered_map<std::string, GLenum> GLUtils::m_stringToGLType =
 	{
 		{ "float"						, GL_FLOAT },
-		{"vec2"							, GL_FLOAT_VEC2 },
+		{ "vec2"						, GL_FLOAT_VEC2 },
 		{ "vec3"						, GL_FLOAT_VEC3 },
 		{ "vec4"						, GL_FLOAT_VEC4 },
 		{ "double"						, GL_DOUBLE },

@@ -14,6 +14,12 @@ namespace rain
         return light;
     }
 
+    void InitLight(Light* _light, LightType _lightType)
+    {
+        _light->componentType = ComponentType::LIGHT;
+        _light->lightType = _lightType;
+    }
+
 
     //LightPool* CreateLightPool(u32 _capacity, u32 _resizeStep)
     //{

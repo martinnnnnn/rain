@@ -218,7 +218,8 @@ namespace rain
 
     void Shader::setParameter(const std::string &_name, bool _value) const
     {
-        glUniform1i(glGetUniformLocation(id, _name.c_str()), (int)_value);
+        GLint t = glGetUniformLocation(id, _name.c_str());
+        glUniform1i(t, (int)_value);
     }
     void Shader::setParameter(const std::string &_name, int _value) const
     {
