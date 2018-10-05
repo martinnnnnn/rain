@@ -23,8 +23,8 @@ class Renderer;
 
 
 
-
-
+//
+//
 //class TBD
 //{
 //public:
@@ -74,7 +74,7 @@ class Renderer;
 //    std::vector<EntitySet*> m_pools;
 //    std::vector<EntityID> m_entities;
 //};
-
+//
 
 
 struct Name

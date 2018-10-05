@@ -25,12 +25,12 @@ public:
         return m_items.back();
     }
 
-    void destroy(const entity_type entity)
+    void destroy(const entity_type _entity)
     {
         Item tmp = std::move(m_items.back());
-        m_items[SparseSet::get(entity)] = std::move(tmp);
+        m_items[SparseSet::get(_entity)] = std::move(tmp);
         m_items.pop_back();
-        SparseSet::destroy(entity);
+        SparseSet::destroy(_entity);
     }
 
     const Item& get(entity_type _entity)
