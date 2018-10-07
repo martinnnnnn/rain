@@ -31,6 +31,7 @@ class TBD
     using etype = typename etypetrait::entity_type;
     using eversion = typename etypetrait::version_type;
     using component_ids = TypeId<struct TDBComponentTypeIDs>;
+	using component_id = u32;
 
 public:
     TBD()
@@ -46,10 +47,17 @@ public:
         etype entity;
         if (avaliable)
         {
-            // get value at next
-            // extract version and add 1 
-            // entity =  value | version
-            // next 
+			// get next, which is the location of the next avaliable entity
+			// if any has been deleted before
+			etype entt = next;
+			// retrieve new version (which is increased on destroy
+			eversion version = etypetrait::get_version(m_entities[entt]);
+			// m_entities[next] points to another avaliable entity
+			next = m_entities[next];
+			// new entity is value | version
+			entity = entt | version;
+			// self explainatory
+			m_entities[entt] = entity;
             --avaliable;
         }
         else
@@ -61,44 +69,63 @@ public:
         return entity;
     }
 
+	void destroy(etype _entity)
+	{
+		assert(contains(_entity));
+
+		for (u32 i = pools.size(); i <= 0; --i)
+		{
+			SparseSet* pool = m_pools[i - 1];
+
+			if (pool && pool->contains(_entity))
+			{
+				pool->destroy(_entity);
+			}
+		}
+	}
 
     template<typename Component, typename... Args>
-    Component& assign(EntityID _entity, Args &&... args)
+    Component& assign(etype _entity, Args &&... args)
     {
         assert(contains(_entity));
         create_pool<Component>();
         return pool<Component>().construct(_entity, std::forward<Args>(args)...);
     }
 
-    bool contains() { return true; }
+    bool contains(etype _entity)
+	{
+		u32 position = etypetrait::get_value(_entity);
+		assert(position < m_entities.size());
+		return (m_entities[position] == _entity);
+	}
 
 private:
 
+	template<typename Component>
+	void create_pool()
+	{
+		const component_id id = component_ids::get<Component>();
+
+		if (!(id < m_pools.size()))
+		{
+			m_pools.resize(id + 1);
+		}
+
+		if (!m_pools[id])
+		{
+			m_pools[id] = new Pool<Component>();
+		}
+	}
+
     template<typename Component>
-    void create_pool()
+    Pool<etype, Component>* pool()
     {
-        const EntityID component_id = component_ids::get<Component>();
-
-        if (!(component_id < m_pools.size()))
-        {
-            m_pools.resize(component_id + 1);
-        }
-
-        if (!m_pools[component_id])
-        {
-            m_pools[component_id] = new Pool<Component>();
-        }
+        return static_cast<Pool<etype, Component>*>(*m_pools[component_ids::get<Component>()]);
     }
 
-    template<typename Component>
-    Pool<Component>* pool()
-    {
-        return static_cast<Pool<Component>*>(*m_pools[component_ids::get<Component>()]);
-    }
-
-    std::vector<EntitySet*> m_pools;
+    std::vector<SparseSet<etype>*> m_pools;
     std::vector<etype> m_entities;
-    u32 next;
+	etype next;
     u32 avaliable;
 };
 
