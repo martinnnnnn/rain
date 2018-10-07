@@ -36,7 +36,7 @@ class TBD
 public:
     TBD()
         : avaliable(0)
-        , next = -1
+        , next(0)
     {
 
     }
@@ -73,9 +73,9 @@ public:
 	{
 		assert(contains(_entity));
 
-		for (u32 i = pools.size(); i <= 0; --i)
+		for (u32 i = m_pools.size(); i <= 0; --i)
 		{
-			SparseSet* pool = m_pools[i - 1];
+			auto pool = m_pools[i - 1];
 
 			if (pool && pool->contains(_entity))
 			{
@@ -89,7 +89,7 @@ public:
     {
         assert(contains(_entity));
         create_pool<Component>();
-        return pool<Component>().construct(_entity, std::forward<Args>(args)...);
+        return pool<Component>()->construct(_entity, std::forward<Args>(args)...);
     }
 
     bool contains(etype _entity)
@@ -113,14 +113,14 @@ private:
 
 		if (!m_pools[id])
 		{
-			m_pools[id] = new Pool<Component>();
+			m_pools[id] = new Pool<etype, Component>();
 		}
 	}
 
     template<typename Component>
     Pool<etype, Component>* pool()
     {
-        return static_cast<Pool<etype, Component>*>(*m_pools[component_ids::get<Component>()]);
+        return static_cast<Pool<etype, Component>*>(m_pools[component_ids::get<Component>()]);
     }
 
     std::vector<SparseSet<etype>*> m_pools;

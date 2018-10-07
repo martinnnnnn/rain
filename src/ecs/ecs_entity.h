@@ -65,23 +65,23 @@ struct EntityTrait<u32>
 * entity  : 32 bits [0 -> alot]
 * version : 32 bits [0 -> alot]
 */
-template<>
-struct EntityTrait<u64>
-{
-    using entity_type = u64;
-    using version_type = u32;
-
-    static constexpr u64 entity_mask = 0xFFFFFFFF;
-    static constexpr u64 version_mask = 0xFFFFFFFF;
-    static constexpr auto entity_shift = 20;
-
-    static constexpr entity_type get_value(const entity_type _entity)
-    {
-        return _entity & entity_mask;
-    }
-
-    static constexpr version_type get_version(const entity_type _entity)
-    {
-        return _entity & (version_mask << entity_shift);
-    }
-};
+//template<>
+//struct EntityTrait<u64>
+//{
+//    using entity_type = u64;
+//    using version_type = u32;
+//
+//    static constexpr u64 entity_mask = 0xFFFFFFFF;
+//    static constexpr u64 version_mask = 0xFFFFFFFF;
+//    static constexpr auto entity_shift = 20;
+//
+//    static constexpr entity_type get_value(const entity_type _entity)
+//    {
+//        return _entity & entity_mask;
+//    }
+//
+//    static constexpr version_type get_version(const entity_type _entity)
+//    {
+//        return _entity & (version_mask << entity_shift);
+//    }
+//};
