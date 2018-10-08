@@ -18,7 +18,7 @@ class Pool : public SparseSet<Entity>
 public:
 
     template <typename... Args>
-    Item construct(const entity_type _entity, Args &&... _args)
+    Item& construct(const entity_type _entity, Args &&... _args)
     {
         SparseSet::construct(_entity);
         m_items.emplace_back(std::forward<Args>(_args)...);

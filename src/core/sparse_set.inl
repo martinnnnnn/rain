@@ -7,7 +7,7 @@ void SparseSet<Entity>::construct(Entity _value)
 
     const entity_type position = entity_trait::get_value(_value);
 
-    if (position > m_sparse.size())
+    if (position >= m_sparse.size())
     {
         m_sparse.resize(position + 1, -1);
     }

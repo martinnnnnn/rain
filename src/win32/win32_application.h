@@ -35,8 +35,8 @@ class TBD
 
 public:
     TBD()
-        : avaliable(0)
-        , next(0)
+        : m_avaliable(0)
+        , m_next(0)
     {
 
     }
@@ -45,20 +45,20 @@ public:
     etype create()
     {
         etype entity;
-        if (avaliable)
+        if (m_avaliable)
         {
 			// get next, which is the location of the next avaliable entity
 			// if any has been deleted before
-			etype entt = next;
+			etype entt = m_next;
 			// retrieve new version (which is increased on destroy
 			eversion version = etypetrait::get_version(m_entities[entt]);
 			// m_entities[next] points to another avaliable entity
-			next = m_entities[next];
+			m_next = m_entities[m_next];
 			// new entity is value | version
 			entity = entt | version;
 			// self explainatory
 			m_entities[entt] = entity;
-            --avaliable;
+            --m_avaliable;
         }
         else
         {
@@ -73,7 +73,7 @@ public:
 	{
 		assert(contains(_entity));
 
-		for (u32 i = m_pools.size(); i <= 0; --i)
+		for (u32 i = m_pools.size(); i != 0; --i)
 		{
 			auto pool = m_pools[i - 1];
 
@@ -82,7 +82,35 @@ public:
 				pool->destroy(_entity);
 			}
 		}
+
+        assert(orphan(_entity));
+
+        // get position in array
+        const etype position = etypetrait::get_value(_entity);
+        // increment version
+        const eversion version = etypetrait::get_version(_entity);
+        // if avaliable entity, point to it && 
+        const etype newValue = (m_avaliable ? m_next : ((position + 1) & etypetrait::entity_mask)) | version;
+
+        m_entities[position] = newValue;
+        m_next = position;
+
+        ++m_avaliable;
 	}
+
+    bool orphan(etype _entity)
+    {
+        bool is_orphan = true;
+        for (u32 i = 0; i < m_pools.size() && is_orphan; ++i)
+        {
+            auto pool = m_pools[i];
+            if (pool && pool->contains(_entity))
+            {
+                is_orphan = false;
+            }
+        }
+        return is_orphan;
+    }
 
     template<typename Component, typename... Args>
     Component& assign(etype _entity, Args &&... args)
@@ -125,8 +153,8 @@ private:
 
     std::vector<SparseSet<etype>*> m_pools;
     std::vector<etype> m_entities;
-	etype next;
-    u32 avaliable;
+	etype m_next;
+    u32 m_avaliable;
 };
 
 

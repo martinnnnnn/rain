@@ -61,9 +61,16 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 	tbd.assign<Transform>(e2, glm::vec3(1, 1, 1));
 	tbd.assign<Name>(e3, "hello");
 
-	tbd.destroy(e4);
+    bool contains1 = tbd.contains(e1);
+    tbd.destroy(e1);
+    contains1 = tbd.contains(e1);
+    tbd.destroy(e2);
+    tbd.destroy(e3);
+    tbd.destroy(e4);
 	etype e5 = tbd.create();
+    contains1 = tbd.contains(e1);
 	etype e6 = tbd.create();
+    contains1 = tbd.contains(e1);
 	etype e7 = tbd.create();
 
 	tbd.destroy(e1);
