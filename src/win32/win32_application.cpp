@@ -5,12 +5,12 @@
 #include "win32_window.h"
 #include "ogl/ogl_renderer.h"
 
-#include "core/sparse_set.h"
 #include "ecs/ecs_entity.h"
+#include "ecs/ecs_registry.h"
 
 void set_test()
 {
-	using DefaultTBD = TBD<u32>;
+	using DefaultTBD = Registry<u32>;
     using etypetrait = EntityTrait<u32>;
     using etype = typename etypetrait::entity_type;
     using eversion = typename etypetrait::version_type;
@@ -44,7 +44,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
-	using DefaultTBD = TBD<u32>;
+	using DefaultTBD = Registry<u32>;
 	using etypetrait = EntityTrait<u32>;
 	using etype = typename etypetrait::entity_type;
 	using eversion = typename etypetrait::version_type;
@@ -72,34 +72,6 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 	etype e6 = tbd.create();
     contains1 = tbd.contains(e1);
 	etype e7 = tbd.create();
-
-	tbd.destroy(e1);
-	tbd.destroy(e2);
-
-
-
-	//using etypetrait = EntityTrait<u32>;
-	//using etype = typename etypetrait::entity_type;
-	//using eversion = typename etypetrait::version_type;
-
-
-	//std::vector<SparseSet<etype>*> pools;
-
-	//using fam = TypeId<struct Hey>;
-
-	//if (fam::get<Transform>() >= pools.size())
-	//{
-	//	pools.resize(fam::get<Transform>() + 1);
-	//}
-
-	//pools[fam::get<Transform>()] = new Pool<etype, Transform>();
-
-	//if (fam::get<Name>() >= pools.size())
-	//{
-	//	pools.resize(fam::get<Name>() + 1);
-	//}
-
-	//pools[fam::get<Name>()] = new Pool<etype, Name>();
 
 
     GETWINDOW.initialize(hinstance, 800, 600, 0);
