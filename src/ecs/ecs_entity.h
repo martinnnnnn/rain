@@ -65,23 +65,87 @@ struct EntityTrait<u32>
 * entity  : 32 bits [0 -> alot]
 * version : 32 bits [0 -> alot]
 */
-//template<>
-//struct EntityTrait<u64>
-//{
-//    using entity_type = u64;
-//    using version_type = u32;
-//
-//    static constexpr u64 entity_mask = 0xFFFFFFFF;
-//    static constexpr u64 version_mask = 0xFFFFFFFF;
-//    static constexpr auto entity_shift = 20;
-//
-//    static constexpr entity_type get_value(const entity_type _entity)
-//    {
-//        return _entity & entity_mask;
-//    }
-//
-//    static constexpr version_type get_version(const entity_type _entity)
-//    {
-//        return _entity & (version_mask << entity_shift);
-//    }
-//};
+template<>
+struct EntityTrait<u64>
+{
+    using entity_type = u64;
+    using version_type = u32;
+
+    static constexpr u64 entity_mask = 0xFFFFFFFF;
+    static constexpr u64 version_mask = 0xFFFFFFFF;
+    static constexpr auto entity_shift = 20;
+
+    static constexpr entity_type get_value(const entity_type _entity)
+    {
+        return _entity & entity_mask;
+    }
+
+    static constexpr version_type get_version(const entity_type _entity)
+    {
+        return _entity & (version_mask << entity_shift);
+    }
+};
+
+
+struct Entity
+{
+    Entity(u32 _value, u16 _version)
+        : value(_value)
+        , version(_version)
+    {}
+
+    Entity() : value(0), version(0) {}
+
+    u32 value;
+    u16 version;
+};
+
+
+struct Null
+{
+    explicit constexpr Null() = default;
+
+    //template <typename Entity>
+    //constexpr operator Entity() const
+    //{
+    //    return 0;
+    //}
+
+    constexpr bool operator==(Null) const
+    {
+        return true;
+    }
+
+    constexpr bool operator!=(Null) const
+    {
+        return false;
+    }
+
+    template<typename Entity>
+    constexpr bool operator==(const Entity entity) const
+    {
+        return entity == static_cast<Entity>(*this);
+    }
+
+    template<typename Entity>
+    constexpr bool operator!=(const Entity entity) const
+    {
+        return entity != static_cast<Entity>(*this);
+    }
+};
+
+
+template<typename Entity>
+constexpr bool operator==(const Entity entity, Null null)
+{
+    return null == entity;
+}
+
+
+template<typename Entity>
+constexpr bool operator!=(const Entity entity, Null null)
+{
+    return null != entity;
+}
+
+constexpr Null null = Null{};

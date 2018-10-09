@@ -9,12 +9,9 @@
 template <typename Entity>
 class SparseSet
 {
-    using entity_trait = EntityTrait<Entity>;
-    using entity_type = typename entity_trait::entity_type;
-    using version_type = typename entity_trait::version_type;
 
 public:
-    SparseSet(Entity _startingMaxValueID = 0, Entity _startingCapacity = 0);
+    SparseSet(u32 _startingMaxValueID = 0, u32 _startingCapacity = 0);
 
     void construct(Entity _value);
     bool contains(Entity _value);
@@ -31,12 +28,63 @@ protected:
 
 
 template<typename Entity>
-SparseSet<Entity>::SparseSet(Entity _startingMaxValueID, Entity _startingCapacity)
+SparseSet<Entity>::SparseSet(u32 _startingMaxValueID, u32 _startingCapacity)
     : m_sparse(_startingMaxValueID)
 {
     m_sparse.reserve(_startingMaxValueID);
     m_dense.reserve(_startingCapacity);
-
 }
 
-#include "sparse_set.inl"
+
+template<typename Entity>
+void SparseSet<Entity>::construct(Entity _entity)
+{
+    assert(!contains(_entity));
+
+    if (_entity.value >= m_sparse.size())
+    {
+        m_sparse.resize(_entity.value + 1, null);
+    }
+
+    m_sparse[_entity.value] = m_dense.size();
+    m_dense.push_back(_entity);
+}
+
+template<typename Entity>
+bool SparseSet<Entity>::contains(Entity _entity)
+{
+    return (_entity.value < m_sparse.size()) && (m_sparse[_entity.value] == _entity);
+}
+
+template<typename Entity>
+void SparseSet<Entity>::destroy(Entity _entity)
+{
+    assert(contains(_entity));
+    const entity_type position = _entity.value;
+    const Entity back = m_dense.back();
+    Entity &candidate = m_sparse[position];
+    m_sparse[back.position] = candidate;
+    m_dense[candidate] = back;
+    candidate = -1;
+    m_dense.pop_back();
+}
+
+template<typename Entity>
+bool SparseSet<Entity>::empty()
+{
+    return !m_dense.size();
+}
+
+template<typename Entity>
+void SparseSet<Entity>::reset()
+{
+    m_sparse.clear();
+    m_dense.clear();
+}
+
+template<typename Entity>
+Entity SparseSet<Entity>::get(Entity _entity)
+{
+    assert(contains(_entity));
+    return m_sparse[_entity.value];
+}
