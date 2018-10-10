@@ -2,6 +2,7 @@
 
 #include "core/types.h"
 
+#include <limits>
 
 
 template<typename>
@@ -89,27 +90,42 @@ struct EntityTrait<u64>
 
 struct Entity
 {
-    Entity(u32 _value, u16 _version)
+    Entity(u32 _value, u32 _version)
         : value(_value)
         , version(_version)
     {}
 
     Entity() : value(0), version(0) {}
 
+    bool operator==(Entity _entity) const
+    {
+        return _entity.value == value && _entity.version == version;
+    }
+
     u32 value;
-    u16 version;
+    u32 version;
+
+    static constexpr u32 MAX_VALUE = 0xFFFFFFFF;
+    static constexpr u32 MAX_VERSION = 0xFFFFFFF;
 };
+
+
 
 
 struct Null
 {
+
+
     explicit constexpr Null() = default;
 
-    //template <typename Entity>
-    //constexpr operator Entity() const
-    //{
-    //    return 0;
-    //}
+    template <typename Entity>
+    constexpr operator Entity() const
+    {
+        Entity entity;
+        entity.value = Entity::MAX_VALUE;
+        entity.version = Entity::MAX_VERSION;
+        return entity;
+    }
 
     constexpr bool operator==(Null) const
     {
