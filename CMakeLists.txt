@@ -39,6 +39,7 @@ message(STATUS "> including directories")
 include_directories(src/
                     # external/assimp/include/
                     external/glm/
+                    external/entt/
                     ${DX12_INCLUDEPATH}
                     ${GLEW_INCLUDE_DIRS})
 

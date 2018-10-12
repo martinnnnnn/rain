@@ -2,66 +2,46 @@
 
 #include <windows.h>
 
+#include <time.h>
+#include <stdlib.h>
+#include <algorithm>
+
 #include "win32_window.h"
 #include "ogl/ogl_renderer.h"
 
-#include "ecs/ecs_entity.h"
-#include "ecs/ecs_registry.h"
 
-void set_test()
-{
-    SparseSet set;
-    bool empty1 = set.empty();
-
-    set.construct(32);
-    set.construct(62);
-    set.construct(12);
-    set.construct(42);
-
-    bool empty2 = set.empty();
-
-    bool c1 = set.contains(32);
-    //bool c2 = set.contains(-1);
-    bool c3 = set.contains(123);
-
-    u32 size1 = set.get(62);
-
-
-    //set.destroy(-1);
-    set.destroy(42);
-    //set.destroy(123);
-    set.destroy(62);
-
-}
 
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
-	Registry registry;
 
-    Entity e1 = registry.create();
-    Entity e2 = registry.create();
-    Entity e3 = registry.create();
-    Entity e4 = registry.create();
+    auto camera = registry.create();
+    registry.assign<Camera>(camera);
 
-	registry.assign<Transform>(e1);
-	registry.assign<Physics>(e1);
-	registry.assign<Transform>(e2, glm::vec3(1, 1, 1));
-	registry.assign<Name>(e3, "hello");
 
-    bool contains1 = registry.contains(e1);
-    registry.destroy(e1);
-    contains1 = registry.contains(e1);
-    registry.destroy(e2);
-    registry.destroy(e3);
-    registry.destroy(e4);
-	Entity e5 = registry.create();
-    contains1 = registry.contains(e1);
-    Entity e6 = registry.create();
-    contains1 = registry.contains(e1);
-    Entity e7 = registry.create();
-    
+
+    srand(time(NULL));
+
+    //for (auto i = 0; i < 50; ++i)
+    //{
+    //    auto entity = registry.create();
+
+    //    registry.assign<Transform>(entity, glm::vec3(i * 1.f, i * 1.f, i * 1.f));
+    //    
+    //    float a = (rand() % 100) / 100.0;
+    //    float b = 1.0 - a;
+    //    registry.assign<Physics>(entity, glm::vec3(a, b, 0), i * .1f);
+    //}
+
+    auto entity = registry.create();
+
+    registry.assign<Transform>(entity, 1.f, 1.f, 0.0f);
+
+    float a = (float)((rand() % 100) / 100.0);
+    float b = (float)(1.0 - a);
+    registry.assign<Physics>(entity, a, b, 0.0f, 2.0f);
+
 
     GETWINDOW.initialize(hinstance, 800, 600, 0);
 
@@ -74,12 +54,46 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 void Application::update()
 {
-    
+    auto view = registry.view<Transform, Physics>();
+
+    char buffer[512];
+    sprintf_s(buffer, "\n\n");
+    OutputDebugStringA(buffer);
+
+    for (auto entity : view)
+    {
+        Physics& physics = view.get<Physics>(entity);
+        Transform& transform = view.get<Transform>(entity);
+        
+        sprintf_s(buffer, "(%f,%f)\n", transform.position.x, transform.position.y);
+        OutputDebugStringA(buffer);
+
+        transform.position.x += physics.direction.x * physics.speed;
+        transform.position.y += physics.direction.y * physics.speed;
+
+
+        if (transform.position.x <= 0 || transform.position.x >= 800)
+        {
+            transform.position.x = std::clamp(transform.position.x, 0.0f, 800.0f);
+            physics.direction.x = -physics.direction.x;
+        }
+        if (transform.position.y <= 0 || transform.position.y >= 600)
+        {
+            transform.position.y = std::clamp(transform.position.y, 0.0f, 600.0f);
+            physics.direction.y = -physics.direction.y;
+        }
+    }
 }
 
 void Application::render()
 {
-    renderer->render();
+    auto view = registry.view<Transform, Physics>();
+
+    for (auto entity : view)
+    {
+        Transform& transform = view.get<Transform>(entity);
+        //renderer->render_quad(transform.position);
+    }
 }
 
 
