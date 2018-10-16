@@ -5,76 +5,59 @@
 
 #include "singleton.h"
 #include "event.h"
+#include "win32/win32_keycodes.h"
 
 namespace rain
 {
     class Input : public Singleton<Input>
     {
     public:
+        Input()
+            : offsetX(0)
+            , offsetY(0)
+            , lastPosX(-1)
+            , lastPosY(-1)
+        {
+        }
+
         void update()
         {
-            m_keyPressedEventArgs.clear();
-            m_keyReleasedEventArgs.clear();
-            m_mouseMotionEventArgs.clear();
-            m_mouseButtonPressedEventArgs.clear();
-            m_mouseButtonReleasedEventArgs.clear();
-            m_mouseWheelEventArgs.clear();
-            m_resizeEventArgs.clear();
+            m_inputEvents.clear();
         }
 
-        virtual void OnKeyPressed(KeyEventArgs& e)
+        void push_back(InputEvent _event)
         {
-            m_keyPressedEventArgs.push_back(e);
+            m_inputEvents.push_back(_event);
+            if (_event.type == InputEvent::Type::MouseMotion)
+            {
+                if (lastPosX == -1 || lastPosY == -1)
+                {
+                    lastPosX = (float)_event.X;
+                    lastPosY = (float)_event.Y;
+                }
+
+                offsetX = (float)_event.X - lastPosX;
+                offsetY = lastPosY - (float)_event.Y;
+                lastPosX = (float)_event.X;
+                lastPosY = (float)_event.Y;
+            }
         }
+
+        bool get_input(KeyCode::Key _key)
+        {
+            for (auto input_event : m_inputEvents)
+            {
+                return (input_event.type == InputEvent::Type::Keyboard && input_event.key == _key);
+            }
+        }
+
         
-        virtual void OnKeyReleased(KeyEventArgs& e)
-        {
-            m_keyReleasedEventArgs.push_back(e);
-        }
-        
-        virtual void OnMouseMoved(MouseMotionEventArgs& e)
-        {
-            m_mouseMotionEventArgs.push_back(e);
-        }
-
-        virtual void OnMouseButtonPressed(MouseButtonEventArgs& e)
-        {
-            m_mouseButtonPressedEventArgs.push_back(e);
-        }
-
-        virtual void OnMouseButtonReleased(MouseButtonEventArgs& e)
-        {
-            m_mouseButtonReleasedEventArgs.push_back(e);
-        }
-
-        virtual void OnMouseWheel(MouseWheelEventArgs& e)
-        {
-            m_mouseWheelEventArgs.push_back(e);
-        }
-
-        virtual void OnResize(ResizeEventArgs& e)
-        {
-            m_resizeEventArgs.push_back(e);
-        }
-
-        bool IsPressed(const KeyEventArgs& e)
-        {
-            return std::find(m_keyPressedEventArgs.begin(), m_keyPressedEventArgs.end(), e) != m_keyPressedEventArgs.end();
-        }
-
-        bool IsReleased(const KeyEventArgs& e)
-        {
-            return std::find(m_keyReleasedEventArgs.begin(), m_keyReleasedEventArgs.end(), e) != m_keyReleasedEventArgs.end();
-        }
-
+        float offsetX;
+        float offsetY;
+        float lastPosX;
+        float lastPosY;
 
     private:
-        std::vector<KeyEventArgs> m_keyPressedEventArgs;
-        std::vector<KeyEventArgs> m_keyReleasedEventArgs;
-        std::vector<MouseMotionEventArgs> m_mouseMotionEventArgs;
-        std::vector<MouseButtonEventArgs> m_mouseButtonPressedEventArgs;
-        std::vector<MouseButtonEventArgs> m_mouseButtonReleasedEventArgs;
-        std::vector<MouseWheelEventArgs> m_mouseWheelEventArgs;
-        std::vector<ResizeEventArgs> m_resizeEventArgs;
+        std::vector<InputEvent> m_inputEvents;
     };
 }

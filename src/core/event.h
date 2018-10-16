@@ -1,143 +1,63 @@
 #pragma once
 #include "win32/win32_keycodes.h"
 
-// Base class for all event args
-class EventArgs
-{
-public:
-    EventArgs()
-    {}
 
-};
-
-class KeyEventArgs : public EventArgs
+struct InputEvent
 {
-public:
-    enum KeyState
+    enum class Type
+    {
+        Keyboard = 0,
+        MouseMotion = 1,
+        MouseButton = 3,
+        MouseWheel = 4
+    };
+
+    enum class State
     {
         Released = 0,
         Pressed = 1
     };
 
-    typedef EventArgs base;
-    KeyEventArgs(KeyCode::Key key, unsigned int c, KeyState state, bool control, bool shift, bool alt)
-        : Key(key)
-        , Char(c)
-        , State(state)
-        , Control(control)
-        , Shift(shift)
-        , Alt(alt)
-    {}
-
-    KeyCode::Key    Key;    // The Key Code that was pressed or released.
-    unsigned int    Char;   // The 32-bit character code that was pressed. This value will be 0 if it is a non-printable character.
-    KeyState        State;  // Was the key pressed or released?
-    bool            Control;// Is the Control modifier pressed
-    bool            Shift;  // Is the Shift modifier pressed
-    bool            Alt;    // Is the Alt modifier pressed
-};
-
-class MouseMotionEventArgs : public EventArgs
-{
-public:
-    typedef EventArgs base;
-    MouseMotionEventArgs(bool leftButton, bool middleButton, bool rightButton, bool control, bool shift, int x, int y)
-        : LeftButton(leftButton)
-        , MiddleButton(middleButton)
-        , RightButton(rightButton)
-        , Control(control)
-        , Shift(shift)
-        , X(x)
-        , Y(y)
-    {}
-
-    bool LeftButton;    // Is the left mouse button down?
-    bool MiddleButton;  // Is the middle mouse button down?
-    bool RightButton;   // Is the right mouse button down?
-    bool Control;       // Is the CTRL key down?
-    bool Shift;         // Is the Shift key down?
-
-    int X;              // The X-position of the cursor relative to the upper-left corner of the client area.
-    int Y;              // The Y-position of the cursor relative to the upper-left corner of the client area.
-    int RelX;           // How far the mouse moved since the last event.
-    int RelY;           // How far the mouse moved since the last event.
-
-};
-
-class MouseButtonEventArgs : public EventArgs
-{
-public:
-    enum MouseButton
+    enum class ButtonType
     {
         None = 0,
         Left = 1,
         Right = 2,
         Middel = 3
     };
-    enum ButtonState
-    {
-        Released = 0,
-        Pressed = 1
-    };
 
-    typedef EventArgs base;
-    MouseButtonEventArgs(MouseButton buttonID, ButtonState state, bool leftButton, bool middleButton, bool rightButton, bool control, bool shift, int x, int y)
-        : Button(buttonID)
-        , State(state)
-        , LeftButton(leftButton)
-        , MiddleButton(middleButton)
-        , RightButton(rightButton)
-        , Control(control)
-        , Shift(shift)
-        , X(x)
-        , Y(y)
-    {}
+    Type type;
 
-    MouseButton Button; // The mouse button that was pressed or released.
-    ButtonState State;  // Was the button pressed or released?
-    bool LeftButton;    // Is the left mouse button down?
-    bool MiddleButton;  // Is the middle mouse button down?
-    bool RightButton;   // Is the right mouse button down?
-    bool Control;       // Is the CTRL key down?
-    bool Shift;         // Is the Shift key down?
+    int X;                      // The X-position of the cursor relative to the upper-left corner of the client area.
+    int Y;                      // The Y-position of the cursor relative to the upper-left corner of the client area.
+    bool LeftButton;
+    bool MiddleButton;
+    bool RightButton;
+    bool Control;
+    bool Shift;
+    bool Alt;
 
-    int X;              // The X-position of the cursor relative to the upper-left corner of the client area.
-    int Y;              // The Y-position of the cursor relative to the upper-left corner of the client area.
+                                // specific to "Keyboard" event
+    KeyCode::Key    key;        // The Key Code that was pressed or released.
+    unsigned int    character;  // The 32-bit character code that was pressed. This value will be 0 if it is a non-printable character.
+    State        state;         // Was the key pressed or released?
+
+                                // specific to "Button" event
+    ButtonType Button;
+
+                                // specific to "Wheel" event
+    float WheelDelta;           // How much the mouse wheel has moved. A positive value indicates that the wheel was moved to the right. A negative value indicates the wheel was moved to the left.
+
+    static InputEvent create_keyboard_event(KeyCode::Key _key, State _state, bool _shift, bool _ctrl, bool _alt);
+    static InputEvent create_mouse_move_event(int _x, int _y, bool _leftButton, bool _rightButton, bool _middleButton, bool _shift, bool _ctrl, bool _alt);
+    static InputEvent create_mouse_button_event(ButtonType _buttonType, State _state, int _x, int _y, bool _leftButton, bool _rightButton, bool _middleButton, bool _shift, bool _ctrl, bool _alt);
 
 };
 
-class MouseWheelEventArgs : public EventArgs
+class ResizeEvent
 {
 public:
-    typedef EventArgs base;
-    MouseWheelEventArgs(float wheelDelta, bool leftButton, bool middleButton, bool rightButton, bool control, bool shift, int x, int y)
-        : WheelDelta(wheelDelta)
-        , LeftButton(leftButton)
-        , MiddleButton(middleButton)
-        , RightButton(rightButton)
-        , Control(control)
-        , Shift(shift)
-        , X(x)
-        , Y(y)
-    {}
-
-    float WheelDelta;   // How much the mouse wheel has moved. A positive value indicates that the wheel was moved to the right. A negative value indicates the wheel was moved to the left.
-    bool LeftButton;    // Is the left mouse button down?
-    bool MiddleButton;  // Is the middle mouse button down?
-    bool RightButton;   // Is the right mouse button down?
-    bool Control;       // Is the CTRL key down?
-    bool Shift;         // Is the Shift key down?
-
-    int X;              // The X-position of the cursor relative to the upper-left corner of the client area.
-    int Y;              // The Y-position of the cursor relative to the upper-left corner of the client area.
-
-};
-
-class ResizeEventArgs : public EventArgs
-{
-public:
-    typedef EventArgs base;
-    ResizeEventArgs(int width, int height)
+    ResizeEvent(int width, int height)
         : Width(width)
         , Height(height)
     {}
@@ -149,21 +69,52 @@ public:
 
 };
 
-class UserEventArgs : public EventArgs
-{
-public:
-    typedef EventArgs base;
-    UserEventArgs(int code, void* data1, void* data2)
-        : Code(code)
-        , Data1(data1)
-        , Data2(data2)
-    {}
 
-    int     Code;
-    void*   Data1;
-    void*   Data2;
-};
+InputEvent InputEvent::create_keyboard_event(KeyCode::Key _key, InputEvent::State _state, bool _shift, bool _ctrl, bool _alt)
+{
+    InputEvent inputEvent = {};
+    inputEvent.type = InputEvent::Type::Keyboard;
+    inputEvent.key = _key;
+    inputEvent.state = _state;
+    inputEvent.Shift = _shift;
+    inputEvent.Control = _ctrl;
+    inputEvent.Alt = _alt;
+    return inputEvent;
+}
+
+InputEvent InputEvent::create_mouse_move_event(int _x, int _y, bool _leftButton, bool _rightButton, bool _middleButton, bool _shift, bool _ctrl, bool _alt)
+{
+    InputEvent inputEvent = {};
+    inputEvent.type = InputEvent::Type::MouseMotion;
+    inputEvent.X = _x;
+    inputEvent.Y = _y;
+    inputEvent.LeftButton = _leftButton;
+    inputEvent.RightButton = _rightButton;
+    inputEvent.MiddleButton = _middleButton;
+    inputEvent.Shift = _shift;
+    inputEvent.Control = _ctrl;
+    inputEvent.Alt = _alt;
+    return inputEvent;
+}
+
+InputEvent InputEvent::create_mouse_button_event(InputEvent::ButtonType _buttonType, InputEvent::State _state, int _x, int _y, bool _leftButton, bool _rightButton, bool _middleButton, bool _shift, bool _ctrl, bool _alt)
+{
+    InputEvent inputEvent = {};
+    inputEvent.type = InputEvent::Type::MouseMotion;
+    inputEvent.Button = _buttonType;
+    inputEvent.state = _state;
+    inputEvent.X = _x;
+    inputEvent.Y = _y;
+    inputEvent.LeftButton = _leftButton;
+    inputEvent.RightButton = _rightButton;
+    inputEvent.MiddleButton = _middleButton;
+    inputEvent.Shift = _shift;
+    inputEvent.Control = _ctrl;
+    inputEvent.Alt = _alt;
+    return inputEvent;
+}
+
 
 #include <Windows.h>
 
-MouseButtonEventArgs::MouseButton DecodeMouseButton(UINT messageID);
+InputEvent::ButtonType DecodeMouseButton(UINT messageID);
