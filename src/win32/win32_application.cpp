@@ -95,7 +95,6 @@ void Application::update()
 void Application::update_camera()
 {
     // get camera
-    char buffer[512];
     
     glm::vec3 movement(0.0f, 0.0f, 0.0f);
     glm::vec3 front = camera.front;
@@ -131,7 +130,7 @@ void Application::update_camera()
     front.y = sin(glm::radians(camera.pitch));
     front.z = sin(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
     camera.front = glm::normalize(front);
-    // Also re-calculate the Right and Up vector
+
     camera.right = glm::normalize(glm::cross(camera.front, camera.worldUp));
     camera.up = glm::normalize(glm::cross(camera.right, camera.front));
 }
@@ -141,6 +140,9 @@ void Application::render()
 {
     renderer->clear();
     renderer->set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
+
+    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+
 
     auto view = registry.view<Transform>();
 
