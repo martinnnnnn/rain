@@ -1,6 +1,7 @@
 #include "win32_window.h"
 
-#include "core/event.h"
+//#include "core/event.h"
+#include "core/input.h"
 
 #include <map>
 
@@ -203,6 +204,37 @@ void Window::recover_display_mode()
 	ChangeDisplaySettings(NULL, 0);
 }
 
+InputEvent::MouseButtonType DecodeMouseButton(UINT messageID)
+{
+    InputEvent::MouseButtonType mouseButton = InputEvent::MouseButtonType::None;
+    switch (messageID)
+    {
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_LBUTTONDBLCLK:
+    {
+        mouseButton = InputEvent::MouseButtonType::Left;
+    }
+    break;
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+    case WM_RBUTTONDBLCLK:
+    {
+        mouseButton = InputEvent::MouseButtonType::Right;
+    }
+    break;
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_MBUTTONDBLCLK:
+    {
+        mouseButton = InputEvent::MouseButtonType::Middel;
+    }
+    break;
+    }
+
+    return mouseButton;
+}
+
 
 LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -239,7 +271,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         bool alt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
         KeyCode::Key key = (KeyCode::Key)wParam;
         unsigned int scanCode = (lParam & 0x00FF0000) >> 16;
-        KeyEventArgs keyEventArgs(key, c, KeyEventArgs::Pressed, shift, control, alt);
+        GETINPUT.push_back(InputEvent::create_keyboard_event(key, c, InputEvent::State::Pressed, shift, control, alt));
     }
     break;
     case WM_SYSKEYUP:
@@ -262,8 +294,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             c = translatedCharacters[0];
         }
-
-        KeyEventArgs keyEventArgs(key, c, KeyEventArgs::Released, shift, control, alt);
+        GETINPUT.push_back(InputEvent::create_keyboard_event(key, c, InputEvent::State::Released, control, shift, alt));
     }
     break;
     // The default window procedure will play a system notification sound 
@@ -282,7 +313,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         int x = ((int)(short)LOWORD(lParam));
         int y = ((int)(short)HIWORD(lParam));
 
-        MouseMotionEventArgs mouseMotionEventArgs(lButton, mButton, rButton, control, shift, x, y);
+        GETINPUT.push_back(InputEvent::create_mouse_motion_event(x, y, lButton, rButton, mButton, control, shift));
     }
     break;
     case WM_LBUTTONDOWN:
@@ -298,7 +329,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         int x = ((int)(short)LOWORD(lParam));
         int y = ((int)(short)HIWORD(lParam));
 
-        MouseButtonEventArgs mouseButtonEventArgs(DecodeMouseButton(msg), MouseButtonEventArgs::Pressed, lButton, mButton, rButton, control, shift, x, y);
+        GETINPUT.push_back(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Pressed, x, y, lButton, rButton, mButton, control, shift));
     }
     break;
     case WM_LBUTTONUP:
@@ -314,7 +345,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         int x = ((int)(short)LOWORD(lParam));
         int y = ((int)(short)HIWORD(lParam));
 
-        MouseButtonEventArgs mouseButtonEventArgs(DecodeMouseButton(msg), MouseButtonEventArgs::Released, lButton, mButton, rButton, control, shift, x, y);
+        GETINPUT.push_back(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Released, x, y, lButton, rButton, mButton, control, shift));
     }
     break;
     case WM_MOUSEWHEEL:
@@ -340,7 +371,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         clientToScreenPoint.y = y;
         ScreenToClient(hwnd, &clientToScreenPoint);
 
-        MouseWheelEventArgs mouseWheelEventArgs(zDelta, lButton, mButton, rButton, control, shift, (int)clientToScreenPoint.x, (int)clientToScreenPoint.y);
+        //MouseWheelEventArgs mouseWheelEventArgs(zDelta, lButton, mButton, rButton, control, shift, (int)clientToScreenPoint.x, (int)clientToScreenPoint.y);
     }
     break;
 	}

@@ -20,44 +20,19 @@ namespace rain
         {
         }
 
-        void update()
-        {
-            m_inputEvents.clear();
-        }
-
-        void push_back(InputEvent _event)
-        {
-            m_inputEvents.push_back(_event);
-            if (_event.type == InputEvent::Type::MouseMotion)
-            {
-                if (lastPosX == -1 || lastPosY == -1)
-                {
-                    lastPosX = (float)_event.X;
-                    lastPosY = (float)_event.Y;
-                }
-
-                offsetX = (float)_event.X - lastPosX;
-                offsetY = lastPosY - (float)_event.Y;
-                lastPosX = (float)_event.X;
-                lastPosY = (float)_event.Y;
-            }
-        }
-
-        bool get_input(KeyCode::Key _key)
-        {
-            for (auto input_event : m_inputEvents)
-            {
-                return (input_event.type == InputEvent::Type::Keyboard && input_event.key == _key);
-            }
-        }
+        void update();
+        void push_back(InputEvent _event);
+        bool get_input(KeyCode::Key _key);
 
         
-        float offsetX;
-        float offsetY;
-        float lastPosX;
-        float lastPosY;
+        int offsetX;
+        int offsetY;
+        int lastPosX;
+        int lastPosY;
 
     private:
         std::vector<InputEvent> m_inputEvents;
     };
+
 }
+#define GETINPUT rain::Input::Get()

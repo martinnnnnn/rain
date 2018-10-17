@@ -9,16 +9,24 @@
 
 #include "win32_window.h"
 #include "ogl/ogl_renderer.h"
-
+#include "core/input.h"
+#include "core/event.h"
 
 
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
-    auto camera = registry.create();
-    registry.assign<Camera>(camera);
+    //auto camera = registry.create();
+    //registry.assign<Camera>(camera);
 
+    camera.position = glm::vec3(0.0, 0.0, 1.0f);
+    camera.movement_speed = 5;
+    camera.yaw = 0.0;
+    camera.pitch = 0.0;
+    camera.front = glm::vec3(0.0, 0.0, -1.0f);
+    camera.right = glm::vec3(glm::cross(camera.front, glm::vec3(0.0, 1.0, 0.0)));
+ 
 
     srand(time(NULL));
 
@@ -50,6 +58,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 void Application::update()
 {
+    
     update_camera();
 
     //auto view = registry.view<Transform, Physics>();
@@ -86,31 +95,50 @@ void Application::update()
 void Application::update_camera()
 {
     // get camera
-
+    char buffer[512];
+    
     glm::vec3 movement(0.0f, 0.0f, 0.0f);
     glm::vec3 front = camera.front;
     glm::vec3 right = camera.right;
 
-    if (/* up key press */false)
+    if (GETINPUT.get_input(KeyCode::Z))
     {
         movement += front * camera.movement_speed;
+        sprintf_s(buffer, "Z\n");
+        OutputDebugStringA(buffer);
     }
-    if (/* down key press */false)
+    if (GETINPUT.get_input(KeyCode::S))
     {
+        sprintf_s(buffer, "S\n");
+        OutputDebugStringA(buffer);
         movement -= front * camera.movement_speed;
     }
-    if (/* left key press */false)
+    if (GETINPUT.get_input(KeyCode::Q))
     {
+        sprintf_s(buffer, "Q\n");
         movement -= right * camera.movement_speed;
     }
-    if (/* right key press */false)
+    if (GETINPUT.get_input(KeyCode::D))
     {
+        sprintf_s(buffer, "D\n");
+        OutputDebugStringA(buffer);
         movement += right * camera.movement_speed;
     }
     camera.position += movement;
 
-    int mouseOffsetX = /* x mouse offset */0;
-    int mouseOffsetY = /* y mouse offset */0;
+    float mouseOffsetX = (float)GETINPUT.offsetX * 0.1f;
+    float mouseOffsetY = (float)GETINPUT.offsetY * 0.1f;
+
+    //if (mouseOffsetX != 0)
+    //{
+    //    sprintf_s(buffer, "x : %f\n", mouseOffsetX);
+    //    OutputDebugStringA(buffer);
+    //}
+    //if (mouseOffsetY != 0)
+    //{
+    //    sprintf_s(buffer, "y : %f\n", mouseOffsetY);
+    //    OutputDebugStringA(buffer);
+    //}
 
     camera.yaw += mouseOffsetX * 0.1f;
     camera.pitch += mouseOffsetY * 0.1f;
@@ -120,13 +148,14 @@ void Application::update_camera()
 
 void Application::render()
 {
+    renderer->clear();
     renderer->set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
 
-    auto view = registry.view<Transform, Physics>();
+    auto view = registry.view<Transform>();
 
     for (auto entity : view)
     {
-        Transform& transform = view.get<Transform>(entity);
+        Transform& transform = view.get(entity);
         renderer->render_cube(transform.position);
     }
 }
@@ -141,6 +170,7 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 	bool quit = false;
 	while (!quit)
 	{
+        GETINPUT.update();
 		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT)

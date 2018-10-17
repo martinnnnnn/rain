@@ -70,6 +70,9 @@ void Renderer::initialize()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
+    
+
+
     GLenum res = glewInit();
     char buffer[500];
     sprintf_s(buffer, 500, "Console working\n");
@@ -83,7 +86,7 @@ void Renderer::initialize()
 
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -105,7 +108,9 @@ void Renderer::initialize()
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        char buffer[512];
+        sprintf_s(buffer, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
+        OutputDebugStringA(buffer);
     }
     // fragment shader
     int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -116,7 +121,9 @@ void Renderer::initialize()
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        char buffer[512];
+        sprintf_s(buffer, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
+        OutputDebugStringA(buffer);
     }
     // link shaders
     shaderProgram = glCreateProgram();
@@ -127,7 +134,9 @@ void Renderer::initialize()
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        char buffer[512];
+        sprintf_s(buffer, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
+        OutputDebugStringA(buffer);
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -164,6 +173,7 @@ void Renderer::initialize()
     //----------------------------------------------------------
 // VAO & VBO & EBO for BOX
     glGenVertexArrays(1, &cubeVAO);
+    glBindVertexArray(cubeVAO);
 
     unsigned int cubeVBO;
     glGenBuffers(1, &cubeVBO);
@@ -172,7 +182,6 @@ void Renderer::initialize()
     //glGenBuffers(1, &EBO);
 
     // binding
-    glBindVertexArray(cubeVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -209,7 +218,7 @@ void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
     glm::vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
     glm::vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
-    view = {
+    view_mat = {
         glm::vec4(xaxis.x,            yaxis.x,            zaxis.x,      0),
         glm::vec4(xaxis.y,            yaxis.y,            zaxis.y,      0),
         glm::vec4(xaxis.z,            yaxis.z,            zaxis.z,      0),
@@ -219,6 +228,7 @@ void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
 
 void Renderer::clear()
 {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -244,20 +254,16 @@ void Renderer::render_quad()
 
 void Renderer::render_cube(const glm::vec3& _position)
 {
-    glm::mat4 mvp = projection * view * glm::translate(glm::mat4(1), _position);
+    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
+
+    glBindVertexArray(cubeVAO);
+    glUseProgram(shaderProgram);
 
     unsigned int transformLoc = glGetUniformLocation(shaderProgram, "mvp");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
