@@ -21,12 +21,12 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     //registry.assign<Camera>(camera);
 
     camera.position = glm::vec3(0.0, 0.0, 1.0f);
-    camera.movement_speed = 5;
+    camera.movement_speed = 0.1f;
     camera.yaw = 0.0;
     camera.pitch = 0.0;
     camera.front = glm::vec3(0.0, 0.0, -1.0f);
     camera.right = glm::vec3(glm::cross(camera.front, glm::vec3(0.0, 1.0, 0.0)));
- 
+    camera.worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     srand(time(NULL));
 
@@ -104,45 +104,36 @@ void Application::update_camera()
     if (GETINPUT.get_input(KeyCode::Z))
     {
         movement += front * camera.movement_speed;
-        sprintf_s(buffer, "Z\n");
-        OutputDebugStringA(buffer);
     }
     if (GETINPUT.get_input(KeyCode::S))
     {
-        sprintf_s(buffer, "S\n");
-        OutputDebugStringA(buffer);
         movement -= front * camera.movement_speed;
     }
     if (GETINPUT.get_input(KeyCode::Q))
     {
-        sprintf_s(buffer, "Q\n");
         movement -= right * camera.movement_speed;
     }
     if (GETINPUT.get_input(KeyCode::D))
     {
-        sprintf_s(buffer, "D\n");
-        OutputDebugStringA(buffer);
         movement += right * camera.movement_speed;
     }
     camera.position += movement;
 
-    float mouseOffsetX = (float)GETINPUT.offsetX * 0.1f;
-    float mouseOffsetY = (float)GETINPUT.offsetY * 0.1f;
 
-    //if (mouseOffsetX != 0)
-    //{
-    //    sprintf_s(buffer, "x : %f\n", mouseOffsetX);
-    //    OutputDebugStringA(buffer);
-    //}
-    //if (mouseOffsetY != 0)
-    //{
-    //    sprintf_s(buffer, "y : %f\n", mouseOffsetY);
-    //    OutputDebugStringA(buffer);
-    //}
+    //sprintf_s(buffer, "offset : (%d, %d)\n", GETINPUT.offsetX, GETINPUT.offsetY);
+    //OutputDebugStringA(buffer);
 
-    camera.yaw += mouseOffsetX * 0.1f;
-    camera.pitch += mouseOffsetY * 0.1f;
+    camera.yaw += (float)GETINPUT.offsetX * 0.1f;
+    camera.pitch += (float)GETINPUT.offsetY * 0.1f;
     camera.pitch = std::clamp(camera.pitch, -89.0f, 89.0f);
+
+    front.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
+    front.y = sin(glm::radians(camera.pitch));
+    front.z = sin(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
+    camera.front = glm::normalize(front);
+    // Also re-calculate the Right and Up vector
+    camera.right = glm::normalize(glm::cross(camera.front, camera.worldUp));
+    camera.up = glm::normalize(glm::cross(camera.right, camera.front));
 }
 
 

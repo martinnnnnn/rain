@@ -1,10 +1,13 @@
 #include "core/input.h"
 
+
 using namespace rain;
 
 void Input::update()
 {
     m_inputEvents.clear();
+    offsetX = 0;
+    offsetY = 0;
 }
 
 void Input::push_back(InputEvent _event)
@@ -12,7 +15,7 @@ void Input::push_back(InputEvent _event)
     m_inputEvents.push_back(_event);
     if (_event.type == InputEvent::Type::MouseMotion)
     {
-        if (lastPosX == -1.0f || lastPosY == -1.0f)
+        if (lastPosX == -1 || lastPosY == -1)
         {
             lastPosX = _event.X;
             lastPosY = _event.Y;
