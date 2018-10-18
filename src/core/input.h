@@ -15,20 +15,21 @@ namespace rain
         Input()
             : offsetX(0)
             , offsetY(0)
-            , lastPosX(-1)
-            , lastPosY(-1)
+            , centerPosX(0)
+            , centerPosY(0)
         {
         }
 
+        void initialize_center_pos(int _x, int _y);
         void update();
-        void push_back(InputEvent _event);
+        void add_input_event(InputEvent _event);
         bool get_input(KeyCode::Key _key);
+        void reset_mouse_offset();
 
-        
         int offsetX;
         int offsetY;
-        int lastPosX;
-        int lastPosY;
+        int centerPosX;
+        int centerPosY;
 
     private:
         std::vector<InputEvent> m_inputEvents;

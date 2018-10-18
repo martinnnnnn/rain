@@ -3,6 +3,7 @@
 //#include "core/event.h"
 #include "core/input.h"
 
+#include <strsafe.h>
 #include <map>
 
 DWORD err;
@@ -25,7 +26,6 @@ int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth
 	m_width = _width;
 	m_height = _height;
 	m_depth = _depth;
-
 
 	WNDCLASSEX ex;
 	ex.cbSize = sizeof(WNDCLASSEX);
@@ -62,6 +62,35 @@ int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth
 		NULL,
 		_hinstance,
 		NULL);
+
+    m_rect.top = posy;
+    m_rect.bottom = posy + m_height;
+    m_rect.left = posx;
+    m_rect.right = posx + m_width;
+
+    //center_pos_x = m_width / 2;
+    //center_pos_y = m_height / 2;
+
+    //GETINPUT.initialize_center_pos(center_pos_x, center_pos_y);
+
+    RAWINPUTDEVICE Rid[2];
+
+    Rid[0].usUsagePage = 0x01;
+    Rid[0].usUsage = 0x02;
+    Rid[0].dwFlags = 0;
+    Rid[0].hwndTarget = 0;
+
+    Rid[1].usUsagePage = 0x01;
+    Rid[1].usUsage = 0x06;
+    Rid[1].dwFlags = 0;
+    Rid[1].hwndTarget = 0;
+
+    if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
+    {
+        MessageBox(m_hwnd, "Failed to register raw input devices", "Input device error", MB_OK);
+        return -1;
+        //registration failed. Call GetLastError for the cause of the error
+    }
 
     if ((m_hdc = GetDC(m_hwnd)) == NULL)
     {
@@ -204,6 +233,12 @@ void Window::recover_display_mode()
 	ChangeDisplaySettings(NULL, 0);
 }
 
+glm::vec2 Window::get_center_pos_absolute()
+{
+    return glm::vec2(m_rect.left + center_pos_x, m_rect.top + center_pos_y);
+}
+
+
 InputEvent::MouseButtonType DecodeMouseButton(UINT messageID)
 {
     InputEvent::MouseButtonType mouseButton = InputEvent::MouseButtonType::None;
@@ -252,6 +287,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		GETWINDOW.resize(LOWORD(lParam), HIWORD(lParam));
 		break;
 	}
+
     case WM_SYSKEYDOWN:
     case WM_KEYDOWN:
     {
@@ -271,7 +307,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         bool alt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
         KeyCode::Key key = (KeyCode::Key)wParam;
         unsigned int scanCode = (lParam & 0x00FF0000) >> 16;
-        GETINPUT.push_back(InputEvent::create_keyboard_event(key, c, InputEvent::State::Pressed, shift, control, alt));
+        GETINPUT.add_input_event(InputEvent::create_keyboard_event(key, c, InputEvent::State::Pressed, shift, control, alt));
     }
     break;
     case WM_SYSKEYUP:
@@ -294,7 +330,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             c = translatedCharacters[0];
         }
-        GETINPUT.push_back(InputEvent::create_keyboard_event(key, c, InputEvent::State::Released, control, shift, alt));
+        GETINPUT.add_input_event(InputEvent::create_keyboard_event(key, c, InputEvent::State::Released, control, shift, alt));
     }
     break;
     // The default window procedure will play a system notification sound 
@@ -310,10 +346,20 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         bool shift = (wParam & MK_SHIFT) != 0;
         bool control = (wParam & MK_CONTROL) != 0;
 
-        int x = ((int)(short)LOWORD(lParam));
-        int y = ((int)(short)HIWORD(lParam));
+        int x = ((int)(short)LOWORD(lParam) - 12);
+        int y = ((int)(short)HIWORD(lParam) + 1);
 
-        GETINPUT.push_back(InputEvent::create_mouse_motion_event(x, y, lButton, rButton, mButton, control, shift));
+        int newx = GETWINDOW.get_center_pos_absolute().x;
+        int newy = GETWINDOW.get_center_pos_absolute().y;
+
+        //GETINPUT.add_input_event(InputEvent::create_mouse_motion_event(x, y, lButton, rButton, mButton, control, shift));
+        //::SetCursorPos(newx, newy);
+
+        //char buffer[256];
+        //sprintf_s(buffer, "received : (%d, %d)\n", x, y);
+        //OutputDebugStringA(buffer);
+        //sprintf_s(buffer, "center : (%d, %d)\n", newx / 2, newy / 2);
+        //OutputDebugStringA(buffer);
     }
     break;
     case WM_LBUTTONDOWN:
@@ -329,7 +375,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         int x = ((int)(short)LOWORD(lParam));
         int y = ((int)(short)HIWORD(lParam));
 
-        GETINPUT.push_back(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Pressed, x, y, lButton, rButton, mButton, control, shift));
+        GETINPUT.add_input_event(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Pressed, x, y, lButton, rButton, mButton, control, shift));
     }
     break;
     case WM_LBUTTONUP:
@@ -345,7 +391,7 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         int x = ((int)(short)LOWORD(lParam));
         int y = ((int)(short)HIWORD(lParam));
 
-        GETINPUT.push_back(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Released, x, y, lButton, rButton, mButton, control, shift));
+        GETINPUT.add_input_event(InputEvent::create_mouse_button_event(DecodeMouseButton(msg), InputEvent::State::Released, x, y, lButton, rButton, mButton, control, shift));
     }
     break;
     case WM_MOUSEWHEEL:

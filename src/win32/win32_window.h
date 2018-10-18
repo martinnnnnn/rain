@@ -18,6 +18,8 @@
 #include "core/singleton.h"
 #include "ogl/ogl_renderer.h"
 
+#include <glm/glm.hpp>
+
 #define RAIN_WNDCLASSNAME "RainClass"
 #define RAIN_WNDNAME "Rain Engine"
 
@@ -35,15 +37,17 @@ public:
 	void fullscreen(bool _fullscreen);
 	void recover_display_mode();
     bool is_initialized() { return initialized; }
-
+    glm::vec2 get_center_pos_absolute();
 
 private:
 
+    int center_pos_x;
+    int center_pos_y;
     HWND m_hwnd;
     HDC m_hdc;
     HGLRC m_hglrc;
-    bool m_fullscreen;
     RECT m_rect;
+    bool m_fullscreen;
     int m_width;
     int m_height;
     int m_depth;

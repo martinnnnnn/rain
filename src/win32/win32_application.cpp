@@ -94,6 +94,20 @@ void Application::update()
 
 void Application::update_camera()
 {
+    if (GETINPUT.get_input(KeyCode::C))
+    {
+        static bool cursor_visible = true;
+        cursor_visible = !cursor_visible;
+        if (cursor_visible)
+        {
+            ::ShowCursor(true);
+        }
+        else
+        {
+            ::ShowCursor(false);
+        }
+    }
+
     // get camera
     
     glm::vec3 movement(0.0f, 0.0f, 0.0f);
@@ -118,9 +132,6 @@ void Application::update_camera()
     }
     camera.position += movement;
 
-
-    //sprintf_s(buffer, "offset : (%d, %d)\n", GETINPUT.offsetX, GETINPUT.offsetY);
-    //OutputDebugStringA(buffer);
 
     camera.yaw += (float)GETINPUT.offsetX * 0.1f;
     camera.pitch += (float)GETINPUT.offsetY * 0.1f;

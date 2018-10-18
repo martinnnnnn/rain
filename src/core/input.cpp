@@ -1,32 +1,44 @@
 #include "core/input.h"
 
+#include <iostream>
 
 using namespace rain;
+
+void Input::initialize_center_pos(int _x, int _y)
+{
+    centerPosX = _x;
+    centerPosY = _y;
+}
 
 void Input::update()
 {
     m_inputEvents.clear();
-    offsetX = 0;
-    offsetY = 0;
+    reset_mouse_offset();
 }
 
-void Input::push_back(InputEvent _event)
+void Input::add_input_event(InputEvent _event)
 {
     m_inputEvents.push_back(_event);
     if (_event.type == InputEvent::Type::MouseMotion)
     {
-        if (lastPosX == -1 || lastPosY == -1)
+        if (_event.X != centerPosX || _event.Y != centerPosY)
         {
-            lastPosX = _event.X;
-            lastPosY = _event.Y;
+            offsetX = _event.X;
+            offsetY = _event.Y;
         }
-
-        offsetX = lastPosX - _event.X;
-        offsetY = lastPosY - _event.Y;
-        lastPosX = _event.X;
-        lastPosY = _event.Y;
+        else
+        {
+            std::cout << "hello";
+        }
     }
 }
+
+void Input::reset_mouse_offset()
+{
+    offsetX = 0;
+    offsetY = 0;
+}
+
 
 bool Input::get_input(KeyCode::Key _key)
 {

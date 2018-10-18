@@ -69,3 +69,8 @@ public:
     int Height;
 
 };
+
+struct RIEvent
+{
+
+};
