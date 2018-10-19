@@ -58,6 +58,10 @@ int Input::initialize()
     m_keyboard->Acquire();
     m_mouse->Acquire();
 
+    auto pos = GETWINDOW.get_center_pos_absolute();
+    x_center = pos.x;
+    y_center = pos.y;
+
     return 0;
 }
 
@@ -122,11 +126,14 @@ void Input::update()
     y_offset = dims2.lY;
     x_screen_pos += x_offset;
     y_screen_pos += y_offset;
+
+    set_cursor_pos(x_center, y_center);
+
 }
 
 bool Input::is_key_pressed(u32 _code)
 {
-    return (m_keys[DIK_Z] & 0x80);
+    return (m_keys[_code] & 0x80);
 }
 
 void Input::set_cursor_pos(u32 _x, u32 _y)

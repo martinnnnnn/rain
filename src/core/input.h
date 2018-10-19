@@ -31,15 +31,16 @@ namespace rain
 
         i32 x_offset;
         i32 y_offset;
-        i32 x_screen_pos;
-        i32 y_screen_pos;
+        u32 x_screen_pos;
+        u32 y_screen_pos;
     private:
         std::vector<InputEvent> m_inputEvents;
         LPDIRECTINPUT8  m_diObject;
         LPDIRECTINPUTDEVICE8 m_keyboard;
         LPDIRECTINPUTDEVICE8 m_mouse;
         BYTE    m_keys[256];
-
+        u32 x_center;
+        u32 y_center;
     };
 
 }

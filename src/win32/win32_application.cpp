@@ -141,8 +141,8 @@ void Application::update_camera()
     camera.position += movement;
 
 
-    camera.yaw += (float)GETINPUT.x_offset * 0.1f;
-    camera.pitch += (float)GETINPUT.y_offset * 0.1f;
+    camera.yaw += (float)GETINPUT.x_offset * -0.1f;
+    camera.pitch += (float)GETINPUT.y_offset * -0.1f;
     camera.pitch = std::clamp(camera.pitch, -89.0f, 89.0f);
 
     front.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));

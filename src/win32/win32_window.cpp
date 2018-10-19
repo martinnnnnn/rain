@@ -68,10 +68,8 @@ int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth
     m_rect.left = posx;
     m_rect.right = posx + m_width;
 
-    //center_pos_x = m_width / 2;
-    //center_pos_y = m_height / 2;
-
-    //GETINPUT.initialize_center_pos(center_pos_x, center_pos_y);
+    center_pos_x = m_width / 2;
+    center_pos_y = m_height / 2;
 
     RAWINPUTDEVICE Rid[2];
 
