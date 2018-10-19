@@ -1,6 +1,10 @@
 #pragma once
 
 #include <Windows.h>
+
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -86,14 +90,20 @@ class Application
 {
 public:
     int init(HINSTANCE _hinstance, const std::string& _config);
+    void shutdown();
     void update();
     void render();
 
     void update_camera();
+
+    LPDIRECTINPUTDEVICE8 m_keyboard;
+    LPDIRECTINPUTDEVICE8 m_mouse;
 
 private:
     HINSTANCE hinstance;
     Renderer* renderer;
     entt::DefaultRegistry registry;
     Camera camera;
+
+    LPDIRECTINPUT8  m_diObject;
 };

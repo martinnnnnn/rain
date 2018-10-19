@@ -38,12 +38,12 @@ public:
 	void recover_display_mode();
     bool is_initialized() { return initialized; }
     glm::vec2 get_center_pos_absolute();
+    HWND m_hwnd;
 
 private:
 
     int center_pos_x;
     int center_pos_y;
-    HWND m_hwnd;
     HDC m_hdc;
     HGLRC m_hglrc;
     RECT m_rect;

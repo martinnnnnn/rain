@@ -145,6 +145,7 @@ int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth
 
     resize(m_width, m_height);
 
+
     initialized = true;
 
 	return 0;

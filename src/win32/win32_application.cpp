@@ -50,8 +50,57 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
     renderer = new Renderer();
     renderer->initialize();
-    
+
+
+    // INITIALIZING INPUT
+    HRESULT hr = ::DirectInput8Create(hinstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_diObject, NULL);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_diObject->CreateDevice(GUID_SysKeyboard, &m_keyboard, NULL);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_keyboard->SetDataFormat(&c_dfDIKeyboard);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_keyboard->SetCooperativeLevel(GETWINDOW.m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_diObject->CreateDevice(GUID_SysMouse, &m_mouse, NULL);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_mouse->SetDataFormat(&c_dfDIMouse2);
+    if (FAILED(hr))
+        return hr;
+
+    hr = m_mouse->SetCooperativeLevel(GETWINDOW.m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+    if (FAILED(hr))
+        return hr;
+
+    //if (!bImmediate)
+    {
+        DIPROPDWORD dipdw;
+        dipdw.diph.dwSize = sizeof(DIPROPDWORD);
+        dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+        dipdw.diph.dwObj = 0;
+        dipdw.diph.dwHow = DIPH_DEVICE;
+        dipdw.dwData = 16; // Arbitrary buffer size
+
+        if (FAILED(hr = m_mouse->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph)))
+            return hr;
+    }
+
     GETWINDOW.show();
+
+    m_keyboard->Acquire();
+    m_mouse->Acquire();
+
+
+
 
     return 0;
 }
@@ -90,6 +139,18 @@ void Application::update()
     //        physics.direction.y = -physics.direction.y;
     //    }
     //}
+}
+
+void Application::shutdown()
+{
+    //if (m_diKeyboardDevice)
+    //{
+    //    m_diKeyboardDevice->Unacquire();
+    //    m_diKeyboardDevice->Release();
+    //}
+
+    //if (m_diObject)
+    //    m_diObject->Release();
 }
 
 void Application::update_camera()
@@ -175,14 +236,87 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 	while (!quit)
 	{
         GETINPUT.update();
-		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-				quit = true;
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+
+        app->m_keyboard->Acquire();
+        BYTE    keys[256];
+        // Get the input's device state, and put the state in keys - zero first
+        ZeroMemory(keys, sizeof(keys));
+        HRESULT hr = app->m_keyboard->GetDeviceState(sizeof(keys), keys);
+
+        if (FAILED(hr))
+        {
+            // If input is lost then acquire and keep trying until we get it back 
+            hr = app->m_keyboard->Acquire();
+            while (hr == DIERR_INPUTLOST)
+            {
+                hr = app->m_keyboard->Acquire();
+            }
+            // Could be we failed for some other reason
+            if (FAILED(hr))
+                return -1;
+            // Now read the state again
+            app->m_keyboard->GetDeviceState(sizeof(keys), keys);
+        }
+
+        if (keys[DIK_Z] & 0x80)
+        {
+            char buffer[128];
+            sprintf_s(buffer, "UP\n");
+            OutputDebugStringA(buffer);
+        }
+
+        if (keys[DIK_S] & 0x80)
+        {
+            char buffer[128];
+            sprintf_s(buffer, "DOWN\n");
+            OutputDebugStringA(buffer);
+        }
+
+        if (keys[DIK_Q] & 0x80)
+        {
+            char buffer[128];
+            sprintf_s(buffer, "LEFT\n");
+            OutputDebugStringA(buffer);
+        }
+
+        if (keys[DIK_D] & 0x80)
+        {
+            char buffer[128];
+            sprintf_s(buffer, "RIGHT\n");
+            OutputDebugStringA(buffer);
+        }
+
+        DIMOUSESTATE2 dims2;
+        ZeroMemory(&dims2, sizeof(dims2));
+
+        hr = app->m_mouse->GetDeviceState(sizeof(DIMOUSESTATE2),
+            &dims2);
+        if (FAILED(hr))
+        {
+            hr = app->m_mouse->Acquire();
+            while (hr == DIERR_INPUTLOST)
+                hr = app->m_mouse->Acquire();
+
+            return S_OK;
+        }
+
+        int xPosRelative = dims2.lX;
+        int yPosRelative = dims2.lY;
+
+
+        char buff[128];
+        sprintf_s(buff, "(%d,%d)\n", xPosRelative, yPosRelative);
+        OutputDebugStringA(buff);
+
+		//if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+		//{
+		//	if (msg.message == WM_QUIT)
+		//		quit = true;
+
+		//	TranslateMessage(&msg);
+		//	DispatchMessage(&msg);
+		//}
 
         // *** game logic update *** // 
         app->update();
