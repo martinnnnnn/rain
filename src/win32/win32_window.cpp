@@ -71,24 +71,6 @@ int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth
     center_pos_x = m_width / 2;
     center_pos_y = m_height / 2;
 
-    RAWINPUTDEVICE Rid[2];
-
-    Rid[0].usUsagePage = 0x01;
-    Rid[0].usUsage = 0x02;
-    Rid[0].dwFlags = 0;
-    Rid[0].hwndTarget = 0;
-
-    Rid[1].usUsagePage = 0x01;
-    Rid[1].usUsage = 0x06;
-    Rid[1].dwFlags = 0;
-    Rid[1].hwndTarget = 0;
-
-    if (RegisterRawInputDevices(Rid, 2, sizeof(Rid[0])) == FALSE)
-    {
-        MessageBox(m_hwnd, "Failed to register raw input devices", "Input device error", MB_OK);
-        return -1;
-        //registration failed. Call GetLastError for the cause of the error
-    }
 
     if ((m_hdc = GetDC(m_hwnd)) == NULL)
     {

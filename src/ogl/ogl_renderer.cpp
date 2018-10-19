@@ -105,10 +105,10 @@ void Renderer::initialize_coord_view()
     float coord_lines[36] =
     {
          0.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-         5.0, 0.0, 0.0,  1.0, 0.0, 0.0,
+         20.0, 0.0, 0.0,  1.0, 0.0, 0.0,
          0.0, 0.0, 0.0,  0.0, 1.0, 0.0,
-         0.0, 5.0, 0.0,  0.0, 1.0, 0.0,
-         0.0, 0.0, 5.0,  0.0, 0.0, 1.0,
+         0.0, 20.0, 0.0,  0.0, 1.0, 0.0,
+         0.0, 0.0, 20.0,  0.0, 0.0, 1.0,
          0.0, 0.0, 0.0,  0.0, 0.0, 1.0,
     };
 
@@ -326,6 +326,16 @@ void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
         glm::vec4(xaxis.z,            yaxis.z,            zaxis.z,      0),
         glm::vec4(-glm::dot(xaxis, _eye), -glm::dot(yaxis, _eye), -glm::dot(zaxis, _eye), 1)
     };
+}
+
+void Renderer::set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up)
+{
+    view_mat = glm::lookAt(_eye, _center, _up);
+}
+
+void Renderer::set_view_matrix(const glm::mat4& _matrix)
+{
+    view_mat = _matrix;
 }
 
 void Renderer::clear()

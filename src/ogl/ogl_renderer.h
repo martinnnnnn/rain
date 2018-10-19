@@ -26,6 +26,8 @@ public:
     void clear();
     void set_projection_matrix(const glm::mat4& _projection);
     void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
+    void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
+    void set_view_matrix(const glm::mat4& _matrix);
     void render_quad();
     void render_coord_view(const glm::vec3& _position);
     void render_cube(const glm::vec3& _position);
