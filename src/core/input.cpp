@@ -123,7 +123,7 @@ void Input::update()
     }
 
     x_offset = dims2.lX;
-    y_offset = dims2.lY;
+    y_offset = -dims2.lY;
     x_screen_pos += x_offset;
     y_screen_pos += y_offset;
 

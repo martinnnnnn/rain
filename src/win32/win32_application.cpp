@@ -22,15 +22,15 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     //auto camera = registry.create();
     //registry.assign<Camera>(camera);
 
-    camera.position = glm::vec3(0.0f, 0.0f, -10.0f);
+    camera.position = glm::vec3(0.0f, 0.0f, 10.0f);
     camera.worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    camera.front = glm::vec3(0.0f, 0.0f, 1.0f);
+    camera.front = glm::vec3(0.0f, 0.0f, -1.0f);
 
 
     //camera.position = glm::vec3(0.0, 0.0, -1.0f);
     camera.movement_speed = 0.1f;
-    camera.yaw = 0.0;
-    camera.pitch = 0.0;
+    camera.yaw = -90.0f;
+    camera.pitch = 0.0f;
     /*camera.front = glm::vec3(0.0, 0.0, 1.0f);
     camera.right = glm::vec3(glm::cross(camera.front, glm::vec3(0.0, 1.0, 0.0)));
     camera.worldUp = glm::vec3(0.0f, 1.0f, 0.0f);*/
@@ -147,12 +147,17 @@ void Application::update_camera()
     }
     camera.position += movement;
 
-    char buffer[256];
-    sprintf_s(buffer, "(%f, %f, %f)\n", camera.position.x, camera.position.y, camera.position.z);
-    OutputDebugStringA(buffer);
+    //char buffer[256];
+    //sprintf_s(buffer, "(%f, %f, %f)\n", camera.position.x, camera.position.y, camera.position.z);
+    //OutputDebugStringA(buffer);
 
     camera.yaw += (float)GETINPUT.x_offset * 0.1f;
     camera.pitch += (float)GETINPUT.y_offset * 0.1f;
+
+	char buffer[256];
+	sprintf_s(buffer, "(%d, %d)\n", GETINPUT.x_offset, GETINPUT.y_offset);
+	OutputDebugStringA(buffer);
+
     camera.pitch = std::clamp(camera.pitch, -89.0f, 89.0f);
 
     front.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
