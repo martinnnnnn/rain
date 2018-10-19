@@ -2,8 +2,7 @@
 
 #include <Windows.h>
 
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
+
 
 #include <string>
 #include <unordered_map>
@@ -96,8 +95,7 @@ public:
 
     void update_camera();
 
-    LPDIRECTINPUTDEVICE8 m_keyboard;
-    LPDIRECTINPUTDEVICE8 m_mouse;
+
 
 private:
     HINSTANCE hinstance;
@@ -105,5 +103,4 @@ private:
     entt::DefaultRegistry registry;
     Camera camera;
 
-    LPDIRECTINPUT8  m_diObject;
 };

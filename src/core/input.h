@@ -3,6 +3,11 @@
 #include <vector>
 #include <algorithm>
 
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
+#include <glm/glm.hpp>
+
 #include "singleton.h"
 #include "event.h"
 #include "win32/win32_keycodes.h"
@@ -12,27 +17,29 @@ namespace rain
     class Input : public Singleton<Input>
     {
     public:
-        Input()
-            : offsetX(0)
-            , offsetY(0)
-            , centerPosX(0)
-            , centerPosY(0)
-        {
-        }
+        Input();
 
-        void initialize_center_pos(int _x, int _y);
+        int initialize();
+        void shutdown();
+
         void update();
-        void add_input_event(InputEvent _event);
-        bool get_input(KeyCode::Key _key);
-        void reset_mouse_offset();
 
-        int offsetX;
-        int offsetY;
-        int centerPosX;
-        int centerPosY;
+        void set_cursor_pos(u32 _x, u32 _y);
+        void update_absolute_mouse_pos(u32 _x, u32 _y);
 
+        bool is_key_pressed(u32 _code);
+
+        i32 x_offset;
+        i32 y_offset;
+        i32 x_screen_pos;
+        i32 y_screen_pos;
     private:
         std::vector<InputEvent> m_inputEvents;
+        LPDIRECTINPUT8  m_diObject;
+        LPDIRECTINPUTDEVICE8 m_keyboard;
+        LPDIRECTINPUTDEVICE8 m_mouse;
+        BYTE    m_keys[256];
+
     };
 
 }
