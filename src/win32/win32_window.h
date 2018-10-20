@@ -28,7 +28,7 @@ class Window : public Singleton<Window>
 {
 public:
 
-    int initialize(HINSTANCE _hinstance, int _width, int _height, int _depth);
+    int init(HINSTANCE _hinstance, int _width, int _height, int _depth);
 	void present();
 	void shutdown();
 	void show();
@@ -57,4 +57,4 @@ private:
 LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 
-#define GETWINDOW Window::Get()
+#define RAIN_WINDOW Window::Get()

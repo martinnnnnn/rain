@@ -5,7 +5,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include <algorithm>
-#include <algorithm>
 
 #include "win32_window.h"
 #include "ogl/ogl_renderer.h"
@@ -19,24 +18,22 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
-    //auto camera = registry.create();
-    //registry.assign<Camera>(camera);
+	// INIT WINDOW
+	RAIN_WINDOW.init(hinstance, 800, 600, 0);
+	renderer.init();
+	RAIN_WINDOW.show();
 
-    camera.position = glm::vec3(0.0f, 0.0f, 10.0f);
-    camera.worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    camera.front = glm::vec3(0.0f, 0.0f, -1.0f);
+	// INIT INPUT
+	RAIN_INPUT.init();
 
 
-    //camera.position = glm::vec3(0.0, 0.0, -1.0f);
-    camera.movement_speed = 0.1f;
-    camera.yaw = -90.0f;
-    camera.pitch = 0.0f;
-    /*camera.front = glm::vec3(0.0, 0.0, 1.0f);
-    camera.right = glm::vec3(glm::cross(camera.front, glm::vec3(0.0, 1.0, 0.0)));
-    camera.worldUp = glm::vec3(0.0f, 1.0f, 0.0f);*/
+	camera.init();
 
-    srand(time(NULL));
 
+	auto entity = registry.create();
+	registry.assign<Transform>(entity, 0.0f, 0.0f, 0.0f);
+
+    //srand(time(NULL));
     //for (auto i = 0; i < 50; ++i)
     //{
     //    auto entity = registry.create();
@@ -48,28 +45,26 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     //    registry.assign<Physics>(entity, glm::vec3(a, b, 0), i * .1f);
     //}
 
-    auto entity = registry.create();
-
-    registry.assign<Transform>(entity, 0.0f, 0.0f, 0.0f);
-
-
-    GETWINDOW.initialize(hinstance, 800, 600, 0);
-
-    renderer = new Renderer();
-    renderer->initialize();
-
-    GETWINDOW.show();
-
-    GETINPUT.initialize();
-
-
     return 0;
 }
 
 void Application::update()
 {
-    
-    update_camera();
+	if (RAIN_INPUT.is_key_pressed(DIK_P))
+	{
+		static bool cursor_visible = true;
+		cursor_visible = !cursor_visible;
+		if (cursor_visible)
+		{
+			::ShowCursor(true);
+		}
+		else
+		{
+			::ShowCursor(false);
+		}
+	}
+	
+	camera.update();
 
     //auto view = registry.view<Transform, Physics>();
 
@@ -104,78 +99,16 @@ void Application::update()
 
 void Application::shutdown()
 {
-    GETINPUT.shutdown();
-}
-
-void Application::update_camera()
-{
-    if (GETINPUT.is_key_pressed(DIK_P))
-    {
-        static bool cursor_visible = true;
-        cursor_visible = !cursor_visible;
-        if (cursor_visible)
-        {
-            ::ShowCursor(true);
-        }
-        else
-        {
-            ::ShowCursor(false);
-        }
-    }
-
-    // get camera
-    
-    glm::vec3 movement(0.0f, 0.0f, 0.0f);
-    glm::vec3 front = camera.front;
-    glm::vec3 right = camera.right;
-
-    if (GETINPUT.is_key_pressed(DIK_W))
-    {
-        movement += front * camera.movement_speed;
-    }
-    if (GETINPUT.is_key_pressed(DIK_S))
-    {
-        movement -= front * camera.movement_speed;
-    }
-    if (GETINPUT.is_key_pressed(DIK_A))
-    {
-        movement -= right * camera.movement_speed;
-    }
-    if (GETINPUT.is_key_pressed(DIK_D))
-    {
-        movement += right * camera.movement_speed;
-    }
-    camera.position += movement;
-
-    //char buffer[256];
-    //sprintf_s(buffer, "(%f, %f, %f)\n", camera.position.x, camera.position.y, camera.position.z);
-    //OutputDebugStringA(buffer);
-
-    camera.yaw += (float)GETINPUT.x_offset * 0.1f;
-    camera.pitch += (float)GETINPUT.y_offset * 0.1f;
-
-	char buffer[256];
-	sprintf_s(buffer, "(%d, %d)\n", GETINPUT.x_offset, GETINPUT.y_offset);
-	OutputDebugStringA(buffer);
-
-    camera.pitch = std::clamp(camera.pitch, -89.0f, 89.0f);
-
-    front.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
-    front.y = sin(glm::radians(camera.pitch));
-    front.z = sin(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
-    camera.front = glm::normalize(front);
-
-    camera.right = glm::normalize(glm::cross(camera.front, camera.worldUp));
-    camera.up = glm::normalize(glm::cross(camera.right, camera.front));
+    RAIN_INPUT.shutdown();
 }
 
 
 void Application::render()
 {
-    renderer->clear();
-    //renderer->set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
-    renderer->set_view_matrix(camera.position, camera.position + camera.front, camera.up);
-    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+    renderer.clear();
+    //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
+    renderer.set_view_matrix(camera.position, camera.position + camera.front, camera.up);
+    renderer.render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
 
 
     auto view = registry.view<Transform>();
@@ -183,23 +116,21 @@ void Application::render()
     for (auto entity : view)
     {
         Transform& transform = view.get(entity);
-        renderer->render_cube(transform.position);
+        renderer.render_cube(transform.position);
     }
 }
 
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-    Application* app = new Application();
-    app->init(hinstance, "");
+	Application app;
+    app.init(hinstance, "");
 
 	MSG msg;
 	bool quit = false;
 	while (!quit)
 	{
-        GETINPUT.update();
-
-
+        RAIN_INPUT.update();
 
         if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
         {
@@ -210,19 +141,17 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
             DispatchMessage(&msg);
         }
 
-        // *** game logic update *** // 
-        app->update();
-        // *** needs a better game loop too *** // 
+        app.update();
 
-		if (GETWINDOW.is_initialized())
+		if (RAIN_WINDOW.is_initialized())
 		{
-			app->render();
-			GETWINDOW.present();
+			app.render();
+			RAIN_WINDOW.present();
 		}
 
         if (GetAsyncKeyState(VK_ESCAPE))
         {
-            GETWINDOW.shutdown();
+            RAIN_WINDOW.shutdown();
         }
 	}
 

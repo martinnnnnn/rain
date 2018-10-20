@@ -19,7 +19,7 @@ namespace rain
     public:
         Input();
 
-        int initialize();
+        int init();
         void shutdown();
 
         void update();
@@ -44,4 +44,4 @@ namespace rain
     };
 
 }
-#define GETINPUT rain::Input::Get()
+#define RAIN_INPUT rain::Input::Get()

@@ -9,7 +9,7 @@
 
 #include "core/high_resolution_clock.h"
 
-void Renderer::initialize()
+void Renderer::init()
 {
     GLenum res = glewInit();
     char buffer[500];

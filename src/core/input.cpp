@@ -11,7 +11,7 @@ Input::Input()
 {
 }
 
-int Input::initialize()
+int Input::init()
 {
     // INITIALIZING INPUT
     HRESULT hr = ::DirectInput8Create(::GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_diObject, NULL);
@@ -26,7 +26,7 @@ int Input::initialize()
     if (FAILED(hr))
         return hr;
 
-    hr = m_keyboard->SetCooperativeLevel(GETWINDOW.m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    hr = m_keyboard->SetCooperativeLevel(RAIN_WINDOW.m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     if (FAILED(hr))
         return hr;
 
@@ -38,7 +38,7 @@ int Input::initialize()
     if (FAILED(hr))
         return hr;
 
-    hr = m_mouse->SetCooperativeLevel(GETWINDOW.m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+    hr = m_mouse->SetCooperativeLevel(RAIN_WINDOW.m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
     if (FAILED(hr))
         return hr;
 
@@ -58,7 +58,7 @@ int Input::initialize()
     m_keyboard->Acquire();
     m_mouse->Acquire();
 
-    auto pos = GETWINDOW.get_center_pos_absolute();
+    auto pos = RAIN_WINDOW.get_center_pos_absolute();
     x_center = pos.x;
     y_center = pos.y;
 

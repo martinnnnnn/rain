@@ -17,7 +17,7 @@ struct StaticMesh
 class Renderer
 {
 public:
-    void initialize();
+    void init();
 
     void initialize_coord_view();
     void initialize_quad();

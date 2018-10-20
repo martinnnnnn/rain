@@ -16,11 +16,11 @@
 
 #include "core/singleton.h"
 #include "core/types.h"
+#include "gfx/gfx_camera.h"
+#include "ogl/ogl_renderer.h"
 
 
-class Renderer;
-
-
+using namespace rain;
 
 struct Name
 {
@@ -71,20 +71,6 @@ struct Physics
     float speed;
 };
 
-
-struct Camera
-{
-    glm::vec3 position;
-    float movement_speed;
-    float yaw;
-    float pitch;
-    glm::vec3 front;
-    glm::vec3 right;
-    glm::vec3 up;
-    glm::vec3 worldUp;
-};
-
-
 class Application
 {
 public:
@@ -93,13 +79,9 @@ public:
     void update();
     void render();
 
-    void update_camera();
-
-
-
 private:
     HINSTANCE hinstance;
-    Renderer* renderer;
+    Renderer renderer;
     entt::DefaultRegistry registry;
     Camera camera;
 

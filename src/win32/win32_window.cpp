@@ -14,7 +14,7 @@ void Window::present()
 	::SwapBuffers(m_hdc);
 }
 
-int Window::initialize(HINSTANCE _hinstance, int _width, int _height, int _depth)
+int Window::init(HINSTANCE _hinstance, int _width, int _height, int _depth)
 {
 	m_hwnd = NULL;
 	m_hdc = NULL;
@@ -259,13 +259,13 @@ LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 	{
-		GETWINDOW.shutdown();
+		RAIN_WINDOW.shutdown();
 		break;
 	}
 
 	case WM_SIZE:
 	{
-		GETWINDOW.resize(LOWORD(lParam), HIWORD(lParam));
+		RAIN_WINDOW.resize(LOWORD(lParam), HIWORD(lParam));
 		break;
 	}
 
