@@ -16,7 +16,7 @@
 #include <algorithm>
 
 #include "core/singleton.h"
-#include "ogl/ogl_renderer.h"
+#include "gfx/ogl/ogl_renderer.h"
 
 #include <glm/glm.hpp>
 

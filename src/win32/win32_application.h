@@ -17,7 +17,7 @@
 #include "core/singleton.h"
 #include "core/types.h"
 #include "gfx/gfx_camera.h"
-#include "ogl/ogl_renderer.h"
+#include "gfx/ogl/ogl_renderer.h"
 
 
 using namespace rain;

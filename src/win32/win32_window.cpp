@@ -1,7 +1,7 @@
 #include "win32_window.h"
 
 //#include "core/event.h"
-#include "core/input.h"
+#include "win32/win32_input.h"
 
 #include <strsafe.h>
 #include <map>

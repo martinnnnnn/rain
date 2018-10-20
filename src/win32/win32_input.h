@@ -8,8 +8,8 @@
 
 #include <glm/glm.hpp>
 
-#include "singleton.h"
-#include "event.h"
+#include "core/singleton.h"
+#include "core/event.h"
 #include "win32/win32_keycodes.h"
 
 namespace rain

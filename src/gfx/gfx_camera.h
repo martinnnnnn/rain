@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "core/input.h"
+#include "win32/win32_input.h"
 #include <algorithm>
 
 namespace rain

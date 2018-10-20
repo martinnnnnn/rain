@@ -7,8 +7,8 @@
 #include <algorithm>
 
 #include "win32_window.h"
-#include "ogl/ogl_renderer.h"
-#include "core/input.h"
+#include "gfx/ogl/ogl_renderer.h"
+#include "win32/win32_input.h"
 #include "core/event.h"
 
 #include <glm/glm.hpp>
@@ -109,7 +109,6 @@ void Application::render()
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     renderer.set_view_matrix(camera.position, camera.position + camera.front, camera.up);
     renderer.render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
-
 
     auto view = registry.view<Transform>();
 
