@@ -10,6 +10,11 @@ bool File::open(const std::string& _path)
 	m_path = _path;
 	m_file = std::fstream(m_path);
 
+	return is_open();
+}
+
+bool File::is_open()
+{
 	return m_file.is_open();
 }
 

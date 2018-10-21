@@ -11,6 +11,7 @@ namespace rain
 
 	class File
 	{
+	public:
 		enum class Mode
 		{
 			READ		= 1 << 0,				// open for reading only
@@ -18,6 +19,7 @@ namespace rain
 		};
 
 		bool open(const std::string& _path);
+		bool is_open();
 		std::string read();
 		void close();
 
