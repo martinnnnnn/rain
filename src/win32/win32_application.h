@@ -20,69 +20,70 @@
 #include "gfx/ogl/ogl_renderer.h"
 
 
-using namespace rain;
-
-struct Name
+namespace rain
 {
-    Name() : Name("default") {}
+	struct Name
+	{
+		Name() : Name("default") {}
 
-    Name(const std::string& _name) :
-        name(_name)
-    {
-    }
+		Name(const std::string& _name) :
+			name(_name)
+		{
+		}
 
-    std::string name;
-};
+		std::string name;
+	};
 
-struct Transform
-{
-    Transform() : Transform(glm::vec3(0.0, 0.0, 0.0)) {}
+	struct Transform
+	{
+		Transform() : Transform(glm::vec3(0.0, 0.0, 0.0)) {}
 
-    Transform(const glm::vec3& _position) :
-        position(_position)
-    {
-    }
+		Transform(const glm::vec3& _position) :
+			position(_position)
+		{
+		}
 
-    Transform(float x, float y, float z) :
-        position(x, y, z)
-    {
-    }
+		Transform(float x, float y, float z) :
+			position(x, y, z)
+		{
+		}
 
-    glm::vec3 position;
-};
+		glm::vec3 position;
+	};
 
-struct Physics
-{
-    Physics() : Physics(glm::vec3(0.0, 0.0, 0.0), 0.0) {}
+	struct Physics
+	{
+		Physics() : Physics(glm::vec3(0.0, 0.0, 0.0), 0.0) {}
 
-    Physics(const glm::vec3& _direction, float _speed) :
-        direction(_direction),
-        speed(_speed)
-    {
-    }
+		Physics(const glm::vec3& _direction, float _speed) :
+			direction(_direction),
+			speed(_speed)
+		{
+		}
 
-    Physics(float x, float y, float z, float _speed) :
-        direction(x, y, z),
-        speed(_speed)
-    {
-    }
+		Physics(float x, float y, float z, float _speed) :
+			direction(x, y, z),
+			speed(_speed)
+		{
+		}
 
-    glm::vec3 direction;
-    float speed;
-};
+		glm::vec3 direction;
+		float speed;
+	};
 
-class Application
-{
-public:
-    int init(HINSTANCE _hinstance, const std::string& _config);
-    void shutdown();
-    void update();
-    void render();
+	class Application
+	{
+	public:
+		int init(HINSTANCE _hinstance, const std::string& _config);
+		void shutdown();
+		void update();
+		void render();
 
-private:
-    HINSTANCE hinstance;
-    Renderer renderer;
-    entt::DefaultRegistry registry;
-    Camera camera;
+	private:
+		HINSTANCE hinstance;
+		Renderer renderer;
+		entt::DefaultRegistry registry;
+		Camera camera;
 
-};
+	};
+}

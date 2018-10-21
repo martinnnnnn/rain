@@ -14,6 +14,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+using namespace rain;
+
+
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;

@@ -8,6 +8,7 @@
 
 DWORD err;
 
+using namespace rain;
 
 void Window::present()
 {
@@ -252,7 +253,7 @@ InputEvent::MouseButtonType DecodeMouseButton(UINT messageID)
 }
 
 
-LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK rain::OGLWinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 
 	switch (msg)
