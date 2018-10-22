@@ -29,76 +29,99 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 	// INIT INPUT
 	RAIN_INPUT.init();
 
-
+    // INIT CAMERA
 	camera.init();
 
+    // INIT CLOCK
+    m_clock.reset();
 
+    // ADDING A FEW ENTITIES
 	auto entity = registry.create();
-	registry.assign<Transform>(entity, 0.0f, 0.0f, 0.0f);
+    registry.assign<Transform>(entity);
+    Physics& physics = registry.assign<Physics>(entity);
+    physics.force = glm::vec3(0.0f, -9.18f, 0.0f);
+    physics.mass = 1.0f;
 
-    //srand(time(NULL));
-    //for (auto i = 0; i < 50; ++i)
-    //{
-    //    auto entity = registry.create();
-
-    //    registry.assign<Transform>(entity, glm::vec3(i * 1.f, i * 1.f, i * 1.f));
-    //    
-    //    float a = (rand() % 100) / 100.0;
-    //    float b = 1.0 - a;
-    //    registry.assign<Physics>(entity, glm::vec3(a, b, 0), i * .1f);
-    //}
+    auto entity2 = registry.create();
+    Transform& transform2 = registry.assign<Transform>(entity2);
+    transform2.position = glm::vec3(0.0f, 12.0f, 0.0f);
+    transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
+    Physics& physics2 = registry.assign<Physics>(entity2);
+    physics2.force = glm::vec3(0.0f, -9.18f, 0.0f);
+    physics2.mass = 0.5f;
 
     return 0;
 }
 
+
 void Application::update()
 {
-	if (RAIN_INPUT.is_key_pressed(DIK_P))
-	{
-		static bool cursor_visible = true;
-		cursor_visible = !cursor_visible;
-		if (cursor_visible)
-		{
-			::ShowCursor(true);
-		}
-		else
-		{
-			::ShowCursor(false);
-		}
-	}
-	
-	camera.update();
+    double t = 0.0;
+    double dt = 0.01;
 
-    //auto view = registry.view<Transform, Physics>();
+    double currentTime = m_clock.get_total_seconds();
+    double accumulator = 0.0;
 
-    //char buffer[512];
-    //sprintf_s(buffer, "\n\n");
-    //OutputDebugStringA(buffer);
+    //State previous;
+    //State current;
+    bool quit = false;
 
-    //for (auto entity : view)
-    //{
-    //    Physics& physics = view.get<Physics>(entity);
-    //    Transform& transform = view.get<Transform>(entity);
-    //    
-    //    sprintf_s(buffer, "(%f,%f)\n", transform.position.x, transform.position.y);
-    //    OutputDebugStringA(buffer);
+    while (!quit)
+    {
+        RAIN_INPUT.update();
+        camera.update();
+        m_clock.tick();
 
-    //    transform.position.x += physics.direction.x * physics.speed;
-    //    transform.position.y += physics.direction.y * physics.speed;
+        double newTime = m_clock.get_total_seconds();
+        double frameTime = newTime - currentTime;
+        if (frameTime > 0.25)
+        {
+            frameTime = 0.25;
+        }
+        currentTime = newTime;
+
+        accumulator += frameTime;
 
 
-    //    if (transform.position.x <= 0 || transform.position.x >= 800)
-    //    {
-    //        transform.position.x = std::clamp(transform.position.x, 0.0f, 800.0f);
-    //        physics.direction.x = -physics.direction.x;
-    //    }
-    //    if (transform.position.y <= 0 || transform.position.y >= 600)
-    //    {
-    //        transform.position.y = std::clamp(transform.position.y, 0.0f, 600.0f);
-    //        physics.direction.y = -physics.direction.y;
-    //    }
-    //}
+        while (accumulator >= dt)
+        {
+
+            update_physics((float)dt);
+            accumulator -= dt;
+        }
+
+        const double alpha = accumulator / dt;
+        render(alpha);
+        if (RAIN_WINDOW.is_initialized())
+        {
+            RAIN_WINDOW.present();
+        }
+
+        if (RAIN_INPUT.is_key_pressed(DIK_ESCAPE))
+        {
+            quit = true;
+        }
+    }
+
+
 }
+
+void Application::update_physics(float _deltaTime)
+{
+    auto view = registry.view<Transform, Physics>();
+    for (auto entity : view)
+    {
+        Physics& physics = view.get<Physics>(entity);
+        Transform& transform = view.get<Transform>(entity);
+
+        char buffer[512];
+
+        physics.velocity += physics.force * physics.mass * _deltaTime;
+        transform.previousPosition = transform.position;
+        transform.position += physics.velocity * _deltaTime;
+    }
+}
+
 
 void Application::shutdown()
 {
@@ -106,7 +129,7 @@ void Application::shutdown()
 }
 
 
-void Application::render()
+void Application::render(float _alpha)
 {
     renderer.clear();
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
@@ -118,7 +141,8 @@ void Application::render()
     for (auto entity : view)
     {
         Transform& transform = view.get(entity);
-        renderer.render_cube(transform.position);
+        glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
+        renderer.render_cube(position);
     }
 }
 
@@ -132,8 +156,6 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 	bool quit = false;
 	while (!quit)
 	{
-        RAIN_INPUT.update();
-
         if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
@@ -144,12 +166,6 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
         }
 
         app.update();
-
-		if (RAIN_WINDOW.is_initialized())
-		{
-			app.render();
-			RAIN_WINDOW.present();
-		}
 
         if (GetAsyncKeyState(VK_ESCAPE))
         {

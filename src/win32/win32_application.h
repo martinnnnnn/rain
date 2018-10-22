@@ -18,6 +18,7 @@
 #include "core/types.h"
 #include "gfx/gfx_camera.h"
 #include "gfx/ogl/ogl_renderer.h"
+#include "core/high_resolution_clock.h"
 
 
 namespace rain
@@ -36,39 +37,26 @@ namespace rain
 
 	struct Transform
 	{
-		Transform() : Transform(glm::vec3(0.0, 0.0, 0.0)) {}
+        Transform()
+            : position(glm::vec3(0.0f))
+            , previousPosition(glm::vec3(0.0f))
+        {}
 
-		Transform(const glm::vec3& _position) :
-			position(_position)
-		{
-		}
-
-		Transform(float x, float y, float z) :
-			position(x, y, z)
-		{
-		}
-
-		glm::vec3 position;
+        glm::vec3 position;
+        glm::vec3 previousPosition;
 	};
 
 	struct Physics
 	{
-		Physics() : Physics(glm::vec3(0.0, 0.0, 0.0), 0.0) {}
+		Physics()
+            : velocity(glm::vec3(0.0f))
+            , force(glm::vec3(0.0f))
+            , mass(0.0f)
+        {}
 
-		Physics(const glm::vec3& _direction, float _speed) :
-			direction(_direction),
-			speed(_speed)
-		{
-		}
-
-		Physics(float x, float y, float z, float _speed) :
-			direction(x, y, z),
-			speed(_speed)
-		{
-		}
-
-		glm::vec3 direction;
-		float speed;
+        glm::vec3 velocity;
+        glm::vec3 force;
+        float mass;
 	};
 
 	class Application
@@ -77,13 +65,14 @@ namespace rain
 		int init(HINSTANCE _hinstance, const std::string& _config);
 		void shutdown();
 		void update();
-		void render();
+        void update_physics(float _deltaTime);
+		void render(float _alpha);
 
 	private:
 		HINSTANCE hinstance;
 		Renderer renderer;
 		entt::DefaultRegistry registry;
 		Camera camera;
-
+        HighResolutionClock m_clock;
 	};
 }
