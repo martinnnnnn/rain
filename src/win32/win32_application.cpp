@@ -44,11 +44,11 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
     auto entity2 = registry.create();
     Transform& transform2 = registry.assign<Transform>(entity2);
-    transform2.position = glm::vec3(0.0f, 12.0f, 0.0f);
+    transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     Physics& physics2 = registry.assign<Physics>(entity2);
     physics2.force = glm::vec3(0.0f, -9.18f, 0.0f);
-    physics2.mass = 0.5f;
+    physics2.mass = 0.2f;
 
     return 0;
 }
@@ -56,52 +56,49 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 void Application::update()
 {
-    double t = 0.0;
-    double dt = 0.01;
+    static double t = 0.0;
+    static double dt = 0.01;
 
-    double currentTime = m_clock.get_total_seconds();
-    double accumulator = 0.0;
+    static double currentTime = m_clock.get_total_seconds();
+    static double accumulator = 0.0;
 
-    //State previous;
-    //State current;
-    bool quit = false;
+    //bool quit = false;
+    //while (!quit)
+    //{
+    RAIN_INPUT.update();
+    camera.update();
+    m_clock.tick();
 
-    while (!quit)
+    double newTime = m_clock.get_total_seconds();
+    double frameTime = newTime - currentTime;
+    if (frameTime > 0.25)
     {
-        RAIN_INPUT.update();
-        camera.update();
-        m_clock.tick();
-
-        double newTime = m_clock.get_total_seconds();
-        double frameTime = newTime - currentTime;
-        if (frameTime > 0.25)
-        {
-            frameTime = 0.25;
-        }
-        currentTime = newTime;
-
-        accumulator += frameTime;
-
-
-        while (accumulator >= dt)
-        {
-
-            update_physics((float)dt);
-            accumulator -= dt;
-        }
-
-        const double alpha = accumulator / dt;
-        render(alpha);
-        if (RAIN_WINDOW.is_initialized())
-        {
-            RAIN_WINDOW.present();
-        }
-
-        if (RAIN_INPUT.is_key_pressed(DIK_ESCAPE))
-        {
-            quit = true;
-        }
+        frameTime = 0.25;
     }
+    currentTime = newTime;
+
+    accumulator += frameTime;
+
+
+    while (accumulator >= dt)
+    {
+
+        update_physics((float)dt);
+        accumulator -= dt;
+    }
+
+    const double alpha = accumulator / dt;
+    render(alpha);
+    if (RAIN_WINDOW.is_initialized())
+    {
+        RAIN_WINDOW.present();
+    }
+
+    //    if (RAIN_INPUT.is_key_pressed(DIK_ESCAPE))
+    //    {
+    //        quit = true;
+    //    }
+    //}
 
 
 }
@@ -116,9 +113,9 @@ void Application::update_physics(float _deltaTime)
 
         char buffer[512];
 
-        physics.velocity += physics.force * physics.mass * _deltaTime;
-        transform.previousPosition = transform.position;
-        transform.position += physics.velocity * _deltaTime;
+        physics.velocity += (physics.force / physics.mass) * _deltaTime;
+        transform.previousPosition = transform.currentPosition;
+        transform.currentPosition += physics.velocity * _deltaTime;
     }
 }
 
@@ -141,7 +138,7 @@ void Application::render(float _alpha)
     for (auto entity : view)
     {
         Transform& transform = view.get(entity);
-        glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
+        glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         renderer.render_cube(position);
     }
 }
@@ -149,29 +146,29 @@ void Application::render(float _alpha)
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-	Application app;
-    app.init(hinstance, "");
+        Application app;
+        app.init(hinstance, "");
 
-	MSG msg;
-	bool quit = false;
-	while (!quit)
-	{
-        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+        MSG msg;
+        bool quit = false;
+        while (!quit)
         {
-            if (msg.message == WM_QUIT)
-                quit = true;
+            if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+            {
+                if (msg.message == WM_QUIT)
+                    quit = true;
 
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+
+            app.update();
+
+            if (GetAsyncKeyState(VK_ESCAPE))
+            {
+                RAIN_WINDOW.shutdown();
+            }
         }
 
-        app.update();
-
-        if (GetAsyncKeyState(VK_ESCAPE))
-        {
-            RAIN_WINDOW.shutdown();
-        }
-	}
-
-	return msg.lParam;
+        return msg.lParam;
 }

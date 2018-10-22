@@ -38,11 +38,11 @@ namespace rain
 	struct Transform
 	{
         Transform()
-            : position(glm::vec3(0.0f))
+            : currentPosition(glm::vec3(0.0f))
             , previousPosition(glm::vec3(0.0f))
         {}
 
-        glm::vec3 position;
+        glm::vec3 currentPosition;
         glm::vec3 previousPosition;
 	};
 
