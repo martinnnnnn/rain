@@ -59,20 +59,20 @@ namespace rain
         float mass;
 	};
 
-	class Application
-	{
-	public:
-		int init(HINSTANCE _hinstance, const std::string& _config);
-		void shutdown();
-		void update();
+    class Application
+    {
+    public:
+        int init(HINSTANCE _hinstance, const std::string& _config);
+        void shutdown();
+        void update();
         void update_physics(float _deltaTime);
-		void render(float _alpha);
+        void render(float _alpha);
 
-	private:
-		HINSTANCE hinstance;
-		Renderer renderer;
-		entt::DefaultRegistry registry;
-		Camera camera;
+    private:
+        HINSTANCE hinstance;
+        Renderer renderer;
+        entt::DefaultRegistry registry;
+        Camera camera;
         HighResolutionClock m_clock;
-	};
+    };
 }
