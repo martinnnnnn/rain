@@ -14,6 +14,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <time.h>
+#include <stdio.h>  
+#include <fcntl.h>  
+#include <string.h>  
+#include <io.h>
+
 using namespace rain;
 
 
@@ -146,29 +156,75 @@ void Application::render(float _alpha)
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-        Application app;
-        app.init(hinstance, "");
 
-        MSG msg;
-        bool quit = false;
-        while (!quit)
+    std::string searchPath = "path";
+    bool result = false;
+
+
+    DIR *dir;
+    struct dirent *entry;
+
+    if (dir = opendir(searchPath.cStr()))
+    {
+        while ((entry = readdir(dir)) != NULL)
         {
-            if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-            {
-                if (msg.message == WM_QUIT)
-                    quit = true;
+            std::string filename;
+            filename.setTextFormat("%s\\%s", _inPath.toString8().cStr(), entry->d_name);
 
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
+            if (entry->d_type == DT_DIR)
+            {
+                char path[1024];
+
+                if (_recursive && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                {
+                    // Scan subfolder
+                    Path subFolder = FILESERVER->pathFromPlatformString8(filename);
+                    subFolder.setDirectory();
+
+                    findFiles(subFolder, _outFiles, _recursive);
+                }
             }
-
-            app.update();
-
-            if (GetAsyncKeyState(VK_ESCAPE))
+            else
             {
-                RAIN_WINDOW.shutdown();
+                FileEntry fileEntry;
+
+                fileEntry.path = FILESERVER->pathFromPlatformString8(filename);
+                fileEntry.size = getFileSize(fileEntry.path);
+                fileEntry.time = getLastTimeWriteAccess(fileEntry.path);
+
+                _outFiles.push_back(fileEntry);
             }
         }
+        result = btrue;
+    }
 
-        return msg.lParam;
+    closedir(dir);
+
+    return result;
+
+        //Application app;
+        //app.init(hinstance, "");
+
+        //MSG msg;
+        //bool quit = false;
+        //while (!quit)
+        //{
+        //    if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+        //    {
+        //        if (msg.message == WM_QUIT)
+        //            quit = true;
+
+        //        TranslateMessage(&msg);
+        //        DispatchMessage(&msg);
+        //    }
+
+        //    app.update();
+
+        //    if (GetAsyncKeyState(VK_ESCAPE))
+        //    {
+        //        RAIN_WINDOW.shutdown();
+        //    }
+        //}
+
+        //return msg.lParam;
 }
