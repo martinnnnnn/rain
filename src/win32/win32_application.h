@@ -13,7 +13,6 @@
 #include <glm/glm.hpp>
 #include <entt.hpp>
 
-
 #include "core/singleton.h"
 #include "core/types.h"
 #include "gfx/gfx_camera.h"

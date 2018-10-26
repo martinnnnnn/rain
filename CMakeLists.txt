@@ -4,6 +4,17 @@ message(STATUS "project name : ${PROJECT_NAME}")
 
 set(RAIN_EXE rain_exe)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+#### VULKAN ####
+find_package(Vulkan REQUIRED)
+if (Vulkan_FOUND)
+    message(STATUS "Headers path : ${Vulkan_INCLUDE_DIRS}")
+    message(STATUS "Headers path : ${Vulkan_LIBRARIES}")
+else()
+    message(STATUS "Couldn't find vulkan ;(")
+endif()
+
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
@@ -32,6 +43,7 @@ include_directories(src/
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+
 #### EXECUTABLE CREATION ####
 
 message(STATUS "> globing source files")
@@ -99,7 +111,6 @@ find_library(glulib
     NAMES GlU32
     HINTS "${WINDOWS_SDK_LIBS}"
 )
-
 
 target_link_libraries(${RAIN_EXE}
                         ${dinput8lib}

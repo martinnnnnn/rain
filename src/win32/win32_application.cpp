@@ -72,9 +72,6 @@ void Application::update()
     static double currentTime = m_clock.get_total_seconds();
     static double accumulator = 0.0;
 
-    //bool quit = false;
-    //while (!quit)
-    //{
     RAIN_INPUT.update();
     camera.update();
     m_clock.tick();
@@ -86,9 +83,7 @@ void Application::update()
         frameTime = 0.25;
     }
     currentTime = newTime;
-
     accumulator += frameTime;
-
 
     while (accumulator >= dt)
     {
@@ -103,14 +98,6 @@ void Application::update()
     {
         RAIN_WINDOW.present();
     }
-
-    //    if (RAIN_INPUT.is_key_pressed(DIK_ESCAPE))
-    //    {
-    //        quit = true;
-    //    }
-    //}
-
-
 }
 
 void Application::update_physics(float _deltaTime)
@@ -156,75 +143,29 @@ void Application::render(float _alpha)
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
+    Application app;
+    app.init(hinstance, "");
 
-    std::string searchPath = "path";
-    bool result = false;
-
-
-    DIR *dir;
-    struct dirent *entry;
-
-    if (dir = opendir(searchPath.cStr()))
+    MSG msg;
+    bool quit = false;
+    while (!quit)
     {
-        while ((entry = readdir(dir)) != NULL)
+        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
         {
-            std::string filename;
-            filename.setTextFormat("%s\\%s", _inPath.toString8().cStr(), entry->d_name);
+            if (msg.message == WM_QUIT)
+                quit = true;
 
-            if (entry->d_type == DT_DIR)
-            {
-                char path[1024];
-
-                if (_recursive && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
-                {
-                    // Scan subfolder
-                    Path subFolder = FILESERVER->pathFromPlatformString8(filename);
-                    subFolder.setDirectory();
-
-                    findFiles(subFolder, _outFiles, _recursive);
-                }
-            }
-            else
-            {
-                FileEntry fileEntry;
-
-                fileEntry.path = FILESERVER->pathFromPlatformString8(filename);
-                fileEntry.size = getFileSize(fileEntry.path);
-                fileEntry.time = getLastTimeWriteAccess(fileEntry.path);
-
-                _outFiles.push_back(fileEntry);
-            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
-        result = btrue;
+
+        app.update();
+
+        if (GetAsyncKeyState(VK_ESCAPE))
+        {
+            RAIN_WINDOW.shutdown();
+        }
     }
 
-    closedir(dir);
-
-    return result;
-
-        //Application app;
-        //app.init(hinstance, "");
-
-        //MSG msg;
-        //bool quit = false;
-        //while (!quit)
-        //{
-        //    if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-        //    {
-        //        if (msg.message == WM_QUIT)
-        //            quit = true;
-
-        //        TranslateMessage(&msg);
-        //        DispatchMessage(&msg);
-        //    }
-
-        //    app.update();
-
-        //    if (GetAsyncKeyState(VK_ESCAPE))
-        //    {
-        //        RAIN_WINDOW.shutdown();
-        //    }
-        //}
-
-        //return msg.lParam;
+    return msg.lParam;
 }
