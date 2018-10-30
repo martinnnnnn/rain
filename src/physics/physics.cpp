@@ -1,22 +1,29 @@
 #include "physics.h"
 
 
-using namespace rain;
-
-
-
-void Physics::update(entt::DefaultRegistry _registry, float _deltaTime)
+namespace rain::Physics
 {
-    auto view = _registry.view<Transform, RigidBody>();
-    for (auto entity : view)
+    void init(entt::DefaultRegistry _registry)
     {
-        RigidBody& physics = view.get<RigidBody>(entity);
-        Transform& transform = view.get<Transform>(entity);
+        auto view = _registry.view<Transform, RigidBody>();
+        for (auto entity : view)
+        {
+            RigidBody& body = view.get<RigidBody>(entity);
 
-        // compute new position / rotation
+            init_body(body);
+        }
+    }
 
 
-        // handle collision
 
+    void update(entt::DefaultRegistry _registry, float _deltaTime)
+    {
+        auto view = _registry.view<Transform, RigidBody>();
+        for (auto entity : view)
+        {
+            RigidBody& body = view.get<RigidBody>(entity);
+
+            rain::update(body, _deltaTime);
+        }
     }
 }

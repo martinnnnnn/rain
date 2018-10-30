@@ -108,10 +108,9 @@ void Application::update_physics(float _deltaTime)
         Physics& physics = view.get<Physics>(entity);
         Transform& transform = view.get<Transform>(entity);
 
-        char buffer[512];
+        transform.previousPosition = transform.currentPosition;
 
         physics.velocity += (physics.force / physics.mass) * _deltaTime;
-        transform.previousPosition = transform.currentPosition;
         transform.currentPosition += physics.velocity * _deltaTime;
     }
 }

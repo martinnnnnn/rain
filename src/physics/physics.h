@@ -10,5 +10,6 @@ namespace rain
     namespace Physics
     {
         void update(entt::DefaultRegistry _registry, float _deltaTime);
+        void init(entt::DefaultRegistry _registry, float _deltaTime);
     };
 }
