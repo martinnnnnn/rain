@@ -35,20 +35,6 @@ namespace rain
 	};
 
 
-
-	//struct Physics
-	//{
-	//	Physics()
- //           : velocity(glm::vec3(0.0f))
- //           , force(glm::vec3(0.0f))
- //           , mass(0.0f)
- //       {}
-
- //       glm::vec3 velocity;
- //       glm::vec3 force;
- //       float mass;
-	//};
-
     class Application
     {
     public:

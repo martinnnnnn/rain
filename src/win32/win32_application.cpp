@@ -52,9 +52,6 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     auto entity = registry.create();
     registry.assign<Transform>(entity);
     registry.assign<RigidBody>(entity);
-    //Physics& physics = registry.assign<Physics>(entity);
-    //physics.force = glm::vec3(0.0f, -9.18f, 0.0f);
-    //physics.mass = 1.0f;
 
     auto entity2 = registry.create();
     Transform& transform2 = registry.assign<Transform>(entity2);
@@ -62,9 +59,6 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     
     registry.assign<RigidBody>(entity2);
-    //Physics& physics2 = registry.assign<Physics>(entity2);
-    //physics2.force = glm::vec3(0.0f, -9.18f, 0.0f);
-    //physics2.mass = 0.2f;
 
     Physics::init(registry);
 
