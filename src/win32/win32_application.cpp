@@ -105,19 +105,6 @@ void Application::update()
 void Application::update_physics(float _deltaTime)
 {
     Physics::update(registry, _deltaTime);
-
-
-    //auto view = registry.view<Transform, RigidBody>();
-    //for (auto entity : view)
-    //{
-    //    Physics& physics = view.get<Physics>(entity);
-    //    Transform& transform = view.get<Transform>(entity);
-
-    //    transform.previousPosition = transform.currentPosition;
-
-    //    physics.velocity += (physics.force / physics.mass) * _deltaTime;
-    //    transform.currentPosition += physics.velocity * _deltaTime;
-    //}
 }
 
 
@@ -140,7 +127,8 @@ void Application::render(float _alpha)
     {
         Transform& transform = view.get(entity);
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
-        renderer.render_cube(position);
+        //renderer.render_cube(position);
+        renderer.render_sphere(position);
     }
 }
 

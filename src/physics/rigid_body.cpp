@@ -16,14 +16,13 @@ namespace rain
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition)
     {
         _body.position = _initialPosition;
-        _body.velocity = glm::vec3(5.0f, 15.0f, 0.0f);
+        _body.momentum = glm::vec3(5.0f, 15.0f, 0.0f);
         _body.mass = 3.0f;
         _body.mass_inverse = 1.0f / _body.mass;
     }
 
     void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces)
     {
-        // compute forces
         _body.force = glm::vec3(0.0f);
         for (int i = 0; i < _forces.size(); ++i)
         {

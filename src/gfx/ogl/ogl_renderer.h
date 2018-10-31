@@ -21,13 +21,13 @@ class Renderer
 public:
     void init();
 
-    void initialize_coord_view();
+    void init_coord_view();
     void render_coord_view(const glm::vec3& _position);
 
-    void initialize_quad();
+    void init_quad();
     void render_quad();
     
-	void initialize_cube();
+	void init_cube();
     void render_cube(const glm::vec3& _position);
 
 	void init_sphere();
