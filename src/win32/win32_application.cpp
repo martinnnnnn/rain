@@ -24,6 +24,9 @@
 #include <string.h>  
 #include <io.h>
 
+#include "physics/physics.h"
+#include "math/transform.h"
+
 using namespace rain;
 
 
@@ -46,19 +49,24 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     m_clock.reset();
 
     // ADDING A FEW ENTITIES
-	auto entity = registry.create();
+    auto entity = registry.create();
     registry.assign<Transform>(entity);
-    Physics& physics = registry.assign<Physics>(entity);
-    physics.force = glm::vec3(0.0f, -9.18f, 0.0f);
-    physics.mass = 1.0f;
+    registry.assign<RigidBody>(entity);
+    //Physics& physics = registry.assign<Physics>(entity);
+    //physics.force = glm::vec3(0.0f, -9.18f, 0.0f);
+    //physics.mass = 1.0f;
 
     auto entity2 = registry.create();
     Transform& transform2 = registry.assign<Transform>(entity2);
     transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
-    Physics& physics2 = registry.assign<Physics>(entity2);
-    physics2.force = glm::vec3(0.0f, -9.18f, 0.0f);
-    physics2.mass = 0.2f;
+    
+    registry.assign<RigidBody>(entity2);
+    //Physics& physics2 = registry.assign<Physics>(entity2);
+    //physics2.force = glm::vec3(0.0f, -9.18f, 0.0f);
+    //physics2.mass = 0.2f;
+
+    Physics::init(registry);
 
     return 0;
 }
@@ -102,17 +110,20 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
-    auto view = registry.view<Transform, Physics>();
-    for (auto entity : view)
-    {
-        Physics& physics = view.get<Physics>(entity);
-        Transform& transform = view.get<Transform>(entity);
+    Physics::update(registry, _deltaTime);
 
-        transform.previousPosition = transform.currentPosition;
 
-        physics.velocity += (physics.force / physics.mass) * _deltaTime;
-        transform.currentPosition += physics.velocity * _deltaTime;
-    }
+    //auto view = registry.view<Transform, RigidBody>();
+    //for (auto entity : view)
+    //{
+    //    Physics& physics = view.get<Physics>(entity);
+    //    Transform& transform = view.get<Transform>(entity);
+
+    //    transform.previousPosition = transform.currentPosition;
+
+    //    physics.velocity += (physics.force / physics.mass) * _deltaTime;
+    //    transform.currentPosition += physics.velocity * _deltaTime;
+    //}
 }
 
 

@@ -7,9 +7,10 @@
 
 namespace rain
 {
-    namespace Physics
+    class Physics
     {
-        void update(entt::DefaultRegistry _registry, float _deltaTime);
-        void init(entt::DefaultRegistry _registry, float _deltaTime);
+    public:
+        static void init(entt::DefaultRegistry& _registry);
+        static void update(entt::DefaultRegistry& _registry, float _deltaTime);
     };
 }

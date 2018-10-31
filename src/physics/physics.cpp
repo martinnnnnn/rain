@@ -1,29 +1,33 @@
 #include "physics.h"
 
+#include "math/transform.h"
 
-namespace rain::Physics
+namespace rain
 {
-    void init(entt::DefaultRegistry _registry)
+    void Physics::init(entt::DefaultRegistry& _registry)
     {
         auto view = _registry.view<Transform, RigidBody>();
         for (auto entity : view)
         {
             RigidBody& body = view.get<RigidBody>(entity);
 
-            init_body(body);
+            init_body(body, view.get<Transform>(entity).currentPosition);
         }
     }
 
 
 
-    void update(entt::DefaultRegistry _registry, float _deltaTime)
+    void Physics::update(entt::DefaultRegistry& _registry, float _deltaTime)
     {
         auto view = _registry.view<Transform, RigidBody>();
         for (auto entity : view)
         {
             RigidBody& body = view.get<RigidBody>(entity);
-
             rain::update(body, _deltaTime);
+
+            Transform& transform = view.get<Transform>(entity);
+            transform.previousPosition = transform.currentPosition;
+            transform.currentPosition = body.position;
         }
     }
 }

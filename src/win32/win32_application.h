@@ -34,29 +34,20 @@ namespace rain
 		std::string name;
 	};
 
-	struct Transform
-	{
-        Transform()
-            : currentPosition(glm::vec3(0.0f))
-            , previousPosition(glm::vec3(0.0f))
-        {}
 
-        glm::vec3 currentPosition;
-        glm::vec3 previousPosition;
-	};
 
-	struct Physics
-	{
-		Physics()
-            : velocity(glm::vec3(0.0f))
-            , force(glm::vec3(0.0f))
-            , mass(0.0f)
-        {}
+	//struct Physics
+	//{
+	//	Physics()
+ //           : velocity(glm::vec3(0.0f))
+ //           , force(glm::vec3(0.0f))
+ //           , mass(0.0f)
+ //       {}
 
-        glm::vec3 velocity;
-        glm::vec3 force;
-        float mass;
-	};
+ //       glm::vec3 velocity;
+ //       glm::vec3 force;
+ //       float mass;
+	//};
 
     class Application
     {

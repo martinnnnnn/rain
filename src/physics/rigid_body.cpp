@@ -1,26 +1,22 @@
 #include "rigid_body.h"
 
+#include <Windows.h>
+
 
 namespace rain
 {
-    void update(RigidBody _body, float _deltaTime)
+    void update(RigidBody& _body, float _deltaTime)
     {
         std::vector<glm::vec3> forces;
         forces.push_back(glm::vec3(0.0f, -9.81f, 0.0f));
 
-        static bool first = true;
-        if (first)
-        {
-            first = false;
-            forces.push_back(glm::vec3(40.0f, 0.0f, 0.0f));
-        }
-
         update_body(_body, _deltaTime, forces);
     }
 
-    void init_body(RigidBody _body)
+    void init_body(RigidBody& _body, const glm::vec3& _initialPosition)
     {
-        _body.position = glm::vec3(0.0f);
+        _body.position = _initialPosition;
+        _body.velocity = glm::vec3(5.0f, 15.0f, 0.0f);
         _body.mass = 3.0f;
         _body.mass_inverse = 1.0f / _body.mass;
     }
