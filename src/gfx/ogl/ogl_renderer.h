@@ -32,6 +32,7 @@ public:
     void render_cube(const glm::vec3& _position, const glm::quat& orientation);
 
 	void init_sphere();
+    void render_sphere(const glm::vec3& _position);
     void render_sphere(const glm::vec3& _position, const glm::quat& orientation);
 
     void clear();

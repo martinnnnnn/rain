@@ -41,25 +41,25 @@ namespace rain
         //_body.angularMomentum = glm::vec3(0.0f, 15.0f, 0.0f);
         _body.mass = 3.0f;
         _body.mass_inverse = 1.0f / _body.mass;
-        _body.rotationInertia = powf(6.0f * _body.size, 2.0f * _body.mass);
+        _body.rotationInertia = powf((1.0f / 6.0f) * _body.size, 2.0f * _body.mass);
         _body.rotationInertiaInverse = 1.0f * _body.rotationInertia;
     }
 
     void update_orientation(RigidBodyOrientation& _body, float _deltaTime)
     {
-        _body.torque = glm::vec3(1.0f, 0.0f, 0.0f) - _body.angularVelocity * 0.1f;
+        _body.torque = glm::vec3(20.0f, 0.0f, 0.0f) - _body.angularVelocity * 0.1f;
         
-        _body.angularMomentum = _body.torque * _deltaTime;
+        _body.angularMomentum += _body.torque * _deltaTime;
         _body.angularVelocity = _body.angularMomentum * _body.rotationInertiaInverse;
-        _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) * _body.orientation;
+        _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) /** _body.orientation*/;
         _body.orientation += _body.spin * _deltaTime;
 
-        char buffer[512];
-        sprintf_s(buffer, "momentum : (%f,%f,%f)\nvelocity : (%f,%f,%f)\norentation : (%f,%f,%f,%f)\n\n",
-            _body.angularMomentum.x, _body.angularMomentum.y, _body.angularMomentum.z,
-            _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z,
-            _body.orientation.x, _body.orientation.y, _body.orientation.z, _body.orientation.w);
-        OutputDebugStringA(buffer);
+        //char buffer[512];
+        //sprintf_s(buffer, "momentum : (%f,%f,%f)\nvelocity : (%f,%f,%f)\norentation : (%f,%f,%f,%f)\n\n",
+        //    _body.angularMomentum.x, _body.angularMomentum.y, _body.angularMomentum.z,
+        //    _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z,
+        //    _body.spin.x, _body.spin.y, _body.spin.z, _body.spin.w);
+        //OutputDebugStringA(buffer);
     }
 
 }

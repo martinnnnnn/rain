@@ -394,6 +394,21 @@ void Renderer::init_sphere()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 }
 
+void Renderer::render_sphere(const glm::vec3& _position)
+{
+    glUseProgram(cubeShaderProgram);
+    glBindVertexArray(sphereVAO);
+
+    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
+
+    unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+}
+
 void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
 {
 	glUseProgram(cubeShaderProgram);

@@ -134,8 +134,14 @@ void Application::render(float _alpha)
         glm::quat orientation = transform.currentOrientation /** _alpha + transform.previousPosition * (1.0f - _alpha)*/;
         //renderer.render_cube(position);
         
+        static glm::quat rotQuat = glm::quat(glm::vec3(0, 0, 0)); 
+        rotQuat = rotQuat * glm::angleAxis(glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        renderer.render_cube(glm::vec3(0,0,0), orientation);
+        char buffer[512];
+        sprintf_s(buffer, "(%f,%f,%f,%f)\n", rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w);
+        OutputDebugStringA(buffer);
+
+        renderer.render_cube(glm::vec3(0,0,0), rotQuat);
     }
 }
 
