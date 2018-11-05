@@ -394,12 +394,13 @@ void Renderer::init_sphere()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 }
 
-void Renderer::render_sphere(const glm::vec3& _position)
+void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
 {
 	glUseProgram(cubeShaderProgram);
 	glBindVertexArray(sphereVAO);
 
-	glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
+	glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
+    
 	unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
@@ -486,6 +487,21 @@ void Renderer::render_coord_view(const glm::vec3& _position)
 void Renderer::render_cube(const glm::vec3& _position)
 {
     glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
+
+    glBindVertexArray(cubeVAO);
+    glUseProgram(cubeShaderProgram);
+
+    unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
+{
+    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
 
     glBindVertexArray(cubeVAO);
     glUseProgram(cubeShaderProgram);

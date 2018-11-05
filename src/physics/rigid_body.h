@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 #include <glm/glm.hpp>
@@ -10,9 +10,9 @@
 namespace rain
 {
 
-    struct RigidBody
+    struct RigidBodyPosition
     {
-        RigidBody()
+        RigidBodyPosition()
             : position(glm::vec3(0.0f, 0.0f, 0.0f))
             , momentum(glm::vec3(0.0f, 0.0f, 0.0f))
             , velocity(glm::vec3(0.0f, 0.0f, 0.0f))
@@ -28,6 +28,35 @@ namespace rain
 
         float mass;
         float mass_inverse;
+    };
+
+    struct RigidBodyOrientation
+    {
+        RigidBodyOrientation()
+            : orientation(glm::quat())
+            , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
+            , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
+            , torque(glm::vec3(0.0f, 0.0f, 0.0f))
+            , spin(glm::quat())
+            , mass(1.0f)
+            , size(1.0f)
+            , mass_inverse(1.0f / mass)
+            , rotationInertia(powf(6.0f * size, 2.0f * mass))
+            , rotationInertiaInverse(1.0f / rotationInertia)
+        {}
+
+        glm::quat orientation;
+        glm::vec3 angularMomentum;
+        glm::vec3 torque;
+
+        glm::quat spin;
+        glm::vec3 angularVelocity;
+
+        float mass;
+        float size;
+        float mass_inverse;
+        float rotationInertia; // ⁄6 x size^2 x mass
+        float rotationInertiaInverse;
     };
 
     struct BoundingSphere
@@ -51,13 +80,16 @@ namespace rain
     {
     };
 
-    void update(RigidBody& _body, float _deltaTime);
-    void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f));
-    void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces);
+    void update(RigidBodyPosition& _body, float _deltaTime);
+    void init_body(RigidBodyPosition& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f));
+    void update_body(RigidBodyPosition& _body, float _deltaTime, const std::vector<glm::vec3>& _forces);
+    void init_orientation(RigidBodyOrientation& _body, const glm::quat& _initialRotation);
+    void update_orientation(RigidBodyOrientation& _body, float _deltaTime);
 
-    void detect_collision(const BoundingSphere& _sphere, const BoundingPlane& _plane)
-    {
 
-    }
-    
+
+    //void detect_collision(const BoundingSphere& _sphere, const BoundingPlane& _plane)
+    //{
+
+    //}
 }

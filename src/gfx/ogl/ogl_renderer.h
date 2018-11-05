@@ -29,9 +29,10 @@ public:
     
 	void init_cube();
     void render_cube(const glm::vec3& _position);
+    void render_cube(const glm::vec3& _position, const glm::quat& orientation);
 
 	void init_sphere();
-	void render_sphere(const glm::vec3& _position);
+    void render_sphere(const glm::vec3& _position, const glm::quat& orientation);
 
     void clear();
     void set_projection_matrix(const glm::mat4& _projection);

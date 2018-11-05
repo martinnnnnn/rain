@@ -17,9 +17,14 @@ namespace rain
         Transform()
             : currentPosition(glm::vec3(0.0f))
             , previousPosition(glm::vec3(0.0f))
+            , currentOrientation(glm::quat())
+            , previousOrientation(glm::quat())
         {}
 
         glm::vec3 currentPosition;
         glm::vec3 previousPosition;
+
+        glm::quat currentOrientation;
+        glm::quat previousOrientation;
     };
 }
