@@ -11,7 +11,6 @@ namespace rain
         {
             RigidBody& body = view.get<RigidBody>(entity);
             init_body(body, view.get<Transform>(entity).currentPosition, view.get<Transform>(entity).currentOrientation);
-            //init_orientation(body, view.get<Transform>(entity).currentOrientation);
         }
     }
 
@@ -24,8 +23,7 @@ namespace rain
         {
             RigidBody& body = view.get<RigidBody>(entity);
             rain::update(body, _deltaTime);
-            //rain::update_orientation(body, _deltaTime);
-
+            
             Transform& transform = view.get<Transform>(entity);
             transform.previousPosition = transform.currentPosition;
             transform.currentPosition = body.position;

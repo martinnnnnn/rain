@@ -9,57 +9,6 @@
 
 namespace rain
 {
-
-    //struct RigidBodyPosition
-    //{
-    //    RigidBodyPosition()
-    //        : position(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , momentum(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , velocity(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , force(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , mass(1.0f)
-    //        , mass_inverse(1.0f / mass)
-    //    {}
-
-    //    glm::vec3 position;
-    //    glm::vec3 momentum;
-    //    glm::vec3 velocity;
-    //    glm::vec3 force;
-
-    //    float mass;
-    //    float mass_inverse;
-    //};
-
-    //struct RigidBodyOrientation
-    //{
-    //    RigidBodyOrientation()
-    //        : orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
-    //        , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , torque(glm::vec3(0.0f, 0.0f, 0.0f))
-    //        , spin(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
-    //        , mass(1.0f)
-    //        , size(1.0f)
-    //        , mass_inverse(1.0f / mass)
-    //        , rotationInertia(powf(6.0f * size, 2.0f * mass))
-    //        , rotationInertiaInverse(1.0f / rotationInertia)
-    //    {}
-
-    //    glm::quat orientation;
-    //    glm::vec3 angularMomentum;
-    //    glm::vec3 torque;
-
-    //    glm::quat spin;
-    //    glm::vec3 angularVelocity;
-
-    //    float mass;
-    //    float size;
-    //    float mass_inverse;
-    //    float rotationInertia;
-    //    float rotationInertiaInverse;
-    //};
-
-
     struct RigidBody
     {
         RigidBody()
@@ -122,10 +71,6 @@ namespace rain
     void update(RigidBody& _body, const float _deltaTime);
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f), const glm::quat& _initialOrientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
     void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
-    //void init_orientation(RigidBody& _body, const glm::quat& _initialRotation);
-    //void update_orientation(RigidBody& _body, float _deltaTime);
-
-
 
     //void detect_collision(const BoundingSphere& _sphere, const BoundingPlane& _plane)
     //{

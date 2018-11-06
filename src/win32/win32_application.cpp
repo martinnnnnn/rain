@@ -131,7 +131,7 @@ void Application::render(float _alpha)
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-        renderer.render_cube(/*position*/glm::vec3(0,0,0), orientation);
+        renderer.render_cube(position, orientation);
     }
 }
 
