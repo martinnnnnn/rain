@@ -52,8 +52,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // ADDING A FEW ENTITIES
     auto entity = registry.create();
     registry.assign<Transform>(entity);
-    registry.assign<RigidBodyPosition>(entity);
-    registry.assign<RigidBodyOrientation>(entity);
+    registry.assign<RigidBody>(entity);
 
     auto entity2 = registry.create();
     Transform& transform2 = registry.assign<Transform>(entity2);
@@ -61,8 +60,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     //transform2.currentOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
     //transform2.previousOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
-    registry.assign<RigidBodyPosition>(entity2);
-    registry.assign<RigidBodyOrientation>(entity2);
+    registry.assign<RigidBody>(entity2);
 
     Physics::init(registry);
 
