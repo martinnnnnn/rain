@@ -22,7 +22,7 @@
 #include <time.h>
 #include <stdio.h>  
 #include <fcntl.h>  
-#include <string.h>  
+#include <string.h>
 #include <io.h>
 
 #include "physics/physics.h"
@@ -132,16 +132,8 @@ void Application::render(float _alpha)
         Transform& transform = view.get(entity);
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
-        //renderer.render_cube(position);
-        
-        //static glm::quat rotQuat = glm::quat(glm::vec3(0, 0, 0)); 
-        //rotQuat = rotQuat * glm::angleAxis(glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        //char buffer[512];
-        //sprintf_s(buffer, "(%f,%f,%f,%f)\n", rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w);
-        //OutputDebugStringA(buffer);
-
-        renderer.render_cube(position, orientation);
+        renderer.render_cube(/*position*/glm::vec3(0,0,0), orientation);
     }
 }
 
