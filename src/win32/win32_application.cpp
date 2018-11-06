@@ -55,14 +55,14 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     registry.assign<RigidBodyPosition>(entity);
     registry.assign<RigidBodyOrientation>(entity);
 
-    //auto entity2 = registry.create();
-    //Transform& transform2 = registry.assign<Transform>(entity2);
-    //transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
-    //transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
+    auto entity2 = registry.create();
+    Transform& transform2 = registry.assign<Transform>(entity2);
+    transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
+    transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     //transform2.currentOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
     //transform2.previousOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
-    //registry.assign<RigidBodyPosition>(entity2);
-    //registry.assign<RigidBodyOrientation>(entity2);
+    registry.assign<RigidBodyPosition>(entity2);
+    registry.assign<RigidBodyOrientation>(entity2);
 
     Physics::init(registry);
 
@@ -131,17 +131,17 @@ void Application::render(float _alpha)
     {
         Transform& transform = view.get(entity);
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
-        glm::quat orientation = transform.currentOrientation /** _alpha + transform.previousPosition * (1.0f - _alpha)*/;
+        glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
         //renderer.render_cube(position);
         
-        static glm::quat rotQuat = glm::quat(glm::vec3(0, 0, 0)); 
-        rotQuat = rotQuat * glm::angleAxis(glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        //static glm::quat rotQuat = glm::quat(glm::vec3(0, 0, 0)); 
+        //rotQuat = rotQuat * glm::angleAxis(glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        char buffer[512];
-        sprintf_s(buffer, "(%f,%f,%f,%f)\n", rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w);
-        OutputDebugStringA(buffer);
+        //char buffer[512];
+        //sprintf_s(buffer, "(%f,%f,%f,%f)\n", rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w);
+        //OutputDebugStringA(buffer);
 
-        renderer.render_cube(glm::vec3(0,0,0), rotQuat);
+        renderer.render_cube(position, orientation);
     }
 }
 

@@ -38,8 +38,13 @@ namespace rain
     void init_orientation(RigidBodyOrientation& _body, const glm::quat& _initialRotation)
     {
         _body.orientation = _initialRotation;
-        //_body.angularMomentum = glm::vec3(0.0f, 15.0f, 0.0f);
-        _body.mass = 3.0f;
+        //bool first = true;
+        //if (first)
+        //{
+        //    first = false;
+        //    _body.angularMomentum = glm::vec3(0.0f, 15.0f, 0.0f);
+        //}
+        _body.mass = 1.0f;
         _body.mass_inverse = 1.0f / _body.mass;
         _body.rotationInertia = powf((1.0f / 6.0f) * _body.size, 2.0f * _body.mass);
         _body.rotationInertiaInverse = 1.0f * _body.rotationInertia;
@@ -47,19 +52,17 @@ namespace rain
 
     void update_orientation(RigidBodyOrientation& _body, float _deltaTime)
     {
-        _body.torque = glm::vec3(20.0f, 0.0f, 0.0f) - _body.angularVelocity * 0.1f;
+        _body.torque = glm::vec3(0.0f, 0.0f, -1.0f) - _body.angularVelocity * 0.1f;
         
+        char buffer[512];
+        sprintf_s(buffer, "(%f,%f,%f)\n", _body.torque.x, _body.torque.y, _body.torque.z);
+        OutputDebugStringA(buffer);
+
         _body.angularMomentum += _body.torque * _deltaTime;
         _body.angularVelocity = _body.angularMomentum * _body.rotationInertiaInverse;
-        _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) /** _body.orientation*/;
-        _body.orientation += _body.spin * _deltaTime;
-
-        //char buffer[512];
-        //sprintf_s(buffer, "momentum : (%f,%f,%f)\nvelocity : (%f,%f,%f)\norentation : (%f,%f,%f,%f)\n\n",
-        //    _body.angularMomentum.x, _body.angularMomentum.y, _body.angularMomentum.z,
-        //    _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z,
-        //    _body.spin.x, _body.spin.y, _body.spin.z, _body.spin.w);
-        //OutputDebugStringA(buffer);
+        _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) * _body.orientation;
+        _body.orientation += _body.spin /** _deltaTime*/;
+        _body.orientation = glm::normalize(_body.orientation);
     }
 
 }

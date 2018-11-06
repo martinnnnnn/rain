@@ -33,11 +33,11 @@ namespace rain
     struct RigidBodyOrientation
     {
         RigidBodyOrientation()
-            : orientation(glm::quat())
+            : orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
             , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
             , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
             , torque(glm::vec3(0.0f, 0.0f, 0.0f))
-            , spin(glm::quat())
+            , spin(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
             , mass(1.0f)
             , size(1.0f)
             , mass_inverse(1.0f / mass)
