@@ -47,16 +47,16 @@ namespace rain
 
     void update_orientation(RigidBodyOrientation& _body, float _deltaTime)
     {
-        _body.torque = glm::vec3(0.0f, 0.0f, -1.0f) - _body.angularVelocity * 0.1f;
+        _body.torque = (glm::vec3(0.0f, 0.0f, -1.0f) - _body.angularVelocity * 0.1f)* _deltaTime;
         
         char buffer[512];
         sprintf_s(buffer, "velocity : (%f,%f,%f)\n", _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z);
         OutputDebugStringA(buffer);
 
-        _body.angularMomentum += _body.torque/* * _deltaTime*/;
+        _body.angularMomentum += _body.torque;
         _body.angularVelocity = _body.angularMomentum * _body.rotationInertiaInverse;
         _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) * _body.orientation;
-        _body.orientation += _body.spin * _deltaTime;
+        _body.orientation += _body.spin;
         _body.orientation = glm::normalize(_body.orientation);
     }
 
