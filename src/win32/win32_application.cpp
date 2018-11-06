@@ -58,8 +58,9 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     Transform& transform2 = registry.assign<Transform>(entity2);
     transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
     transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
-    //transform2.currentOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
-    //transform2.previousOrientation = glm::angleAxis(2.0f * 3.14f, glm::vec3(0, 0, 1));
+    transform2.currentOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    transform2.previousOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
     registry.assign<RigidBody>(entity2);
 
     Physics::init(registry);
@@ -131,6 +132,7 @@ void Application::render(float _alpha)
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
+        //renderer.render_cube(glm::vec3(0.0f, 0.0f, 0.0f), orientation);
         renderer.render_cube(position, orientation);
     }
 }

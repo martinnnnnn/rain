@@ -22,7 +22,7 @@ namespace rain
 
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition, const glm::quat& _initialOrientation)
     {
-        // position & co
+            // position & co
         _body.position = _initialPosition;
         _body.momentum = glm::vec3(5.0f, 15.0f, 0.0f);
         _body.mass = 3.0f;

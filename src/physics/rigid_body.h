@@ -47,33 +47,8 @@ namespace rain
     };
 
 
-    struct BoundingSphere
-    {
-        BoundingSphere()
-            : center(glm::vec3(0.0f, 0.0f, 0.0f))
-            , radius(0.0f)
-        {}
-
-        glm::vec3 center;
-        f32 radius;
-    };
-
-    struct BoundingPlane
-    {
-        glm::vec3 position;
-        glm::vec3 normal;
-    };
-
-    struct BoundingBox
-    {
-    };
-
     void update(RigidBody& _body, const float _deltaTime);
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f), const glm::quat& _initialOrientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
     void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
 
-    //void detect_collision(const BoundingSphere& _sphere, const BoundingPlane& _plane)
-    //{
-
-    //}
 }
