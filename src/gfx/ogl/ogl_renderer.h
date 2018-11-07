@@ -28,12 +28,10 @@ public:
     void render_quad();
     
 	void init_cube();
-    void render_cube(const glm::vec3& _position);
-    void render_cube(const glm::vec3& _position, const glm::quat& orientation);
+    void render_cube(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
 
 	void init_sphere();
-    void render_sphere(const glm::vec3& _position);
-    void render_sphere(const glm::vec3& _position, const glm::quat& orientation);
+    void render_sphere(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f,0.0f,0.0f)));
 
     void clear();
     void set_projection_matrix(const glm::mat4& _projection);
@@ -51,8 +49,9 @@ public:
 	GLuint sphereVAO;
 	u32 sphere_index_count;
 
-    unsigned int cubeShaderProgram;
-    unsigned int coordviewShaderProgram;
+    unsigned int phong_shader_id;
+    unsigned int pbr_shader_id;
+    unsigned int coordview_shader_id;
     glm::mat4 projection;
     glm::mat4 view_mat;
 };

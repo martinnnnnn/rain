@@ -89,14 +89,14 @@ void Renderer::init_coord_view()
         OutputDebugStringA(buffer);
     }
     // link shaders
-    coordviewShaderProgram = glCreateProgram();
-    glAttachShader(coordviewShaderProgram, vertexShader);
-    glAttachShader(coordviewShaderProgram, fragmentShader);
-    glLinkProgram(coordviewShaderProgram);
+    coordview_shader_id = glCreateProgram();
+    glAttachShader(coordview_shader_id, vertexShader);
+    glAttachShader(coordview_shader_id, fragmentShader);
+    glLinkProgram(coordview_shader_id);
     // check for linking errors
-    glGetProgramiv(coordviewShaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(coordview_shader_id, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(coordviewShaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(coordview_shader_id, 512, NULL, infoLog);
         char buffer[512];
         sprintf_s(buffer, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
         OutputDebugStringA(buffer);
@@ -173,6 +173,8 @@ void Renderer::init_quad()
     //glBindVertexArray(0);
 }
 
+
+
 void Renderer::init_cube()
 {
     const char *vertexShaderSource = "#version 330 core\n"
@@ -217,14 +219,14 @@ void Renderer::init_cube()
         OutputDebugStringA(buffer);
     }
     // link shaders
-    cubeShaderProgram = glCreateProgram();
-    glAttachShader(cubeShaderProgram, vertexShader);
-    glAttachShader(cubeShaderProgram, fragmentShader);
-    glLinkProgram(cubeShaderProgram);
+    phong_shader_id = glCreateProgram();
+    glAttachShader(phong_shader_id, vertexShader);
+    glAttachShader(phong_shader_id, fragmentShader);
+    glLinkProgram(phong_shader_id);
     // check for linking errors
-    glGetProgramiv(cubeShaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(phong_shader_id, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(cubeShaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(phong_shader_id, 512, NULL, infoLog);
         char buffer[512];
         sprintf_s(buffer, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
         OutputDebugStringA(buffer);
@@ -394,29 +396,15 @@ void Renderer::init_sphere()
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 }
 
-void Renderer::render_sphere(const glm::vec3& _position)
-{
-    glUseProgram(cubeShaderProgram);
-    glBindVertexArray(sphereVAO);
-
-    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
-
-    unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-
-}
 
 void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
 {
-	glUseProgram(cubeShaderProgram);
+	glUseProgram(phong_shader_id);
 	glBindVertexArray(sphereVAO);
 
 	glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
     
-	unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
+	unsigned int transformLoc = glGetUniformLocation(phong_shader_id, "mvp");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
 	glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
@@ -490,38 +478,23 @@ void Renderer::render_coord_view(const glm::vec3& _position)
     glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
 
     glBindVertexArray(coordviewVAO);
-    glUseProgram(coordviewShaderProgram);
+    glUseProgram(coordview_shader_id);
 
-    unsigned int transformLoc = glGetUniformLocation(coordviewShaderProgram, "mvp");
+    unsigned int transformLoc = glGetUniformLocation(coordview_shader_id, "mvp");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glDrawArrays(GL_LINES, 0, 9);
 }
 
 
-void Renderer::render_cube(const glm::vec3& _position)
-{
-    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
-
-    glBindVertexArray(cubeVAO);
-    glUseProgram(cubeShaderProgram);
-
-    unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
-
 void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
 {
     glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
 
     glBindVertexArray(cubeVAO);
-    glUseProgram(cubeShaderProgram);
+    glUseProgram(phong_shader_id);
 
-    unsigned int transformLoc = glGetUniformLocation(cubeShaderProgram, "mvp");
+    unsigned int transformLoc = glGetUniformLocation(phong_shader_id, "mvp");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
     glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -19,6 +19,7 @@ namespace rain
 		};
 
 		bool open(const std::string& _path);
+        bool reopen();
 		bool is_open();
 		std::string read();
 		void close();

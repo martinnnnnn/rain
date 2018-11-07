@@ -21,9 +21,8 @@ namespace rain
 
 		Shader();
 		void use();
-		void reload();
 		bool load(const std::string& _vertex_file, const std::string& _fragment_file, const std::string& _geometry_file = "");
-		void load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code = nullptr);
+        void unload();
 
 		u32 set(const std::string& _name, bool _value) const;
 		u32 set(const std::string& _name, int _value) const;
@@ -47,8 +46,7 @@ namespace rain
 
 	private:
 		
-		//std::string readFile(const char* _path);
-
+		void load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code = nullptr);
 		void check_compile_errors(unsigned int _shader, const std::string& _type);
 
 		File m_vertex_file;

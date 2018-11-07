@@ -15,39 +15,38 @@ namespace rain
 	{
 	}
 
-	void Shader::reload()
-	{
-		//std::string s1 = readFile(m_vertexPath.c_str());
-		//std::string s2 = readFile(m_fragmentPath.c_str());
-		//const char* vShaderCode = s1.c_str();
-		//const char* fShaderCode = s2.c_str();
-
-		//load(vShaderCode, fShaderCode);
-	}
-
 	bool Shader::load(const std::string& _vertex_file, const std::string& _fragment_file, const std::string& _geometry_file)
 	{
-		bool retval = true;
-		retval = retval && m_vertex_file.open(_vertex_file);
-		retval = retval && m_fragment_file.open(_fragment_file);
-		if (_geometry_file != "")
-		{
-			retval = retval && m_geometry_file.open(_geometry_file);
-		}
+        bool success = false;
 
-		if (retval)
-		{
-			const char* vertex = m_vertex_file.read().c_str();
-			const char* fragment = m_fragment_file.read().c_str();
-			const char* geometry = m_geometry_file.read().c_str();
+        std::string vertex_code = "";
+        std::string fragment_code = "";
+        std::string geometry_code = "";
 
-			load(m_vertex_file.read().c_str(), m_fragment_file.read().c_str(), m_geometry_file.read().c_str());
-		}
+        if (m_vertex_file.open(_vertex_file))
+        {
+            vertex_code = m_vertex_file.read();
+        }
+        if (m_fragment_file.open(_fragment_file))
+        {
+            fragment_code = m_vertex_file.read();
+        }
+        if (m_geometry_file.open(_geometry_file))
+        {
+            geometry_code = m_vertex_file.read();
+        }
+
+        if (vertex_code != "" && fragment_code != "")
+        {
+            load(vertex_code.c_str(), fragment_code.c_str(), geometry_code != "" ? geometry_code.c_str() : nullptr);
+            success = true;
+        }
+
 		m_vertex_file.close();
 		m_fragment_file.close();
 		m_geometry_file.close();
 
-		return true;
+		return success;
 	}
 
 
@@ -92,6 +91,11 @@ namespace rain
 		glDeleteShader(m_fragmentShader);
 		glDeleteShader(m_geometryShader);
 	}
+
+    void Shader::unload()
+    {
+        glDeleteProgram(id);
+    }
 
 	void Shader::use()
 	{
