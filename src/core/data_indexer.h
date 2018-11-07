@@ -2,13 +2,14 @@
 
 #include <vector>
 #include <string>
+#include <Windows.h>
+#include <map>
 
 
 #include "core/singleton.h"
 #include "core/file.h"
+#include "core/string.h"
 
-#include <string.h>
-#include <Windows.h>
 
 namespace rain
 {
@@ -18,17 +19,44 @@ namespace rain
 
 
     public:
-        void init()
+        bool init()
         {
-            std::string path = File::GetExePath() + "/config.rain";
+            const std::string path = File::GetExePath() + "/config.rain";
 
-            File config;
-            if (config.open(path))
+            File configFile;
+            if (!configFile.open(path))
             {
-                root_path = config.read();
+                return false;
             }
+            
+            const std::string lines = configFile.read();
+            std::vector<std::string> splitedLines = String::split(lines, "\n");
+            std::map<std::string, std::string> config;
+            for (u32 i = 0; i < splitedLines.size(); ++i)
+            {
+                std::vector<std::string> line = String::split(splitedLines[i], "=");
+                config[line[0]] = line[1];
+                if (line[0] == "data_path")
+                {
+                    root_path = line[1];
+                }
+            }
+
+            bool data_found = find("data_path", root_path);
+            assert(data_found);
         }
 
+        bool find(const std::string& _key, std::string& _value)
+        {
+            if (config.find(_key) != config.end())
+            {
+                _value = config.at(_key);
+                return true;
+            }
+            return false;
+        }
+
+        std::map<std::string, std::string> config;
         std::string root_path;
     };
 

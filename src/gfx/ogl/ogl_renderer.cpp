@@ -11,6 +11,7 @@
 
 #include "core/high_resolution_clock.h"
 #include "ogl_shader.h"
+#include "core/data_indexer.h"
 
 namespace rain
 {
@@ -48,7 +49,9 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-        //default_phong;
+        //RAIN_DATA.root_path
+
+        //default_phong.load(RAIN_DATA.root_path + "/engine/shaders/glsl/");
         //default_pbr;
         //default_coord_view;
 

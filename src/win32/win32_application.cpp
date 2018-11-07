@@ -144,10 +144,6 @@ void Application::render(float _alpha)
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-    //scanf("%s %s", &number, &iterations);
-
-
-
     Application app;
     app.init(hinstance, "");
 
