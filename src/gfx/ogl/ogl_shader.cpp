@@ -98,60 +98,111 @@ namespace rain
 		glUseProgram(id);
 	}
 
-	
-
-
-	void Shader::set(const std::string &_name, bool _value) const
+    u32 Shader::set(const std::string &_name, bool _value) const
 	{
-		GLint t = glGetUniformLocation(id, _name.c_str());
-		glUniform1i(t, (int)_value);
-	}
-	void Shader::set(const std::string &_name, int _value) const
-	{
-		glUniform1i(glGetUniformLocation(id, _name.c_str()), _value);
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+		glUniform1i(parameter_id, (int)_value);
+        return parameter_id;
 	}
 
-	void Shader::set(const std::string &_name, float _value) const
+    u32 Shader::set(const std::string &_name, int _value) const
 	{
-		glUniform1f(glGetUniformLocation(id, _name.c_str()), _value);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform1i(parameter_id, _value);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, float x, float y) const
+    u32 Shader::set(const std::string &_name, float _value) const
 	{
-		glUniform2f(glGetUniformLocation(id, name.c_str()), x, y);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform1f(parameter_id, _value);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, float x, float y, float z) const
+    u32 Shader::set(const std::string &_name, float _x, float _y) const
 	{
-		glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform2f(parameter_id, _x, _y);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, float x, float y, float z, float w) const
+    u32 Shader::set(const std::string &_name, float _x, float _y, float _z) const
 	{
-		glUniform4f(glGetUniformLocation(id, name.c_str()), x, y, z, w);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform3f(parameter_id, _x, _y, _z);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, const glm::fvec2 &vector) const
+    u32 Shader::set(const std::string &_name, float _x, float _y, float _z, float _w) const
 	{
-		glUniform2f(glGetUniformLocation(id, name.c_str()), vector.x, vector.y);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform4f(parameter_id, _x, _y, _z, _w);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, const glm::fvec3 &vector) const
+    u32 Shader::set(const std::string &_name, const glm::fvec2 &_vector) const
 	{
-		glUniform3f(glGetUniformLocation(id, name.c_str()), vector.x, vector.y, vector.z);
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform2f(parameter_id, _vector.x, _vector.y);
+        return parameter_id;
+    }
 
-	void Shader::set(const std::string &name, const glm::fmat4 &matrix)
+    u32 Shader::set(const std::string &_name, const glm::fvec3 &_vector) const
 	{
-		glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
-	}
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniform3f(parameter_id, _vector.x, _vector.y, _vector.z);
+        return parameter_id;
+    }
 
+    u32 Shader::set(const std::string &_name, const glm::fmat4 &_matrix) const
+	{
+        u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
+        glUniformMatrix4fv(parameter_id, 1, GL_FALSE, glm::value_ptr(_matrix));
+        return parameter_id;
+    }
 
-	void Shader::check_compile_errors(unsigned int _shader, std::string _type)
+    void Shader::set(u32 _parameterID, bool _value) const
+    {
+        glUniform1i(_parameterID, (int)_value);
+    }
+    void Shader::set(u32 _parameterID, int _value) const
+    {
+        glUniform1i(_parameterID, _value);
+    }
+    void Shader::set(u32 _parameterID, float _x) const
+    {
+        glUniform1f(_parameterID, _x);
+    }
+    void Shader::set(u32 _parameterID, float _x, float _y) const
+    {
+        glUniform2f(_parameterID, _x, _y);
+    }
+    void Shader::set(u32 _parameterID, float _x, float _y, float _z) const
+    {
+        glUniform3f(_parameterID, _x, _y, _z);
+    }
+    void Shader::set(u32 _parameterID, float _x, float _y, float _z, float _w) const
+    {
+        glUniform4f(_parameterID, _x, _y, _z, _w);
+    }
+    void Shader::set(u32 _parameterID, const glm::fvec2& _vector) const
+    {
+        glUniform2f(_parameterID, _vector.x, _vector.y);
+    }
+    void Shader::set(u32 _parameterID, const glm::fvec3& _vector) const
+    {
+        glUniform3f(_parameterID, _vector.x, _vector.y, _vector.z);
+
+    }
+    void Shader::set(u32 _parameterID, const glm::fmat4& _matrix) const
+    {
+        glUniformMatrix4fv(_parameterID, 1, GL_FALSE, glm::value_ptr(_matrix));
+    }
+
+	void Shader::check_compile_errors(unsigned int _shader, const std::string& _type)
 	{
 		int success;
 		char infoLog[1024];
-		char buffer[2048];
 
 		if (_type != "PROGRAM")
 		{
@@ -160,7 +211,7 @@ namespace rain
 			{
 				glGetShaderInfoLog(_shader, 1024, NULL, infoLog);
 				char buffer[512];
-				sprintf_s(buffer, "ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type, infoLog);
+				sprintf_s(buffer, "ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 				OutputDebugStringA(buffer);
 
 			}
@@ -172,7 +223,7 @@ namespace rain
 			{
 				glGetProgramInfoLog(_shader, 1024, NULL, infoLog);
 				char buffer[512];
-				sprintf_s(buffer, "ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type, infoLog);
+				sprintf_s(buffer, "ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 				OutputDebugStringA(buffer);
 			}
 		}

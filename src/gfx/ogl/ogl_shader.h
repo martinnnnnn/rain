@@ -25,21 +25,31 @@ namespace rain
 		bool load(const std::string& _vertex_file, const std::string& _fragment_file, const std::string& _geometry_file = "");
 		void load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code = nullptr);
 
-		void set(const std::string &name, bool value) const;
-		void set(const std::string &name, int value) const;
-		void set(const std::string &name, float x) const;
-		void set(const std::string &name, float x, float y) const;
-		void set(const std::string &name, float x, float y, float z) const;
-		void set(const std::string &name, float x, float y, float z, float w) const;
-		void set(const std::string &name, const glm::fvec2 &vector) const;
-		void set(const std::string &name, const glm::fvec3 &vector) const;
-		void set(const std::string &name, const glm::fmat4 &matrix);
+		u32 set(const std::string& _name, bool _value) const;
+		u32 set(const std::string& _name, int _value) const;
+		u32 set(const std::string& _name, float _x) const;
+		u32 set(const std::string& _name, float _x, float _y) const;
+		u32 set(const std::string& _name, float _x, float _y, float _z) const;
+		u32 set(const std::string& _name, float _x, float _y, float _z, float _w) const;
+		u32 set(const std::string& _name, const glm::fvec2& _vector) const;
+		u32 set(const std::string& _name, const glm::fvec3& _vector) const;
+		u32 set(const std::string& _name, const glm::fmat4& _matrix) const;
+
+        void set(u32 _parameterID, bool _value) const;
+        void set(u32 _parameterID, int _value) const;
+        void set(u32 _parameterID, float _x) const;
+        void set(u32 _parameterID, float _x, float _y) const;
+        void set(u32 _parameterID, float _x, float _y, float _z) const;
+        void set(u32 _parameterID, float _x, float _y, float _z, float _w) const;
+        void set(u32 _parameterID, const glm::fvec2& _vector) const;
+        void set(u32 _parameterID, const glm::fvec3& _vector) const;
+        void set(u32 _parameterID, const glm::fmat4& _matrix) const;
 
 	private:
 		
 		//std::string readFile(const char* _path);
 
-		void check_compile_errors(unsigned int _shader, std::string _type);
+		void check_compile_errors(unsigned int _shader, const std::string& _type);
 
 		File m_vertex_file;
 		File m_fragment_file;
