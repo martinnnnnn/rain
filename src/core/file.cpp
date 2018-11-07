@@ -9,7 +9,7 @@ using namespace rain;
 bool File::open(const std::string& _path)
 {
     m_path = _path;
-    m_file = std::fstream(m_path);
+    m_file = std::fstream(m_path.c_str());
 
     return is_open();
 }

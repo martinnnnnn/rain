@@ -10,6 +10,7 @@
 #include "gfx/ogl/ogl_renderer.h"
 #include "win32/win32_input.h"
 #include "core/event.h"
+#include "core/data_indexer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -34,6 +35,9 @@ using namespace rain;
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
+
+    // INIT CONFIG
+    RAIN_DATA.init();
 
 	// INIT WINDOW
 	RAIN_WINDOW.init(hinstance, 800, 600, 0);
@@ -140,6 +144,10 @@ void Application::render(float _alpha)
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
+    //scanf("%s %s", &number, &iterations);
+
+
+
     Application app;
     app.init(hinstance, "");
 
