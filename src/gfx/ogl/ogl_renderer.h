@@ -21,6 +21,8 @@ class Renderer
 public:
     void init();
 
+    void init_shaders();
+
     void init_coord_view();
     void render_coord_view(const glm::vec3& _position);
 
@@ -49,9 +51,9 @@ public:
 	GLuint sphereVAO;
 	u32 sphere_index_count;
 
-    unsigned int phong_shader_id;
-    unsigned int pbr_shader_id;
-    unsigned int coordview_shader_id;
+    GLuint phong_shader_id;
+    GLuint pbr_shader_id;
+    GLuint coordview_shader_id;
     glm::mat4 projection;
     glm::mat4 view_mat;
 };

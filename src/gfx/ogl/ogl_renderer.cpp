@@ -10,6 +10,7 @@
 #include <glm/trigonometric.hpp>
 
 #include "core/high_resolution_clock.h"
+#include "ogl_shader.h"
 
 void Renderer::init()
 {
@@ -39,6 +40,15 @@ void Renderer::init()
     init_quad();
     init_cube();
     init_sphere();
+}
+
+void Renderer::init_shaders()
+{
+    Shader phong;
+    phong.load();
+    phong_shader_id;
+    pbr_shader_id;
+    coordview_shader_id;
 }
 
 void Renderer::init_coord_view()
