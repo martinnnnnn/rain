@@ -26,19 +26,39 @@ namespace rain
 		bool is_open();
 		std::string read();
 		void close();
+        std::string get_path();
+        std::string get_directory();
+        std::string get_name();
+
+        static std::string get_directory(const std::string& _path);
+        static std::string get_name(const std::string& _path);
 
 
-        static std::string GetExePath()
-        {
-            char buffer[MAX_PATH];
-            GetModuleFileName(NULL, buffer, MAX_PATH);
-            std::string path = std::string(buffer).substr(0, std::string(buffer).find_last_of("\\/"));
-            String::replace(path, "\\", "/");
-            return path;
-        }
-
+        static std::string get_exe_path();
 	private:
 		std::fstream m_file;
 		std::string m_path;
 	};
+
+    class FilePath
+    {
+    public:
+        FilePath(const std::string& _path)
+        {
+            path = _path;
+        }
+
+        std::string get_name()
+        {
+            size_t lastSlash = path.find_last_of("/");
+            return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
+        }
+
+        std::string get_directory()
+        {
+            return path.substr(0, path.find_last_of("/"));
+        }
+
+        std::string path;
+    };
 }

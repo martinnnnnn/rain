@@ -50,8 +50,8 @@ namespace rain
     void Renderer::init_default_shaders()
     {
         //RAIN_DATA.root_path
-
-        //default_phong.load(RAIN_DATA.root_path + "/engine/shaders/glsl/");
+        //shaders_indexer_path = RAIN_DATA.root_path + "/engine/shaders/glsl/glsl_shader_index.rain";
+        //default_phong.load();
         //default_pbr;
         //default_coord_view;
 

@@ -60,7 +60,7 @@ namespace rain
         glm::mat4 projection;
         glm::mat4 view_mat;
 
-        
+        std::string shaders_indexer_path;
         Shader default_phong;
         Shader default_pbr;
         Shader default_coord_view;

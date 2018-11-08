@@ -4,7 +4,7 @@
 #include <string>
 #include <Windows.h>
 #include <map>
-
+#include <cassert>
 
 #include "core/singleton.h"
 #include "core/file.h"
@@ -13,72 +13,36 @@
 
 namespace rain
 {
+    struct DataIndexer
+    {
+        using Key = std::string;
+        using Value = std::string;
+        using DataMap = std::map<Key, Value>;
+
+        DataIndexer(std::string _path);
+
+        bool find(const Key& _key, Value& _value);
+        DataIndexer* find(const std::string& _indexer);
+
+        File file;
+        DataMap data_map;
+        std::vector<DataIndexer*> indexers;
+    };
+
 
     class Data : public Singleton<Data>
     {
-
-
     public:
-        bool init()
+        void init(const std::string& _path)
         {
-            const std::string path = File::GetExePath() + "/config.rain";
-
-            File configFile;
-            if (!configFile.open(path))
-            {
-                return false;
-            }
-            
-            const std::string lines = configFile.read();
-            std::vector<std::string> splitedLines = String::split(lines, "\n");
-            std::map<std::string, std::string> config;
-            for (u32 i = 0; i < splitedLines.size(); ++i)
-            {
-                std::vector<std::string> line = String::split(splitedLines[i], "=");
-                config[line[0]] = line[1];
-                if (line[0] == "data_path")
-                {
-                    root_path = line[1];
-                }
-            }
-
-            bool data_found = find("data_path", root_path);
-            assert(data_found);
+            config = new DataIndexer(_path);
+            bool dataRootFound = config->find("data_path", root);
+            assert(dataRootFound, "couldn't locate data root path");
+            root = File::get_directory(root);
         }
-
-        bool find(const std::string& _key, std::string& _value)
-        {
-            if (config.find(_key) != config.end())
-            {
-                _value = config.at(_key);
-                return true;
-            }
-            return false;
-        }
-
-        std::map<std::string, std::string> config;
-        std::string root_path;
+        std::string root;
+        DataIndexer* config;
     };
-
-
-    //struct Data
-    //{
-    //    /*
-
-    //    string path
-    //    u64 id
-
-
-    //    */
-    //};
-
-
-    struct DataIndexer
-    {
-        std::vector<DataIndexer*> indexers;
-        std::vector<Data> data;
-    };
-
 }
 
 #define RAIN_DATA rain::Data::Get()

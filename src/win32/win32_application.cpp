@@ -37,7 +37,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     hinstance = _hinstance;
 
     // INIT CONFIG
-    RAIN_DATA.init();
+    RAIN_DATA.init(File::get_exe_path() + "/config.rain");
 
 	// INIT WINDOW
 	RAIN_WINDOW.init(hinstance, 800, 600, 0);
