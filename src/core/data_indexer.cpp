@@ -38,7 +38,7 @@ namespace rain
         return false;
     }
 
-    DataIndexer* DataIndexer::find(const std::string& _indexer)
+    DataIndexer* DataIndexer::find_indexer(const std::string& _indexer)
     {
         for (u32 i = 0; i < indexers.size(); ++i)
         {
@@ -47,7 +47,15 @@ namespace rain
                 return indexers[i];
             }
         }
-
         return nullptr;
+    }
+
+    std::string DataIndexer::find(const Key& _key)
+    {
+        if (data_map.find(_key) != data_map.end())
+        {
+            return data_map.at(_key);
+        }
+        return std::string("");
     }
 }

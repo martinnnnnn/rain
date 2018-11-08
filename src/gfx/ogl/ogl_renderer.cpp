@@ -11,7 +11,6 @@
 
 #include "core/high_resolution_clock.h"
 #include "ogl_shader.h"
-#include "core/data_indexer.h"
 
 namespace rain
 {
@@ -49,9 +48,13 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-        //RAIN_DATA.root_path
-        //shaders_indexer_path = RAIN_DATA.root_path + "/engine/shaders/glsl/glsl_shader_index.rain";
-        //default_phong.load();
+        shaders_indexer_path = new DataIndexer(RAIN_DATA.root + "/engine/shaders/glsl/glsl_shader_index.rain");
+
+        // creating default phong shader
+        std::string default_phong_shaders = shaders_indexer_path->find("default_phong");
+        auto shaders = String::pair_split(default_phong_shaders, " ");
+        default_phong.load(shaders.first, shaders.second);
+
         //default_pbr;
         //default_coord_view;
 

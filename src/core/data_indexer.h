@@ -22,7 +22,8 @@ namespace rain
         DataIndexer(std::string _path);
 
         bool find(const Key& _key, Value& _value);
-        DataIndexer* find(const std::string& _indexer);
+        Value find(const Key& _indexer);
+        DataIndexer* find_indexer(const std::string& _indexer);
 
         File file;
         DataMap data_map;
