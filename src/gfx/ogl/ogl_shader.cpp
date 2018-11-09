@@ -29,11 +29,11 @@ namespace rain
         }
         if (m_fragment_file.open(_fragment_file))
         {
-            fragment_code = m_vertex_file.read();
+            fragment_code = m_fragment_file.read();
         }
         if (m_geometry_file.open(_geometry_file))
         {
-            geometry_code = m_vertex_file.read();
+            geometry_code = m_geometry_file.read();
         }
 
         if (vertex_code != "" && fragment_code != "")
@@ -52,9 +52,9 @@ namespace rain
 
 	void Shader::load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code)
 	{
-		GLuint m_vertexShader;
-		GLuint m_fragmentShader;
-		GLuint m_geometryShader;
+		//GLuint m_vertexShader;
+		//GLuint m_fragmentShader;
+		//GLuint m_geometryShader;
 
 		id = glCreateProgram();
 		m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -89,7 +89,10 @@ namespace rain
 
 		glDeleteShader(m_vertexShader);
 		glDeleteShader(m_fragmentShader);
-		glDeleteShader(m_geometryShader);
+        if (_geometry_code != nullptr)
+        {
+		    glDeleteShader(m_geometryShader);
+        }
 	}
 
     void Shader::unload()
@@ -214,7 +217,7 @@ namespace rain
 			if (!success)
 			{
 				glGetShaderInfoLog(_shader, 1024, NULL, infoLog);
-				char buffer[512];
+				char buffer[2048];
 				sprintf_s(buffer, "ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 				OutputDebugStringA(buffer);
 
@@ -226,7 +229,7 @@ namespace rain
 			if (!success)
 			{
 				glGetProgramInfoLog(_shader, 1024, NULL, infoLog);
-				char buffer[512];
+				char buffer[2048];
 				sprintf_s(buffer, "ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 				OutputDebugStringA(buffer);
 			}

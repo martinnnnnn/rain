@@ -54,9 +54,9 @@ namespace rain
 	    GLuint sphereVAO;
 	    u32 sphere_index_count;
 
-        GLuint phong_shader_id;
-        GLuint pbr_shader_id;
-        GLuint coordview_shader_id;
+        //GLuint phong_shader_id;
+        //GLuint pbr_shader_id;
+        //GLuint coordview_shader_id;
         glm::mat4 projection;
         glm::mat4 view_mat;
 
