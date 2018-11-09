@@ -1,5 +1,7 @@
 #include "gfx_camera.h"
 
+#include "win32/win32_application.h"
+#include "core/types.h"
 
 using namespace rain;
 
@@ -17,26 +19,26 @@ void Camera::update()
 {
 	glm::vec3 movement(0.0f, 0.0f, 0.0f);
 
-	if (RAIN_INPUT.is_key_pressed(DIK_W))
+	if (RAIN_INPUT->is_key_pressed(DIK_W))
 	{
 		movement += front * movement_speed;
 	}
-	if (RAIN_INPUT.is_key_pressed(DIK_S))
+	if (RAIN_INPUT->is_key_pressed(DIK_S))
 	{
 		movement -= front * movement_speed;
 	}
-	if (RAIN_INPUT.is_key_pressed(DIK_A))
+	if (RAIN_INPUT->is_key_pressed(DIK_A))
 	{
 		movement -= right * movement_speed;
 	}
-	if (RAIN_INPUT.is_key_pressed(DIK_D))
+	if (RAIN_INPUT->is_key_pressed(DIK_D))
 	{
 		movement += right * movement_speed;
 	}
 	position += movement;
 
-	yaw += (float)RAIN_INPUT.x_offset * 0.1f;
-	pitch += (float)RAIN_INPUT.y_offset * 0.1f;
+	yaw += f32(RAIN_INPUT->x_offset * 0.1f);
+	pitch += f32(RAIN_INPUT->y_offset * 0.1f);
 
 	//char buffer[256];
 	//sprintf_s(buffer, "(%d, %d)\n", RAIN_INPUT.x_offset, RAIN_INPUT.y_offset);

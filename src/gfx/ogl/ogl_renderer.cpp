@@ -11,6 +11,7 @@
 
 #include "core/high_resolution_clock.h"
 #include "ogl_shader.h"
+#include "win32/win32_application.h"
 
 namespace rain
 {
@@ -48,13 +49,46 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-        shaders_indexer_path = new DataIndexer(RAIN_DATA.root + "/engine/shaders/glsl/glsl_shader_index.rain");
+        shaders_indexer_path = new DataIndexer(RAIN_DATA->root + "/engine/shaders/glsl/glsl_shader_index.rain");
 
         // creating default phong shader
         std::string default_phong_shaders = shaders_indexer_path->find("default_phong");
         auto shaders = String::pair_split(default_phong_shaders, " ");
         bool retval = default_phong.load(shaders_indexer_path->file.get_directory() + shaders.first, shaders_indexer_path->file.get_directory() + shaders.second);
         assert(retval);
+        default_phong.use();
+        default_phong.set("light1.type", 0);
+        default_phong.set("light1.direction", -0.2f, -1.0f, -0.3f);
+        default_phong.set("light1.ambient", 0.5f, 0.5f, 0.5f);
+        default_phong.set("light1.diffuse", 0.1f, 0.1f, 0.1f);
+        default_phong.set("light1.specular", 1.0f, 1.0f, 1.0f);
+        // point light
+        default_phong.set("light2.type", 1);
+        default_phong.set("light2.ambient", 0.1f, 0.1f, 0.1f);
+        default_phong.set("light2.diffuse", 0.8f, 0.8f, 0.8f);
+        default_phong.set("light2.specular", 1.0f, 1.0f, 1.0f);
+        default_phong.set("light2.constant", 1.0f);
+        default_phong.set("light2.linear", 0.09f);
+        default_phong.set("light2.quadratic", 0.032f);
+        // spot light
+        default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        default_phong.set("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
+        default_phong.set("light3.ambient", 0.1f, 0.1f, 0.1f);
+        default_phong.set("light3.diffuse", 0.8f, 0.8f, 0.8f);
+        default_phong.set("light3.specular", 1.0f, 1.0f, 1.0f);
+        default_phong.set("light3.constant", 1.0f);
+        default_phong.set("light3.linear", 0.09f);
+        default_phong.set("light3.quadratic", 0.032f);
+        // material
+        default_phong.set("mat.diffuse", 0);
+        default_phong.set("mat.specular", 1);
+        default_phong.set("mat.emissive", 2);
+        default_phong.set("mat.shininess", 32.0f);
+        // env mapping
+
+
+
         std::string default_coord_shaders = shaders_indexer_path->find("default_coord_view");
         shaders = String::pair_split(default_coord_shaders, " ");
         retval = default_coord_view.load(shaders_indexer_path->file.get_directory() + shaders.first, shaders_indexer_path->file.get_directory() + shaders.second);
@@ -225,7 +259,7 @@ namespace rain
 
 	    const unsigned int X_SEGMENTS = 64;
 	    const unsigned int Y_SEGMENTS = 64;
-	    const float PI = 3.14159265359;
+	    const float PI = 3.14159265359f;
 	    for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
 	    {
 		    for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
@@ -266,7 +300,7 @@ namespace rain
 	    sphere_index_count = indices.size();
 
 	    std::vector<float> data;
-	    for (int i = 0; i < positions.size(); ++i)
+	    for (u32 i = 0; i < positions.size(); ++i)
 	    {
 		    data.push_back(positions[i].x);
 		    data.push_back(positions[i].y);
@@ -288,7 +322,7 @@ namespace rain
 	    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
 	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-	    float stride = (3 + 2 + 3) * sizeof(float);
+	    i32 stride = (3 + 2 + 3) * sizeof(float);
 	    glEnableVertexAttribArray(0);
 	    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
 	    glEnableVertexAttribArray(1);
@@ -387,8 +421,17 @@ namespace rain
     void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-        glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
-        default_phong.set("mvp", mvp);
+        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        default_phong.set("proj", projection);
+        default_phong.set("view", view_mat);
+        
+        //default_phong.set("viewPos", camTransform->position);
+        //default_phong.set("pointLight.position", lightPos);
+        //default_phong.set("spotLight.position", camTransform->position);
+        //default_phong.set("spotLight.direction", _camera->front);
+
+        //glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
+        //default_phong.set("mvp", mvp);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -1,5 +1,6 @@
 #include "data_indexer.h"
 
+#include "win32/win32_application.h"
 
 
 namespace rain
@@ -18,7 +19,7 @@ namespace rain
             if (dataPair.first == "indexer")
             {
                 auto indexer_data = String::pair_split(dataPair.second, "=");
-                indexers.push_back(new DataIndexer(RAIN_DATA.root + indexer_data.second));
+                indexers.push_back(new DataIndexer(RAIN_DATA->root + indexer_data.second));
             }
             else
             {

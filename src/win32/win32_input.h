@@ -14,7 +14,7 @@
 
 namespace rain
 {
-    class Input : public Singleton<Input>
+    class Input
     {
     public:
         Input();
@@ -44,4 +44,4 @@ namespace rain
     };
 
 }
-#define RAIN_INPUT rain::Input::Get()
+//#define RAIN_INPUT rain::Input::Get()

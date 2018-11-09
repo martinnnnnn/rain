@@ -26,7 +26,7 @@
 
 namespace rain
 {
-	class Window : public Singleton<Window>
+	class Window
 	{
 	public:
 
@@ -57,6 +57,4 @@ namespace rain
 	};
 
 	LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
-	#define RAIN_WINDOW Window::Get()
 }

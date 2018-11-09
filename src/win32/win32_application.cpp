@@ -28,6 +28,10 @@
 
 #include "physics/physics.h"
 #include "math/transform.h"
+#include "gfx/ogl/ogl_renderer.h"
+#include "core/data_indexer.h"
+#include "win32/win32_input.h"
+#include "win32/win32_window.h"
 
 using namespace rain;
 
@@ -37,15 +41,23 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     hinstance = _hinstance;
 
     // INIT CONFIG
-    RAIN_DATA.init(File::get_exe_path() + "/config.rain");
+    data = new Data();
+    data->init(File::get_exe_path() + "/config.rain");
 
 	// INIT WINDOW
-	RAIN_WINDOW.init(hinstance, 800, 600, 0);
-	renderer.init();
-	RAIN_WINDOW.show();
+    window = new Window();
+	window->init(hinstance, 800, 600, 0);
+
+    // INIT RENDERER
+    renderer = new Renderer();
+	renderer->init();
+
+    // SHOW WINDOW
+	window->show();
 
 	// INIT INPUT
-	RAIN_INPUT.init();
+    input = new Input();
+	input->init();
 
     // INIT CAMERA
 	camera.init();
@@ -81,7 +93,7 @@ void Application::update()
     static double currentTime = m_clock.get_total_seconds();
     static double accumulator = 0.0;
 
-    RAIN_INPUT.update();
+    input->update();
     camera.update();
     m_clock.tick();
 
@@ -102,10 +114,10 @@ void Application::update()
     }
 
     const double alpha = accumulator / dt;
-    render(alpha);
-    if (RAIN_WINDOW.is_initialized())
+    render(float(alpha));
+    if (window->is_initialized())
     {
-        RAIN_WINDOW.present();
+        window->present();
     }
 }
 
@@ -117,16 +129,16 @@ void Application::update_physics(float _deltaTime)
 
 void Application::shutdown()
 {
-    RAIN_INPUT.shutdown();
+    input->shutdown();
 }
 
 
 void Application::render(float _alpha)
 {
-    renderer.clear();
+    renderer->clear();
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
-    renderer.set_view_matrix(camera.position, camera.position + camera.front, camera.up);
-    renderer.render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+    renderer->set_view_matrix(camera.position, camera.position + camera.front, camera.up);
+    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto view = registry.view<Transform>();
 
@@ -137,15 +149,14 @@ void Application::render(float _alpha)
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
         //renderer.render_cube(glm::vec3(0.0f, 0.0f, 0.0f), orientation);
-        renderer.render_cube(position, orientation);
+        renderer->render_cube(position, orientation);
     }
 }
 
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-    Application app;
-    app.init(hinstance, "");
+    RAIN_APPLICATION.init(hinstance, "");
 
     MSG msg;
     bool quit = false;
@@ -160,11 +171,11 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
             DispatchMessage(&msg);
         }
 
-        app.update();
+        RAIN_APPLICATION.update();
 
         if (GetAsyncKeyState(VK_ESCAPE))
         {
-            RAIN_WINDOW.shutdown();
+            RAIN_WINDOW->shutdown();
         }
     }
 

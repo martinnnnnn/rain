@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "win32/win32_window.h"
+#include "win32/win32_application.h"
 
 using namespace rain;
 
@@ -26,7 +27,7 @@ int Input::init()
     if (FAILED(hr))
         return hr;
 
-    hr = m_keyboard->SetCooperativeLevel(RAIN_WINDOW.m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    hr = m_keyboard->SetCooperativeLevel(RAIN_WINDOW->m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     if (FAILED(hr))
         return hr;
 
@@ -38,7 +39,7 @@ int Input::init()
     if (FAILED(hr))
         return hr;
 
-    hr = m_mouse->SetCooperativeLevel(RAIN_WINDOW.m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+    hr = m_mouse->SetCooperativeLevel(RAIN_WINDOW->m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
     if (FAILED(hr))
         return hr;
 
@@ -58,9 +59,9 @@ int Input::init()
     m_keyboard->Acquire();
     m_mouse->Acquire();
 
-    auto pos = RAIN_WINDOW.get_center_pos_absolute();
-    x_center = pos.x;
-    y_center = pos.y;
+    auto pos = RAIN_WINDOW->get_center_pos_absolute();
+    x_center = u32(pos.x);
+    y_center = u32(pos.y);
 
     return 0;
 }

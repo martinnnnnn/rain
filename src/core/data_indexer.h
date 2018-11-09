@@ -31,19 +31,17 @@ namespace rain
     };
 
 
-    class Data : public Singleton<Data>
+    class Data
     {
     public:
         void init(const std::string& _path)
         {
             config = new DataIndexer(_path);
             bool dataRootFound = config->find("data_path", root);
-            assert(dataRootFound, "couldn't locate data root path");
+            assert(dataRootFound);
             root = File::get_directory(root);
         }
         std::string root;
         DataIndexer* config;
     };
 }
-
-#define RAIN_DATA rain::Data::Get()
