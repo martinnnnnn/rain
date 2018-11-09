@@ -20,6 +20,8 @@ namespace rain
         GLuint vao;
     };
 
+    struct Camera;
+
     class Renderer
     {
     public:
@@ -44,7 +46,9 @@ namespace rain
         void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
         void set_view_matrix(const glm::mat4& _matrix);
 
+        void update_camera();
 
+        Camera* camera;
         GLuint coordviewVAO;
 	    u32 coord_index_count;
 	    GLuint quadVAO;

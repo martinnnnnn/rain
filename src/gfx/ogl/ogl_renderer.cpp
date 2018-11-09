@@ -12,6 +12,7 @@
 #include "core/high_resolution_clock.h"
 #include "ogl_shader.h"
 #include "win32/win32_application.h"
+#include "gfx/gfx_camera.h"
 
 namespace rain
 {
@@ -45,6 +46,15 @@ namespace rain
         init_quad();
         init_cube();
         init_sphere();
+
+        camera = new Camera();
+        camera->init();
+    }
+
+    void Renderer::update_camera()
+    {
+        camera->update();
+        set_view_matrix(camera->position, camera->position + camera->front, camera->up);
     }
 
     void Renderer::init_default_shaders()
@@ -52,11 +62,14 @@ namespace rain
         shaders_indexer_path = new DataIndexer(RAIN_DATA->root + "/engine/shaders/glsl/glsl_shader_index.rain");
 
         // creating default phong shader
-        std::string default_phong_shaders = shaders_indexer_path->find("default_phong");
-        auto shaders = String::pair_split(default_phong_shaders, " ");
-        bool retval = default_phong.load(shaders_indexer_path->file.get_directory() + shaders.first, shaders_indexer_path->file.get_directory() + shaders.second);
+        auto default_phong_shaders = String::pair_split(shaders_indexer_path->find("default_phong"), " ");
+        bool retval = default_phong.load(
+            shaders_indexer_path->file.get_directory() + default_phong_shaders.first,
+            shaders_indexer_path->file.get_directory() + default_phong_shaders.second);
         assert(retval);
+
         default_phong.use();
+        // directional light
         default_phong.set("light1.type", 0);
         default_phong.set("light1.direction", -0.2f, -1.0f, -0.3f);
         default_phong.set("light1.ambient", 0.5f, 0.5f, 0.5f);
@@ -85,13 +98,11 @@ namespace rain
         default_phong.set("mat.specular", 1);
         default_phong.set("mat.emissive", 2);
         default_phong.set("mat.shininess", 32.0f);
-        // env mapping
 
-
-
-        std::string default_coord_shaders = shaders_indexer_path->find("default_coord_view");
-        shaders = String::pair_split(default_coord_shaders, " ");
-        retval = default_coord_view.load(shaders_indexer_path->file.get_directory() + shaders.first, shaders_indexer_path->file.get_directory() + shaders.second);
+        auto default_coord_shaders = String::pair_split(shaders_indexer_path->find("default_coord_view"), " ");
+        retval = default_coord_view.load(
+            shaders_indexer_path->file.get_directory() + default_coord_shaders.first,
+            shaders_indexer_path->file.get_directory() + default_coord_shaders.second);
         assert(retval);
     }
 

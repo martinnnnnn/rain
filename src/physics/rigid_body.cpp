@@ -5,7 +5,7 @@
 
 namespace rain
 {
-    void update(RigidBody& _body, const float _deltaTime)
+    void update(RigidBody& _body, const f32 _deltaTime)
     {
         // here we're adding some forces to move objects around 
         // this should really be done differenlty in the future -> springs, dampers, collision resolution, gravity, projectile, etc.
@@ -22,7 +22,7 @@ namespace rain
 
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition, const glm::quat& _initialOrientation)
     {
-            // position & co
+        // position & co
         _body.position = _initialPosition;
         _body.momentum = glm::vec3(5.0f, 15.0f, 0.0f);
         _body.mass = 3.0f;
@@ -37,11 +37,11 @@ namespace rain
         _body.rotationInertiaInverse = 1.0f / _body.rotationInertia;
     }
 
-    void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque)
+    void update_body(RigidBody& _body, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque)
     {
         // update position
         _body.force = glm::vec3(0.0f);
-        for (int i = 0; i < _forces.size(); ++i)
+        for (u32 i = 0; i < _forces.size(); ++i)
         {
             _body.force += _forces[i];
         }

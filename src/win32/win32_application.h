@@ -1,9 +1,6 @@
 #pragma once
 
 #include <Windows.h>
-
-
-
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -15,7 +12,7 @@
 
 #include "core/singleton.h"
 #include "core/types.h"
-#include "gfx/gfx_camera.h"
+//#include "gfx/gfx_camera.h"
 #include "core/high_resolution_clock.h"
 
 namespace rain
@@ -40,6 +37,8 @@ namespace rain
 
     class Application : public Singleton<Application>
     {
+        using Registry = entt::Registry<u32>;
+
     public:
         int init(HINSTANCE _hinstance, const std::string& _config);
         void shutdown();
@@ -54,13 +53,12 @@ namespace rain
 
     private:
         HINSTANCE hinstance;
-        entt::DefaultRegistry registry;
-        Camera camera;
+        Registry  registry;
         HighResolutionClock m_clock;
     };
 }
 
-#define RAIN_APPLICATION rain::Application::Get()
-#define RAIN_DATA rain::Application::Get().data
-#define RAIN_WINDOW rain::Application::Get().window
-#define RAIN_INPUT rain::Application::Get().input
+#define RAIN_APPLICATION rain::Application::get()
+#define RAIN_DATA rain::Application::get().data
+#define RAIN_WINDOW rain::Application::get().window
+#define RAIN_INPUT rain::Application::get().input

@@ -1,13 +1,10 @@
 #include "win32_window.h"
 
-//#include "core/event.h"
 #include "win32/win32_input.h"
 #include "win32/win32_application.h"
 
 #include <strsafe.h>
 #include <map>
-
-DWORD err;
 
 namespace rain
 {

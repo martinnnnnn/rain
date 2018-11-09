@@ -4,11 +4,11 @@
 
 namespace rain
 {
-	template<typename Entity>
+	template<typename T>
 	class Singleton
 	{
 	protected:
-		Singleton() noexcept = default;
+        Singleton() noexcept = default;
 
 		Singleton(const Singleton&) = delete;
 
@@ -16,10 +16,11 @@ namespace rain
 
 		virtual ~Singleton() = default;
 
+        static T* instance;
 	public:
-		static Entity& Get() noexcept(std::is_nothrow_constructible<Entity>::value)
+		static T& get() noexcept(std::is_nothrow_constructible<T>::value)
 		{
-			static Entity instance;
+            static T instance;
 
 			return instance;
 		}

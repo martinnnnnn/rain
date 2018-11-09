@@ -28,9 +28,9 @@ namespace rain
             , force(glm::vec3(0.0f, 0.0f, 0.0f))
         {}
 
-        float mass;
-        float mass_inverse;
-        float size;
+        f32 mass;
+        f32 mass_inverse;
+        f32 size;
 
         glm::vec3 position;
         glm::vec3 force;
@@ -42,13 +42,13 @@ namespace rain
         glm::vec3 angularMomentum;
         glm::vec3 angularVelocity;
         glm::quat spin;
-        float rotationInertia;
-        float rotationInertiaInverse;
+        f32 rotationInertia;
+        f32 rotationInertiaInverse;
     };
 
 
-    void update(RigidBody& _body, const float _deltaTime);
+    void update(RigidBody& _body, const f32 _deltaTime);
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f), const glm::quat& _initialOrientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
-    void update_body(RigidBody& _body, float _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
+    void update_body(RigidBody& _body, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
 
 }

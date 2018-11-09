@@ -1,37 +1,24 @@
 #include "win32_application.h"
 
+#include <entt.hpp>
 #include <windows.h>
-
 #include <time.h>
 #include <stdlib.h>
 #include <algorithm>
-
-#include "win32_window.h"
-#include "gfx/ogl/ogl_renderer.h"
-#include "win32/win32_input.h"
-#include "core/event.h"
-#include "core/data_indexer.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <errno.h>
-#include <time.h>
-#include <stdio.h>  
-#include <fcntl.h>  
-#include <string.h>
-#include <io.h>
-
-#include "physics/physics.h"
-#include "math/transform.h"
-#include "gfx/ogl/ogl_renderer.h"
-#include "core/data_indexer.h"
+#include "win32_window.h"
 #include "win32/win32_input.h"
 #include "win32/win32_window.h"
+#include "core/event.h"
+#include "core/data_indexer.h"
+#include "math/transform.h"
+#include "gfx/ogl/ogl_renderer.h"
+#include "gfx/ogl/ogl_renderer.h"
+#include "physics/physics.h"
 
 using namespace rain;
 
@@ -58,9 +45,6 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 	// INIT INPUT
     input = new Input();
 	input->init();
-
-    // INIT CAMERA
-	camera.init();
 
     // INIT CLOCK
     m_clock.reset();
@@ -94,7 +78,7 @@ void Application::update()
     static double accumulator = 0.0;
 
     input->update();
-    camera.update();
+    renderer->update_camera();
     m_clock.tick();
 
     double newTime = m_clock.get_total_seconds();
@@ -137,7 +121,7 @@ void Application::render(float _alpha)
 {
     renderer->clear();
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
-    renderer->set_view_matrix(camera.position, camera.position + camera.front, camera.up);
+    //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
     renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto view = registry.view<Transform>();
@@ -148,7 +132,6 @@ void Application::render(float _alpha)
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-        //renderer.render_cube(glm::vec3(0.0f, 0.0f, 0.0f), orientation);
         renderer->render_cube(position, orientation);
     }
 }

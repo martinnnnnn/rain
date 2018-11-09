@@ -1,13 +1,11 @@
 #pragma once
 
-
 #include <glm/glm.hpp>
-
-#include "win32/win32_input.h"
-#include <algorithm>
 
 namespace rain
 {
+
+
 	struct Camera
 	{
 		glm::vec3 position;
@@ -19,8 +17,11 @@ namespace rain
 		glm::vec3 up;
 		glm::vec3 worldUp;
 
+
 		void init();
 		void update();
+
+        
 	};
 
 	

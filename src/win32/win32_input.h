@@ -44,4 +44,3 @@ namespace rain
     };
 
 }
-//#define RAIN_INPUT rain::Input::Get()
