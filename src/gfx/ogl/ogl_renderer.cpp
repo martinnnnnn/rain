@@ -59,82 +59,10 @@ namespace rain
         shaders = String::pair_split(default_coord_shaders, " ");
         retval = default_coord_view.load(shaders_indexer_path->file.get_directory() + shaders.first, shaders_indexer_path->file.get_directory() + shaders.second);
         assert(retval);
-        //default_pbr;
-        //default_coord_view;
-
-
-
-        //Shader phong;
-        ////phong.load();
-        //phong_shader_id;
-        //pbr_shader_id;
-        //coordview_shader_id;
     }
 
     void Renderer::init_coord_view()
     {
-        //const char *vertexShaderSource = "#version 330 core\n"
-        //    "layout (location = 0) in vec3 aPos;\n"
-        //    "layout(location = 1) in vec3 aColor;\n"
-        //    "out vec4 color;"
-        //    "uniform mat4 mvp;\n"
-        //    "void main()\n"
-        //    "{\n"
-        //    "   gl_Position = mvp * vec4(aPos, 1.0f);\n"
-        //    "   color = vec4(aColor, 1.0f);\n"
-        //    "}\0";
-        //const char *fragmentShaderSource = "#version 330 core\n"
-        //    "out vec4 FragColor;\n"
-        //    "in vec4 color;\n"
-        //    "void main()\n"
-        //    "{\n"
-        //    "   FragColor = color;\n"
-        //    "}\n\0";
-
-        //int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        //glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        //glCompileShader(vertexShader);
-        //// check for shader compile errors
-        //int success;
-        //char infoLog[512];
-        //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        //if (!success)
-        //{
-        //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        //// fragment shader
-        //int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        //glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        //glCompileShader(fragmentShader);
-        //// check for shader compile errors
-        //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        //if (!success)
-        //{
-        //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        // link shaders
-        //coordview_shader_id = glCreateProgram();
-        //glAttachShader(coordview_shader_id, vertexShader);
-        //glAttachShader(coordview_shader_id, fragmentShader);
-        //glLinkProgram(coordview_shader_id);
-        //// check for linking errors
-        //glGetProgramiv(coordview_shader_id, GL_LINK_STATUS, &success);
-        //if (!success) {
-        //    glGetProgramInfoLog(coordview_shader_id, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        //glDeleteShader(vertexShader);
-        //glDeleteShader(fragmentShader);
-
-
         float coord_lines[36] =
         {
              0.0, 0.0, 0.0,  1.0, 0.0, 0.0,
@@ -207,63 +135,6 @@ namespace rain
 
     void Renderer::init_cube()
     {
-        //const char *vertexShaderSource = "#version 330 core\n"
-        //    "layout (location = 0) in vec3 aPos;\n"
-        //    "uniform mat4 mvp;\n"
-        //    "void main()\n"
-        //    "{\n"
-        //    "   gl_Position = mvp * vec4(aPos, 1.0f);"
-        //    "}\0";
-        //const char *fragmentShaderSource = "#version 330 core\n"
-        //    "out vec4 FragColor;\n"
-        //    "void main()\n"
-        //    "{\n"
-        //    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        //    "}\n\0";
-
-        //int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        //glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        //glCompileShader(vertexShader);
-        //// check for shader compile errors
-        //int success;
-        //char infoLog[512];
-        //glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        //if (!success)
-        //{
-        //    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        //// fragment shader
-        //int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        //glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        //glCompileShader(fragmentShader);
-        //// check for shader compile errors
-        //glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        //if (!success)
-        //{
-        //    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        //// link shaders
-        //phong_shader_id = glCreateProgram();
-        //glAttachShader(phong_shader_id, vertexShader);
-        //glAttachShader(phong_shader_id, fragmentShader);
-        //glLinkProgram(phong_shader_id);
-        //// check for linking errors
-        //glGetProgramiv(phong_shader_id, GL_LINK_STATUS, &success);
-        //if (!success) {
-        //    glGetProgramInfoLog(phong_shader_id, 512, NULL, infoLog);
-        //    char buffer[512];
-        //    sprintf_s(buffer, "ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
-        //    OutputDebugStringA(buffer);
-        //}
-        //glDeleteShader(vertexShader);
-        //glDeleteShader(fragmentShader);
-
         const float vertices[288] = {
             // position           // normals          // texture coords
             -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
@@ -430,15 +301,11 @@ namespace rain
     void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-	    //glUseProgram(phong_shader_id);
-	    glBindVertexArray(sphereVAO);
-
 	    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
-    
         default_phong.set("mvp", glm::value_ptr(mvp));
-	    //unsigned int transformLoc = glGetUniformLocation(phong_shader_id, "mvp");
-	    //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+    
 
+	    glBindVertexArray(sphereVAO);
 	    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
 	    glBindVertexArray(0);
 
@@ -507,31 +374,23 @@ namespace rain
 
     void Renderer::render_coord_view(const glm::vec3& _position)
     {
+        default_coord_view.use();
         glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position);
+        default_coord_view.set("mvp", mvp);
 
         glBindVertexArray(coordviewVAO);
-
-        default_coord_view.use();
-        //glUseProgram(coordview_shader_id);
-        default_coord_view.set("mvp", mvp);
-        //unsigned int transformLoc = glGetUniformLocation(coordview_shader_id, "mvp");
-        //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
         glDrawArrays(GL_LINES, 0, 9);
+        glBindVertexArray(0);
     }
 
 
     void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
     {
+        default_phong.use();
         glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
+        default_phong.set("mvp", mvp);
 
         glBindVertexArray(cubeVAO);
-        //glUseProgram(phong_shader_id);
-        default_phong.use();
-        default_phong.set("mvp", mvp);
-        //unsigned int transformLoc = glGetUniformLocation(phong_shader_id, "mvp");
-        //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
