@@ -68,36 +68,36 @@ namespace rain
             shaders_indexer_path->file.get_directory() + default_phong_shaders.second);
         assert(retval);
 
-        default_phong.use();
-        // directional light
-        default_phong.set("light1.type", 0);
-        default_phong.set("light1.direction", -0.2f, -1.0f, -0.3f);
-        default_phong.set("light1.ambient", 0.5f, 0.5f, 0.5f);
-        default_phong.set("light1.diffuse", 0.1f, 0.1f, 0.1f);
-        default_phong.set("light1.specular", 1.0f, 1.0f, 1.0f);
-        // point light
-        default_phong.set("light2.type", 1);
-        default_phong.set("light2.ambient", 0.1f, 0.1f, 0.1f);
-        default_phong.set("light2.diffuse", 0.8f, 0.8f, 0.8f);
-        default_phong.set("light2.specular", 1.0f, 1.0f, 1.0f);
-        default_phong.set("light2.constant", 1.0f);
-        default_phong.set("light2.linear", 0.09f);
-        default_phong.set("light2.quadratic", 0.032f);
-        // spot light
-        default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        default_phong.set("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
-        default_phong.set("light3.ambient", 0.1f, 0.1f, 0.1f);
-        default_phong.set("light3.diffuse", 0.8f, 0.8f, 0.8f);
-        default_phong.set("light3.specular", 1.0f, 1.0f, 1.0f);
-        default_phong.set("light3.constant", 1.0f);
-        default_phong.set("light3.linear", 0.09f);
-        default_phong.set("light3.quadratic", 0.032f);
-        // material
-        default_phong.set("mat.diffuse", 0);
-        default_phong.set("mat.specular", 1);
-        default_phong.set("mat.emissive", 2);
-        default_phong.set("mat.shininess", 32.0f);
+        //default_phong.use();
+        //// directional light
+        //default_phong.set("light1.type", 0);
+        //default_phong.set("light1.direction", -0.2f, -1.0f, -0.3f);
+        //default_phong.set("light1.ambient", 0.5f, 0.5f, 0.5f);
+        //default_phong.set("light1.diffuse", 0.1f, 0.1f, 0.1f);
+        //default_phong.set("light1.specular", 1.0f, 1.0f, 1.0f);
+        //// point light
+        //default_phong.set("light2.type", 1);
+        //default_phong.set("light2.ambient", 0.1f, 0.1f, 0.1f);
+        //default_phong.set("light2.diffuse", 0.8f, 0.8f, 0.8f);
+        //default_phong.set("light2.specular", 1.0f, 1.0f, 1.0f);
+        //default_phong.set("light2.constant", 1.0f);
+        //default_phong.set("light2.linear", 0.09f);
+        //default_phong.set("light2.quadratic", 0.032f);
+        //// spot light
+        //default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        //default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
+        //default_phong.set("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
+        //default_phong.set("light3.ambient", 0.1f, 0.1f, 0.1f);
+        //default_phong.set("light3.diffuse", 0.8f, 0.8f, 0.8f);
+        //default_phong.set("light3.specular", 1.0f, 1.0f, 1.0f);
+        //default_phong.set("light3.constant", 1.0f);
+        //default_phong.set("light3.linear", 0.09f);
+        //default_phong.set("light3.quadratic", 0.032f);
+        //// material
+        //default_phong.set("mat.diffuse", 0);
+        //default_phong.set("mat.specular", 1);
+        //default_phong.set("mat.emissive", 2);
+        //default_phong.set("mat.shininess", 32.0f);
 
         auto default_coord_shaders = String::pair_split(shaders_indexer_path->find("default_coord_view"), " ");
         retval = default_coord_view.load(
@@ -346,9 +346,13 @@ namespace rain
     void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-	    glm::mat4 mvp = projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation);
-        default_phong.set("mvp", glm::value_ptr(mvp));
-    
+        default_phong.set("model", glm::value_ptr(glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation)));
+        default_phong.set("view", glm::value_ptr(view_mat));
+        default_phong.set("proj", glm::value_ptr(projection));
+        default_phong.set("viewPos", camera->position);
+        //default_phong.set("pointLight.position", glm::vec3(RAIN_APPLICATION.::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4););
+        default_phong.set("spotLight.position", camera->position);
+        default_phong.set("spotLight.direction", camera->front);
 
 	    glBindVertexArray(sphereVAO);
 	    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
@@ -432,9 +436,10 @@ namespace rain
     void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
-        default_phong.set("proj", projection);
-        default_phong.set("view", view_mat);
+        //default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        //default_phong.set("proj", projection);
+        //default_phong.set("view", view_mat);
+        default_phong.set("mvp", projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
         
         //default_phong.set("viewPos", camTransform->position);
         //default_phong.set("pointLight.position", lightPos);

@@ -49,8 +49,6 @@ namespace rain
 	    int posx = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_width / 2);
 	    int posy = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_height / 2);
 
-	    // TODO (martin) : handle windowed / full screen
-
 	    m_hwnd = CreateWindowEx(NULL,
 		    RAIN_WNDCLASSNAME,
 		    RAIN_WNDNAME,

@@ -24,16 +24,22 @@ namespace rain
     {
         // position & co
         _body.position = _initialPosition;
-        _body.momentum = glm::vec3(5.0f, 15.0f, 0.0f);
-        _body.mass = 3.0f;
+        //_body.momentum = glm::vec3(5.0f, 15.0f, 0.0f);
+        _body.momentum = glm::vec3(0.0f, 0.0f, 0.0f);
+        static bool first = true;
+        _body.mass = 100.0f;
+        if (first)
+        {
+            first = false;
+            _body.position = glm::vec3(0.0f, 12.0f, 0.0f);
+            _body.mass = 1.0f;
+        }
         _body.mass_inverse = 1.0f / _body.mass;
         
         // rotation & co
         _body.orientation = _initialOrientation;
         _body.size = 1.0f;
-        _body.mass = 1.0f;
-        _body.mass_inverse = 1.0f / _body.mass;
-        _body.rotationInertia = powf((1.0f / 6.0f) * _body.size, 2.0f * _body.mass);
+        _body.rotationInertia = (1.0f / 6.0f) * _body.mass * powf(_body.size, 2);
         _body.rotationInertiaInverse = 1.0f / _body.rotationInertia;
     }
 

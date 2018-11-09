@@ -19,6 +19,7 @@
 #include "gfx/ogl/ogl_renderer.h"
 #include "gfx/ogl/ogl_renderer.h"
 #include "physics/physics.h"
+#include "physics/collision.h"
 
 using namespace rain;
 
@@ -53,15 +54,20 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     auto entity = registry.create();
     registry.assign<Transform>(entity);
     registry.assign<RigidBody>(entity);
+    BoundingSphere& bound = registry.assign<BoundingSphere>(entity);
+    bound.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    bound.radius = 0.5f;
 
     auto entity2 = registry.create();
+    registry.assign<RigidBody>(entity2);
     Transform& transform2 = registry.assign<Transform>(entity2);
-    transform2.currentPosition = glm::vec3(0.0f, 12.0f, 0.0f);
-    transform2.previousPosition = glm::vec3(0.0f, 12.0f, 0.0f);
+    BoundingSphere& bound2 = registry.assign<BoundingSphere>(entity2);
+    transform2.currentPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    transform2.previousPosition = glm::vec3(0.0f, 0.0f, 0.0f);
     transform2.currentOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     transform2.previousOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    registry.assign<RigidBody>(entity2);
+    bound2.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    bound2.radius = 0.5f;
 
     Physics::init(registry);
 
@@ -71,8 +77,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 void Application::update()
 {
-    static double t = 0.0;
-    static double dt = 0.01;
+    static const double dt = 0.01;
 
     static double currentTime = m_clock.get_total_seconds();
     static double accumulator = 0.0;
@@ -108,6 +113,23 @@ void Application::update()
 void Application::update_physics(float _deltaTime)
 {
     Physics::update(registry, _deltaTime);
+
+    auto view = registry.view<RigidBody, BoundingSphere>();
+    for (auto entity1 : view)
+    {
+        RigidBody& body1 = view.get<RigidBody>(entity1);
+        BoundingSphere& bound1 = view.get<BoundingSphere>(entity1);
+        for (auto entity2 : view)
+        {
+            if (entity1 == entity2)
+            {
+                break;
+            }
+            RigidBody& body2 = view.get<RigidBody>(entity2);
+            BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
+            detect_collision(bound1, bound2, body1, body2);
+        }
+    }
 }
 
 
@@ -131,6 +153,10 @@ void Application::render(float _alpha)
         Transform& transform = view.get(entity);
         glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
+
+        //char buffer[256];
+        //sprintf_s(buffer, "(%f, %f, %f) - (%f, %f, %f, %f)\n", position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
+        //OutputDebugStringA(buffer);
 
         renderer->render_cube(position, orientation);
     }
