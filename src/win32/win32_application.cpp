@@ -127,7 +127,11 @@ void Application::update_physics(float _deltaTime)
             }
             RigidBody& body2 = view.get<RigidBody>(entity2);
             BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
-            detect_collision(bound1, bound2, body1, body2);
+            bool collide = detect_collision(bound1, bound2, body1, body2);
+			if (collide)
+			{
+				collision_response(bound1, bound2, body1, body2);
+			}
         }
     }
 }
@@ -158,7 +162,8 @@ void Application::render(float _alpha)
         //sprintf_s(buffer, "(%f, %f, %f) - (%f, %f, %f, %f)\n", position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
         //OutputDebugStringA(buffer);
 
-        renderer->render_cube(position, orientation);
+		//renderer->render_cube(position, orientation);
+		renderer->render_sphere(position, orientation);
     }
 }
 

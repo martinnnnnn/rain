@@ -47,30 +47,47 @@ namespace rain
     }
 
 
-    void detect_collision(BoundingSphere& _sphere1Bounding, BoundingSphere& _sphere2Bounding, RigidBody& _sphere1Body, RigidBody& _sphere2Body)
-    {
-        _sphere1Bounding.position = _sphere1Body.position;
-        _sphere2Bounding.position = _sphere2Body.position;
+	bool detect_collision(BoundingSphere& _bound1, BoundingSphere& _bound2, RigidBody& _body1, RigidBody& _body2)
+	{
+		_bound1.position = _body1.position;
+		_bound2.position = _body2.position;
 
-        int rSquared = _sphere1Bounding.radius + _sphere2Bounding.radius;
-        rSquared *= rSquared;
+		float length = glm::length(_body1.position - _body2.position);
+		float sumradius = _bound1.radius + _bound2.radius;
 
-        glm::vec3 delta = _sphere1Bounding.position - _sphere2Bounding.position;
-        float distance = glm::dot(delta, delta);
+		if (length <= sumradius)
+		{
+			return true;
+		}
 
-        if (distance < rSquared)
-        {
-            glm::vec3 nv1;
-            glm::vec3 nv2;
-            nv1 = _sphere1Body.momentum;
-            nv1 += project(_sphere2Body.momentum, _sphere2Body.position - _sphere1Bounding.position);
-            nv1 -= project(_sphere1Body.momentum, _sphere1Body.position - _sphere2Bounding.position);
-            nv2 = _sphere2Body.momentum;
-            nv2 += project(_sphere1Body.momentum, _sphere2Body.position - _sphere1Bounding.position);
-            nv2 -= project(_sphere1Body.momentum, _sphere1Body.position - _sphere2Bounding.position);
-            _sphere1Body.momentum = nv1;
-            _sphere2Body.momentum = nv2;
-        }
+		return false;
+	}
 
-    }
+	void collision_response(BoundingSphere& _bound1, BoundingSphere& _bound2, RigidBody& _body1, RigidBody& _body2)
+	{
+		glm::vec3 U1x, U1y, U2x, U2y, V1x, V1y, V2x, V2y;
+
+
+		f32 m1, m2, x1, x2;
+		glm::vec3 v1temp, v1, v2, v1x, v2x, v1y, v2y;
+
+		glm::vec3 x = glm::normalize(_body1.position - _body2.position);
+		
+		v1 = _body1.velocity;
+		x1 = glm::dot(x, v1);
+		v1x = x * x1;
+		v1y = v1 - v1x;
+		m1 = _body1.mass;
+
+		x = x * -1.0f;
+		v2 = _body2.velocity;
+		x2 = glm::dot(x, v2);
+		v2x = x * x2;
+		v2y = v2 - v2x;
+		m2 = _body2.mass;
+
+		_body1.momentum = glm::vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _body1.mass;
+		_body2.momentum = glm::vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _body2.mass;
+	}
+
 }

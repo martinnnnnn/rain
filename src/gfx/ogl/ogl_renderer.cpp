@@ -346,13 +346,7 @@ namespace rain
     void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-        default_phong.set("model", glm::value_ptr(glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation)));
-        default_phong.set("view", glm::value_ptr(view_mat));
-        default_phong.set("proj", glm::value_ptr(projection));
-        default_phong.set("viewPos", camera->position);
-        //default_phong.set("pointLight.position", glm::vec3(RAIN_APPLICATION.::sin(glfwGetTime()) * 4, 0, glm::cos(glfwGetTime()) * 4););
-        default_phong.set("spotLight.position", camera->position);
-        default_phong.set("spotLight.direction", camera->front);
+		default_phong.set("mvp", projection * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
 
 	    glBindVertexArray(sphereVAO);
 	    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
