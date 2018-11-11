@@ -90,4 +90,35 @@ namespace rain
 		_body2.momentum = glm::vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _body2.mass;
 	}
 
+	bool collision_detect_advanced(BoundingSphere& _bound1, BoundingSphere& _bound2, RigidBody& _body1, RigidBody& _body2)
+	{
+		glm::vec3 s = _body1.position - _body2.position; // vector between the centers of each sphere
+		glm::vec3 v = _body1.velocity - _body2.velocity; // relative velocity between spheres
+		float r = _bound1.radius + _bound2.radius;
+
+		float c1 = s.dot(s) - r * r; // if negative, they overlap
+		if (c1 < 0.0) // if true, they already overlap
+		{
+			// This is bad ... we need to correct this by moving them a tiny fraction from each other
+			//a->pos +=
+			t = .0;
+			return true;
+		}
+
+		float a1 = v.dot(v);
+		if (a1 < 0.00001f)
+			return false; // does not move towards each other
+
+		float b1 = v.dot(s);
+		if (b1 >= 0.0)
+			return false; // does not move towards each other
+
+		float d1 = b1 * b1 - a1 * c1;
+		if (d1 < 0.0)
+			return false; // no real roots ... no collision
+
+		t = (-b1 - sqrtf(d1)) / a1;
+
+		return true;
+	}
 }
