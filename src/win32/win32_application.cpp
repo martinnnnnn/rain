@@ -122,31 +122,36 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
-
+    // updating physics
     auto physics_view = world.registry.view<RigidBody, Transform>();
     for (auto entity : physics_view)
     {
         Physics::update(physics_view.get<RigidBody>(entity), physics_view.get<Transform>(entity), _deltaTime);
     }
 
+    // updateting collision
 
-    auto view = world.registry.view<RigidBody, BoundingSphere>();
+    auto view = world.registry.view<RigidBody, BoundingSphere, Transform>();
     for (auto entity1 : view)
     {
         RigidBody& body1 = view.get<RigidBody>(entity1);
         BoundingSphere& bound1 = view.get<BoundingSphere>(entity1);
+        Transform& transform1 = view.get<Transform>(entity1);
         for (auto entity2 : view)
         {
             if (entity1 == entity2)
             {
                 break;
             }
+
             RigidBody& body2 = view.get<RigidBody>(entity2);
             BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
-            bool collide = detect_collision(bound1, bound2, body1, body2);
+            Transform& transform2 = view.get<Transform>(entity2);
+
+            bool collide = detect_collision(body1, bound1, transform1, body2, bound2, transform2);
 			if (collide)
 			{
-				collision_response(bound1, bound2, body1, body2);
+				collision_response(body1, transform1, body2, transform2);
 			}
         }
     }
@@ -171,7 +176,7 @@ void Application::render(float _alpha)
     for (auto entity : view)
     {
         Transform& transform = view.get(entity);
-        glm::vec3 position = transform.currentPosition * _alpha + transform.previousPosition * (1.0f - _alpha);
+        glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
         //char buffer[256];

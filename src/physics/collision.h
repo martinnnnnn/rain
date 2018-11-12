@@ -13,11 +13,10 @@ namespace rain
     struct BoundingSphere
     {
         BoundingSphere()
-            : position(glm::vec3(0.0f, 0.0f, 0.0f))
+            : offset(glm::vec3(0.0f, 0.0f, 0.0f))
             , radius(0.0f)
         {}
 
-        glm::vec3 position;
         // offset from the center of the object - which must have a transform
         glm::vec3 offset;
         f32 radius;
@@ -43,6 +42,11 @@ namespace rain
 
     };
 
-    bool detect_collision(BoundingSphere& _bound1, BoundingSphere& _bound2, RigidBody& _body1, RigidBody& _body2);
-    void collision_response(BoundingSphere& _bound1, BoundingSphere& _bound2, RigidBody& _body1, RigidBody& _body2);
+    bool detect_collision(
+        RigidBody& _bodyA, BoundingSphere& _boundA, Transform& _transformA,
+        RigidBody& _bodyB, BoundingSphere& _boundB, Transform& _transformB);
+
+    void collision_response(
+        RigidBody& _bodyA, Transform& _transformA,
+        RigidBody& _bodyB, Transform& _transformB);
 }

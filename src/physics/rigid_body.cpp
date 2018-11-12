@@ -32,7 +32,7 @@ namespace rain
 
         _body.momentum += _body.force * _deltaTime;
         _body.velocity = _body.momentum * _body.mass_inverse;
-        _transform.currentPosition += _body.velocity * _deltaTime;
+        _transform.position += _body.velocity * _deltaTime;
 
         // update orientation
         _body.torque = _torque;

@@ -76,7 +76,7 @@ namespace rain
         Transform transform;
         if (_json.HasMember("position"))
         {
-            transform.currentPosition = read_vec3(_json["position"]);
+            transform.position = read_vec3(_json["position"]);
         }
         if (_json.HasMember("orientation"))
         {
