@@ -28,11 +28,6 @@ using namespace rain;
 
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
-    //File file;
-    //file.open(RAIN_DATA->root + "/entities/component_defaults.json");
-    //json defaults_json = json(file.read());
-
-
     hinstance = _hinstance;
 
     // INIT CONFIG
@@ -57,29 +52,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // INIT CLOCK
     m_clock.reset();
 
-    // ADDING A FEW ENTITIES
-    /*auto entity = registry.create();
-    registry.assign<Transform>(entity);
-    auto hello  = registry.assign<RigidBody>(entity);
-    BoundingSphere& bound = registry.assign<BoundingSphere>(entity);
-    bound.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    bound.radius = 0.5f;
-
-    auto entity2 = registry.create();
-    registry.assign<RigidBody>(entity2);
-    Transform& transform2 = registry.assign<Transform>(entity2);
-    BoundingSphere& bound2 = registry.assign<BoundingSphere>(entity2);
-    transform2.currentPosition = glm::vec3(0.5f, 12.0f, -0.5f);
-    transform2.previousPosition = glm::vec3(0.5f, 12.0f, -0.5f);
-    transform2.currentOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    transform2.previousOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    bound2.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    bound2.radius = 0.5f;*/
-
-
     world.init(RAIN_DATA->root + "/world/world_1.rain");
-
-    //Physics::init(world.registry);
 
     return 0;
 }
@@ -130,7 +103,6 @@ void Application::update_physics(float _deltaTime)
     }
 
     // updateting collision
-
     auto view = world.registry.view<RigidBody, BoundingSphere, Transform>();
     for (auto entity1 : view)
     {
