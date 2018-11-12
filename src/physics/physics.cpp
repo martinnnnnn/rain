@@ -7,32 +7,10 @@
 namespace rain
 {
 
-
-    void Physics::init(entt::DefaultRegistry& _registry)
+    void Physics::update(RigidBody& _body, Transform& _transform, float _deltaTime)
     {
-        auto view = _registry.view<Transform, RigidBody>();
-        for (auto entity : view)
-        {
-            RigidBody& body = view.get<RigidBody>(entity);
-            init_body(body, view.get<Transform>(entity).currentPosition, view.get<Transform>(entity).currentOrientation);
-        }
-    }
-
-
-
-    void Physics::update(entt::DefaultRegistry& _registry, float _deltaTime)
-    {
-        auto view = _registry.view<Transform, RigidBody>();
-        for (auto entity : view)
-        {
-            RigidBody& body = view.get<RigidBody>(entity);
-            rain::update(body, _deltaTime);
-            
-            Transform& transform = view.get<Transform>(entity);
-            transform.previousPosition = transform.currentPosition;
-            transform.currentPosition = body.position;
-            transform.previousOrientation = transform.currentOrientation;
-            transform.currentOrientation = body.orientation;
-        }
+        _transform.previousPosition = _transform.currentPosition;
+        _transform.previousOrientation = _transform.currentOrientation;
+        apply_physics(_body, _transform, _deltaTime);
     }
 }

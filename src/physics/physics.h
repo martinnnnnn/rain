@@ -11,7 +11,6 @@ namespace rain
     {
     public:
         // TODO(martin) : change these interfaces to receive components directly
-        static void init(entt::DefaultRegistry& _registry);
-        static void update(entt::DefaultRegistry& _registry, float _deltaTime);
+        static void update(RigidBody& _body, Transform& _transform, float _deltaTime);
     };
 }

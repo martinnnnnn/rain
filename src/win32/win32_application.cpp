@@ -79,7 +79,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
     world.init(RAIN_DATA->root + "/world/world_1.rain");
 
-    Physics::init(world.registry);
+    //Physics::init(world.registry);
 
     return 0;
 }
@@ -122,7 +122,13 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
-    Physics::update(world.registry, _deltaTime);
+
+    auto physics_view = world.registry.view<RigidBody, Transform>();
+    for (auto entity : physics_view)
+    {
+        Physics::update(physics_view.get<RigidBody>(entity), physics_view.get<Transform>(entity), _deltaTime);
+    }
+
 
     auto view = world.registry.view<RigidBody, BoundingSphere>();
     for (auto entity1 : view)

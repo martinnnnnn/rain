@@ -5,7 +5,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
 
-
+#include "math/transform.h"
 #include "core/types.h"
 
 namespace rain
@@ -17,12 +17,12 @@ namespace rain
             , mass_inverse(1.0f / mass)
             , size(1.0f)
 
-            , position(glm::vec3(0.0f, 0.0f, 0.0f))
+            //, position(glm::vec3(0.0f, 0.0f, 0.0f))
             , force(glm::vec3(0.0f, 0.0f, 0.0f))
             , momentum(glm::vec3(0.0f, 0.0f, 0.0f))
             , velocity(glm::vec3(0.0f, 0.0f, 0.0f))
 
-            , orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
+            //, orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
             , torque(glm::vec3(0.0f, 0.0f, 0.0f))
             , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
             , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
@@ -38,12 +38,12 @@ namespace rain
         f32 mass_inverse;
         f32 size;
 
-        glm::vec3 position;
+        //glm::vec3 position;
         glm::vec3 force;
         glm::vec3 momentum;
         glm::vec3 velocity;
 
-        glm::quat orientation;
+        //glm::quat orientation;
         glm::vec3 torque;
         glm::vec3 angularMomentum;
         glm::vec3 angularVelocity;
@@ -55,11 +55,7 @@ namespace rain
         bool infiniteMass;
     };
 
-    
-    
-
-    void update(RigidBody& _body, const f32 _deltaTime);
-    void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f), const glm::quat& _initialOrientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
-    void update_body(RigidBody& _body, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
+    void apply_physics(RigidBody& _body, Transform& _transform, const f32 _deltaTime);
+    void apply_physics(RigidBody& _body, Transform& _transform, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);
 
 }
