@@ -12,20 +12,25 @@ namespace rain
     struct RigidBody
     {
         RigidBody()
-            : orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
-            , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
-            , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
-            , torque(glm::vec3(0.0f, 0.0f, 0.0f))
-            , spin(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
-            , mass(1.0f)
-            , size(1.0f)
+            : mass(1.0f)
             , mass_inverse(1.0f / mass)
-            , rotationInertia(powf(6.0f * size, 2.0f * mass))
-            , rotationInertiaInverse(1.0f / rotationInertia)
+            , size(1.0f)
+
             , position(glm::vec3(0.0f, 0.0f, 0.0f))
+            , force(glm::vec3(0.0f, 0.0f, 0.0f))
             , momentum(glm::vec3(0.0f, 0.0f, 0.0f))
             , velocity(glm::vec3(0.0f, 0.0f, 0.0f))
-            , force(glm::vec3(0.0f, 0.0f, 0.0f))
+
+            , orientation(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
+            , torque(glm::vec3(0.0f, 0.0f, 0.0f))
+            , angularMomentum(glm::vec3(0.0f, 0.0f, 0.0f))
+            , angularVelocity(glm::vec3(0.0f, 0.0f, 0.0f))
+            , spin(glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
+            , rotationInertia(powf(6.0f * size, 2.0f * mass))
+            , rotationInertiaInverse(1.0f / rotationInertia)
+
+            , applyGravity(false)
+            , infiniteMass(false)
         {}
 
         f32 mass;
@@ -44,6 +49,9 @@ namespace rain
         glm::quat spin;
         f32 rotationInertia;
         f32 rotationInertiaInverse;
+
+        bool applyGravity;
+        bool infiniteMass;
     };
 
 

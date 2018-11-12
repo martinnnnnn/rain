@@ -1,0 +1,23 @@
+
+{
+    "Transform":
+    {
+        "position": [0.0, 0.0, 0.0],
+        "orientation": [0.0, 0.0, 0.0, 1.0]
+    },
+    "RigidBody":
+    {
+        "required": ["Transform"],
+        "default": false,
+        "mass": 100.0,
+        "size": 1.0,
+        "rotationInertia": "cube",
+        "applygravity": false,
+        "infiniteMass": false
+    },
+    "BoundingSphere":
+    {
+        "required": ["Transform"],
+        "radius": 0.5
+    }
+}

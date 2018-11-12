@@ -53,7 +53,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // ADDING A FEW ENTITIES
     auto entity = registry.create();
     registry.assign<Transform>(entity);
-    registry.assign<RigidBody>(entity);
+    auto hello  = registry.assign<RigidBody>(entity);
     BoundingSphere& bound = registry.assign<BoundingSphere>(entity);
     bound.position = glm::vec3(0.0f, 0.0f, 0.0f);
     bound.radius = 0.5f;
@@ -62,8 +62,8 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     registry.assign<RigidBody>(entity2);
     Transform& transform2 = registry.assign<Transform>(entity2);
     BoundingSphere& bound2 = registry.assign<BoundingSphere>(entity2);
-    transform2.currentPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    transform2.previousPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    transform2.currentPosition = glm::vec3(0.5f, 12.0f, -0.5f);
+    transform2.previousPosition = glm::vec3(0.5f, 12.0f, -0.5f);
     transform2.currentOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     transform2.previousOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     bound2.position = glm::vec3(0.0f, 0.0f, 0.0f);
