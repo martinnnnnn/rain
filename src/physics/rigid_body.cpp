@@ -5,6 +5,7 @@
 
 namespace rain
 {
+
     void update(RigidBody& _body, const f32 _deltaTime)
     {
         // here we're adding some forces to move objects around 

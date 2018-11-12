@@ -59,6 +59,5 @@ namespace rain
 }
 
 #define RAIN_APPLICATION rain::Application::get()
-#define RAIN_DATA rain::Application::get().data
 #define RAIN_WINDOW rain::Application::get().window
 #define RAIN_INPUT rain::Application::get().input

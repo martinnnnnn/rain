@@ -26,6 +26,11 @@ using namespace rain;
 
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
+    //File file;
+    //file.open(RAIN_DATA->root + "/entities/component_defaults.json");
+    //json defaults_json = json(file.read());
+
+
     hinstance = _hinstance;
 
     // INIT CONFIG

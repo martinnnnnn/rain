@@ -9,6 +9,7 @@
 #include "core/singleton.h"
 #include "core/file.h"
 #include "core/string.h"
+#include "win32/win32_application.h"
 
 
 namespace rain
@@ -45,3 +46,5 @@ namespace rain
         DataIndexer* config;
     };
 }
+
+#define RAIN_DATA rain::Application::get().data

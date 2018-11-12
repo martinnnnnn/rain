@@ -39,7 +39,7 @@ include_directories(src/
                     ${WINDOWS_SDK_INCLUDES}
                     external/glm/
                     external/entt/
-                    external/rapidjson/
+                    external/json/
                     ${GLEW_INCLUDE_DIRS})
 
 #### SOURCE DIRECTORY ####

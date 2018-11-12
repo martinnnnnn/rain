@@ -5,6 +5,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
 
+
 #include "core/types.h"
 
 namespace rain
@@ -29,7 +30,7 @@ namespace rain
             , rotationInertia(powf(6.0f * size, 2.0f * mass))
             , rotationInertiaInverse(1.0f / rotationInertia)
 
-            , applyGravity(false)
+            , applyGravity(true)
             , infiniteMass(false)
         {}
 
@@ -54,6 +55,8 @@ namespace rain
         bool infiniteMass;
     };
 
+    
+    
 
     void update(RigidBody& _body, const f32 _deltaTime);
     void init_body(RigidBody& _body, const glm::vec3& _initialPosition = glm::vec3(0.0f, 0.0f, 0.0f), const glm::quat& _initialOrientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
