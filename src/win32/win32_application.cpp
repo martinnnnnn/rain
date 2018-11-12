@@ -1,6 +1,6 @@
 #include "win32_application.h"
 
-#include <entt.hpp>
+//#include <entt.hpp>
 #include <windows.h>
 #include <time.h>
 #include <stdlib.h>
@@ -58,7 +58,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     m_clock.reset();
 
     // ADDING A FEW ENTITIES
-    auto entity = registry.create();
+    /*auto entity = registry.create();
     registry.assign<Transform>(entity);
     auto hello  = registry.assign<RigidBody>(entity);
     BoundingSphere& bound = registry.assign<BoundingSphere>(entity);
@@ -74,12 +74,12 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     transform2.currentOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     transform2.previousOrientation = glm::quat(glm::vec3(0, 0, 0)) * glm::angleAxis(glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     bound2.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    bound2.radius = 0.5f;
+    bound2.radius = 0.5f;*/
 
-    Physics::init(registry);
 
-    World world;
     world.init(RAIN_DATA->root + "/world/world_1.rain");
+
+    Physics::init(world.registry);
 
     return 0;
 }
@@ -122,9 +122,9 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
-    Physics::update(registry, _deltaTime);
+    Physics::update(world.registry, _deltaTime);
 
-    auto view = registry.view<RigidBody, BoundingSphere>();
+    auto view = world.registry.view<RigidBody, BoundingSphere>();
     for (auto entity1 : view)
     {
         RigidBody& body1 = view.get<RigidBody>(entity1);
@@ -160,7 +160,7 @@ void Application::render(float _alpha)
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
     renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    auto view = registry.view<Transform>();
+    auto view = world.registry.view<Transform>();
 
     for (auto entity : view)
     {

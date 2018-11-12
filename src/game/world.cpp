@@ -12,32 +12,8 @@ namespace rain
 
     void World::init(const std::string& _path)
     {
-        //using namespace rapidjson;
-
-        File world_file;
-        world_file.open(_path);
-
-        rapidjson::Document world_document;
-        world_document.Parse(world_file.read().c_str());
-        assert(world_document.IsObject());
-        assert(world_document.HasMember("name"));
-        assert(world_document["name"].IsString());
-        char buffer[128];
-        sprintf_s(buffer, 128, "world name : %s\n", world_document["name"].GetString());
-        OutputDebugString(buffer);
-
-        const rapidjson::Value& a = world_document["objects"];
-        assert(a.IsArray());
-        for (u32 i = 0; i < a.Size(); i++)
-        {
-            const rapidjson::Value& world_object = a[i];
-            assert(world_object.IsObject());
-            assert(world_object.HasMember("name"));
-            assert(world_object["name"].IsString());
-
-            sprintf_s(buffer, 128, "object name : %s\n", world_object["name"].GetString());
-            OutputDebugString(buffer);
-        }
+        file.open(_path);
+        JsonReader::read_world(*this, file.read());
     }
 
 

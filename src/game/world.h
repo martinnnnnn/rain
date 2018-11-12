@@ -11,7 +11,8 @@ namespace rain
     {
         std::string name;
         entt::DefaultRegistry registry;
+        File file;
 
-        //void init(const std::string& _path);
+        void init(const std::string& _path);
     };
 }

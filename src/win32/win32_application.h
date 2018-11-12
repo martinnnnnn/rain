@@ -8,12 +8,13 @@
 #include <cassert>
 
 #include <glm/glm.hpp>
-#include <entt.hpp>
+//#include <entt.hpp>
 
 #include "core/singleton.h"
 #include "core/types.h"
 //#include "gfx/gfx_camera.h"
 #include "core/high_resolution_clock.h"
+#include "game/world.h"
 
 namespace rain
 {
@@ -53,7 +54,8 @@ namespace rain
 
     private:
         HINSTANCE hinstance;
-        entt::DefaultRegistry  registry;
+        //entt::DefaultRegistry registry;
+        World world;
         HighResolutionClock m_clock;
     };
 }

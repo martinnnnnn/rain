@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <string.h>
 #include <rapidjson/document.h>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
@@ -12,7 +13,6 @@
 #include "math/transform.h"
 #include "physics/collision.h"
 #include "physics/rigid_body.h"
-
 #define JSON_ASSEZR
 
 namespace rain
@@ -107,6 +107,7 @@ namespace rain
             {
                 transform.currentOrientation = read_quat(_json["orientation"]);
             }
+            return transform;
         }
 
         static RigidBody read_rigid_body(const rapidjson::Value& _json)
@@ -132,8 +133,11 @@ namespace rain
             }
             if (_json.HasMember("rotationInertia"))
             {
-                body.rotationInertia = _json["rotationInertia"].GetFloat();
-                body.rotationInertiaInverse = 1.0f / body.rotationInertia;
+                if (!strcmp(_json["rotationInertia"].GetString(), "cube"))
+                {
+                    body.rotationInertia = (1.0f / 6.0f) * body.mass * powf(body.size, 2);;
+                    body.rotationInertiaInverse = 1.0f / body.rotationInertia;
+                }
             }
             
             return body;
@@ -141,10 +145,6 @@ namespace rain
 
         static BoundingSphere read_bounding_sphere(const rapidjson::Value& _json)
         {
-            glm::vec3 position;
-            glm::vec3 offset;
-            f32 radius;
-
             BoundingSphere bound;
 
             if (_json.HasMember("offset"))
