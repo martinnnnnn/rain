@@ -17,16 +17,14 @@
 
 namespace rain
 {
-    class JsonReader
+    namespace JsonReader
     {
-    public:
-
-        static std::string get_string(const rapidjson::Value& _json_value);
-        static glm::vec3 read_vec3(const rapidjson::Value& _json);
-        static glm::quat read_quat(const rapidjson::Value& _json);
-        static Transform read_transform(const rapidjson::Value& _json);
-        static RigidBody read_rigid_body(const rapidjson::Value& _json);
-        static BoundingSphere read_bounding_sphere(const rapidjson::Value& _json);
-        static void read_world(World& world, const std::string& _json);
+        std::string get_string(const rapidjson::Value& _json_value);
+        glm::vec3 read_vec3(const rapidjson::Value& _json);
+        glm::quat read_quat(const rapidjson::Value& _json);
+        Transform read_transform(const rapidjson::Value& _json);
+        RigidBody read_rigid_body(const rapidjson::Value& _json);
+        BoundingSphere read_bounding_sphere(const rapidjson::Value& _json);
+        void read_world(World& world, const std::string& _json);
     };
 }
