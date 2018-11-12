@@ -20,6 +20,8 @@
 #include "gfx/ogl/ogl_renderer.h"
 #include "physics/physics.h"
 #include "physics/collision.h"
+#include "game/world.h"
+#include "core/data_indexer.h"
 
 using namespace rain;
 
@@ -75,6 +77,9 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     bound2.radius = 0.5f;
 
     Physics::init(registry);
+
+    World world;
+    world.init(RAIN_DATA->root + "/world/world_1.rain");
 
     return 0;
 }

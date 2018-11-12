@@ -33,10 +33,6 @@ namespace rain
             transform.currentPosition = body.position;
             transform.previousOrientation = transform.currentOrientation;
             transform.currentOrientation = body.orientation;
-
-            char buffer[256];
-            sprintf_s(buffer, "(%f, %f, %f) - (%f, %f, %f, %f)\n", transform.currentPosition.x, transform.currentPosition.y, transform.currentPosition.z, transform.currentOrientation.x, transform.currentOrientation.y, transform.currentOrientation.z, transform.currentOrientation.w);
-            OutputDebugStringA(buffer);
         }
     }
 }
