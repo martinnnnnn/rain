@@ -18,6 +18,8 @@ namespace rain
         {}
 
         glm::vec3 position;
+        // offset from the center of the object - which must have a transform
+        glm::vec3 offset;
         f32 radius;
     };
 
