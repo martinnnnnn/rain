@@ -23,6 +23,11 @@ namespace rain
 
     void apply_physics(RigidBody& _body, Transform& _transform, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque)
     {
+        if (!_body.applyGravity || (_body.infiniteMass))
+        {
+            return;
+        }
+
         // update position
         _body.force = glm::vec3(0.0f);
         for (u32 i = 0; i < _forces.size(); ++i)

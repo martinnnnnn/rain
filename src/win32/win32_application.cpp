@@ -139,9 +139,9 @@ void Application::shutdown()
 void Application::render(float _alpha)
 {
     renderer->clear();
+    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
-    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
 
     auto view = world.registry.view<Transform>();
 
@@ -151,11 +151,6 @@ void Application::render(float _alpha)
         glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
         glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-        //char buffer[256];
-        //sprintf_s(buffer, "(%f, %f, %f) - (%f, %f, %f, %f)\n", position.x, position.y, position.z, orientation.x, orientation.y, orientation.z, orientation.w);
-        //OutputDebugStringA(buffer);
-
-		//renderer->render_cube(position, orientation);
 		renderer->render_sphere(position, orientation);
     }
 }

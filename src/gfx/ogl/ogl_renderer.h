@@ -61,7 +61,7 @@ namespace rain
         //GLuint phong_shader_id;
         //GLuint pbr_shader_id;
         //GLuint coordview_shader_id;
-        glm::mat4 projection;
+        glm::mat4 proj_map;
         glm::mat4 view_mat;
 
         DataIndexer* shaders_indexer_path;

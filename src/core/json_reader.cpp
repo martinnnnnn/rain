@@ -114,6 +114,14 @@ namespace rain
                 body.rotationInertiaInverse = 1.0f / body.rotationInertia;
             }
         }
+        if (_json.HasMember("applygravity"))
+        {
+            body.applyGravity = _json["applygravity"].GetBool();
+        }
+        if (_json.HasMember("infiniteMass"))
+        {
+            body.infiniteMass = _json["infiniteMass"].GetBool();
+        }
 
         return body;
     }

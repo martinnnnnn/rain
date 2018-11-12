@@ -38,8 +38,7 @@
                 "mass": 100.0,
                 "size": 1.0,
                 "rotationInertia": "cube",
-                "applygravity": false,
-                "infiniteMass": true
+                "applygravity": false
             },
             "BoundingSphere":
             {
