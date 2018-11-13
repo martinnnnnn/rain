@@ -20,9 +20,14 @@ namespace rain
         _body.force += -_spring.k * _transform.position - _spring.b * _body.velocity;
     }
 
-    void Physics::apply_spring(const Spring& _spring, const Transform& _transform, RigidBody& _body)
+    void Physics::apply_spring(const SpringRope& _spring, const Transform& _transformA, RigidBody& _bodyA, const Transform& _transformB, RigidBody& _bodyB)
     {
+        f32 distance = glm::distance(_transformA.position, _transformB.position);
+        glm::vec3 directionAtoB = glm::normalize(_transformA.position - _transformB.position);
+        glm::vec3 directionBtoA = glm::normalize(_transformB.position - _transformA.position);
 
+        _bodyA.force += -_spring.k * (distance - _spring.distance) * directionAtoB - _spring.b * _bodyA.velocity;
+        _bodyB.force += -_spring.k * (distance - _spring.distance) * directionBtoA - _spring.b * _bodyB.velocity;
     }
 
     void Physics::update(RigidBody& _body, Transform& _transform, float _deltaTime)

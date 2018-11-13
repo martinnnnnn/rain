@@ -95,6 +95,7 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
+    // applying springs
     auto spring_view = world.registry.view<Spring>();
     for (auto entity : spring_view) 
     {
@@ -102,6 +103,18 @@ void Application::update_physics(float _deltaTime)
         RigidBody& body = world.registry.get<RigidBody>(spring.entity);
         Transform& transform = world.registry.get<Transform>(spring.entity);
         Physics::apply_spring(spring, transform, body);
+    }
+
+    // applying ropes
+    auto rope_view = world.registry.view<SpringRope>();
+    for (auto entity : rope_view)
+    {
+        SpringRope& rope = rope_view.get(entity);
+        RigidBody& bodyA = world.registry.get<RigidBody>(rope.entityA);
+        Transform& transformA = world.registry.get<Transform>(rope.entityA);
+        RigidBody& bodyB = world.registry.get<RigidBody>(rope.entityB);
+        Transform& transformB = world.registry.get<Transform>(rope.entityB);
+        Physics::apply_spring(rope, transformA, bodyA, transformB, bodyB);
     }
 
     // updating physics

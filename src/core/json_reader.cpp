@@ -191,7 +191,7 @@ namespace rain
         }
         if (_json.HasMember("distance"))
         {
-            spring.distance = _json["distance"].GetUint();
+            spring.distance = _json["distance"].GetFloat();
         }
         if (_json.HasMember("k"))
         {

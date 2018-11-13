@@ -71,11 +71,19 @@ namespace rain
     
     struct SpringRope
     {
+        SpringRope()
+            : entityA(0)
+            , entityB(0)
+            , distance(0.0f)
+            , k(15.0f)
+            , b(0.1f)
+        {}
+
         u32 entityA;
         u32 entityB;
         float distance;
-        float k{ 15.0f };
-        float b{ 0.1f };
+        f32 k;
+        f32 b;
     };
 
 
