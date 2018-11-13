@@ -4,6 +4,7 @@
 
 #include "rigid_body.h"
 #include "collision.h"
+#include "spring.h"
 
 namespace rain
 {

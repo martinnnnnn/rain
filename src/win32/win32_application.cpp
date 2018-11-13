@@ -20,6 +20,7 @@
 #include "physics/physics.h"
 #include "physics/rigid_body.h"
 #include "physics/collision.h"
+#include "physics/spring.h"
 #include "game/world.h"
 #include "core/data_indexer.h"
 

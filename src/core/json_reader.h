@@ -11,7 +11,7 @@
 #include "math/transform.h"
 #include "physics/collision.h"
 #include "physics/rigid_body.h"
-#define JSON_ASSEZR
+#include "physics/spring.h"
 
 namespace rain
 {
