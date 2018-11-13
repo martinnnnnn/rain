@@ -10,6 +10,8 @@
 
 namespace rain
 {
+
+
     struct RigidBody
     {
         RigidBody()
@@ -54,6 +56,28 @@ namespace rain
         bool applyGravity;
         bool infiniteMass;
     };
+
+    struct Spring
+    {
+        Spring()
+            : entity(0)
+            , k(15.0f)
+            , b(0.1f)
+        {}
+        u32 entity;
+        f32 k;
+        f32 b;
+    };
+    
+    struct SpringRope
+    {
+        u32 entityA;
+        u32 entityB;
+        float distance;
+        float k{ 15.0f };
+        float b{ 0.1f };
+    };
+
 
     void apply_physics(RigidBody& _body, Transform& _transform, const f32 _deltaTime);
     void apply_physics(RigidBody& _body, Transform& _transform, f32 _deltaTime, const std::vector<glm::vec3>& _forces, const glm::vec3& _torque);

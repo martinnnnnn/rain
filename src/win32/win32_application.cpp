@@ -17,8 +17,8 @@
 #include "core/data_indexer.h"
 #include "math/transform.h"
 #include "gfx/ogl/ogl_renderer.h"
-#include "gfx/ogl/ogl_renderer.h"
 #include "physics/physics.h"
+#include "physics/rigid_body.h"
 #include "physics/collision.h"
 #include "game/world.h"
 #include "core/data_indexer.h"
@@ -95,14 +95,25 @@ void Application::update()
 
 void Application::update_physics(float _deltaTime)
 {
+    auto spring_view = world.registry.view<Spring>();
+    for (auto entity : spring_view) 
+    {
+        Spring& spring = spring_view.get(entity);
+        RigidBody& body = world.registry.get<RigidBody>(spring.entity);
+        Transform& transform = world.registry.get<Transform>(spring.entity);
+        Physics::apply_spring(spring, transform, body);
+    }
+
     // updating physics
     auto physics_view = world.registry.view<RigidBody, Transform>();
     for (auto entity : physics_view)
     {
-        Physics::update(physics_view.get<RigidBody>(entity), physics_view.get<Transform>(entity), _deltaTime);
+        RigidBody& body = physics_view.get<RigidBody>(entity);
+        Physics::apply_gravity(body);
+        Physics::update(body, physics_view.get<Transform>(entity), _deltaTime);
     }
 
-    // updateting collision
+    // updating collision
     auto view = world.registry.view<RigidBody, BoundingSphere, Transform>();
     for (auto entity1 : view)
     {
@@ -149,7 +160,7 @@ void Application::render(float _alpha)
     {
         Transform& transform = view.get(entity);
         glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
-        glm::quat orientation = transform.currentOrientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
+        glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
 		renderer->render_sphere(position, orientation);
     }

@@ -3,9 +3,7 @@
 
 #include <string.h>
 #include <rapidjson/document.h>
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -25,6 +23,8 @@ namespace rain
         Transform read_transform(const rapidjson::Value& _json);
         RigidBody read_rigid_body(const rapidjson::Value& _json);
         BoundingSphere read_bounding_sphere(const rapidjson::Value& _json);
+        Spring read_spring(const rapidjson::Value& _json);
+        SpringRope read_spring_rope(const rapidjson::Value& _json);
         void read_world(World& world, const std::string& _json);
     };
 }

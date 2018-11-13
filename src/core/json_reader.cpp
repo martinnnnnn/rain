@@ -1,7 +1,8 @@
 #include "json_reader.h"
 
 
-
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 namespace rain
 {
@@ -31,6 +32,10 @@ namespace rain
 
             auto entity = registry.create();
 
+            // TODO (martin) : should really be a struct idenfier there
+            u32& id = registry.assign<u32>(entity);
+            id = world_object["id"].GetUint();
+
             if (world_object.HasMember("Transform"))
             {
                 Transform& transform = registry.assign<Transform>(entity);
@@ -45,6 +50,16 @@ namespace rain
             {
                 BoundingSphere& sphere = registry.assign<BoundingSphere>(entity);
                 sphere = read_bounding_sphere(world_object["BoundingSphere"]);
+            }
+            if (world_object.HasMember("Spring"))
+            {
+                Spring& spring = registry.assign<Spring>(entity);
+                spring = read_spring(world_object["Spring"]);
+            }
+            if (world_object.HasMember("SpringRope"))
+            {
+                SpringRope& spring = registry.assign<SpringRope>(entity);
+                spring = read_spring_rope(world_object["SpringRope"]);
             }
         }
     }
@@ -80,7 +95,7 @@ namespace rain
         }
         if (_json.HasMember("orientation"))
         {
-            transform.currentOrientation = read_quat(_json["orientation"]);
+            transform.orientation = read_quat(_json["orientation"]);
         }
         return transform;
     }
@@ -142,4 +157,51 @@ namespace rain
         return bound;
     }
 
+    Spring JsonReader::read_spring(const rapidjson::Value& _json)
+    {
+        Spring spring;
+
+        if (_json.HasMember("entity"))
+        {
+            spring.entity = _json["entity"].GetUint();
+        }
+        if (_json.HasMember("k"))
+        {
+            spring.k = _json["k"].GetFloat();
+        }
+        if (_json.HasMember("b"))
+        {
+            spring.b = _json["b"].GetFloat();
+        }
+
+        return spring;
+    }
+
+    SpringRope JsonReader::read_spring_rope(const rapidjson::Value& _json)
+    {
+        SpringRope spring;
+
+        if (_json.HasMember("entityA"))
+        {
+            spring.entityA = _json["entityA"].GetUint();
+        }
+        if (_json.HasMember("entityB"))
+        {
+            spring.entityB = _json["entityB"].GetUint();
+        }
+        if (_json.HasMember("distance"))
+        {
+            spring.distance = _json["distance"].GetUint();
+        }
+        if (_json.HasMember("k"))
+        {
+            spring.k = _json["k"].GetFloat();
+        }
+        if (_json.HasMember("b"))
+        {
+            spring.b = _json["b"].GetFloat();
+        }
+
+        return spring;
+    }
 }
