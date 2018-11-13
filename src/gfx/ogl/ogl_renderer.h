@@ -11,6 +11,7 @@
 #include "core/types.h"
 #include "core/data_indexer.h"
 #include "ogl_shader.h"
+#include "win32/win32_application.h"
 
 
 namespace rain
@@ -70,3 +71,5 @@ namespace rain
         Shader default_coord_view;
     };
 }
+
+#define RAIN_RENDERER rain::Application::get().renderer

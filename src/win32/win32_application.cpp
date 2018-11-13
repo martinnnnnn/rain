@@ -1,6 +1,5 @@
 #include "win32_application.h"
 
-//#include <entt.hpp>
 #include <windows.h>
 #include <time.h>
 #include <stdlib.h>
@@ -82,7 +81,7 @@ void Application::update()
     while (accumulator >= dt)
     {
 
-        update_physics((float)dt);
+        world.update_physics((float)dt);
         accumulator -= dt;
     }
 
@@ -93,67 +92,6 @@ void Application::update()
         window->present();
     }
 }
-
-void Application::update_physics(float _deltaTime)
-{
-    // applying springs
-    auto spring_view = world.registry.view<Spring>();
-    for (auto entity : spring_view) 
-    {
-        Spring& spring = spring_view.get(entity);
-        RigidBody& body = world.registry.get<RigidBody>(spring.entity);
-        Transform& transform = world.registry.get<Transform>(spring.entity);
-        Physics::apply_spring(spring, transform, body);
-    }
-
-    // applying ropes
-    auto rope_view = world.registry.view<SpringRope>();
-    for (auto entity : rope_view)
-    {
-        SpringRope& rope = rope_view.get(entity);
-        RigidBody& bodyA = world.registry.get<RigidBody>(rope.entityA);
-        Transform& transformA = world.registry.get<Transform>(rope.entityA);
-        RigidBody& bodyB = world.registry.get<RigidBody>(rope.entityB);
-        Transform& transformB = world.registry.get<Transform>(rope.entityB);
-        Physics::apply_spring(rope, transformA, bodyA, transformB, bodyB);
-    }
-
-    // updating physics
-    auto physics_view = world.registry.view<RigidBody, Transform>();
-    for (auto entity : physics_view)
-    {
-        RigidBody& body = physics_view.get<RigidBody>(entity);
-        Physics::apply_gravity(body);
-        Physics::update(body, physics_view.get<Transform>(entity), _deltaTime);
-    }
-
-    // updating collision
-    auto view = world.registry.view<RigidBody, BoundingSphere, Transform>();
-    for (auto entity1 : view)
-    {
-        RigidBody& body1 = view.get<RigidBody>(entity1);
-        BoundingSphere& bound1 = view.get<BoundingSphere>(entity1);
-        Transform& transform1 = view.get<Transform>(entity1);
-        for (auto entity2 : view)
-        {
-            if (entity1 == entity2)
-            {
-                break;
-            }
-
-            RigidBody& body2 = view.get<RigidBody>(entity2);
-            BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
-            Transform& transform2 = view.get<Transform>(entity2);
-
-            bool collide = detect_collision(body1, bound1, transform1, body2, bound2, transform2);
-			if (collide)
-			{
-				collision_response(body1, transform1, body2, transform2);
-			}
-        }
-    }
-}
-
 
 void Application::shutdown()
 {
@@ -168,16 +106,7 @@ void Application::render(float _alpha)
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
-    auto view = world.registry.view<Transform>();
-
-    for (auto entity : view)
-    {
-        Transform& transform = view.get(entity);
-        glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
-        glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
-
-		renderer->render_sphere(position, orientation);
-    }
+    world.render(_alpha);
 }
 
 

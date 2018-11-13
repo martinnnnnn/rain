@@ -38,13 +38,11 @@ namespace rain
 
     class Application : public Singleton<Application>
     {
-        //using Registry = entt::Registry<u32>;
-
     public:
+
         int init(HINSTANCE _hinstance, const std::string& _config);
         void shutdown();
         void update();
-        void update_physics(float _deltaTime);
         void render(float _alpha);
 
         Data* data;
@@ -54,7 +52,6 @@ namespace rain
 
     private:
         HINSTANCE hinstance;
-        //entt::DefaultRegistry registry;
         World world;
         HighResolutionClock m_clock;
     };
