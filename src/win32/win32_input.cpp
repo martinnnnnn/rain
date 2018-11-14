@@ -10,7 +10,7 @@ using namespace rain;
 
 Input::Input()
     : mouse_lock(true)
-    , m_keysCurrent(m_keysA)
+    , m_keysCurrent(&m_keysA)
 {
 }
 
@@ -93,17 +93,17 @@ void Input::update()
 {
     m_keyboard->Acquire();
 
-    if (m_keysCurrent == m_keysA)
+    if (m_keysCurrent == &m_keysA)
     {
-        m_keysCurrent = m_keysB;
+        m_keysCurrent = &m_keysB;
     }
-    else if (m_keysCurrent == m_keysB)
+    else
     {
-        m_keysCurrent = m_keysA;
+        m_keysCurrent = &m_keysA;
     }
 
-    ZeroMemory(m_keysCurrent, sizeof(m_keysCurrent));
-    HRESULT hr = m_keyboard->GetDeviceState(sizeof(m_keysA), m_keysCurrent);
+    ZeroMemory(m_keysCurrent->data(), m_keysCurrent->size());
+    HRESULT hr = m_keyboard->GetDeviceState(m_keysCurrent->size(), m_keysCurrent->data());
 
     if (FAILED(hr))
     {
@@ -115,7 +115,7 @@ void Input::update()
         if (FAILED(hr))
             return;
 
-        m_keyboard->GetDeviceState(sizeof(m_keysCurrent), m_keysCurrent);
+        m_keyboard->GetDeviceState(m_keysCurrent->size(), m_keysCurrent->data());
     }
 
     // MOUSE
@@ -158,7 +158,7 @@ void Input::update()
 
 bool Input::is_key_pressed(u32 _code) const
 {
-    return (m_keysCurrent[_code] & 0x80);
+    return ((*m_keysCurrent)[_code] & 0x80);
     //return (m_keysCurrent[_code] & 0x80);
 }
 
@@ -166,7 +166,7 @@ bool Input::is_key_released(u32 _code) const
 {
     if (!is_key_pressed(_code))
     {
-        if (m_keysCurrent == m_keysA)
+        if (m_keysCurrent == &m_keysA)
         {
             return (m_keysB[_code] & 0x80);
         }

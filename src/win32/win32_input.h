@@ -37,13 +37,15 @@ namespace rain
         u32 y_screen_pos;
         bool mouse_lock;
     private:
+        static constexpr u32 KEYS_COUNT = 256;
+
         std::vector<InputEvent> m_inputEvents;
         LPDIRECTINPUT8  m_diObject;
         LPDIRECTINPUTDEVICE8 m_keyboard;
         LPDIRECTINPUTDEVICE8 m_mouse;
-        BYTE m_keysA[256];
-        BYTE m_keysB[256];
-        BYTE* m_keysCurrent;
+        std::array<BYTE, KEYS_COUNT> m_keysA;
+        std::array<BYTE, KEYS_COUNT> m_keysB;
+        std::array<BYTE, KEYS_COUNT>* m_keysCurrent;
         u32 x_center;
         u32 y_center;
     };
