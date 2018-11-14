@@ -13,7 +13,7 @@
 #include "win32/win32_input.h"
 #include "win32/win32_window.h"
 #include "core/event.h"
-#include "core/data_indexer.h"
+#include "core/config.h"
 #include "math/transform.h"
 #include "gfx/ogl/ogl_renderer.h"
 #include "physics/physics.h"
@@ -21,7 +21,7 @@
 #include "physics/collision.h"
 #include "physics/spring.h"
 #include "game/world.h"
-#include "core/data_indexer.h"
+#include "core/config.h"
 
 using namespace rain;
 

@@ -1,4 +1,4 @@
-#include "data_indexer.h"
+#include "config.h"
 
 #include "win32/win32_application.h"
 

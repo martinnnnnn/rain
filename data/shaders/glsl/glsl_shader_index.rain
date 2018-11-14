@@ -1,2 +1,0 @@
-default_phong=/phong.vs /phong.fs   
-default_coord_view=/coord_view.vs /coord_view.fs

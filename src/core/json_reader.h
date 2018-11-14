@@ -12,7 +12,7 @@
 #include "physics/collision.h"
 #include "physics/rigid_body.h"
 #include "physics/spring.h"
-#include "core/data_indexer.h"
+#include "core/config.h"
 
 namespace rain
 {

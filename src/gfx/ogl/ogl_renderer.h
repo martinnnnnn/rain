@@ -9,7 +9,7 @@
 #include "glm/gtc/quaternion.hpp"
 
 #include "core/types.h"
-#include "core/data_indexer.h"
+#include "core/config.h"
 #include "ogl_shader.h"
 #include "win32/win32_application.h"
 
