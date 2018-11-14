@@ -4,6 +4,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
+
 namespace rain
 {
     std::string JsonReader::get_string(const rapidjson::Value& _json_value)
@@ -13,19 +14,35 @@ namespace rain
         _json_value.Accept(writer);
         return buffer.GetString();
     }
+    
+    void JsonReader::read_config(const std::string& _json, Config& _config)
+    {
+        rapidjson::Document config_document;
+        config_document.Parse(_json.c_str());
 
-    void JsonReader::read_world(World& world, const std::string& _json)
+        _config.engine_name = config_document["engine_name"].GetString();
+        char buffer[128];
+        sprintf_s(buffer, 128, "reading config file for engine : %s\n", _config.engine_name.c_str());
+        OutputDebugString(buffer);
+
+        _config.data_root = config_document["data_root"].GetString();
+        _config.screen_width = config_document["screen_width"].GetUint();
+        _config.screen_height = config_document["screen_height"].GetUint();
+        _config.full_screen = config_document["full_screen"].GetBool();
+    }
+
+    void JsonReader::read_world(const std::string& _json, World& _world)
     {
         rapidjson::Document world_document;
         world_document.Parse(_json.c_str());
 
-        world.name = world_document["name"].GetString();
+        _world.name = world_document["name"].GetString();
         char buffer[128];
-        sprintf_s(buffer, 128, "parsing world : %s\n", world.name.c_str());
+        sprintf_s(buffer, 128, "parsing world : %s\n", _world.name.c_str());
         OutputDebugString(buffer);
 
         const rapidjson::Value& world_objects = world_document["objects"];
-        entt::DefaultRegistry& registry = world.registry;
+        entt::DefaultRegistry& registry = _world.registry;
         for (u32 i = 0; i < world_objects.Size(); i++)
         {
             const rapidjson::Value& world_object = world_objects[i];

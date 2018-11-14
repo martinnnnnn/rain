@@ -12,6 +12,7 @@
 #include "physics/collision.h"
 #include "physics/rigid_body.h"
 #include "physics/spring.h"
+#include "core/data_indexer.h"
 
 namespace rain
 {
@@ -25,6 +26,7 @@ namespace rain
         BoundingSphere read_bounding_sphere(const rapidjson::Value& _json);
         Spring read_spring(const rapidjson::Value& _json);
         SpringRope read_spring_rope(const rapidjson::Value& _json);
-        void read_world(World& world, const std::string& _json);
+        void read_world(const std::string& _json, World& _world);
+        void read_config(const std::string& _path, Config& _config);
     };
 }

@@ -59,54 +59,18 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-        shaders_indexer_path = new DataIndexer(RAIN_DATA->root + "/engine/shaders/glsl/glsl_shader_index.rain");
-
-        // creating default phong shader
-        auto default_phong_shaders = String::pair_split(shaders_indexer_path->find("default_phong"), " ");
+       ;
         bool retval = default_phong.load(
-            shaders_indexer_path->file.get_directory() + default_phong_shaders.first,
-            shaders_indexer_path->file.get_directory() + default_phong_shaders.second);
-        assert(retval);
+            RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs",
+            RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
 
         default_phong.use();
         default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
         default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
 
-        //default_phong.use();
-        //// directional light
-        //default_phong.set("light1.type", 0);
-        //default_phong.set("light1.direction", -0.2f, -1.0f, -0.3f);
-        //default_phong.set("light1.ambient", 0.5f, 0.5f, 0.5f);
-        //default_phong.set("light1.diffuse", 0.1f, 0.1f, 0.1f);
-        //default_phong.set("light1.specular", 1.0f, 1.0f, 1.0f);
-        //// point light
-        //default_phong.set("light2.type", 1);
-        //default_phong.set("light2.ambient", 0.1f, 0.1f, 0.1f);
-        //default_phong.set("light2.diffuse", 0.8f, 0.8f, 0.8f);
-        //default_phong.set("light2.specular", 1.0f, 1.0f, 1.0f);
-        //default_phong.set("light2.constant", 1.0f);
-        //default_phong.set("light2.linear", 0.09f);
-        //default_phong.set("light2.quadratic", 0.032f);
-        //// spot light
-        //default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        //default_phong.set("light3.cutOff", glm::cos(glm::radians(12.5f)));
-        //default_phong.set("light3.outerCutOff", glm::cos(glm::radians(15.0f)));
-        //default_phong.set("light3.ambient", 0.1f, 0.1f, 0.1f);
-        //default_phong.set("light3.diffuse", 0.8f, 0.8f, 0.8f);
-        //default_phong.set("light3.specular", 1.0f, 1.0f, 1.0f);
-        //default_phong.set("light3.constant", 1.0f);
-        //default_phong.set("light3.linear", 0.09f);
-        //default_phong.set("light3.quadratic", 0.032f);
-        //// material
-        //default_phong.set("mat.diffuse", 0);
-        //default_phong.set("mat.specular", 1);
-        //default_phong.set("mat.emissive", 2);
-        //default_phong.set("mat.shininess", 32.0f);
-
-        auto default_coord_shaders = String::pair_split(shaders_indexer_path->find("default_coord_view"), " ");
         retval = default_coord_view.load(
-            shaders_indexer_path->file.get_directory() + default_coord_shaders.first,
-            shaders_indexer_path->file.get_directory() + default_coord_shaders.second);
+            RAIN_CONFIG->data_root + "/shaders/glsl/coord_view.vs",
+            RAIN_CONFIG->data_root + "/shaders/glsl/coord_view.fs");
         assert(retval);
     }
 

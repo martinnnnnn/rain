@@ -18,7 +18,7 @@ namespace rain
     void World::init(const std::string& _path)
     {
         file.open(_path);
-        JsonReader::read_world(*this, file.read());
+        JsonReader::read_world(file.read(), *this);
     }
 
     void World::update_physics(const float _deltaTime)

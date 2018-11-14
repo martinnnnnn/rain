@@ -1,2 +1,9 @@
-data_path=D:\_MARTIN\programming\_projects\rain_engine\data
-screen_size=800 600
+
+
+{
+    "engine_name": "Rain Engine",
+    "data_root": "D:/_MARTIN/programming/_projects/rain_engine/data",
+    "screen_width": 800,
+    "screen_height": 600,
+    "full_screen": false
+}

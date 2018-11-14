@@ -11,13 +11,14 @@
             {
                 "default": false,
 
-                    "position" : [15.0, 10.0, 0.0],
+                    "position" : [5.0, 10.0, 0.0],
                     "orientation" : [0.0, 0.0, 0.0, 1.0]
             },
             "RigidBody":
             {
                 "default": true,
-                    "required" : ["Transform"]
+                "required" : ["Transform"],
+                "mass": 3.0
             },
             "BoundingSphere" :
             {
@@ -57,8 +58,8 @@
                 "entityA": 0,
                 "entityB": 1,
                 "distance": 5.0,
-                "k": 50.0,
-                "b": 0.0
+                "k": 15.0,
+                "b": 0.2
             }
         }
     ]

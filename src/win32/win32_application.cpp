@@ -31,8 +31,8 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     hinstance = _hinstance;
 
     // INIT CONFIG
-    data = new Data();
-    data->init(File::get_exe_path() + "/config.rain");
+    config = new Config();
+    config->init(File::get_exe_path() + "/config.rain");
 
 	// INIT WINDOW
     window = new Window();
@@ -52,7 +52,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // INIT CLOCK
     m_clock.reset();
 
-    world.init(RAIN_DATA->root + "/world/world_1.rain");
+    world.init(RAIN_CONFIG->data_root + "/world/world_1.rain");
 
     return 0;
 }

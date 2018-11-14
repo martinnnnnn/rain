@@ -10,41 +10,21 @@
 #include "core/file.h"
 #include "core/string.h"
 #include "win32/win32_application.h"
-
+#include "core/json_reader.h"
 
 namespace rain
 {
-    struct DataIndexer
+    struct Config
     {
-        using Key = std::string;
-        using Value = std::string;
-        using DataMap = std::map<Key, Value>;
-
-        DataIndexer(std::string _path);
-
-        bool find(const Key& _key, Value& _value);
-        Value find(const Key& _indexer);
-        DataIndexer* find_indexer(const std::string& _indexer);
+        void init(const std::string& _path);
 
         File file;
-        DataMap data_map;
-        std::vector<DataIndexer*> indexers;
-    };
-
-
-    class Data
-    {
-    public:
-        void init(const std::string& _path)
-        {
-            config = new DataIndexer(_path);
-            bool dataRootFound = config->find("data_path", root);
-            assert(dataRootFound);
-            root = File::get_directory(root);
-        }
-        std::string root;
-        DataIndexer* config;
+        std::string engine_name;
+        std::string data_root;
+        u32 screen_width;
+        u32 screen_height;
+        bool full_screen;
     };
 }
 
-#define RAIN_DATA rain::Application::get().data
+#define RAIN_CONFIG rain::Application::get().config

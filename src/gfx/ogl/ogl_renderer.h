@@ -65,7 +65,7 @@ namespace rain
         glm::mat4 proj_map;
         glm::mat4 view_mat;
 
-        DataIndexer* shaders_indexer_path;
+        //DataIndexer* shaders_indexer_path;
         Shader default_phong;
         Shader default_pbr;
         Shader default_coord_view;

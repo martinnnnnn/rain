@@ -32,7 +32,7 @@ namespace rain
 
 
     class Window;
-    class Data;
+    struct Config;
     class Renderer;
     class Input;
 
@@ -45,7 +45,7 @@ namespace rain
         void update();
         void render(float _alpha);
 
-        Data* data;
+        Config* config;
         Window* window;
         Renderer* renderer;
         Input* input;
