@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <array>
 #include <algorithm>
 
 #define DIRECTINPUT_VERSION 0x0800

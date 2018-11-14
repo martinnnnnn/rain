@@ -45,6 +45,18 @@ namespace rain
             Physics::apply_spring(rope, transformA, bodyA, transformB, bodyB);
         }
 
+        // applying spring 2
+        auto spring2_view = registry.view<Spring2>();
+        for (auto entity : spring2_view)
+        {
+            Spring2& spring2 = spring2_view.get(entity);
+            RigidBody& bodyA = registry.get<RigidBody>(spring2.entityA);
+            Transform& transformA = registry.get<Transform>(spring2.entityA);
+            RigidBody& bodyB = registry.get<RigidBody>(spring2.entityB);
+            Transform& transformB = registry.get<Transform>(spring2.entityB);
+            Physics::apply_spring(spring2, transformA, bodyA, transformB, bodyB);
+        }
+
         // updating physics
         auto physics_view = registry.view<RigidBody, Transform>();
         for (auto entity : physics_view)
@@ -91,7 +103,7 @@ namespace rain
             glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->render_sphere(position, orientation);
+            RAIN_RENDERER->render_cube(position, orientation);
         }
     }
 

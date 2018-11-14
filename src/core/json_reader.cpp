@@ -78,6 +78,11 @@ namespace rain
                 SpringRope& spring = registry.assign<SpringRope>(entity);
                 spring = read_spring_rope(world_object["SpringRope"]);
             }
+            if (world_object.HasMember("Spring2"))
+            {
+                Spring2& spring = registry.assign<Spring2>(entity);
+                spring = read_spring2(world_object["Spring2"]);
+            }
         }
     }
 
@@ -190,6 +195,10 @@ namespace rain
         {
             spring.b = _json["b"].GetFloat();
         }
+        if (_json.HasMember("anchorPoint"))
+        {
+            spring.anchorPoint = read_vec3(_json["anchorPoint"]);
+        }
 
         return spring;
     }
@@ -205,6 +214,42 @@ namespace rain
         if (_json.HasMember("entityB"))
         {
             spring.entityB = _json["entityB"].GetUint();
+        }
+        if (_json.HasMember("distance"))
+        {
+            spring.distance = _json["distance"].GetFloat();
+        }
+        if (_json.HasMember("k"))
+        {
+            spring.k = _json["k"].GetFloat();
+        }
+        if (_json.HasMember("b"))
+        {
+            spring.b = _json["b"].GetFloat();
+        }
+
+        return spring;
+    }
+
+    Spring2 JsonReader::read_spring2(const rapidjson::Value& _json)
+    {
+        Spring2 spring;
+
+        if (_json.HasMember("entityA"))
+        {
+            spring.entityA = _json["entityA"].GetUint();
+        }
+        if (_json.HasMember("entityB"))
+        {
+            spring.entityB = _json["entityB"].GetUint();
+        }
+        if (_json.HasMember("anchorPointA"))
+        {
+            spring.anchorPointA = read_vec3(_json["anchorPointA"]);
+        }
+        if (_json.HasMember("anchorPointB"))
+        {
+            spring.anchorPointB = read_vec3(_json["anchorPointB"]);
         }
         if (_json.HasMember("distance"))
         {

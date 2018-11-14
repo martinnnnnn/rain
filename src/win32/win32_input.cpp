@@ -12,6 +12,8 @@ Input::Input()
     : mouse_lock(true)
     , m_keysCurrent(&m_keysA)
 {
+    ZeroMemory(m_keysA.data(), m_keysA.size());
+    ZeroMemory(m_keysB.data(), m_keysB.size());
 }
 
 int Input::init()

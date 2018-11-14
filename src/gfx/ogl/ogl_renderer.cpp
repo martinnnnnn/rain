@@ -316,20 +316,6 @@ namespace rain
     }
 
 
-    void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
-    {
-        default_phong.use();
-		//default_phong.set("mvp", proj_map * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
-        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
-        default_phong.set("proj", proj_map);
-        default_phong.set("view", view_mat);
-
-	    glBindVertexArray(sphereVAO);
-	    glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
-	    glBindVertexArray(0);
-
-    }
-
     void Renderer::set_projection_matrix(const glm::mat4& _projection)
     {
         proj_map = _projection;
@@ -406,15 +392,29 @@ namespace rain
     void Renderer::render_cube(const glm::vec3& _position, const glm::quat& orientation)
     {
         default_phong.use();
-        default_phong.set("mvp", proj_map * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
-        //default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
-        //default_phong.set("proj", proj_map);
-        //default_phong.set("view", view_mat);
+        //default_phong.set("mvp", proj_map * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        default_phong.set("proj", proj_map);
+        default_phong.set("view", view_mat);
 
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+    }
+
+    void Renderer::render_sphere(const glm::vec3& _position, const glm::quat& orientation)
+    {
+        default_phong.use();
+        //default_phong.set("mvp", proj_map * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation));
+        default_phong.set("proj", proj_map);
+        default_phong.set("view", view_mat);
+
+        glBindVertexArray(sphereVAO);
+        glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
     }
 }

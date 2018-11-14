@@ -52,7 +52,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // INIT CLOCK
     m_clock.reset();
 
-    world.init(RAIN_CONFIG->data_root + "/world/world_1.rain");
+    world.init(RAIN_CONFIG->data_root + "/world/world_2.rain");
 
     return 0;
 }

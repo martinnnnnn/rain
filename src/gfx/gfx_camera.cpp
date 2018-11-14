@@ -11,10 +11,10 @@ namespace rain
 {
     void Camera::init()
     {
-        position = glm::vec3(0.0f, 5.0f, 30.0f);
+        position = glm::vec3(0.0f, 7.0f, 20.0f);
         worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
         front = glm::vec3(0.0f, 0.0f, -1.0f);
-        movement_speed = 0.1f;
+        movement_speed = 0.2f;
         yaw = -90.0f;
         pitch = 0.0f;
     }
