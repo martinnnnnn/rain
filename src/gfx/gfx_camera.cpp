@@ -23,26 +23,27 @@ namespace rain
     {
 	    glm::vec3 movement(0.0f, 0.0f, 0.0f);
 
-	    if (RAIN_INPUT->is_key_pressed(DIK_W))
-	    {
-		    movement += front * movement_speed;
-	    }
-	    if (RAIN_INPUT->is_key_pressed(DIK_S))
-	    {
-		    movement -= front * movement_speed;
-	    }
-	    if (RAIN_INPUT->is_key_pressed(DIK_A))
-	    {
-		    movement -= right * movement_speed;
-	    }
-	    if (RAIN_INPUT->is_key_pressed(DIK_D))
-	    {
-		    movement += right * movement_speed;
-	    }
-	    position += movement;
 
         if (RAIN_INPUT->mouse_lock)
         {
+	        if (RAIN_INPUT->is_key_pressed(DIK_W))
+	        {
+		        movement += front * movement_speed;
+	        }
+	        if (RAIN_INPUT->is_key_pressed(DIK_S))
+	        {
+		        movement -= front * movement_speed;
+	        }
+	        if (RAIN_INPUT->is_key_pressed(DIK_A))
+	        {
+		        movement -= right * movement_speed;
+	        }
+	        if (RAIN_INPUT->is_key_pressed(DIK_D))
+	        {
+		        movement += right * movement_speed;
+	        }
+	        position += movement;
+
 	        yaw += f32(RAIN_INPUT->x_offset * 0.1f);
 	        pitch += f32(RAIN_INPUT->y_offset * 0.1f);
         }

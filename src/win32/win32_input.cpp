@@ -10,6 +10,7 @@ using namespace rain;
 
 Input::Input()
     : mouse_lock(true)
+    , m_keysCurrent(m_keysA)
 {
 }
 
@@ -87,12 +88,22 @@ void Input::shutdown()
     }
 }
 
+
 void Input::update()
 {
     m_keyboard->Acquire();
 
-    ZeroMemory(m_keys, sizeof(m_keys));
-    HRESULT hr = m_keyboard->GetDeviceState(sizeof(m_keys), m_keys);
+    if (m_keysCurrent == m_keysA)
+    {
+        m_keysCurrent = m_keysB;
+    }
+    else if (m_keysCurrent == m_keysB)
+    {
+        m_keysCurrent = m_keysA;
+    }
+
+    ZeroMemory(m_keysCurrent, sizeof(m_keysCurrent));
+    HRESULT hr = m_keyboard->GetDeviceState(sizeof(m_keysA), m_keysCurrent);
 
     if (FAILED(hr))
     {
@@ -104,11 +115,11 @@ void Input::update()
         if (FAILED(hr))
             return;
 
-        m_keyboard->GetDeviceState(sizeof(m_keys), m_keys);
+        m_keyboard->GetDeviceState(sizeof(m_keysCurrent), m_keysCurrent);
     }
 
     // MOUSE
-    if (is_key_pressed(DIK_C))
+    if (is_key_released(DIK_C))
     {
         mouse_lock = !mouse_lock;
         char buffer[500];
@@ -142,12 +153,29 @@ void Input::update()
     {
         set_cursor_pos(x_center, y_center);
     }
-
 }
 
-bool Input::is_key_pressed(u32 _code)
+
+bool Input::is_key_pressed(u32 _code) const
 {
-    return (m_keys[_code] & 0x80);
+    return (m_keysCurrent[_code] & 0x80);
+    //return (m_keysCurrent[_code] & 0x80);
+}
+
+bool Input::is_key_released(u32 _code) const
+{
+    if (!is_key_pressed(_code))
+    {
+        if (m_keysCurrent == m_keysA)
+        {
+            return (m_keysB[_code] & 0x80);
+        }
+        else
+        {
+            return (m_keysA[_code] & 0x80);
+        }
+    }
+    return false;
 }
 
 void Input::set_cursor_pos(u32 _x, u32 _y)

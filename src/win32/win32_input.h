@@ -28,7 +28,8 @@ namespace rain
         void set_cursor_pos(u32 _x, u32 _y);
         void update_absolute_mouse_pos(u32 _x, u32 _y);
 
-        bool is_key_pressed(u32 _code);
+        bool is_key_pressed(u32 _code) const;
+        bool is_key_released(u32 _code)  const;
 
         i32 x_offset;
         i32 y_offset;
@@ -40,7 +41,9 @@ namespace rain
         LPDIRECTINPUT8  m_diObject;
         LPDIRECTINPUTDEVICE8 m_keyboard;
         LPDIRECTINPUTDEVICE8 m_mouse;
-        BYTE m_keys[256];
+        BYTE m_keysA[256];
+        BYTE m_keysB[256];
+        BYTE* m_keysCurrent;
         u32 x_center;
         u32 y_center;
     };
