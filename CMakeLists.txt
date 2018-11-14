@@ -15,6 +15,8 @@ else()
     message(STATUS "Couldn't find vulkan ;(")
 endif()
 
+#### OPENCL ####
+find_package(OpenCL REQUIRED)
 
 #### CXX FLAGS ####
 message(STATUS "> setting cxx flags")
@@ -122,7 +124,8 @@ target_link_libraries(${RAIN_EXE}
                         ${opengllib}
                         ${glulib}
                         Shlwapi.lib
-                        ${GLEW_LIBRARIES})
+                        ${GLEW_LIBRARIES}
+                        OpenCL::OpenCL)
 
 
 

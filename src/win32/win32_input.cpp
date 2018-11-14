@@ -9,6 +9,7 @@ using namespace rain;
 
 
 Input::Input()
+    : mouse_lock(true)
 {
 }
 
@@ -106,6 +107,15 @@ void Input::update()
         m_keyboard->GetDeviceState(sizeof(m_keys), m_keys);
     }
 
+    // MOUSE
+    if (is_key_pressed(DIK_C))
+    {
+        mouse_lock = !mouse_lock;
+        char buffer[500];
+        sprintf_s(buffer, 500, "C pressed, mouse locked = %s\n", mouse_lock ? "true" : "false");
+        OutputDebugString(buffer);
+    }
+
     DIMOUSESTATE2 dims2;
     ZeroMemory(&dims2, sizeof(dims2));
 
@@ -128,7 +138,10 @@ void Input::update()
     x_screen_pos += x_offset;
     y_screen_pos += y_offset;
 
-    set_cursor_pos(x_center, y_center);
+    if (mouse_lock)
+    {
+        set_cursor_pos(x_center, y_center);
+    }
 
 }
 

@@ -42,6 +42,8 @@ namespace rain
 		glm::vec2 get_center_pos_absolute();
 		HWND m_hwnd;
 
+        glm::u32vec2 size() const;
+
 	private:
 
 		int center_pos_x;
@@ -58,3 +60,5 @@ namespace rain
 
 	LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 }
+
+#define RAIN_WINDOW rain::Application::get().window

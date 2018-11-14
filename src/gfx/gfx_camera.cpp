@@ -41,8 +41,11 @@ namespace rain
 	    }
 	    position += movement;
 
-	    yaw += f32(RAIN_INPUT->x_offset * 0.1f);
-	    pitch += f32(RAIN_INPUT->y_offset * 0.1f);
+        if (RAIN_INPUT->mouse_lock)
+        {
+	        yaw += f32(RAIN_INPUT->x_offset * 0.1f);
+	        pitch += f32(RAIN_INPUT->y_offset * 0.1f);
+        }
 
 	    //char buffer[256];
 	    //sprintf_s(buffer, "(%d, %d)\n", RAIN_INPUT.x_offset, RAIN_INPUT.y_offset);

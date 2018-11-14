@@ -149,6 +149,12 @@ namespace rain
 	    gluPerspective(45.0f, (float)m_width / (float)m_height, 0.2f, 255.0f);
 	    glMatrixMode(GL_MODELVIEW);
 	    glLoadIdentity();
+        if (RAIN_RENDERER) RAIN_RENDERER->resize(m_width, m_height);
+    }
+
+    glm::u32vec2 Window::size() const
+    {
+        return glm::u32vec2(m_width, m_height);
     }
 
     void Window::fullscreen(bool _fullscreen)

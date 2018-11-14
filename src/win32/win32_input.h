@@ -11,6 +11,7 @@
 #include "core/singleton.h"
 #include "core/event.h"
 #include "win32/win32_keycodes.h"
+#include "win32/win32_application.h"
 
 namespace rain
 {
@@ -33,14 +34,17 @@ namespace rain
         i32 y_offset;
         u32 x_screen_pos;
         u32 y_screen_pos;
+        bool mouse_lock;
     private:
         std::vector<InputEvent> m_inputEvents;
         LPDIRECTINPUT8  m_diObject;
         LPDIRECTINPUTDEVICE8 m_keyboard;
         LPDIRECTINPUTDEVICE8 m_mouse;
-        BYTE    m_keys[256];
+        BYTE m_keys[256];
         u32 x_center;
         u32 y_center;
     };
 
 }
+
+#define RAIN_INPUT rain::Application::get().input

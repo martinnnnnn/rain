@@ -12,6 +12,7 @@
 #include "core/high_resolution_clock.h"
 #include "ogl_shader.h"
 #include "win32/win32_application.h"
+#include "win32/win32_window.h"
 #include "gfx/gfx_camera.h"
 
 namespace rain
@@ -36,9 +37,7 @@ namespace rain
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glViewport(0, 0, 800, 600);
-
-        set_projection_matrix(glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10000.0f));    
+        resize(RAIN_WINDOW->size().x, RAIN_WINDOW->size().y);
 
         init_default_shaders();
 
@@ -49,6 +48,12 @@ namespace rain
 
         camera = new Camera();
         camera->init();
+    }
+
+    void Renderer::resize(u32 _width, u32 _height)
+    {
+        glViewport(0, 0, _width, _height);
+        set_projection_matrix(glm::perspective(glm::radians(45.0f), (float)_width / (float)_height, 0.1f, 10000.0f));
     }
 
     void Renderer::update_camera()

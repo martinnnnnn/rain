@@ -36,7 +36,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 	// INIT WINDOW
     window = new Window();
-	window->init(hinstance, 800, 600, 0);
+	window->init(hinstance, config->screen_width, config->screen_height, 0);
 
     // INIT RENDERER
     renderer = new Renderer();

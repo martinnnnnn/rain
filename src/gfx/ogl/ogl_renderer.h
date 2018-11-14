@@ -48,6 +48,7 @@ namespace rain
         void set_view_matrix(const glm::mat4& _matrix);
 
         void update_camera();
+        void resize(u32 _width, u32 _height);
 
         Camera* camera;
         GLuint coordviewVAO;

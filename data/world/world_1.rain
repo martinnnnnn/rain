@@ -18,7 +18,7 @@
             {
                 "default": true,
                 "required" : ["Transform"],
-                "mass": 3.0
+                "mass": 0.5
             },
             "BoundingSphere" :
             {
@@ -39,7 +39,7 @@
                 "required": ["Transform"],
                 "default": false,
 
-                "mass": 3.0,
+                "mass": 1.0,
                 "size": 1.0,
                 "rotationInertia": "cube",
                 "applygravity": false,
@@ -58,7 +58,7 @@
                 "entityA": 0,
                 "entityB": 1,
                 "distance": 5.0,
-                "k": 15.0,
+                "k": 30.0,
                 "b": 0.2
             }
         }
