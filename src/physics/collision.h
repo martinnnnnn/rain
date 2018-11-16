@@ -24,8 +24,22 @@ namespace rain
 
     struct BoundingPlane
     {
-        glm::vec3 position;
-        glm::vec3 normal;
+        f32 D;
+        glm::vec3 n;
+        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _n)
+            : n(n)
+            , D(-glm::dot(n,_p0))
+        {}
+
+        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _p1, const glm::vec3& _p2)
+            : n(glm::cross((_p1 - _p0), glm::normalize(_p2 - _p0)))
+            , D(-glm::dot(n, _p0))
+        {}
+        
+        const f32 distance_to_point(const glm::vec3& _p) const
+        {
+            return glm::dot(n, _p) + D;
+        }
     };
 
     struct BoundingQuad
