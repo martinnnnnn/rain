@@ -26,6 +26,7 @@
 using namespace rain;
 
 
+
 int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
@@ -53,6 +54,14 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     m_clock.reset();
 
     world.init(RAIN_CONFIG->data_root + "/world/world_2.rain");
+
+    //// Allocate a console window for this process
+    //AllocConsole();
+
+    //// Update the C/C++ runtime standard input, output, and error targets to use the console window
+    //BindCrtHandlesToStdHandles(true, true, true);
+
+    //printf("hello ??? %s \n ---> %d     %f", "world !", 5, 42.0);
 
     return 0;
 }
@@ -137,3 +146,4 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 
     return msg.lParam;
 }
+
