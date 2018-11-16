@@ -15,8 +15,12 @@
 #include "win32/win32_window.h"
 #include "gfx/gfx_camera.h"
 
+#include "core/log.h"
+
+
 namespace rain
 {
+
     void Renderer::init()
     {
         GLenum res = glewInit();
@@ -78,6 +82,41 @@ namespace rain
             RAIN_CONFIG->data_root + "/shaders/glsl/coord_view.fs");
         assert(retval);
     }
+
+
+    void Renderer::init_line()
+    {
+        float line[6] =
+        {
+             0.5, 0.0, 0.0,  -0.5, 0.0, 0.0
+        };
+
+        glGenVertexArrays(1, &lineVAO);
+        glBindVertexArray(lineVAO);
+
+        unsigned int lineVBO;
+        glGenBuffers(1, &lineVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(line), line, GL_STATIC_DRAW);
+
+        // position
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        //glEnableVertexAttribArray(0);
+        //// normals
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        //glEnableVertexAttribArray(1);
+
+        glBindVertexArray(0);
+    }
+
 
     void Renderer::init_coord_view()
     {
@@ -374,6 +413,11 @@ namespace rain
         //glUseProgram(shaderProgram);
         //glBindVertexArray(VAO);
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    }
+
+    void Renderer::render_line(const glm::vec3& _position, const glm::quat& orientation)
+    {
+
     }
 
 

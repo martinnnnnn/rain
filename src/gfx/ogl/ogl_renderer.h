@@ -30,6 +30,7 @@ namespace rain
 
         void init_default_shaders();
 
+        void init_line();
         void init_coord_view();
         void init_quad();
 	    void init_cube();
@@ -37,6 +38,7 @@ namespace rain
 
         void render_coord_view(const glm::vec3& _position);
         void render_quad();
+        void render_line(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void render_cube(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void render_sphere(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f,0.0f,0.0f)));
 
@@ -51,6 +53,8 @@ namespace rain
         void resize(u32 _width, u32 _height);
 
         Camera* camera;
+        GLuint lineVAO;
+        u32 line_index_count;
         GLuint coordviewVAO;
 	    u32 coord_index_count;
 	    GLuint quadVAO;
