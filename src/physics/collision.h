@@ -24,8 +24,6 @@ namespace rain
 
     struct BoundingPlane
     {
-        f32 D;
-        glm::vec3 n;
         BoundingPlane(const glm::vec3& _p0, const glm::vec3& _n)
             : n(n)
             , D(-glm::dot(n,_p0))
@@ -40,6 +38,9 @@ namespace rain
         {
             return glm::dot(n, _p) + D;
         }
+
+        f32 D;
+        glm::vec3 n;
     };
 
     struct BoundingQuad
@@ -51,14 +52,23 @@ namespace rain
     {
     };
 
-    struct collision
+    struct HitInfo
     {
-
+        bool hit;
+        glm::vec3 positionObjA;
+        glm::vec3 positionObjB;
+        f32 normalizedTime;
+        glm::vec3 contactPoint;
+        glm::vec3 contactNormal;
     };
 
-    bool detect_collision(
-        RigidBody& _bodyA, BoundingSphere& _boundA, Transform& _transformA,
-        RigidBody& _bodyB, BoundingSphere& _boundB, Transform& _transformB);
+    HitInfo detect_collision(
+        BoundingSphere& _boundA, Transform& _transformA,
+        BoundingSphere& _boundB, Transform& _transformB);
+
+    HitInfo detect_collision(
+        BoundingSphere& _sphereBound, Transform& _sphereTransform,
+        BoundingPlane& _planeBound, Transform& _planeTransform);
 
     void collision_response(
         RigidBody& _bodyA, Transform& _transformA,

@@ -84,8 +84,8 @@ namespace rain
                 BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
                 Transform& transform2 = view.get<Transform>(entity2);
 
-                bool collide = detect_collision(body1, bound1, transform1, body2, bound2, transform2);
-                if (collide)
+                HitInfo hitinfo = detect_collision(bound1, transform1, bound2, transform2);
+                if (hitinfo.hit)
                 {
                     collision_response(body1, transform1, body2, transform2);
                 }
