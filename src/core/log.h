@@ -8,10 +8,10 @@
 
 namespace rain
 {
-    //class Log
-    //{
-    //public:
-    //    static void init(bool bindStdIn, bool bindStdOut, bool bindStdErr);
+    class Log
+    {
+    public:
+        static void init(bool bindStdIn, bool bindStdOut, bool bindStdErr);
 
     //    static void log(const char* _str, va_list va)
     //    {
@@ -46,7 +46,7 @@ namespace rain
     //        std::string msg = "[LOG][INFO] " + str;
     //        info(msg.c_str(), __VA_ARGS__);
     //    }
-    //};
+    };
 }
 
 //static char header[]{  };

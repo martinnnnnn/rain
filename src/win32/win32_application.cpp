@@ -55,13 +55,13 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
     world.init(RAIN_CONFIG->data_root + "/world/world_2.rain");
 
-    //// Allocate a console window for this process
-    //AllocConsole();
+    // Allocate a console window for this process
+    AllocConsole();
 
-    //// Update the C/C++ runtime standard input, output, and error targets to use the console window
+    // Update the C/C++ runtime standard input, output, and error targets to use the console window
     //BindCrtHandlesToStdHandles(true, true, true);
-
-    //printf("hello ??? %s \n ---> %d     %f", "world !", 5, 42.0);
+    log.init(true, true, true);
+    printf("hello ??? %s \n ---> %d     %f", "world !", 5, 42.0);
 
     return 0;
 }

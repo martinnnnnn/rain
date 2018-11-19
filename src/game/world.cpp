@@ -67,29 +67,41 @@ namespace rain
         }
 
         // updating collision
-        auto view = registry.view<RigidBody, BoundingSphere, Transform>();
-        for (auto entity1 : view)
+        auto sphere_view = registry.view<RigidBody, BoundingSphere, Transform>();
+        for (auto entity1 : sphere_view)
         {
-            RigidBody& body1 = view.get<RigidBody>(entity1);
-            BoundingSphere& bound1 = view.get<BoundingSphere>(entity1);
-            Transform& transform1 = view.get<Transform>(entity1);
-            for (auto entity2 : view)
+            RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
+            BoundingSphere& bound1 = sphere_view.get<BoundingSphere>(entity1);
+            Transform& transform1 = sphere_view.get<Transform>(entity1);
+            for (auto entity2 : sphere_view)
             {
                 if (entity1 == entity2)
                 {
                     break;
                 }
 
-                RigidBody& body2 = view.get<RigidBody>(entity2);
-                BoundingSphere& bound2 = view.get<BoundingSphere>(entity2);
-                Transform& transform2 = view.get<Transform>(entity2);
+                RigidBody& body2 = sphere_view.get<RigidBody>(entity2);
+                BoundingSphere& bound2 = sphere_view.get<BoundingSphere>(entity2);
+                Transform& transform2 = sphere_view.get<Transform>(entity2);
 
-                HitInfo hitinfo = detect_collision(bound1, transform1, bound2, transform2);
-                if (hitinfo.hit)
+                HitInfo info = detect_collision(bound1, transform1, bound2, transform2);
+                if (info.hit)
                 {
                     collision_response(body1, transform1, body2, transform2);
                 }
             }
+
+            auto plane_view = registry.view<BoundingPlane>();
+            for (auto ent_plane : plane_view)
+            {
+                BoundingPlane& planeBound = plane_view.get(ent_plane);
+                HitInfo info = detect_collision(bound1, transform1, planeBound);
+                if (info.hit)
+                {
+                    collision_response(body1, transform1, planeBound.project(transform1.position));
+                }
+            }
+
         }
     }
 

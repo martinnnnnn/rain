@@ -20,9 +20,7 @@ namespace rain
         return info;
     }
 
-    HitInfo detect_collision(
-        BoundingSphere& _sphereBound, Transform& _sphereTransform,
-        BoundingPlane& _planeBound, Transform& _planeTransform)
+    HitInfo detect_collision(BoundingSphere& _sphereBound, Transform& _sphereTransform, BoundingPlane& _planeBound)
     {
         HitInfo info{};
 
@@ -45,6 +43,25 @@ namespace rain
         }
 
         return info;
+    }
+
+    void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position)
+    {
+        glm::vec3 x = glm::normalize(_transformA.position - _position);
+
+        glm::vec3 v1 = _bodyA.velocity;
+        f32 x1 = glm::dot(x, v1);
+        glm::vec3 v1x = x * x1;
+        glm::vec3 v1y = v1 - v1x;
+        f32 m1 = _bodyA.mass;
+
+        x = x * -1.0f;
+        glm::vec3 v2 = glm::vec3(0.0f,0.0f,0.0f);
+        f32 x2 = glm::dot(x, v2);
+        glm::vec3 v2x = x * x2;
+        f32 m2 = 100.0f;
+
+        _bodyA.momentum = glm::vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
     }
 
     void collision_response(

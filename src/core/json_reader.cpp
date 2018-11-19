@@ -83,6 +83,12 @@ namespace rain
                 Spring2& spring = registry.assign<Spring2>(entity);
                 spring = read_spring2(world_object["Spring2"]);
             }
+            if (world_object.HasMember("BoundingPlane"))
+            {
+                BoundingPlane& plane = registry.assign<BoundingPlane>(entity);
+                plane = read_plane(world_object["BoundingPlane"]);
+                printf("hello");
+            }
         }
     }
 
@@ -265,5 +271,31 @@ namespace rain
         }
 
         return spring;
+    }
+
+    BoundingPlane JsonReader::read_plane(const rapidjson::Value& _json)
+    {
+        glm::vec3 position {};
+        glm::vec3 normal {};
+
+        glm::vec3 point1 {};
+        glm::vec3 point2 {};
+        glm::vec3 point3 {};
+
+        if (_json.HasMember("position") && _json.HasMember("normal"))
+        {
+            position = read_vec3(_json["position"]);
+            normal = read_vec3(_json["normal"]);
+            auto hello = BoundingPlane(position, normal);
+            return BoundingPlane(position, normal);
+        }
+        else if (_json.HasMember("point1") && _json.HasMember("point2") && _json.HasMember("point3"))
+        {
+            point1 = read_vec3(_json["point1"]);
+            point2 = read_vec3(_json["point2"]);
+            point3 = read_vec3(_json["point3"]);
+            return BoundingPlane(point1, point2, point3);
+        }
+        return BoundingPlane(glm::vec3{}, glm::vec3{});
     }
 }

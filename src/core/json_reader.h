@@ -27,6 +27,7 @@ namespace rain
         Spring read_spring(const rapidjson::Value& _json);
         SpringRope read_spring_rope(const rapidjson::Value& _json);
         Spring2 read_spring2(const rapidjson::Value& _json);
+        BoundingPlane read_plane(const rapidjson::Value& _json);
         void read_world(const std::string& _json, World& _world);
         void read_config(const std::string& _path, Config& _config);
     };

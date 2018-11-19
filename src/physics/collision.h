@@ -24,23 +24,35 @@ namespace rain
 
     struct BoundingPlane
     {
-        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _n)
-            : n(n)
-            , D(-glm::dot(n,_p0))
+        BoundingPlane()
+            : n(glm::vec3(0.0))
+            , D(-glm::dot(n, glm::vec3(0.0)))
         {}
+
+        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _n)
+            : n(_n)
+            , D(-glm::dot(n,_p0))
+        {
+        }
 
         BoundingPlane(const glm::vec3& _p0, const glm::vec3& _p1, const glm::vec3& _p2)
             : n(glm::cross((_p1 - _p0), glm::normalize(_p2 - _p0)))
             , D(-glm::dot(n, _p0))
-        {}
+        {
+        }
         
         const f32 distance_to_point(const glm::vec3& _p) const
         {
             return glm::dot(n, _p) + D;
         }
 
-        f32 D;
+        glm::vec3 project(glm::vec3 _point)
+        {
+            return _point - (distance_to_point(_point) * n);
+        }
+
         glm::vec3 n;
+        f32 D;
     };
 
     struct BoundingQuad
@@ -66,11 +78,12 @@ namespace rain
         BoundingSphere& _boundA, Transform& _transformA,
         BoundingSphere& _boundB, Transform& _transformB);
 
-    HitInfo detect_collision(
-        BoundingSphere& _sphereBound, Transform& _sphereTransform,
-        BoundingPlane& _planeBound, Transform& _planeTransform);
+    HitInfo detect_collision( BoundingSphere& _sphereBound, Transform& _sphereTransform, BoundingPlane& _planeBound);
+
+    void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position);
 
     void collision_response(
         RigidBody& _bodyA, Transform& _transformA,
         RigidBody& _bodyB, Transform& _transformB);
+
 }

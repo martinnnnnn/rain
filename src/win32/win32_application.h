@@ -8,13 +8,12 @@
 #include <cassert>
 
 #include <glm/glm.hpp>
-//#include <entt.hpp>
 
 #include "core/singleton.h"
 #include "core/types.h"
-//#include "gfx/gfx_camera.h"
 #include "core/high_resolution_clock.h"
 #include "game/world.h"
+#include "core/log.h"
 
 namespace rain
 {
@@ -54,6 +53,7 @@ namespace rain
         HINSTANCE hinstance;
         World world;
         HighResolutionClock m_clock;
+        Log log;
     };
 }
 
