@@ -31,6 +31,10 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
+    // INIT LOG
+    AllocConsole();
+    log.init(true, true, true);
+
     // INIT CONFIG
     config = new Config();
     config->init(File::get_exe_path() + "/config.rain");
@@ -53,15 +57,9 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // INIT CLOCK
     m_clock.reset();
 
-    world.init(RAIN_CONFIG->data_root + "/world/world_2.rain");
+    world.init(RAIN_CONFIG->data_root + "/world/world_1.rain");
 
-    // Allocate a console window for this process
-    AllocConsole();
 
-    // Update the C/C++ runtime standard input, output, and error targets to use the console window
-    //BindCrtHandlesToStdHandles(true, true, true);
-    log.init(true, true, true);
-    printf("hello ??? %s \n ---> %d     %f", "world !", 5, 42.0);
 
     return 0;
 }
