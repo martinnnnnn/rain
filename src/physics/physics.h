@@ -1,6 +1,5 @@
 #pragma once
 
-#include <entt.hpp>
 
 #include "rigid_body.h"
 #include "collision.h"

@@ -15,7 +15,7 @@ namespace rain
         void init();
         void render(const glm::mat4& _view, const glm::mat4& _proj);
         void add_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color);
-        void add_cube(const glm::vec3& _point1, const glm::vec3& _point2);
+        void add_cube(const glm::vec3& _center, f32 _width, f32 height, const glm::vec3& _color);
         void add_sphere(const glm::vec3& _point1, const glm::vec3& _point2);
         void add_quad(const glm::vec3& _point1, const glm::vec3& _point2);
 

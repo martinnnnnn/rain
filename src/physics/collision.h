@@ -74,16 +74,13 @@ namespace rain
         glm::vec3 contactNormal;
     };
 
-    HitInfo detect_collision(
-        BoundingSphere& _boundA, Transform& _transformA,
-        BoundingSphere& _boundB, Transform& _transformB);
 
+    bool get_quadratic_roots(const f32 _a, const f32 _b, const f32 _c, f32& _r1, f32& _r2);
+
+    HitInfo detect_collision(BoundingSphere& _boundA, Transform& _transformA, BoundingSphere& _boundB, Transform& _transformB);
     HitInfo detect_collision( BoundingSphere& _sphereBound, Transform& _sphereTransform, BoundingPlane& _planeBound);
 
     void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position);
-
-    void collision_response(
-        RigidBody& _bodyA, Transform& _transformA,
-        RigidBody& _bodyB, Transform& _transformB);
+    void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB);
 
 }

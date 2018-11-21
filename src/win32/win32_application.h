@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Windows.h>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -9,6 +8,7 @@
 
 #include <glm/glm.hpp>
 
+#include "win32/win32_helper.h"
 #include "core/singleton.h"
 #include "core/types.h"
 #include "core/high_resolution_clock.h"
@@ -48,12 +48,12 @@ namespace rain
         Window* window;
         Renderer* renderer;
         Input* input;
+        Log log;
 
     private:
         HINSTANCE hinstance;
         World world;
         HighResolutionClock m_clock;
-        Log log;
     };
 }
 

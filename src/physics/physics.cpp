@@ -1,6 +1,5 @@
 #include "physics.h"
 
-#include <Windows.h>
 
 #include "math/transform.h"
 

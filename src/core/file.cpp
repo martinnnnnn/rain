@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "win32/win32_helper.h"
+
 namespace rain
 {
 

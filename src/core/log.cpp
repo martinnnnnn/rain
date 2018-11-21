@@ -1,7 +1,8 @@
 #include "log.h"
 
+#include "win32/win32_helper.h"
 
-#include <Windows.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>

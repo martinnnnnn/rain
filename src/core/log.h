@@ -11,7 +11,7 @@ namespace rain
     class Log
     {
     public:
-        static void init(bool bindStdIn, bool bindStdOut, bool bindStdErr);
+        void init(bool bindStdIn, bool bindStdOut, bool bindStdErr);
 
     //    static void log(const char* _str, va_list va)
     //    {
@@ -49,5 +49,6 @@ namespace rain
     };
 }
 
+#define RAIN_LOG rain::Application::get().log
 //static char header[]{  };
 

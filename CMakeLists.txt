@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.10.1)
 project(rain)
 message(STATUS "project name : ${PROJECT_NAME}")
 
-set(RAIN_EXE rain_exe)
+set(RAIN_ENGINE rain_engine)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
+add_subdirectory(server)
 
 #### VULKAN ####
 find_package(Vulkan REQUIRED)
@@ -53,7 +55,7 @@ message(STATUS "> globing source files")
 file(GLOB_RECURSE PROJECT_SOURCE_FILES "src/*.h" "src/*.hpp" "src/*.cpp" "src/*.inl")
 
 message(STATUS "> adding files to exetutable")
-add_executable(${RAIN_EXE} WIN32 ${PROJECT_SOURCE_FILES})
+add_executable(${RAIN_ENGINE} WIN32 ${PROJECT_SOURCE_FILES})
 # 
 
 #### GROUP CREATION ####
@@ -115,7 +117,7 @@ find_library(glulib
     HINTS "${WINDOWS_SDK_LIBS}"
 )
 
-target_link_libraries(${RAIN_EXE}
+target_link_libraries(${RAIN_ENGINE}
                         ${dinput8lib}
                         ${d3d12lib}
                         ${dxgilib}
@@ -130,16 +132,16 @@ target_link_libraries(${RAIN_EXE}
 
 
 
-set_target_properties(${RAIN_EXE} PROPERTIES FOLDER "rain")
+set_target_properties(${RAIN_ENGINE} PROPERTIES FOLDER "rain")
 
 #### OUTPUT DIRECTORY ####
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
-set_target_properties(${RAIN_EXE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/exe")
+set_target_properties(${RAIN_ENGINE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/engine")
 
 #### SETTING THE OUPUT CONSOLE TO 
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
 
 #project(rain)
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${RAIN_EXE})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${RAIN_ENGINE})
 
 message(STATUS "> end of generation")

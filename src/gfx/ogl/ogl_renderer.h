@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 #include "GL/glew.h"
 #include "gl/GL.h"
 #include "gl/GLU.h"
@@ -28,29 +26,48 @@ namespace rain
     public:
         void init();
 
-        void init_default_shaders();
-
-        void init_line();
-        void init_coord_view();
-        void init_quad();
-	    void init_cube();
-	    void init_sphere();
-
-        void render_coord_view(const glm::vec3& _position);
-        void render_quad();
-        void render_line(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
-        void render_cube(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
-        void render_sphere(const glm::vec3& _position, const glm::quat& orientation = glm::quat(glm::vec3(0.0f,0.0f,0.0f)));
-
         void clear();
 
+
+        void init_default_shaders();
+
+        void init_debug();
+        void init_coord_view();
+
+        void init_shapes();
+	    void init_cube();
+        void init_sphere();
+
+        void draw_debug();
+        void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color);
+        void draw_debug_cube(const glm::vec3& _center, const f32 _width, const f32 _height, const glm::vec3& _color);
+        void draw_debug_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
+        void draw_coord_view(const glm::vec3& _position);
+
+        void draw_billboard();
+        void draw_line();
+        void draw_quad();
+        void draw_cube(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
+        void draw_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
+        void draw_mesh();
+
+        void update_camera();
+        void resize(u32 _width, u32 _height);
         void set_projection_matrix(const glm::mat4& _projection);
         void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
         void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
         void set_view_matrix(const glm::mat4& _matrix);
 
-        void update_camera();
-        void resize(u32 _width, u32 _height);
+        // debug buffer variables
+        static constexpr u32 debug_vertices_max_count = 8192;
+
+        u32      m_debug_vertex_count;
+        glm::vec3 m_debug_vertices[debug_vertices_max_count];
+        glm::vec3 m_debug_colors[debug_vertices_max_count];
+        u32      m_debug_vao;
+        u32      m_debug_vbo;
+        u32      m_debug_cbo;
+        Shader debug_shader;
 
         Camera* camera;
         GLuint lineVAO;
@@ -64,13 +81,9 @@ namespace rain
 	    GLuint sphereVAO;
 	    u32 sphere_index_count;
 
-        //GLuint phong_shader_id;
-        //GLuint pbr_shader_id;
-        //GLuint coordview_shader_id;
         glm::mat4 proj_map;
         glm::mat4 view_mat;
 
-        //DataIndexer* shaders_indexer_path;
         Shader default_phong;
         Shader default_pbr;
         Shader default_coord_view;

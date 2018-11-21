@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <Windows.h>
 #include <map>
 #include <cassert>
 
@@ -21,6 +20,7 @@ namespace rain
         File file;
         std::string engine_name;
         std::string data_root;
+        std::string starting_world;
         u32 screen_width;
         u32 screen_height;
         bool full_screen;

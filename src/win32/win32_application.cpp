@@ -1,6 +1,5 @@
 #include "win32_application.h"
 
-#include <windows.h>
 #include <time.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -57,9 +56,7 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
     // INIT CLOCK
     m_clock.reset();
 
-    world.init(RAIN_CONFIG->data_root + "/world/world_1.rain");
-
-
+    world.init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
 
     return 0;
 }
@@ -109,7 +106,7 @@ void Application::shutdown()
 void Application::render(float _alpha)
 {
     renderer->clear();
-    renderer->render_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+    renderer->draw_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 

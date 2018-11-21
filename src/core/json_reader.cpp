@@ -26,6 +26,7 @@ namespace rain
         OutputDebugString(buffer);
 
         _config.data_root = config_document["data_root"].GetString();
+        _config.starting_world = config_document["starting_world"].GetString();
         _config.screen_width = config_document["screen_width"].GetUint();
         _config.screen_height = config_document["screen_height"].GetUint();
         _config.full_screen = config_document["full_screen"].GetBool();

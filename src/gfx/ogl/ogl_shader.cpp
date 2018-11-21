@@ -6,7 +6,8 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <Windows.h>
+
+#include "win32/win32_helper.h"
 
 namespace rain
 {

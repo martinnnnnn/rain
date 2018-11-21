@@ -3,7 +3,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <Windows.h>
 #include <algorithm>
 
 #include "core/types.h"

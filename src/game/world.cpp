@@ -115,7 +115,7 @@ namespace rain
             glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->render_cube(position, orientation);
+            RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
         }
     }
 
