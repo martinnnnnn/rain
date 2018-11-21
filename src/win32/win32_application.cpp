@@ -106,7 +106,7 @@ void Application::shutdown()
 void Application::render(float _alpha)
 {
     renderer->clear();
-    renderer->draw_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+    renderer->draw();
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 

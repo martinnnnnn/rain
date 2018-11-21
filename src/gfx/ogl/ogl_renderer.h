@@ -32,11 +32,12 @@ namespace rain
         void init_default_shaders();
 
         void init_debug();
-        void init_coord_view();
 
         void init_shapes();
 	    void init_cube();
         void init_sphere();
+
+        void draw();
 
         void draw_debug();
         void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color);
@@ -72,8 +73,6 @@ namespace rain
         Camera* camera;
         GLuint lineVAO;
         u32 line_index_count;
-        GLuint coordviewVAO;
-	    u32 coord_index_count;
 	    GLuint quadVAO;
 	    u32 quad_index_count;
 	    GLuint cubeVAO;
@@ -86,7 +85,6 @@ namespace rain
 
         Shader default_phong;
         Shader default_pbr;
-        Shader default_coord_view;
     };
 }
 

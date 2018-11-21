@@ -27,12 +27,10 @@ namespace rain
     void Renderer::init()
     {
         GLenum res = glewInit();
-        char buffer[500];
-        sprintf_s(buffer, 500, "Console working\n");
-        OutputDebugString(buffer);
 
         if (res != GLEW_OK)
         {
+            char buffer[500];
             sprintf_s(buffer, 500, "Error : %s\n", glewGetErrorString(res));
             OutputDebugString(buffer);
         }
@@ -46,12 +44,9 @@ namespace rain
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         resize(RAIN_WINDOW->size().x, RAIN_WINDOW->size().y);
 
-
         init_default_shaders();
         init_debug();
         init_shapes();
-
-        init_coord_view();
 
         camera = new Camera();
         camera->init();
@@ -79,44 +74,7 @@ namespace rain
         default_phong.use();
         default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
         default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
-
-        retval = default_coord_view.load(
-            RAIN_CONFIG->data_root + "/shaders/glsl/coord_view.vs",
-            RAIN_CONFIG->data_root + "/shaders/glsl/coord_view.fs");
-        assert(retval);
     }
-
-    void Renderer::init_coord_view()
-    {
-        float coord_lines[36] =
-        {
-             0.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-             20.0, 0.0, 0.0,  1.0, 0.0, 0.0,
-             0.0, 0.0, 0.0,  0.0, 1.0, 0.0,
-             0.0, 20.0, 0.0,  0.0, 1.0, 0.0,
-             0.0, 0.0, 20.0,  0.0, 0.0, 1.0,
-             0.0, 0.0, 0.0,  0.0, 0.0, 1.0,
-        };
-
-        glGenVertexArrays(1, &coordviewVAO);
-        glBindVertexArray(coordviewVAO);
-
-        unsigned int coordviewVBO;
-        glGenBuffers(1, &coordviewVBO);
-        glBindBuffer(GL_ARRAY_BUFFER, coordviewVBO);
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(coord_lines), coord_lines, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glBindVertexArray(0);
-    }
-
-
 
     void Renderer::set_projection_matrix(const glm::mat4& _projection)
     {
@@ -160,13 +118,9 @@ namespace rain
 
     void Renderer::draw_coord_view(const glm::vec3& _position)
     {
-        default_coord_view.use();
-        glm::mat4 mvp = proj_map * view_mat * glm::translate(glm::mat4(1), _position);
-        default_coord_view.set("mvp", mvp);
-
-        glBindVertexArray(coordviewVAO);
-        glDrawArrays(GL_LINES, 0, 9);
-        glBindVertexArray(0);
+        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     }
 
 
@@ -360,6 +314,12 @@ namespace rain
         glBindVertexArray(0);
 
         debug_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/debug.vs", RAIN_CONFIG->data_root + "/shaders/glsl/debug.fs");
+    }
+
+    void Renderer::draw()
+    {
+        draw_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+        draw_debug();
     }
 
     void Renderer::draw_debug()

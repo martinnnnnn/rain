@@ -7,6 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/trigonometric.hpp>
 
+#include "gfx/ogl/ogl_renderer.h"
+
 namespace rain
 {
 
@@ -39,8 +41,12 @@ namespace rain
 
     void Physics::apply_spring(const Spring2& _spring, const Transform& _transformA, RigidBody& _bodyA, const Transform& _transformB, RigidBody& _bodyB)
     {
+
         glm::vec3 position_anchorA = glm::translate(glm::mat4(1), _transformA.position) * glm::mat4_cast(_transformA.orientation) * glm::vec4(_spring.anchorPointA, 1.0);
         glm::vec3 position_anchorB = glm::translate(glm::mat4(1), _transformB.position) * glm::mat4_cast(_transformB.orientation) * glm::vec4(_spring.anchorPointB, 1.0);
+
+        RAIN_RENDERER->draw_debug_line(glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        //RAIN_RENDERER->draw_debug_line(position_anchorA, position_anchorB, glm::vec3(0.0f, 1.0f, 0.0f));
 
         glm::vec3 point_velocityA = _bodyA.velocity + glm::cross(_bodyA.angularVelocity, (position_anchorA, _transformA.position));
         glm::vec3 point_velocityB = _bodyB.velocity + glm::cross(_bodyB.angularVelocity, (position_anchorB, _transformB.position));
