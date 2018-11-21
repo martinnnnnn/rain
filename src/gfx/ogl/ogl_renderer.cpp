@@ -17,7 +17,6 @@
 #include "win32/win32_application.h"
 #include "win32/win32_window.h"
 #include "gfx/gfx_camera.h"
-#include "gfx/ogl/ogl_debug.h"
 
 #include "core/log.h"
 
