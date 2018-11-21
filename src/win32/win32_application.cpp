@@ -22,6 +22,8 @@
 #include "game/world.h"
 #include "core/config.h"
 
+
+
 using namespace rain;
 
 
@@ -107,10 +109,14 @@ void Application::render(float _alpha)
 {
     renderer->clear();
     renderer->draw();
+
     //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
     //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
+    renderer->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
     world.render(_alpha);
+
+
 }
 
 

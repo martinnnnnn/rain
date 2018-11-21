@@ -20,6 +20,9 @@
 
 #include "core/log.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 
 namespace rain
 {
@@ -47,6 +50,7 @@ namespace rain
         init_default_shaders();
         init_debug();
         init_shapes();
+        init_text_2d();
 
         camera = new Camera();
         camera->init();
@@ -55,7 +59,9 @@ namespace rain
     void Renderer::resize(u32 _width, u32 _height)
     {
         glViewport(0, 0, _width, _height);
-        set_projection_matrix(glm::perspective(glm::radians(45.0f), (float)_width / (float)_height, 0.1f, 10000.0f));
+        set_perspective_projection_matrix(glm::perspective(glm::radians(45.0f), (f32)_width / (f32)_height, 0.1f, 10000.0f));
+        set_orthogonal_projection_matrix(glm::ortho(0.0f, (f32)_width, 0.0f, (f32)_height));
+        
     }
 
     void Renderer::update_camera()
@@ -76,9 +82,15 @@ namespace rain
         default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
-    void Renderer::set_projection_matrix(const glm::mat4& _projection)
+    void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
     {
-        proj_map = _projection;
+        proj_mat_perspective = _projection;
+    }
+
+    void Renderer::set_orthogonal_projection_matrix(const glm::mat4& _projection)
+    {
+        proj_mat_orthogonal = _projection;
+        proj_mat_orthogonal = glm::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
     void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
@@ -340,7 +352,7 @@ namespace rain
         glDisable(GL_BLEND);
 
         // Sets up shader
-        glm::mat4 mvp = proj_map * view_mat * glm::mat4(1.0f);
+        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -406,15 +418,7 @@ namespace rain
 
     void Renderer::draw_debug_sphere(const glm::vec3& _position, const f32 _scale, const glm::quat& orientation)
     {
-        glm::mat4 mvp = proj_map * view_mat * glm::translate(glm::mat4(1), _position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale));
-        debug_shader.use();
-        debug_shader.set("mvp", mvp);
-
-        glBindVertexArray(sphereVAO);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glBindVertexArray(0);
+        assert(false);
     }
 
     void Renderer::draw_billboard()
@@ -436,7 +440,7 @@ namespace rain
     {
         default_phong.use();
         default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
-        default_phong.set("proj", proj_map);
+        default_phong.set("proj", proj_mat_perspective);
         default_phong.set("view", view_mat);
 
 
@@ -449,7 +453,7 @@ namespace rain
     {
         default_phong.use();
         default_phong.set("model", glm::translate(glm::mat4(1), _center) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
-        default_phong.set("proj", proj_map);
+        default_phong.set("proj", proj_mat_perspective);
         default_phong.set("view", view_mat);
 
         glBindVertexArray(sphereVAO);
@@ -462,5 +466,131 @@ namespace rain
         assert(false);
     }
 
+    void Renderer::init_text_2d()
+    {
 
+
+        text_renderer._shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
+
+        text_renderer._shader.use();
+        text_renderer._shader.set("projection", proj_mat_orthogonal);
+        //glUniformMatrix4fv(glGetUniformLocation(text_renderer._shader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+        FT_Library ft;
+
+        if (FT_Init_FreeType(&ft))
+        {
+            printf("ERROR::FREETYPE: Could not init FreeType Library\n");
+            return;
+        }
+
+        std::string path_to_font = RAIN_CONFIG->data_root + "/fonts/arial.ttf";
+        FT_Face face;
+        if (FT_New_Face(ft, path_to_font.c_str(), 0, &face))
+        {
+            printf("ERROR::FREETYPE: Failed to load font\n");
+            return;
+        }
+
+        FT_Set_Pixel_Sizes(face, 0, 48);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        for (GLubyte c = 0; c < 128; c++)
+        {
+            if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+            {
+                std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                continue;
+            }
+            GLuint texture;
+            glGenTextures(1, &texture);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RED,
+                face->glyph->bitmap.width,
+                face->glyph->bitmap.rows,
+                0,
+                GL_RED,
+                GL_UNSIGNED_BYTE,
+                face->glyph->bitmap.buffer
+            );
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            RChar character = {
+                texture,
+                glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                face->glyph->advance.x
+            };
+            text_renderer._characters.insert(std::pair<GLchar, RChar>(c, character));
+        }
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        FT_Done_Face(face);
+        FT_Done_FreeType(ft);
+
+        glGenVertexArrays(1, &text_renderer._VAO);
+        glGenBuffers(1, &text_renderer._VBO);
+        glBindVertexArray(text_renderer._VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, text_renderer._VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+
+    void Renderer::draw_text_2d(const std::string& _text, const GLfloat _x, const GLfloat _y, const GLfloat _scale, const glm::vec3& _color)
+    {
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        text_renderer._shader.use();
+        text_renderer._shader.set("textColor", _color);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(text_renderer._VAO);
+
+        std::string::const_iterator c;
+        GLfloat x = _x;
+        for (c = _text.begin(); c != _text.end(); c++)
+        {
+            RChar ch = text_renderer._characters[*c];
+
+            GLfloat xpos = x + ch.Bearing.x * _scale;
+            GLfloat ypos = _y - (ch.Size.y - ch.Bearing.y) * _scale;
+
+            GLfloat w = ch.Size.x * _scale;
+            GLfloat h = ch.Size.y * _scale;
+            // Update VBO for each character
+            GLfloat vertices[6][4] = {
+                { xpos,     ypos + h,   0.0, 0.0 },
+                { xpos,     ypos,       0.0, 1.0 },
+                { xpos + w, ypos,       1.0, 1.0 },
+
+                { xpos,     ypos + h,   0.0, 0.0 },
+                { xpos + w, ypos,       1.0, 1.0 },
+                { xpos + w, ypos + h,   1.0, 0.0 }
+            };
+            // Render glyph texture over quad
+            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+            // Update content of VBO memory
+            glBindBuffer(GL_ARRAY_BUFFER, text_renderer._VBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // Be sure to use glBufferSubData and not glBufferData
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // Render quad
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+            x += (ch.Advance >> 6) * _scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+        }
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }

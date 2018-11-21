@@ -44,10 +44,13 @@ include_directories(src/
                     external/glm/
                     external/entt/
                     external/json/
+                    external/
                     ${GLEW_INCLUDE_DIRS})
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
+
+link_directories(${CMAKE_SOURCE_DIR}/libs)
 
 #### EXECUTABLE CREATION ####
 
@@ -117,6 +120,7 @@ find_library(glulib
     HINTS "${WINDOWS_SDK_LIBS}"
 )
 
+
 target_link_libraries(${RAIN_ENGINE}
                         ${dinput8lib}
                         ${d3d12lib}
@@ -126,6 +130,7 @@ target_link_libraries(${RAIN_ENGINE}
                         ${opengllib}
                         ${glulib}
                         Shlwapi.lib
+                        freetype
                         ${GLEW_LIBRARIES}
                         OpenCL::OpenCL)
 

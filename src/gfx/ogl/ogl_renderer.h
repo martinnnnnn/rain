@@ -21,6 +21,21 @@ namespace rain
 
     struct Camera;
 
+    struct RChar {
+        GLuint     TextureID;
+        glm::ivec2 Size;
+        glm::ivec2 Bearing;
+        GLuint     Advance;
+    };
+
+    struct TextRenderer
+    {
+        std::unordered_map<GLchar, RChar> _characters;
+        glm::mat4 _projectionMatrix;
+        Shader _shader;
+        GLuint _VAO, _VBO;
+    };
+
     class Renderer
     {
     public:
@@ -37,6 +52,8 @@ namespace rain
 	    void init_cube();
         void init_sphere();
 
+        void init_text_2d();
+
         void draw();
 
         void draw_debug();
@@ -52,9 +69,12 @@ namespace rain
         void draw_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void draw_mesh();
 
+        void draw_text_2d(const std::string& _text, const GLfloat _x, const GLfloat _y, const GLfloat _scale, const glm::vec3& _color);
+
         void update_camera();
         void resize(u32 _width, u32 _height);
-        void set_projection_matrix(const glm::mat4& _projection);
+        void set_perspective_projection_matrix(const glm::mat4& _projection);
+        void set_orthogonal_projection_matrix(const glm::mat4& _projection);
         void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
         void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
         void set_view_matrix(const glm::mat4& _matrix);
@@ -80,11 +100,14 @@ namespace rain
 	    GLuint sphereVAO;
 	    u32 sphere_index_count;
 
-        glm::mat4 proj_map;
+        glm::mat4 proj_mat_perspective;
+        glm::mat4 proj_mat_orthogonal;
         glm::mat4 view_mat;
 
         Shader default_phong;
         Shader default_pbr;
+
+        TextRenderer text_renderer;
     };
 }
 
