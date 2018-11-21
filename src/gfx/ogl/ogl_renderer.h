@@ -22,18 +22,10 @@ namespace rain
     struct Camera;
 
     struct RChar {
-        GLuint     TextureID;
-        glm::ivec2 Size;
-        glm::ivec2 Bearing;
-        GLuint     Advance;
-    };
-
-    struct TextRenderer
-    {
-        std::unordered_map<GLchar, RChar> _characters;
-        glm::mat4 _projectionMatrix;
-        Shader _shader;
-        GLuint _VAO, _VBO;
+        GLuint     texture_id;
+        glm::ivec2 size;
+        glm::ivec2 bearing;
+        GLuint     advance;
     };
 
     class Renderer
@@ -107,7 +99,10 @@ namespace rain
         Shader default_phong;
         Shader default_pbr;
 
-        TextRenderer text_renderer;
+        std::unordered_map<GLchar, RChar> text_characters;
+        Shader text_shader;
+        GLuint text_vao;
+        GLuint text_vbo;
     };
 }
 

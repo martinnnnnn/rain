@@ -72,10 +72,7 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-       ;
-        bool retval = default_phong.load(
-            RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs",
-            RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
+        bool retval = default_phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
 
         default_phong.use();
         default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
@@ -336,7 +333,6 @@ namespace rain
 
     void Renderer::draw_debug()
     {
-        // drawing lines, wired quad, wired cube, wired sphere
         if (m_debug_vertex_count == 0)
         {
             return;
@@ -351,12 +347,10 @@ namespace rain
         glEnable(GL_MULTISAMPLE);
         glDisable(GL_BLEND);
 
-        // Sets up shader
         glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
-        // Draws all lines
         glBindVertexArray(m_debug_vao);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
@@ -468,13 +462,10 @@ namespace rain
 
     void Renderer::init_text_2d()
     {
+        text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
 
-
-        text_renderer._shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
-
-        text_renderer._shader.use();
-        text_renderer._shader.set("projection", proj_mat_orthogonal);
-        //glUniformMatrix4fv(glGetUniformLocation(text_renderer._shader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        text_shader.use();
+        text_shader.set("projection", proj_mat_orthogonal);
 
         FT_Library ft;
 
@@ -522,23 +513,24 @@ namespace rain
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            RChar character = {
+            RChar character =
+            {
                 texture,
                 glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
                 glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                face->glyph->advance.x
+                GLuint(face->glyph->advance.x)
             };
-            text_renderer._characters.insert(std::pair<GLchar, RChar>(c, character));
+            text_characters.insert(std::pair<GLchar, RChar>(c, character));
         }
         glBindTexture(GL_TEXTURE_2D, 0);
 
         FT_Done_Face(face);
         FT_Done_FreeType(ft);
 
-        glGenVertexArrays(1, &text_renderer._VAO);
-        glGenBuffers(1, &text_renderer._VBO);
-        glBindVertexArray(text_renderer._VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, text_renderer._VBO);
+        glGenVertexArrays(1, &text_vao);
+        glGenBuffers(1, &text_vbo);
+        glBindVertexArray(text_vao);
+        glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
@@ -551,24 +543,24 @@ namespace rain
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        text_renderer._shader.use();
-        text_renderer._shader.set("textColor", _color);
+        text_shader.use();
+        text_shader.set("textColor", _color);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindVertexArray(text_renderer._VAO);
+        glBindVertexArray(text_vao);
 
         std::string::const_iterator c;
         GLfloat x = _x;
         for (c = _text.begin(); c != _text.end(); c++)
         {
-            RChar ch = text_renderer._characters[*c];
+            RChar ch = text_characters[*c];
 
-            GLfloat xpos = x + ch.Bearing.x * _scale;
-            GLfloat ypos = _y - (ch.Size.y - ch.Bearing.y) * _scale;
+            GLfloat xpos = x + ch.bearing.x * _scale;
+            GLfloat ypos = _y - (ch.size.y - ch.bearing.y) * _scale;
 
-            GLfloat w = ch.Size.x * _scale;
-            GLfloat h = ch.Size.y * _scale;
-            // Update VBO for each character
+            GLfloat w = ch.size.x * _scale;
+            GLfloat h = ch.size.y * _scale;
+
             GLfloat vertices[6][4] = {
                 { xpos,     ypos + h,   0.0, 0.0 },
                 { xpos,     ypos,       0.0, 1.0 },
@@ -578,17 +570,17 @@ namespace rain
                 { xpos + w, ypos,       1.0, 1.0 },
                 { xpos + w, ypos + h,   1.0, 0.0 }
             };
-            // Render glyph texture over quad
-            glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-            // Update content of VBO memory
-            glBindBuffer(GL_ARRAY_BUFFER, text_renderer._VBO);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // Be sure to use glBufferSubData and not glBufferData
+
+            glBindTexture(GL_TEXTURE_2D, ch.texture_id);
+
+            glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            // Render quad
+
             glDrawArrays(GL_TRIANGLES, 0, 6);
-            // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-            x += (ch.Advance >> 6) * _scale; // Bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+
+            x += (ch.advance >> 6) * _scale;
         }
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
