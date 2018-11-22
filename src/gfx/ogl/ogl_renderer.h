@@ -21,7 +21,8 @@ namespace rain
 
     struct Camera;
 
-    struct RChar {
+    struct RChar
+    {
         GLuint     texture_id;
         glm::ivec2 size;
         glm::ivec2 bearing;
@@ -71,7 +72,6 @@ namespace rain
         void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
         void set_view_matrix(const glm::mat4& _matrix);
 
-        // debug buffer variables
         static constexpr u32 debug_vertices_max_count = 8192;
 
         u32      m_debug_vertex_count;

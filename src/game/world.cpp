@@ -24,32 +24,10 @@ namespace rain
     void World::update_physics(const float _deltaTime)
     {
         // applying springs
-        auto spring_view = registry.view<Spring>();
-        for (auto entity : spring_view)
-        {
-            Spring& spring = spring_view.get(entity);
-            RigidBody& body = registry.get<RigidBody>(spring.entity);
-            Transform& transform = registry.get<Transform>(spring.entity);
-            Physics::apply_spring(spring, transform, body);
-        }
-
-        // applying ropes
-        auto rope_view = registry.view<SpringRope>();
-        for (auto entity : rope_view)
-        {
-            SpringRope& rope = rope_view.get(entity);
-            RigidBody& bodyA = registry.get<RigidBody>(rope.entityA);
-            Transform& transformA = registry.get<Transform>(rope.entityA);
-            RigidBody& bodyB = registry.get<RigidBody>(rope.entityB);
-            Transform& transformB = registry.get<Transform>(rope.entityB);
-            Physics::apply_spring(rope, transformA, bodyA, transformB, bodyB);
-        }
-
-        // applying spring 2
-        auto spring2_view = registry.view<Spring2>();
+        auto spring2_view = registry.view<Spring>();
         for (auto entity : spring2_view)
         {
-            Spring2& spring2 = spring2_view.get(entity);
+            Spring& spring2 = spring2_view.get(entity);
             RigidBody& bodyA = registry.get<RigidBody>(spring2.entityA);
             Transform& transformA = registry.get<Transform>(spring2.entityA);
             RigidBody& bodyB = registry.get<RigidBody>(spring2.entityB);

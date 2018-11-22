@@ -72,17 +72,7 @@ namespace rain
             if (world_object.HasMember("Spring"))
             {
                 Spring& spring = registry.assign<Spring>(entity);
-                spring = read_spring(world_object["Spring"]);
-            }
-            if (world_object.HasMember("SpringRope"))
-            {
-                SpringRope& spring = registry.assign<SpringRope>(entity);
-                spring = read_spring_rope(world_object["SpringRope"]);
-            }
-            if (world_object.HasMember("Spring2"))
-            {
-                Spring2& spring = registry.assign<Spring2>(entity);
-                spring = read_spring2(world_object["Spring2"]);
+                spring = read_spring2(world_object["Spring"]);
             }
             if (world_object.HasMember("BoundingPlane"))
             {
@@ -186,61 +176,10 @@ namespace rain
         return bound;
     }
 
-    Spring JsonReader::read_spring(const rapidjson::Value& _json)
+
+    Spring JsonReader::read_spring2(const rapidjson::Value& _json)
     {
         Spring spring;
-
-        if (_json.HasMember("entity"))
-        {
-            spring.entity = _json["entity"].GetUint();
-        }
-        if (_json.HasMember("k"))
-        {
-            spring.k = _json["k"].GetFloat();
-        }
-        if (_json.HasMember("b"))
-        {
-            spring.b = _json["b"].GetFloat();
-        }
-        if (_json.HasMember("anchorPoint"))
-        {
-            spring.anchorPoint = read_vec3(_json["anchorPoint"]);
-        }
-
-        return spring;
-    }
-
-    SpringRope JsonReader::read_spring_rope(const rapidjson::Value& _json)
-    {
-        SpringRope spring;
-
-        if (_json.HasMember("entityA"))
-        {
-            spring.entityA = _json["entityA"].GetUint();
-        }
-        if (_json.HasMember("entityB"))
-        {
-            spring.entityB = _json["entityB"].GetUint();
-        }
-        if (_json.HasMember("distance"))
-        {
-            spring.distance = _json["distance"].GetFloat();
-        }
-        if (_json.HasMember("k"))
-        {
-            spring.k = _json["k"].GetFloat();
-        }
-        if (_json.HasMember("b"))
-        {
-            spring.b = _json["b"].GetFloat();
-        }
-
-        return spring;
-    }
-
-    Spring2 JsonReader::read_spring2(const rapidjson::Value& _json)
-    {
-        Spring2 spring;
 
         if (_json.HasMember("entityA"))
         {
