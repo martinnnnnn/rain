@@ -23,8 +23,13 @@
 #include "core/config.h"
 
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/name_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 using namespace rain;
+
+
 
 
 
@@ -32,13 +37,22 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 {
     hinstance = _hinstance;
 
+
     // INIT LOG
     AllocConsole();
     log.init(true, true, true);
 
+    boost::uuids::uuid rain_uuid;
+
+    boost::uuids::name_generator name_gen(rain_uuid);
+    boost::uuids::uuid hello = name_gen("theboostcpplibraries.com");
+    std::cout << boost::uuids::to_string(hello) << '\n';
+
     // INIT CONFIG
     config = new Config();
     config->init(File::get_exe_path() + "/config.rain");
+
+    DataSystem data_system{ config->data_root };
 
 	// INIT WINDOW
     window = new Window();

@@ -45,6 +45,7 @@ include_directories(src/
                     external/entt/
                     external/json/
                     external/
+                    C:/boost/
                     ${GLEW_INCLUDE_DIRS})
 
 #### SOURCE DIRECTORY ####

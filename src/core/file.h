@@ -4,9 +4,15 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <filesystem>
 
 #include "core/types.h"
 #include "core/string.h"
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/name_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
+namespace fs = std::filesystem;
 
 namespace rain
 {
@@ -60,4 +66,48 @@ namespace rain
 
         std::string path;
     };
+
+
+    struct DataId
+    {
+        std::string path;
+        boost::uuids::uuid id;
+        // maybe find a way to get info about data and put it here for the editor ?
+    };
+
+    struct Texture
+    {
+        DataId id;
+        GLuint gpu_id;
+        u32 width;
+        u32 height;
+    };
+
+    class DataSystem
+    {
+    public:
+        DataSystem(const std::string& _dataRoot)
+        {
+            for (auto& p : fs::recursive_directory_iterator(_dataRoot))
+            {
+                std::string path = p.path().string();
+                String::replace(path, "\\", "/");
+                if (!p.is_directory())
+                {
+                    std::cout << path << '\n';
+
+                    boost::uuids::uuid rain_uuid;
+                    boost::uuids::name_generator name_gen(rain_uuid);
+                    boost::uuids::uuid hello = name_gen("theboostcpplibraries.com");
+                    std::cout << boost::uuids::to_string(hello) << '\n';
+                }
+            }
+        }
+
+        // map [uuid -> path]
+
+    };
+
+
+    
 }
