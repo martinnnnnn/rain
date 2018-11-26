@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "core/log.h"
 #include "win32/win32_helper.h"
 
 namespace rain
@@ -218,10 +219,7 @@ namespace rain
 			if (!success)
 			{
 				glGetShaderInfoLog(_shader, 1024, NULL, infoLog);
-				char buffer[2048];
-				sprintf_s(buffer, "ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
-				OutputDebugStringA(buffer);
-
+                RAIN_LOG("ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 			}
 		}
 		else
@@ -230,9 +228,7 @@ namespace rain
 			if (!success)
 			{
 				glGetProgramInfoLog(_shader, 1024, NULL, infoLog);
-				char buffer[2048];
-				sprintf_s(buffer, "ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
-				OutputDebugStringA(buffer);
+                RAIN_LOG("ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n-------------------------------------------------------\n", _type.c_str(), infoLog);
 			}
 		}
 	}

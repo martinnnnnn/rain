@@ -33,9 +33,7 @@ namespace rain
 
         if (res != GLEW_OK)
         {
-            char buffer[500];
-            sprintf_s(buffer, 500, "Error : %s\n", glewGetErrorString(res));
-            OutputDebugString(buffer);
+            RAIN_LOG("Error : %s\n", glewGetErrorString(res));
         }
 
         glEnable(GL_TEXTURE_2D);

@@ -4,6 +4,7 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
+#include "core/log.h"
 
 namespace rain
 {
@@ -21,9 +22,7 @@ namespace rain
         config_document.Parse(_json.c_str());
 
         _config.engine_name = config_document["engine_name"].GetString();
-        char buffer[128];
-        sprintf_s(buffer, 128, "reading config file for engine : %s\n", _config.engine_name.c_str());
-        OutputDebugString(buffer);
+        RAIN_LOG("reading config file for engine : %s\n", _config.engine_name.c_str());
 
         _config.data_root = config_document["data_root"].GetString();
         _config.starting_world = config_document["starting_world"].GetString();
@@ -38,9 +37,7 @@ namespace rain
         world_document.Parse(_json.c_str());
 
         _world.name = world_document["name"].GetString();
-        char buffer[128];
-        sprintf_s(buffer, 128, "parsing world : %s\n", _world.name.c_str());
-        OutputDebugString(buffer);
+        RAIN_LOG("parsing world : %s\n", _world.name.c_str());
 
         const rapidjson::Value& world_objects = world_document["objects"];
         entt::DefaultRegistry& registry = _world.registry;

@@ -4,6 +4,7 @@
 
 #include "win32/win32_window.h"
 #include "win32/win32_application.h"
+#include "core/log.h"
 
 using namespace rain;
 
@@ -124,9 +125,6 @@ void Input::update()
     if (is_key_released(DIK_C))
     {
         mouse_lock = !mouse_lock;
-        char buffer[500];
-        sprintf_s(buffer, 500, "C pressed, mouse locked = %s\n", mouse_lock ? "true" : "false");
-        OutputDebugString(buffer);
     }
 
     DIMOUSESTATE2 dims2;

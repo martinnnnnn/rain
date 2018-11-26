@@ -58,9 +58,8 @@ namespace rain
         _bodyA.torque += glm::cross(spring_forceA, (position_anchorA, _transformA.position));
         _bodyB.torque += glm::cross(spring_forceB, (position_anchorB, _transformB.position));
 
-        //char buffer[500];
-        //sprintf_s(buffer, 500, "torqueA : (%f,%f,%f), torqueB : (%f,%f,%f)\n", _bodyA.torque.x, _bodyA.torque.y, _bodyA.torque.z, _bodyB.torque.x, _bodyB.torque.y, _bodyB.torque.z);
-        //OutputDebugString(buffer);
+        //RAIN_LOG("torqueA : (%f,%f,%f), torqueB : (%f,%f,%f)\n", _bodyA.torque.x, _bodyA.torque.y, _bodyA.torque.z, _bodyB.torque.x, _bodyB.torque.y, _bodyB.torque.z);
+
     }
 
 

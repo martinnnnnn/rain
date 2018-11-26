@@ -2,6 +2,7 @@
 
 #include "win32/win32_input.h"
 #include "win32/win32_application.h"
+#include "core/log.h"
 
 #include <strsafe.h>
 #include <map>
@@ -159,9 +160,8 @@ namespace rain
 
     void Window::fullscreen(bool _fullscreen)
     {
-        char buffer[500];
-        sprintf_s(buffer, 500, "fullscreen ? %d\n", _fullscreen);
-        OutputDebugString(buffer);
+        RAIN_LOG("fullscreen ? %d\n", _fullscreen);
+
 	    if (_fullscreen != m_fullscreen)
 	    {
 		    m_fullscreen = _fullscreen;
