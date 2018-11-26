@@ -75,14 +75,6 @@ namespace rain
         // maybe find a way to get info about data and put it here for the editor ?
     };
 
-    struct Texture
-    {
-        DataId id;
-        GLuint gpu_id;
-        u32 width;
-        u32 height;
-    };
-
     class DataSystem
     {
     public:
@@ -96,7 +88,7 @@ namespace rain
                 {
                     std::cout << path << '\n';
 
-                    boost::uuids::uuid rain_uuid;
+                    boost::uuids::uuid rain_uuid; 
                     boost::uuids::name_generator name_gen(rain_uuid);
                     boost::uuids::uuid hello = name_gen("theboostcpplibraries.com");
                     std::cout << boost::uuids::to_string(hello) << '\n';

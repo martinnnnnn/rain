@@ -21,6 +21,7 @@
 #include "physics/spring.h"
 #include "game/world.h"
 #include "core/config.h"
+#include "core/log.h"
 
 
 #include <boost/uuid/uuid.hpp>
@@ -39,8 +40,11 @@ int Application::init(HINSTANCE _hinstance, const std::string& _config)
 
 
     // INIT LOG
-    AllocConsole();
-    log.init(true, true, true);
+    logger = new Logger();
+    RAIN_LOG("hello %d", 1);
+    RAIN_LOG_DEBUG("hello %d", 2);
+    RAIN_LOG_WARNING("hello %d", 3);
+    RAIN_LOG_ERROR("hello %d", 4);
 
     boost::uuids::uuid rain_uuid;
 

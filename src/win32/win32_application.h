@@ -13,7 +13,6 @@
 #include "core/types.h"
 #include "core/high_resolution_clock.h"
 #include "game/world.h"
-#include "core/log.h"
 
 namespace rain
 {
@@ -34,6 +33,7 @@ namespace rain
     struct Config;
     class Renderer;
     class Input;
+    class Logger;
 
     class Application : public Singleton<Application>
     {
@@ -48,7 +48,7 @@ namespace rain
         Window* window;
         Renderer* renderer;
         Input* input;
-        Log log;
+        Logger* logger;
 
     private:
         HINSTANCE hinstance;
