@@ -33,37 +33,37 @@ namespace rain
 
         virtual ~pupper() {}
 
-        virtual void pup(char& val_, const var_info& info_) = 0;
-        virtual void pup(wchar_t& val_, const var_info& info_) = 0;
-        virtual void pup(i8& val_, const var_info& info_) = 0;
-        virtual void pup(i16& val_, const var_info& info_) = 0;
-        virtual void pup(i32& val_, const var_info& info_) = 0;
-        virtual void pup(i64& val_, const var_info& info_) = 0;
-        virtual void pup(u8& val_, const var_info& info_) = 0;
-        virtual void pup(u16& val_, const var_info& info_) = 0;
-        virtual void pup(u32& val_, const var_info& info_) = 0;
-        virtual void pup(u64& val_, const var_info& info_) = 0;
-        virtual void pup(f32& val_, const var_info& info_) = 0;
-        virtual void pup(f64& val_, const var_info& info_) = 0;
-        virtual void pup(f128& val_, const var_info& info_) = 0;
-        virtual void pup(bool& val_, const var_info& info_) = 0;
+        virtual void pup(char& _val, const var_info& _info) = 0;
+        virtual void pup(wchar_t& _val, const var_info& _info) = 0;
+        virtual void pup(i8& _val, const var_info& _info) = 0;
+        virtual void pup(i16& _val, const var_info& _info) = 0;
+        virtual void pup(i32& _val, const var_info& _info) = 0;
+        virtual void pup(i64& _val, const var_info& _info) = 0;
+        virtual void pup(u8& _val, const var_info& _info) = 0;
+        virtual void pup(u16& _val, const var_info& _info) = 0;
+        virtual void pup(u32& _val, const var_info& _info) = 0;
+        virtual void pup(u64& _val, const var_info& _info) = 0;
+        virtual void pup(f32& _val, const var_info& _info) = 0;
+        virtual void pup(f64& _val, const var_info& _info) = 0;
+        virtual void pup(f128& _val, const var_info& _info) = 0;
+        virtual void pup(bool& _val, const var_info& _info) = 0;
 
         IO io;
     };
 
-    void pup(pupper* p, char& val_, const var_info& info_);
-    void pup(pupper* p, wchar_t& val_, const var_info& info_);
-    void pup(pupper* p, i8& val_, const var_info& info_);
-    void pup(pupper* p, i16& val_, const var_info& info_);
-    void pup(pupper* p, i32& val_, const var_info& info_);
-    void pup(pupper* p, i64& val_, const var_info& info_);
-    void pup(pupper* p, u8& val_, const var_info& info_);
-    void pup(pupper* p, u16& val_, const var_info& info_);
-    void pup(pupper* p, u32& val_, const var_info& info_);
-    void pup(pupper* p, u64& val_, const var_info& info_);
-    void pup(pupper* p, f32& val_, const var_info& info_);
-    void pup(pupper* p, f64& val_, const var_info& info_);
-    void pup(pupper* p, f128& val_, const var_info& info_);
-    void pup(pupper* p, bool& val_, const var_info& info_);
+    void pup(pupper* _p, char& _val, const var_info& _info);
+    void pup(pupper* _p, wchar_t& _val, const var_info& _info);
+    void pup(pupper* _p, i8& _val, const var_info& _info);
+    void pup(pupper* _p, i16& _val, const var_info& _info);
+    void pup(pupper* _p, i32& _val, const var_info& _info);
+    void pup(pupper* _p, i64& _val, const var_info& _info);
+    void pup(pupper* _p, u8& _val, const var_info& _info);
+    void pup(pupper* _p, u16& _val, const var_info& _info);
+    void pup(pupper* _p, u32& _val, const var_info& _info);
+    void pup(pupper* _p, u64& _val, const var_info& _info);
+    void pup(pupper* _p, f32& _val, const var_info& _info);
+    void pup(pupper* _p, f64& _val, const var_info& _info);
+    void pup(pupper* _p, f128& _val, const var_info& _info);
+    void pup(pupper* _p, bool& _val, const var_info& _info);
 
 }

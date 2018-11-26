@@ -1,72 +1,72 @@
 #include "pupper.h"
 
 
-void rain::pup(pupper* p, char& val_, const var_info& info_)
+void rain::pup(pupper* _p, char& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, wchar_t& val_, const var_info& info_)
+void rain::pup(pupper* _p, wchar_t& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, i8& val_, const var_info& info_)
+void rain::pup(pupper* _p, i8& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, i16& val_, const var_info& info_)
+void rain::pup(pupper* _p, i16& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, i32& val_, const var_info& info_)
+void rain::pup(pupper* _p, i32& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, i64& val_, const var_info& info_)
+void rain::pup(pupper* _p, i64& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, u8& val_, const var_info& info_)
+void rain::pup(pupper* _p, u8& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, u16& val_, const var_info& info_)
+void rain::pup(pupper* _p, u16& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, u32& val_, const var_info& info_)
+void rain::pup(pupper* _p, u32& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, u64& val_, const var_info& info_)
+void rain::pup(pupper* _p, u64& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, f32& val_, const var_info& info_)
+void rain::pup(pupper* _p, f32& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, f64& val_, const var_info& info_)
+void rain::pup(pupper* _p, f64& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, f128& val_, const var_info& info_)
+void rain::pup(pupper* _p, f128& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
 
-void rain::pup(pupper* p, bool& val_, const var_info& info_)
+void rain::pup(pupper* _p, bool& _val, const var_info& _info)
 {
-    p->pup(val_, info_);
+    _p->pup(_val, _info);
 }
