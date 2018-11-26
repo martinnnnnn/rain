@@ -2,7 +2,7 @@
 
 #include "win32/win32_input.h"
 #include "win32/win32_application.h"
-#include "core/log.h"
+#include "core/logger.h"
 
 #include <strsafe.h>
 #include <map>
