@@ -22,7 +22,8 @@
 #include "game/world.h"
 #include "core/config.h"
 #include "core/logger.h"
-#include "serializer/pupper_binary.h"
+#include "serializer/archivist_binary.h"
+#include "serializer/archivist_json.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/name_generator.hpp>
@@ -49,7 +50,11 @@ namespace rain
 
         // INIT CONFIG
         config = new Config();
-        config->init(FilePath::get_exe_path() + "/config.rain");
+        //config->init(FilePath::get_exe_path() + "/config.rain");
+        File config_file;
+        config_file.open(FilePath::get_exe_path() + "/config.rain");
+        archivist_json* pupper = new archivist_json(config_file.read().c_str(), archivist::IO::READ);
+        archive(pupper, *config, var_info(""));
 
         DataSystem data_system{ config->data_root };
 

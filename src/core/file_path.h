@@ -6,7 +6,7 @@
 
 namespace rain
 {
-    struct pupper;
+    struct archivist;
 
     class FilePath
     {
@@ -31,5 +31,5 @@ namespace rain
         std::string path;
     };
 
-    void pup(pupper* p_, FilePath& _file, const var_info& info);
+    void archive(archivist* p_, FilePath& _file, const var_info& info);
 }

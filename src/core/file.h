@@ -19,7 +19,7 @@ namespace fs = std::filesystem;
 
 namespace rain
 {
-    struct pupper;
+    struct archivist;
 
 	class File
 	{
@@ -44,7 +44,7 @@ namespace rain
         FilePath m_path;
 	};
 
-    void pup(pupper* p_, File& _file, const var_info& info);
+    void archive(archivist* p_, File& _file, const var_info& info);
 
 
     

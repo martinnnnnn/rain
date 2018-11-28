@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "win32/win32_helper.h"
-#include "serializer/pupper.h"
+#include "serializer/archivist.h"
 #include "core/types.h"
 #include "core/string.h"
 #include "core/config.h"
@@ -63,8 +63,8 @@ namespace rain
         return _path.substr(0, _path.find_last_of("/"));
     }
 
-    void pup(pupper* p_, FilePath& _file, const var_info& info)
+    void archive(archivist* p_, FilePath& _file, const var_info& info)
     {
-
+        archive(p_, _file.get_path_relative(), var_info("relative_path"));
     }
 }

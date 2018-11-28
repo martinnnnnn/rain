@@ -14,7 +14,7 @@
 
 namespace rain
 {
-    struct pupper;
+    struct archivist;
 
     struct Config
     {
@@ -29,7 +29,7 @@ namespace rain
         bool full_screen;
     };
 
-    void pup(pupper* p_, Config& _config, const var_info& info);
+    void archive(archivist* p_, Config& _config, const var_info& info);
 }
 
 #define RAIN_CONFIG rain::Application::get().config

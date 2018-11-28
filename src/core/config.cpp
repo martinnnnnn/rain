@@ -1,8 +1,8 @@
 #include "config.h"
 
 #include "win32/win32_application.h"
-#include "serializer/pupper.h"
-#include "serializer/pupper_json.h"
+#include "serializer/archivist.h"
+#include "serializer/archivist_json.h"
 
 namespace rain
 {
@@ -15,14 +15,14 @@ namespace rain
         //pup(p, *this, var_info("config"));
     }
 
-    void pup(pupper* p_, Config& _config, const var_info& info)
+    void archive(archivist* p_, Config& _config, const var_info& info)
     {
-        pup(p_, _config.engine_name, var_info("engine_name")); 
-        pup(p_, _config.data_root, var_info("data_root"));
-        pup(p_, _config.starting_world, var_info("starting_world"));
-        pup(p_, _config.screen_width, var_info("screen_width"));
-        pup(p_, _config.screen_height, var_info("screen_height"));
-        pup(p_, _config.full_screen, var_info("full_screen"));
+        archive(p_, _config.engine_name, var_info("engine_name")); 
+        archive(p_, _config.data_root, var_info("data_root"));
+        archive(p_, _config.starting_world, var_info("starting_world"));
+        archive(p_, _config.screen_width, var_info("screen_width"));
+        archive(p_, _config.screen_height, var_info("screen_height"));
+        archive(p_, _config.full_screen, var_info("full_screen"));
     }
 
 }
