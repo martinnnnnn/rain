@@ -15,7 +15,7 @@ namespace rain
         //pup(p, *this, var_info("config"));
     }
 
-    void archive(archivist* p_, Config& _config, const var_info& info)
+    void archive(Archivist* p_, Config& _config, const var_info& info)
     {
         archive(p_, _config.engine_name, var_info("engine_name")); 
         archive(p_, _config.data_root, var_info("data_root"));

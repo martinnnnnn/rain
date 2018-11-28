@@ -12,7 +12,6 @@
 #include "core/singleton.h"
 #include "core/types.h"
 #include "core/high_resolution_clock.h"
-#include "game/world.h"
 
 namespace rain
 {
@@ -26,6 +25,8 @@ namespace rain
     class Renderer;
     class Input;
     class Logger;
+    struct IdGenerator;
+    struct World;
 
     class Application : public Singleton<Application>
     {
@@ -41,10 +42,10 @@ namespace rain
         Renderer* renderer;
         Input* input;
         Logger* logger;
-
+        IdGenerator* id_generator;
     private:
+        World* world;
         HINSTANCE hinstance;
-        World world;
         HighResolutionClock m_clock;
     };
 }

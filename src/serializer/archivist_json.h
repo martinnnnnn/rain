@@ -9,9 +9,9 @@
 namespace rain
 {
 
-    struct archivist_json : public archivist
+    struct ArchivistJson : public Archivist
     {
-        archivist_json(const char* _content, IO _mode);
+        ArchivistJson(const char* _content, IO _mode);
 
         void archive(char& _val, const var_info& _info) override;
         void archive(wchar_t& _val, const var_info& _info) override;
@@ -28,6 +28,10 @@ namespace rain
         void archive(f64& _val, const var_info& _info) override;
         void archive(f128& _val, const var_info& _info) override;
         void archive(bool& _val, const var_info& _info) override;
+        void archive(glm::vec3& _val, const var_info& _info) override;
+        void archive(glm::vec4& _val, const var_info& _info) override;
+        void archive(glm::mat4& _val, const var_info& _info) override;
+        void archive(glm::quat& _val, const var_info& _info) override;
 
         rapidjson::Document document;
 
@@ -35,13 +39,13 @@ namespace rain
 
 
     template<typename T>
-    void archive_json(archivist_json* _p, T& _value, const var_info& _info, rapidjson::Value& _json)
+    void archive_json(ArchivistJson* _p, T& _value, const var_info& _info, rapidjson::Value& _json)
     {
-        if (_p->io == archivist::IO::READ && _p->document.HasMember(_info.name.c_str()))
+        if (_p->io == Archivist::IO::READ && _p->document.HasMember(_info.name.c_str()))
         {
             _json = _p->document[_info.name.c_str()];
         }
-        else if (_p->io == archivist::IO::WRITE)
+        else if (_p->io == Archivist::IO::WRITE)
         {
             //_json = rapidjson::Value(_info.name, _value);
         }

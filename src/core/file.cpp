@@ -52,7 +52,7 @@ namespace rain
         return m_path;
     }
 
-    void archive(archivist* p_, File& _file, const var_info& _info)
+    void archive(Archivist* p_, File& _file, const var_info& _info)
     {
         archive(p_, _file.get_path(), var_info("file"));
     }

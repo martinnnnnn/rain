@@ -6,7 +6,7 @@
 
 namespace rain
 {
-    struct archivist;
+    struct Archivist;
 
     class FilePath
     {
@@ -31,5 +31,5 @@ namespace rain
         std::string path;
     };
 
-    void archive(archivist* p_, FilePath& _file, const var_info& info);
+    void archive(Archivist* p_, FilePath& _file, const var_info& info);
 }

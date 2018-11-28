@@ -2,26 +2,21 @@
 
 #include <string>
 
+#include "core/types.h"
+
 namespace rain
 {
     struct var_info
     {
-        enum class Type
-        {
-            UNKNOWN,
-            NATIVE,
-            OBJECT,
-            ARRAY
-        };
-
-        var_info(const std::string & _name, Type _type = Type::UNKNOWN) :
-            name(_name)
-            , type(_type)
+        var_info(const std::string & _name, u32 _size = 0)
+            : name(_name)
+            , size(_size)
         {}
 
         virtual ~var_info() {}
 
         std::string name;
-        Type type;
+        u32 size;
+
     };
 }

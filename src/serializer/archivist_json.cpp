@@ -6,23 +6,23 @@
 
 namespace rain
 {
-    archivist_json::archivist_json(const char* _content, IO _mode) :
-        archivist(_mode)
+    ArchivistJson::ArchivistJson(const char* _content, IO _mode) :
+        Archivist(_mode)
     {
         document.Parse(_content);
     }
 
-    void archivist_json::archive(char& _val, const var_info& _info)
+    void ArchivistJson::archive(char& _val, const var_info& _info)
     {
 
     }
 
-    void archivist_json::archive(wchar_t& _val, const var_info& _info)
+    void ArchivistJson::archive(wchar_t& _val, const var_info& _info)
     {
         //pup_json(this, _val, _info);
     }
 
-    void archivist_json::archive(std::string& _val, const var_info& _info)
+    void ArchivistJson::archive(std::string& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -32,7 +32,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(i8& _val, const var_info& _info)
+    void ArchivistJson::archive(i8& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -42,7 +42,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(i16& _val, const var_info& _info)
+    void ArchivistJson::archive(i16& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -52,7 +52,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(i32& _val, const var_info& _info)
+    void ArchivistJson::archive(i32& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -62,7 +62,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(i64& _val, const var_info& _info)
+    void ArchivistJson::archive(i64& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -72,7 +72,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(u8& _val, const var_info& _info)
+    void ArchivistJson::archive(u8& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -82,7 +82,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(u16& _val, const var_info& _info)
+    void ArchivistJson::archive(u16& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -92,7 +92,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(u32& _val, const var_info& _info)
+    void ArchivistJson::archive(u32& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -102,7 +102,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(u64& _val, const var_info& _info)
+    void ArchivistJson::archive(u64& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -112,7 +112,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(f32& _val, const var_info& _info)
+    void ArchivistJson::archive(f32& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -122,7 +122,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(f64& _val, const var_info& _info)
+    void ArchivistJson::archive(f64& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -132,7 +132,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(f128& _val, const var_info& _info)
+    void ArchivistJson::archive(f128& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -142,7 +142,7 @@ namespace rain
         }
     }
 
-    void archivist_json::archive(bool& _val, const var_info& _info)
+    void ArchivistJson::archive(bool& _val, const var_info& _info)
     {
         rapidjson::Value json;
         archive_json(this, _val, _info, json);
@@ -150,6 +150,26 @@ namespace rain
         {
             _val = static_cast<bool>(json.GetBool());
         }
+    }
+
+    void ArchivistJson::archive(glm::vec3& _val, const var_info& _info)
+    {
+
+    }
+
+    void ArchivistJson::archive(glm::vec4& _val, const var_info& _info)
+    {
+
+    }
+
+    void ArchivistJson::archive(glm::mat4& _val, const var_info& _info)
+    {
+
+    }
+
+    void ArchivistJson::archive(glm::quat& _val, const var_info& _info)
+    {
+
     }
 
 }

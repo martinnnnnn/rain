@@ -26,9 +26,71 @@
                 "radius": 0.5
             }
         },
-        "still_sphere": {
+        {
             "name": "still_sphere",
             "id": 1,
+            "Transform":
+            {
+                "default": false,
+                "position" : [0.0, 40.0, 0.0]
+            },
+            "RigidBody":
+            {
+                "required": ["Transform"],
+                "default": false,
+
+                "mass": 10.0,
+                "size": 1.0,
+                "rotationInertia": "cube"
+            },
+            "BoundingSphere":
+            {
+                "radius": 0.5
+            }
+        }
+    ]
+}
+
+
+{
+    "name":"world_1",
+    "Transform":
+    [
+
+    ],
+    "RigidBody":
+    [
+
+    ],
+    "Bound":
+    [
+
+    ]
+
+        {
+            "name":"falling_sphere",
+            
+            "Transform" :
+            {
+                "default": false,
+
+                    "position" : [0.0, 50.0, 0.0],
+                    "orientation" : [0.0, 0.0, 0.0, 1.0]
+            },
+            "RigidBody":
+            {
+                "default": true,
+                "required" : ["Transform"],
+                "size": 1.0,
+                "mass": 0.5
+            },
+            "BoundingSphere" :
+            {
+                "radius": 0.5
+            }
+        },
+        {
+            "name": "still_sphere",
             "Transform":
             {
                 "default": false,

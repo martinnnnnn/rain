@@ -63,7 +63,7 @@ namespace rain
         return _path.substr(0, _path.find_last_of("/"));
     }
 
-    void archive(archivist* p_, FilePath& _file, const var_info& info)
+    void archive(Archivist* p_, FilePath& _file, const var_info& info)
     {
         archive(p_, _file.get_path_relative(), var_info("relative_path"));
     }

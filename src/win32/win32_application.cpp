@@ -24,6 +24,7 @@
 #include "core/logger.h"
 #include "serializer/archivist_binary.h"
 #include "serializer/archivist_json.h"
+#include "core/id_generator.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/name_generator.hpp>
@@ -38,22 +39,41 @@ namespace rain
 {
 
 
-
-
-
     int Application::init(HINSTANCE _hinstance, const std::string& _config)
     {
         hinstance = _hinstance;
 
+
+
         // INIT LOGGER
         logger = new Logger();
 
+        id_generator = new IdGenerator();
+        auto id1 = id_generator->get_new_unique_id();
+        auto id2 = id_generator->get_new_unique_id();
+        auto id3 = id_generator->get_new_unique_id();
+        auto id4 = id_generator->get_new_unique_id();
+        auto id5 = id_generator->get_new_unique_id("name 1");
+        auto id6 = id_generator->get_new_unique_id("name 2");
+        auto id7 = id_generator->get_new_unique_id("name 3");
+        auto id8 = id_generator->get_new_unique_id("name 4");
+        auto id9 = id_generator->get_new_unique_id("name 4");
+
+        RAIN_LOG("rand %s", id_generator->str(id1).c_str());
+        RAIN_LOG("rand %s", id_generator->str(id2).c_str());
+        RAIN_LOG("rand %s", id_generator->str(id3).c_str());
+        RAIN_LOG("rand %s", id_generator->str(id4).c_str());
+        RAIN_LOG("name %s", id_generator->str(id5).c_str());
+        RAIN_LOG("name %s", id_generator->str(id6).c_str());
+        RAIN_LOG("name %s", id_generator->str(id7).c_str());
+        RAIN_LOG("name %s", id_generator->str(id8).c_str());
+        RAIN_LOG("name %s", id_generator->str(id9).c_str());
+
         // INIT CONFIG
-        config = new Config();
         //config->init(FilePath::get_exe_path() + "/config.rain");
         File config_file;
         config_file.open(FilePath::get_exe_path() + "/config.rain");
-        archivist_json* pupper = new archivist_json(config_file.read().c_str(), archivist::IO::READ);
+        ArchivistJson* pupper = new ArchivistJson(config_file.read().c_str(), Archivist::IO::READ);
         archive(pupper, *config, var_info(""));
 
         DataSystem data_system{ config->data_root };
@@ -76,8 +96,8 @@ namespace rain
         document.AddMember("ObjectA2", objA2, document.GetAllocator());
         document.AddMember("ObjectB1", objB1, document.GetAllocator());
         
-        
-        FILE* fp = fopen("output.json", "wb");
+        FILE* fp;
+        fopen_s(&fp, "output.json", "wb");
 
         char writeBuffer[65536];
         rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
@@ -120,7 +140,8 @@ namespace rain
         // INIT CLOCK
         m_clock.reset();
 
-        world.init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
+        world = new World();
+        world->init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
 
         return 0;
     }
@@ -149,7 +170,7 @@ namespace rain
         while (accumulator >= dt)
         {
 
-            world.update_physics((float)dt);
+            world->update_physics((float)dt);
             accumulator -= dt;
         }
 
@@ -176,7 +197,7 @@ namespace rain
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
         renderer->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-        world.render(_alpha);
+        world->render(_alpha);
 
 
     }

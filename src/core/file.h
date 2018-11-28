@@ -9,7 +9,10 @@
 #include "core/types.h"
 #include "core/string.h"
 #include "serializer/var_info.h"
+#include "serializer/archivist.h"
 #include "file_path.h"
+#include "core/logger.h"
+#include "win32/win32_application.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/name_generator.hpp>
@@ -19,7 +22,7 @@ namespace fs = std::filesystem;
 
 namespace rain
 {
-    struct archivist;
+    struct Archivist;
 
 	class File
 	{
@@ -44,7 +47,7 @@ namespace rain
         FilePath m_path;
 	};
 
-    void archive(archivist* p_, File& _file, const var_info& info);
+    void archive(Archivist* p_, File& _file, const var_info& info);
 
 
     
@@ -73,7 +76,8 @@ namespace rain
                     boost::uuids::uuid rain_uuid; 
                     boost::uuids::name_generator name_gen(rain_uuid);
                     boost::uuids::uuid hello = name_gen("theboostcpplibraries.com");
-                    std::cout << boost::uuids::to_string(hello) << '\n';
+                    RAIN_LOG("%s", boost::uuids::to_string(hello));
+                    //std::cout << boost::uuids::to_string(hello) << '\n';
                 }
             }
         }

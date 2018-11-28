@@ -5,9 +5,9 @@
 namespace rain
 {
 
-    struct archivist_binary : public archivist
+    struct ArchivistBinary : public Archivist
     {
-        archivist_binary(std::fstream& _fstrm, IO _mode);
+        ArchivistBinary(std::fstream& _fstrm, IO _mode);
 
         void archive(char& _val, const var_info& _info) override;
         void archive(wchar_t& _val, const var_info& _info) override;
@@ -24,20 +24,24 @@ namespace rain
         void archive(f64& _val, const var_info& _info) override;
         void archive(f128& _val, const var_info& _info) override;
         void archive(bool& _val, const var_info& _info) override;
+        void archive(glm::vec3& _val, const var_info& _info) override;
+        void archive(glm::vec4& _val, const var_info& _info) override;
+        void archive(glm::mat4& _val, const var_info& _info) override;
+        void archive(glm::quat& _val, const var_info& _info) override;
 
         std::fstream& fs;
     };
 
     template <class T>
-    void archive_bytes(archivist_binary* p, T& val_)
+    void archive_bytes(ArchivistBinary* p, T& val_)
     {
         archive_bytes(p, val_, sizeof(T));
     }
 
     template <class T>
-    void archive_bytes(archivist_binary* p, T& val_, u32 _size)
+    void archive_bytes(ArchivistBinary* p, T& val_, u32 _size)
     {
-        if (p->io == archivist::IO::READ)
+        if (p->io == Archivist::IO::READ)
         {
             p->fs.read((char*)&val_, _size);
         }
@@ -52,5 +56,5 @@ namespace rain
         f32 hello_f;
     };
 
-    void archive(archivist* p_, Test& _test, const var_info& info);
+    void archive(Archivist* p_, Test& _test, const var_info& info);
 }
