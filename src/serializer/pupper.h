@@ -2,22 +2,15 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
+#include "serializer/var_info.h"
 #include "core/types.h"
 
 namespace rain
 {
 
-    struct var_info
-    {
-        var_info(const std::string & name_) :
-            name(name_)
-        {}
 
-        virtual ~var_info() {}
-
-        std::string name;
-    };
 
     struct pupper
     {
@@ -35,6 +28,7 @@ namespace rain
 
         virtual void pup(char& _val, const var_info& _info) = 0;
         virtual void pup(wchar_t& _val, const var_info& _info) = 0;
+        virtual void pup(std::string& _val, const var_info& _info) = 0;
         virtual void pup(i8& _val, const var_info& _info) = 0;
         virtual void pup(i16& _val, const var_info& _info) = 0;
         virtual void pup(i32& _val, const var_info& _info) = 0;
@@ -53,6 +47,7 @@ namespace rain
 
     void pup(pupper* _p, char& _val, const var_info& _info);
     void pup(pupper* _p, wchar_t& _val, const var_info& _info);
+    void pup(pupper* _p, std::string& _val, const var_info& _info);
     void pup(pupper* _p, i8& _val, const var_info& _info);
     void pup(pupper* _p, i16& _val, const var_info& _info);
     void pup(pupper* _p, i32& _val, const var_info& _info);
@@ -65,5 +60,18 @@ namespace rain
     void pup(pupper* _p, f64& _val, const var_info& _info);
     void pup(pupper* _p, f128& _val, const var_info& _info);
     void pup(pupper* _p, bool& _val, const var_info& _info);
+
+    //template<typename T>
+    //void pup(pupper* _p, std::vector<T> _vec, const var_info& _info)
+    //{
+    //    uint32_t size = static_cast<uint32_t>(_vec.size());
+    //    pup(_p, size, var_info("size"));
+    //    vec.resize(size);
+    //    for (uint32_t i = 0; i < size; ++i)
+    //    {
+    //        _p->pup(_vec[i], _info);
+    //        pup(_p, _vec[i], var_info(std::to_string(i)));
+    //    }
+    //}
 
 }

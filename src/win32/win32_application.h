@@ -16,17 +16,9 @@
 
 namespace rain
 {
-	struct Name
-	{
-		Name() : Name("default") {}
 
-		Name(const std::string& _name) :
-			name(_name)
-		{
-		}
 
-		std::string name;
-	};
+
 
 
     class Window;

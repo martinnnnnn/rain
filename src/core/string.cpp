@@ -48,18 +48,19 @@ namespace rain
         return std::make_pair(first, second);
     }
 
-    void String::print_to_buffer(char* _dest, size_t _destSize, const char* _format, va_list args)
-    {
-        std::vsnprintf(_dest, _destSize, _format, args);
-    }
-
     void String::print_to_buffer(char* _dest, size_t _destSize, const char* _format, ...)
     {
         va_list args;
         va_start(args, _format);
-        print_to_buffer(_dest, _destSize, _format, args);
+        print_to_buffer_va(_dest, _destSize, _format, args);
         //int result = std::vsnprintf(_dest, _destSize, _format, args);
         va_end(args);
     }
+
+    void String::print_to_buffer_va(char* _dest, size_t _destSize, const char* _format, va_list args)
+    {
+        std::vsnprintf(_dest, _destSize, _format, args);
+    }
+
 
 }

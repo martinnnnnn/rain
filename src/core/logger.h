@@ -35,10 +35,14 @@ namespace rain
     };
 }
 
-//#define RAIN_LOG(...) do { rain::Application::get().log(__FILE__, __LINE__, format/*Log::LOG_INFO, */__VA_ARGS__); } while(false)
-
-//#define RAIN_LOG(...) do { rain::Application::get().log->log(__VA_ARGS__); } while(false)
+#ifdef _DEBUG
 #define RAIN_LOG(...) do { rain::Application::get().logger->log(Logger::LOG_INFO, __VA_ARGS__); } while(false)
 #define RAIN_LOG_DEBUG(...) do { rain::Application::get().logger->log(Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
 #define RAIN_LOG_WARNING(...) do { rain::Application::get().logger->log(__FILE__, __LINE__, Logger::LOG_WARNING, __VA_ARGS__); } while(false)
 #define RAIN_LOG_ERROR(...) do { rain::Application::get().logger->log(__FILE__, __LINE__, Logger::LOG_ERROR, __VA_ARGS__); } while(false)
+#else
+#define RAIN_LOG(...)
+#define RAIN_LOG_DEBUG(...)
+#define RAIN_LOG_WARNING(...)
+#define RAIN_LOG_ERROR(...)
+#endif

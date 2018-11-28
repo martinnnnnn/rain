@@ -3,32 +3,39 @@
 #include <cassert>
 
 #include "win32/win32_helper.h"
+#include "serializer/pupper.h"
+#include "core/config.h"
 
 namespace rain
 {
 
-    bool File::open(const std::string& _path)
+    bool File::open(const std::string& _path, std::ios_base::openmode _mode)
     {
-        m_path = _path;
-        m_file = std::fstream(m_path.c_str());
+        //m_path = FilePath(_path);
+        m_stream = std::fstream(m_path.get_path_absolute().c_str(), _mode);
         return is_open();
     }
 
     bool File::reopen()
     {
-        m_file = std::fstream(m_path);
+        //m_stream = std::fstream(m_path.get_path_absolute().c_str());
         return is_open();
     }
 
     bool File::is_open()
     {
-        return m_file.is_open();
+        return m_stream.is_open();
+    }
+
+    std::fstream& File::get_stream()
+    {
+        return m_stream;
     }
 
     std::string File::read()
     {
         std::stringstream file_stream;
-        file_stream << m_file.rdbuf();
+        file_stream << m_stream.rdbuf();
         return file_stream.str();
     }
 
@@ -36,43 +43,18 @@ namespace rain
     {
         if (is_open())
         {
-	        m_file.close();
+	        m_stream.close();
         }
     }
 
-    std::string File::get_path()
+    rain::FilePath& File::get_path()
     {
         return m_path;
     }
-    std::string File::get_name()
-    {
-        size_t lastSlash = m_path.find_last_of("/");
-        return m_path.substr(lastSlash + 1, (m_path.length() - 1) - lastSlash);
-    }
 
-    std::string File::get_directory()
+    void pup(pupper* p_, File& _file, const var_info& _info)
     {
-        return m_path.substr(0, m_path.find_last_of("/"));
-    }
-
-    std::string File::get_name(const std::string& _path)
-    {
-        size_t lastSlash = _path.find_last_of("/");
-        return _path.substr(lastSlash + 1, (_path.length() - 1) - lastSlash);
-    }
-
-    std::string File::get_directory(const std::string& _path)
-    {
-        return _path.substr(0, _path.find_last_of("/"));
-    }
-
-    std::string File::get_exe_path()
-    {
-        char buffer[MAX_PATH];
-        GetModuleFileName(NULL, buffer, MAX_PATH);
-        std::string path = std::string(buffer).substr(0, std::string(buffer).find_last_of("\\/"));
-        String::replace(path, "\\", "/");
-        return path;
+        pup(p_, _file.get_path(), var_info("file"));
     }
 }
 

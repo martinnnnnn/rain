@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "core/log.h"
+#include "core/logger.h"
 #include "win32/win32_helper.h"
 
 namespace rain

@@ -8,6 +8,9 @@
 
 #include "core/types.h"
 #include "core/string.h"
+#include "serializer/var_info.h"
+#include "file_path.h"
+
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/name_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -16,56 +19,35 @@ namespace fs = std::filesystem;
 
 namespace rain
 {
+    struct pupper;
 
 	class File
 	{
 	public:
+
 		enum class Mode
 		{
 			READ		= 1 << 0,				// open for reading only
 			WRITE		= 1 << 1,				// open for write only
 		};
 
-		bool open(const std::string& _path);
+		bool open(const std::string& _path, std::ios_base::openmode _mode = std::fstream::in);
         bool reopen();
 		bool is_open();
 		std::string read();
 		void close();
-        std::string get_path();
-        std::string get_directory();
-        std::string get_name();
+        FilePath& get_path();
+        std::fstream& get_stream();
 
-        static std::string get_directory(const std::string& _path);
-        static std::string get_name(const std::string& _path);
-
-
-        static std::string get_exe_path();
 	private:
-		std::fstream m_file;
-		std::string m_path;
+		std::fstream m_stream;
+        FilePath m_path;
 	};
 
-    class FilePath
-    {
-    public:
-        FilePath(const std::string& _path)
-        {
-            path = _path;
-        }
+    void pup(pupper* p_, File& _file, const var_info& info);
 
-        std::string get_name()
-        {
-            size_t lastSlash = path.find_last_of("/");
-            return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
-        }
 
-        std::string get_directory()
-        {
-            return path.substr(0, path.find_last_of("/"));
-        }
-
-        std::string path;
-    };
+    
 
 
     struct DataId

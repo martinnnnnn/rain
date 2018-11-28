@@ -9,20 +9,21 @@ namespace rain
     {
         binary_file_pupper(std::fstream& _fstrm, IO _mode);
 
-        void pup(char& _val, const var_info& _info);
-        void pup(wchar_t& _val, const var_info& _info);
-        void pup(int8_t& _val, const var_info& _info);
-        void pup(int16_t& _val, const var_info& _info);
-        void pup(int32_t& _val, const var_info& _info);
-        void pup(int64_t& _val, const var_info& _info);
-        void pup(uint8_t& _val, const var_info& _info);
-        void pup(uint16_t& _val, const var_info& _info);
-        void pup(uint32_t& _val, const var_info& _info);
-        void pup(uint64_t& _val, const var_info& _info);
-        void pup(float& _val, const var_info& _info);
-        void pup(double& _val, const var_info& _info);
-        void pup(long double& _val, const var_info& _info);
-        void pup(bool& _val, const var_info& _info);
+        void pup(char& _val, const var_info& _info) override;
+        void pup(wchar_t& _val, const var_info& _info) override;
+        void pup(std::string& _val, const var_info& _info) override;
+        void pup(i8& _val, const var_info& _info) override;
+        void pup(i16& _val, const var_info& _info) override;
+        void pup(i32& _val, const var_info& _info) override;
+        void pup(i64& _val, const var_info& _info) override;
+        void pup(u8& _val, const var_info& _info) override;
+        void pup(u16& _val, const var_info& _info) override;
+        void pup(u32& _val, const var_info& _info) override;
+        void pup(u64& _val, const var_info& _info) override;
+        void pup(f32& _val, const var_info& _info) override;
+        void pup(f64& _val, const var_info& _info) override;
+        void pup(f128& _val, const var_info& _info) override;
+        void pup(bool& _val, const var_info& _info) override;
 
         std::fstream& fs;
     };
@@ -30,9 +31,26 @@ namespace rain
     template <class T>
     void pup_bytes(binary_file_pupper* p, T& val_)
     {
-        if (p->io == IO::READ)
-            p->fs.read((char*)&val_, sizeof(T));
-        else
-            p->fs.write((char*)&val_, sizeof(T));
+        pup_bytes(p, val_, sizeof(T));
     }
+
+    template <class T>
+    void pup_bytes(binary_file_pupper* p, T& val_, u32 _size)
+    {
+        if (p->io == pupper::IO::READ)
+        {
+            p->fs.read((char*)&val_, _size);
+        }
+        else
+            p->fs.write((char*)&val_, _size);
+    }
+
+    struct Test
+    {
+        i32 hello_i;
+        u64 hello_u;
+        f32 hello_f;
+    };
+
+    void pup(pupper* p_, Test& _test, const var_info& info);
 }
