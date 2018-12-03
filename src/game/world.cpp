@@ -9,7 +9,6 @@
 #include "physics/rigid_body.h"
 #include "physics/physics.h"
 #include "physics/spring.h"
-#include "serializer/archivist.h"
 
 namespace rain
 {
@@ -96,15 +95,6 @@ namespace rain
 
             RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
         }
-    }
-
-
-    void archive(Archivist* _p, World& _world, const var_info& _info)
-    {
-        auto view_transform = _world.registry.view<Transform>();
-
-        archive(_p, _world.name, var_info("name"));
-        archive(_p, *(view_transform.raw()), var_info("transform", view_transform.size()));
     }
 
 }

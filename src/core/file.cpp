@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "win32/win32_helper.h"
-#include "serializer/archivist.h"
 #include "core/config.h"
 
 namespace rain
@@ -11,14 +10,15 @@ namespace rain
 
     bool File::open(const std::string& _path, std::ios_base::openmode _mode)
     {
-        m_path = FilePath(_path);
-        m_stream = std::fstream(m_path.get_path_absolute().c_str(), _mode);
+        
+        filepath = FilePath(_path);
+        m_stream = std::fstream(filepath.get_path_absolute().c_str(), _mode);
         return is_open();
     }
 
     bool File::reopen()
     {
-        m_stream = std::fstream(m_path.get_path_absolute().c_str());
+        m_stream = std::fstream(filepath.get_path_absolute().c_str());
         return is_open();
     }
 
@@ -49,13 +49,9 @@ namespace rain
 
     rain::FilePath& File::get_path()
     {
-        return m_path;
+        return filepath;
     }
 
-    void archive(Archivist* p_, File& _file, const var_info& _info)
-    {
-        archive(p_, _file.get_path(), var_info("file"));
-    }
 }
 
 

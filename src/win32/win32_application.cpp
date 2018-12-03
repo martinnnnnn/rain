@@ -22,8 +22,6 @@
 #include "game/world.h"
 #include "core/config.h"
 #include "core/logger.h"
-#include "serializer/archivist_binary.h"
-#include "serializer/archivist_json.h"
 #include "core/id_generator.h"
 
 #include <boost/uuid/uuid.hpp>
@@ -70,40 +68,10 @@ namespace rain
         RAIN_LOG("name %s", id_generator->str(id9).c_str());
 
         // INIT CONFIG
-        //config->init(FilePath::get_exe_path() + "/config.rain");
-        File config_file;
-        config_file.open(FilePath::get_exe_path() + "/config.rain");
-        ArchivistJson* pupper = new ArchivistJson(config_file.read().c_str(), Archivist::IO::READ);
-        archive(pupper, *config, var_info(""));
-
+        config = new Config();
+        config->init(FilePath::get_exe_path() + "/config.rain");
         DataSystem data_system{ config->data_root };
 
-        rapidjson::Document document;
-        document.SetObject();
-        rapidjson::Value objA1;
-        objA1.SetObject();
-        objA1.AddMember("name", "objA1 name", document.GetAllocator());
-        objA1.AddMember("char_value", 'a', document.GetAllocator());
-        rapidjson::Value objA2;
-        objA2.SetObject();
-        objA2.AddMember("name", "objA2 name", document.GetAllocator());
-        objA2.AddMember("float_value", 42.0f, document.GetAllocator());
-        rapidjson::Value objB1;
-        objB1.SetObject();
-        objB1.AddMember("name", "objB1 name", document.GetAllocator());
-        objB1.AddMember("int_value", 12, document.GetAllocator());
-        document.AddMember("ObjectA1", objA1, document.GetAllocator());
-        document.AddMember("ObjectA2", objA2, document.GetAllocator());
-        document.AddMember("ObjectB1", objB1, document.GetAllocator());
-        
-        FILE* fp;
-        fopen_s(&fp, "output.json", "wb");
-
-        char writeBuffer[65536];
-        rapidjson::FileWriteStream os(fp, writeBuffer, sizeof(writeBuffer));
-        rapidjson::Writer<rapidjson::FileWriteStream> writer(os);
-        document.Accept(writer);
-        fclose(fp);
         //std::string path = config->data_root + "/test.rain.bin";
         //std::ios_base::openmode flags = std::fstream::out | std::fstream::binary;
         //std::fstream file;

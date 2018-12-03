@@ -10,7 +10,6 @@
 #include "core/string.h"
 #include "win32/win32_application.h"
 #include "core/json_reader.h"
-#include "serializer/var_info.h"
 
 namespace rain
 {
@@ -29,7 +28,6 @@ namespace rain
         bool full_screen;
     };
 
-    void archive(Archivist* p_, Config& _config, const var_info& info);
 }
 
 #define RAIN_CONFIG rain::Application::get().config

@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "serializer/var_info.h"
 
 namespace rain
 {
@@ -17,6 +16,11 @@ namespace rain
 
         }
         FilePath(const std::string& _path);
+        const FilePath& operator = (const FilePath& src)
+        {
+            path = src.path;
+            return *this;
+        }
         std::string get_path_absolute();
         std::string get_path_relative();
         std::string get_name();
@@ -31,5 +35,4 @@ namespace rain
         std::string path;
     };
 
-    void archive(Archivist* p_, FilePath& _file, const var_info& info);
 }

@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "win32/win32_helper.h"
-#include "serializer/archivist.h"
 #include "core/types.h"
 #include "core/string.h"
 #include "core/config.h"
@@ -61,10 +60,5 @@ namespace rain
     std::string FilePath::get_directory(const std::string& _path)
     {
         return _path.substr(0, _path.find_last_of("/"));
-    }
-
-    void archive(Archivist* p_, FilePath& _file, const var_info& info)
-    {
-        archive(p_, _file.get_path_relative(), var_info("relative_path"));
     }
 }
