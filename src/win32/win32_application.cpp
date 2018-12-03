@@ -72,24 +72,6 @@ namespace rain
         config->init(FilePath::get_exe_path() + "/config.rain");
         DataSystem data_system{ config->data_root };
 
-        //std::string path = config->data_root + "/test.rain.bin";
-        //std::ios_base::openmode flags = std::fstream::out | std::fstream::binary;
-        //std::fstream file;
-        //file.open(path, flags);
-        //binary_file_pupper* p = new binary_file_pupper(file, pupper::IO::WRITE);
-
-        //Test test1{ -5, 12, 42.0f };
-        //Test test2{};
-        //pup(p, test1, var_info(""));
-        //file.close();
-        //std::ios_base::openmode flags2 = std::fstream::in | std::fstream::binary;
-        //std::fstream file2;
-        //file2.open(path, flags2);
-
-        //binary_file_pupper* p2 = new binary_file_pupper(file2, pupper::IO::READ);
-        //pup(p2, test2, var_info(""));
-        //file2.close();
-
 	    // INIT WINDOW
         window = new Window();
 	    window->init(hinstance, config->screen_width, config->screen_height, 0);
