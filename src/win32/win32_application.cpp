@@ -46,26 +46,8 @@ namespace rain
         // INIT LOGGER
         logger = new Logger();
 
+        // INIT ID GENERATOR
         id_generator = new IdGenerator();
-        auto id1 = id_generator->get_new_unique_id();
-        auto id2 = id_generator->get_new_unique_id();
-        auto id3 = id_generator->get_new_unique_id();
-        auto id4 = id_generator->get_new_unique_id();
-        auto id5 = id_generator->get_new_unique_id("name 1");
-        auto id6 = id_generator->get_new_unique_id("name 2");
-        auto id7 = id_generator->get_new_unique_id("name 3");
-        auto id8 = id_generator->get_new_unique_id("name 4");
-        auto id9 = id_generator->get_new_unique_id("name 4");
-
-        RAIN_LOG("rand %s", id_generator->str(id1).c_str());
-        RAIN_LOG("rand %s", id_generator->str(id2).c_str());
-        RAIN_LOG("rand %s", id_generator->str(id3).c_str());
-        RAIN_LOG("rand %s", id_generator->str(id4).c_str());
-        RAIN_LOG("name %s", id_generator->str(id5).c_str());
-        RAIN_LOG("name %s", id_generator->str(id6).c_str());
-        RAIN_LOG("name %s", id_generator->str(id7).c_str());
-        RAIN_LOG("name %s", id_generator->str(id8).c_str());
-        RAIN_LOG("name %s", id_generator->str(id9).c_str());
 
         // INIT CONFIG
         config = new Config();
