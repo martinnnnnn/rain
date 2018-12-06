@@ -144,6 +144,12 @@ set_target_properties(${RAIN_ENGINE} PROPERTIES FOLDER "rain")
 message(STATUS "> setting target property: RUNTIME_OUTPUT_DIRECTORY")
 set_target_properties(${RAIN_ENGINE} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/engine")
 
+#### ADDING POST BUILD EVENTS ####
+add_custom_command(TARGET ${RAIN_ENGINE} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/data/exe_root"
+        ${CMAKE_SOURCE_DIR}/bin/engine/$<CONFIGURATION>)
+
 #### SETTING THE OUPUT CONSOLE TO 
 # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
 
