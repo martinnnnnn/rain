@@ -1,8 +1,11 @@
 #pragma once
 
 
+
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
+
+#include "win32/win32_application.h"
 
 
 namespace rain
@@ -26,3 +29,5 @@ namespace rain
 
     };
 }
+
+#define RAIN_NEW_ID rain::Application::get().id_generator->get_new_unique_id()
