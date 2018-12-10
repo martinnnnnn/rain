@@ -23,9 +23,9 @@ namespace rain
         glm::quat read_quat(const rapidjson::Value& _json);
         Transform read_transform(const rapidjson::Value& _json);
         RigidBody read_rigid_body(const rapidjson::Value& _json);
-        BoundingSphere read_bounding_sphere(const rapidjson::Value& _json);
+        Sphere read_bounding_sphere(const rapidjson::Value& _json);
         Spring read_spring2(const rapidjson::Value& _json);
-        BoundingPlane read_plane(const rapidjson::Value& _json);
+        Plane read_plane(const rapidjson::Value& _json);
         void read_world(const std::string& _json, World& _world);
         void read_config(const std::string& _path, Config& _config);
     };

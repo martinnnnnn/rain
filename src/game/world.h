@@ -5,8 +5,17 @@
 
 #include "core/file.h"
 
+// TEMP
+#include <glm/glm.hpp>
+
 namespace rain
 {
+    struct Boid
+    {
+        glm::vec3 position;
+
+    };
+
     struct World
     {
         std::string name;
@@ -21,4 +30,3 @@ namespace rain
 
 }
 
-#define RAIN_NEW_ID rain::Application::get().id_generator->get_new_unique_id()

@@ -45,11 +45,11 @@ namespace rain
         }
 
         // updating collision
-        auto sphere_view = registry.view<RigidBody, BoundingSphere, Transform>();
+        auto sphere_view = registry.view<RigidBody, Sphere, Transform>();
         for (auto entity1 : sphere_view)
         {
             RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
-            BoundingSphere& bound1 = sphere_view.get<BoundingSphere>(entity1);
+            Sphere& bound1 = sphere_view.get<Sphere>(entity1);
             Transform& transform1 = sphere_view.get<Transform>(entity1);
             for (auto entity2 : sphere_view)
             {
@@ -59,21 +59,21 @@ namespace rain
                 }
 
                 RigidBody& body2 = sphere_view.get<RigidBody>(entity2);
-                BoundingSphere& bound2 = sphere_view.get<BoundingSphere>(entity2);
+                Sphere& bound2 = sphere_view.get<Sphere>(entity2);
                 Transform& transform2 = sphere_view.get<Transform>(entity2);
 
-                HitInfo info = detect_collision(bound1, transform1, bound2, transform2);
+                HitInfo info = detect_collision_sphere(bound1, transform1, bound2, transform2);
                 if (info.hit)
                 {
                     collision_response(body1, transform1, body2, transform2);
                 }
             }
 
-            auto plane_view = registry.view<BoundingPlane>();
+            auto plane_view = registry.view<Plane>();
             for (auto ent_plane : plane_view)
             {
-                BoundingPlane& planeBound = plane_view.get(ent_plane);
-                HitInfo info = detect_collision(bound1, transform1, planeBound);
+                Plane& planeBound = plane_view.get(ent_plane);
+                HitInfo info = detect_collision_sphere_plane(bound1, transform1, planeBound);
                 if (info.hit)
                 {
                     collision_response(body1, transform1, planeBound.project(transform1.position));

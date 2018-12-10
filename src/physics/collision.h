@@ -10,32 +10,46 @@
 
 namespace rain
 {
-    struct BoundingSphere
+
+    struct Ray
     {
-        BoundingSphere()
-            : offset(glm::vec3(0.0f, 0.0f, 0.0f))
-            , radius(0.0f)
+        glm::vec3 origin;
+        glm::vec3 direction;
+    };
+
+
+
+
+    struct Sphere
+    {
+        Sphere()
+            : Sphere(0.0f, glm::vec3(0.0f, 0.0f, 0.0f))
+        {}
+
+        Sphere(float _radius, glm::vec3 _offset)
+            : radius(_radius)
+            , offset(_offset)
         {}
 
         // offset from the center of the object - which must have a transform
-        glm::vec3 offset;
         f32 radius;
+        glm::vec3 offset;
     };
 
-    struct BoundingPlane
+    struct Plane
     {
-        BoundingPlane()
+        Plane()
             : n(glm::vec3(0.0))
             , D(-glm::dot(n, glm::vec3(0.0)))
         {}
 
-        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _n)
+        Plane(const glm::vec3& _p0, const glm::vec3& _n)
             : n(_n)
             , D(-glm::dot(n,_p0))
         {
         }
 
-        BoundingPlane(const glm::vec3& _p0, const glm::vec3& _p1, const glm::vec3& _p2)
+        Plane(const glm::vec3& _p0, const glm::vec3& _p1, const glm::vec3& _p2)
             : n(glm::cross((_p1 - _p0), glm::normalize(_p2 - _p0)))
             , D(-glm::dot(n, _p0))
         {
@@ -55,20 +69,18 @@ namespace rain
         f32 D;
     };
 
-    struct BoundingQuad
+    struct Quad
     {
 
     };
 
-    struct BoundingBox
+    struct Box
     {
     };
 
     struct HitInfo
     {
         bool hit;
-        glm::vec3 positionObjA;
-        glm::vec3 positionObjB;
         f32 normalizedTime;
         glm::vec3 contactPoint;
         glm::vec3 contactNormal;
@@ -77,8 +89,13 @@ namespace rain
 
     bool get_quadratic_roots(const f32 _a, const f32 _b, const f32 _c, f32& _r1, f32& _r2);
 
-    HitInfo detect_collision(BoundingSphere& _boundA, Transform& _transformA, BoundingSphere& _boundB, Transform& _transformB);
-    HitInfo detect_collision( BoundingSphere& _sphereBound, Transform& _sphereTransform, BoundingPlane& _planeBound);
+    HitInfo detect_collision_sphere(const Sphere& _sphereA, const Transform& _transformA, const Sphere& _sphereB, const Transform& _transformB);
+    HitInfo detect_collision_sphere_plane( Sphere& _sphere, Transform& _transform, Plane& _plane);
+
+
+    glm::vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere);
+
+
 
     void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position);
     void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB);

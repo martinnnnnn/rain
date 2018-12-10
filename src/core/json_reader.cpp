@@ -63,7 +63,7 @@ namespace rain
             }
             if (world_object.HasMember("BoundingSphere"))
             {
-                BoundingSphere& sphere = registry.assign<BoundingSphere>(entity);
+                Sphere& sphere = registry.assign<Sphere>(entity);
                 sphere = read_bounding_sphere(world_object["BoundingSphere"]);
             }
             if (world_object.HasMember("Spring"))
@@ -73,7 +73,7 @@ namespace rain
             }
             if (world_object.HasMember("BoundingPlane"))
             {
-                BoundingPlane& plane = registry.assign<BoundingPlane>(entity);
+                Plane& plane = registry.assign<Plane>(entity);
                 plane = read_plane(world_object["BoundingPlane"]);
                 printf("hello");
             }
@@ -157,9 +157,9 @@ namespace rain
         return body;
     }
 
-    BoundingSphere JsonReader::read_bounding_sphere(const rapidjson::Value& _json)
+    Sphere JsonReader::read_bounding_sphere(const rapidjson::Value& _json)
     {
-        BoundingSphere bound;
+        Sphere bound;
 
         if (_json.HasMember("offset"))
         {
@@ -210,7 +210,7 @@ namespace rain
         return spring;
     }
 
-    BoundingPlane JsonReader::read_plane(const rapidjson::Value& _json)
+    Plane JsonReader::read_plane(const rapidjson::Value& _json)
     {
         glm::vec3 position {};
         glm::vec3 normal {};
@@ -223,16 +223,16 @@ namespace rain
         {
             position = read_vec3(_json["position"]);
             normal = read_vec3(_json["normal"]);
-            auto hello = BoundingPlane(position, normal);
-            return BoundingPlane(position, normal);
+            auto hello = Plane(position, normal);
+            return Plane(position, normal);
         }
         else if (_json.HasMember("point1") && _json.HasMember("point2") && _json.HasMember("point3"))
         {
             point1 = read_vec3(_json["point1"]);
             point2 = read_vec3(_json["point2"]);
             point3 = read_vec3(_json["point3"]);
-            return BoundingPlane(point1, point2, point3);
+            return Plane(point1, point2, point3);
         }
-        return BoundingPlane(glm::vec3{}, glm::vec3{});
+        return Plane(glm::vec3{}, glm::vec3{});
     }
 }
