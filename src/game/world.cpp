@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include "win32/win32_application.h"
 #include "core/json_reader.h"
 #include "math/transform.h"
 #include "gfx/ogl/ogl_renderer.h"
@@ -10,15 +11,18 @@
 #include "physics/physics.h"
 #include "physics/spring.h"
 
+
 namespace rain
 {
-
-
-
     void World::init(const std::string& _path)
     {
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
+        
+        Scene scene;
+        read_scene_fbx(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx", &scene);
+        mesh = scene.meshes[0];
+        RAIN_RENDERER->load_mesh(&mesh);
     }
 
     void World::update_physics(const float _deltaTime)
@@ -93,7 +97,8 @@ namespace rain
             glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
+            //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
+            RAIN_RENDERER->draw_mesh(&mesh, position, orientation, glm::vec3(1.0f, 1.0f, 1.0f));
         }
     }
 

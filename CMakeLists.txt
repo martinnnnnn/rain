@@ -3,6 +3,7 @@ project(rain)
 message(STATUS "project name : ${PROJECT_NAME}")
 
 set(RAIN_ENGINE rain_engine)
+set(ARCH_32 ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
@@ -25,6 +26,10 @@ message(STATUS "> setting cxx flags")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /MP /GR-")
 # /W4 /Za
 
+#### FBX SDK ####
+set(FBXSDK_VERSION "2019.0")
+set(FBXSDK_VS_VERSION "vs2015")
+find_package(FBX REQUIRED)
 
 #### GLEW ####
 set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glew-2.1.0")
@@ -33,12 +38,15 @@ find_package(GLEW REQUIRED)
 
 #### WINDOWS SDK PATHS ####
 file(TO_CMAKE_PATH "$ENV{PROGRAMFILES\(X86\)}" _progFilePath)
-message("${_progFilePath}/Windows\ Kits/10/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um")
 set(WINDOWS_SDK_INCLUDES "${_progFilePath}/Windows Kits/10/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um/")
 set(WINDOWS_SDK_LIBS "${_progFilePath}/Windows Kits/10/Lib/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um/x86")
 
 #### INCLUDES ####
 message(STATUS "> including directories")
+#         FBXSDK_DIR
+#         FBXSDK_LIBRARY
+#         FBXSDK_LIBRARY_DEBUG
+
 include_directories(src/
                     ${WINDOWS_SDK_INCLUDES}
                     external/glm/
@@ -46,7 +54,8 @@ include_directories(src/
                     external/json/
                     external/
                     C:/boost/
-                    ${GLEW_INCLUDE_DIRS})
+                    ${GLEW_INCLUDE_DIRS}
+                    ${FBXSDK_INCLUDE_DIR})
 
 #### SOURCE DIRECTORY ####
 add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
@@ -121,22 +130,11 @@ find_library(glulib
     HINTS "${WINDOWS_SDK_LIBS}"
 )
 
-
-target_link_libraries(${RAIN_ENGINE}
-                        ${dinput8lib}
-                        ${d3d12lib}
-                        ${dxgilib}
-                        ${dxguidlib}
-                        ${d3dcompilerlib}
-                        ${opengllib}
-                        ${glulib}
-                        Shlwapi.lib
-                        freetype
-                        ${GLEW_LIBRARIES}
-                        OpenCL::OpenCL)
-
-
-
+set (LIBS ${dinput8lib} ${d3d12lib} ${dxgilib} ${dxguidlib} ${d3dcompilerlib} ${opengllib} ${glulib} Shlwapi.lib freetype ${GLEW_LIBRARIES} OpenCL::OpenCL)
+set (LIBS_RELEASE ${LIBS} ${FBXSDK_LIBRARY})
+set (LIBS_DEBUG ${LIBS} ${FBXSDK_LIBRARY_DEBUG})
+target_link_libraries(${RAIN_ENGINE} ${LIBS} optimized ${FBXSDK_LIBRARY} debug ${FBXSDK_LIBRARY_DEBUG})
+# target_link_libraries(${RAIN_ENGINE} debug ${LIBS_DEBUG})
 
 set_target_properties(${RAIN_ENGINE} PROPERTIES FOLDER "rain")
 

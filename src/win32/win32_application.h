@@ -4,29 +4,21 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
-#include <cassert>
-
-#include <glm/glm.hpp>
 
 #include "win32/win32_helper.h"
 #include "core/singleton.h"
-#include "core/types.h"
 #include "core/high_resolution_clock.h"
 
 namespace rain
 {
-
-
-
-
+    struct IdGenerator;
+    struct World;
+    struct Config;
 
     class Window;
-    struct Config;
     class Renderer;
     class Input;
     class Logger;
-    struct IdGenerator;
-    struct World;
 
     class Application : public Singleton<Application>
     {

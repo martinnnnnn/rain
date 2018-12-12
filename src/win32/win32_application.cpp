@@ -33,15 +33,14 @@
 #include <rapidjson/writer.h>
 #include <cstdio>
 
+#include "gfx/mesh.h"
+
 namespace rain
 {
-
 
     int Application::init(HINSTANCE _hinstance, const std::string& _config)
     {
         hinstance = _hinstance;
-
-
 
         // INIT LOGGER
         logger = new Logger();
@@ -139,9 +138,11 @@ namespace rain
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-    
 
-    RAIN_APPLICATION.init(hinstance, "");
+    if (RAIN_APPLICATION.init(hinstance, "") != 0)
+    {
+        return -1;
+    }
 
     MSG msg;
     bool quit = false;

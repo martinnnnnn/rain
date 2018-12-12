@@ -54,10 +54,6 @@ namespace rain
 
 	void Shader::load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code)
 	{
-		//GLuint m_vertexShader;
-		//GLuint m_fragmentShader;
-		//GLuint m_geometryShader;
-
 		id = glCreateProgram();
 		m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);

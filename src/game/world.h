@@ -4,9 +4,10 @@
 #include <entt.hpp>
 
 #include "core/file.h"
+#include "gfx/mesh.h"
 
 // TEMP
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 
 namespace rain
 {
@@ -26,6 +27,8 @@ namespace rain
 
         void update_physics(const float _deltaTime);
         void render(const float _alpha);
+
+        Mesh mesh;
     };
 
 }

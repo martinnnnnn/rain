@@ -10,6 +10,7 @@
 #include "core/config.h"
 #include "ogl_shader.h"
 #include "win32/win32_application.h"
+#include "gfx/mesh.h"
 
 
 namespace rain
@@ -72,6 +73,9 @@ namespace rain
         void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
         void set_view_matrix(const glm::mat4& _matrix);
 
+        void load_mesh(Mesh* _mesh);
+        void draw_mesh(Mesh * _mesh, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale);
+
         static constexpr u32 debug_vertices_max_count = 8192;
 
         u32      m_debug_vertex_count;
@@ -97,6 +101,7 @@ namespace rain
         glm::mat4 view_mat;
 
         Shader default_phong;
+        Shader model;
         Shader default_pbr;
 
         std::unordered_map<GLchar, RChar> text_characters;

@@ -70,11 +70,13 @@ namespace rain
 
     void Renderer::init_default_shaders()
     {
-        bool retval = default_phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
+        default_phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
 
         default_phong.use();
         default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
         default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
+
+        model.load(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs", RAIN_CONFIG->data_root + "/shaders/glsl/model.fs");
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -115,6 +117,47 @@ namespace rain
     void Renderer::set_view_matrix(const glm::mat4& _matrix)
     {
         view_mat = _matrix;
+    }
+
+    void Renderer::load_mesh(Mesh * _mesh)
+    {
+        glGenVertexArrays(1, &_mesh->vao);
+        glGenBuffers(1, &_mesh->vbo);
+        glGenBuffers(1, &_mesh->ebo);
+
+        glBindVertexArray(_mesh->vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, _mesh->vbo);
+        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(Vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh->indices.size() * sizeof(unsigned int), &_mesh->indices[0], GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+        glBindVertexArray(0);
+    }
+
+    void Renderer::draw_mesh(Mesh * _mesh, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale)
+    {
+        model.use();
+
+        model.use();
+        model.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        model.set("proj", proj_mat_perspective);
+        model.set("view", view_mat);
+
+        glBindVertexArray(_mesh->vao);
+        glDrawElements(GL_TRIANGLES, _mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        glActiveTexture(GL_TEXTURE0);
     }
 
     void Renderer::clear()
@@ -435,7 +478,6 @@ namespace rain
         default_phong.set("proj", proj_mat_perspective);
         default_phong.set("view", view_mat);
 
-
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
@@ -469,7 +511,7 @@ namespace rain
 
         if (FT_Init_FreeType(&ft))
         {
-            printf("ERROR::FREETYPE: Could not init FreeType Library\n");
+            RAIN_LOG_ERROR("ERROR::FREETYPE: Could not init FreeType Library");
             return;
         }
 
@@ -477,7 +519,7 @@ namespace rain
         FT_Face face;
         if (FT_New_Face(ft, path_to_font.c_str(), 0, &face))
         {
-            printf("ERROR::FREETYPE: Failed to load font\n");
+            RAIN_LOG_ERROR("ERROR::FREETYPE: Failed to load font");
             return;
         }
 
@@ -489,7 +531,7 @@ namespace rain
         {
             if (FT_Load_Char(face, c, FT_LOAD_RENDER))
             {
-                std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                RAIN_LOG_ERROR("ERROR::FREETYTPE: Failed to load Glyph");
                 continue;
             }
             GLuint texture;
