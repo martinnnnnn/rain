@@ -30,7 +30,7 @@ namespace rain
 
     std::string FilePath::get_path_relative()
     {
-        u32 lenght = RAIN_CONFIG->data_root.length();
+        static u32 lenght = RAIN_CONFIG->data_root.length();
         return path.substr(lenght);
     }
 

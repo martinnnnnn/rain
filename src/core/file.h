@@ -16,8 +16,6 @@ namespace fs = std::filesystem;
 
 namespace rain
 {
-    struct Archivist;
-
 	class File
 	{
 	public:
@@ -42,26 +40,26 @@ namespace rain
 	};
 
 
-    class DataSystem
-    {
-    public:
-        DataSystem(const std::string& _dataRoot)
-        {
-            for (auto& p : fs::recursive_directory_iterator(_dataRoot))
-            {
-                std::string path = p.path().string();
-                String::replace(path, "\\", "/");
-                FilePath filepath(path);
-                if (!p.is_directory())
-                {
-                    RAIN_LOG("%s", filepath.get_path_relative().c_str());
-                }
-            }
-        }
+    //class DataSystem
+    //{
+    //public:
+    //    DataSystem(const std::string& _dataRoot)
+    //    {
+    //        for (auto& p : fs::recursive_directory_iterator(_dataRoot))
+    //        {
+    //            std::string path = p.path().string();
+    //            String::replace(path, "\\", "/");
+    //            FilePath filepath(path);
+    //            if (!p.is_directory())
+    //            {
+    //                RAIN_LOG("%s", filepath.get_path_relative().c_str());
+    //            }
+    //        }
+    //    }
 
-        // map [uuid -> path]
+    //    // map [uuid -> path]
 
-    };
+    //};
 
 
     

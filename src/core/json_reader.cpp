@@ -75,7 +75,6 @@ namespace rain
             {
                 Plane& plane = registry.assign<Plane>(entity);
                 plane = read_plane(world_object["BoundingPlane"]);
-                printf("hello");
             }
         }
     }
@@ -108,10 +107,17 @@ namespace rain
         if (_json.HasMember("position"))
         {
             transform.position = read_vec3(_json["position"]);
+            transform.lastPosition = transform.position;
         }
         if (_json.HasMember("orientation"))
         {
             transform.orientation = read_quat(_json["orientation"]);
+            transform.lastOrientation = transform.orientation;
+        }
+        if (_json.HasMember("scale"))
+        {
+            transform.scale = read_vec3(_json["scale"]);
+            transform.lastScale = transform.scale;
         }
         return transform;
     }

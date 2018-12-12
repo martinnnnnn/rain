@@ -1,18 +1,23 @@
 #pragma once
 
-
-
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/nil_generator.hpp>
 
 #include "win32/win32_application.h"
 
 
 namespace rain
 {
-    struct uuid
+    struct unique_id
     {
-        uuid(boost::uuids::uuid boost_id)
+        unique_id()
+            : data(boost::uuids::nil_uuid())
+        {
+            assert(data.is_nil());
+        }
+
+        unique_id(boost::uuids::uuid boost_id)
             : data(boost_id)
         {}
 
@@ -21,9 +26,9 @@ namespace rain
 
     struct IdGenerator
     {
-        uuid get_new_unique_id();
-        uuid get_new_unique_id(const std::string& _name);
-        std::string str(uuid _id);
+        unique_id get_new_unique_id();
+        unique_id get_new_unique_id(const std::string& _name);
+        std::string str(unique_id _id);
 
         boost::uuids::random_generator gen;
 

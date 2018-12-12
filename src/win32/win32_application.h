@@ -7,7 +7,6 @@
 
 #include "win32/win32_helper.h"
 #include "core/singleton.h"
-#include "core/high_resolution_clock.h"
 
 namespace rain
 {
@@ -19,6 +18,7 @@ namespace rain
     class Renderer;
     class Input;
     class Logger;
+    class HighResolutionClock;
 
     class Application : public Singleton<Application>
     {
@@ -38,7 +38,7 @@ namespace rain
     private:
         World* world;
         HINSTANCE hinstance;
-        HighResolutionClock m_clock;
+        HighResolutionClock* m_clock;
     };
 }
 

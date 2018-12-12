@@ -1,0 +1,20 @@
+
+{
+    "name":"world_3",
+    
+    "objects":
+    [
+        {
+            "name":"skelet",
+            "id": 0,
+            "Transform" :
+            {
+                "default": false,
+
+                    "position" : [5.2, 5.0, 0.2],
+                    "orientation" : [0.0, 0.0, 0.0, 1.0],
+                    "scale" : [0.1, 0.1, 0.1]
+            }
+        }
+    ]
+}

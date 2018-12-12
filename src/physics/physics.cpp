@@ -65,8 +65,8 @@ namespace rain
 
     void Physics::update(RigidBody& _body, Transform& _transform, float _deltaTime)
     {
-        _transform.previousPosition = _transform.position;
-        _transform.previousOrientation = _transform.orientation;
+        _transform.lastPosition = _transform.position;
+        _transform.lastOrientation = _transform.orientation;
 
         apply_physics(_body, _transform, _deltaTime);
     }

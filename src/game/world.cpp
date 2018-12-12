@@ -94,11 +94,11 @@ namespace rain
         for (auto entity : view)
         {
             Transform& transform = view.get(entity);
-            glm::vec3 position = transform.position * _alpha + transform.previousPosition * (1.0f - _alpha);
-            glm::quat orientation = transform.orientation * _alpha + transform.previousOrientation * (1.0f - _alpha);
+            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
             //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
-            RAIN_RENDERER->draw_mesh(&mesh, position, orientation, glm::vec3(1.0f, 1.0f, 1.0f));
+            RAIN_RENDERER->draw_mesh(&mesh, position, orientation, transform.scale);
         }
     }
 

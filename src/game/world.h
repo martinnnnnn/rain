@@ -4,10 +4,7 @@
 #include <entt.hpp>
 
 #include "core/file.h"
-#include "gfx/mesh.h"
-
-// TEMP
-//#include <glm/glm.hpp>
+#include "data/geometry/mesh.h"
 
 namespace rain
 {

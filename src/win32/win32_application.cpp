@@ -1,13 +1,5 @@
 #include "win32_application.h"
 
-#include <time.h>
-#include <stdlib.h>
-#include <algorithm>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-
 #include "win32_window.h"
 #include "win32/win32_input.h"
 #include "win32/win32_window.h"
@@ -23,17 +15,10 @@
 #include "core/config.h"
 #include "core/logger.h"
 #include "core/id_generator.h"
+#include "core/high_resolution_clock.h"
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/name_generator.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
-#include <rapidjson/document.h>
-#include <rapidjson/filewritestream.h>
-#include <rapidjson/writer.h>
-#include <cstdio>
-
-#include "gfx/mesh.h"
+// TEMP
+#include "data/data_system.h"
 
 namespace rain
 {
@@ -51,7 +36,11 @@ namespace rain
         // INIT CONFIG
         config = new Config();
         config->init(FilePath::get_exe_path() + "/config.rain");
-        DataSystem data_system{ config->data_root };
+        
+        // TEMP
+        DataHandler dataHandler;
+        dataHandler.meshes.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
+        dataHandler.textures.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
 
 	    // INIT WINDOW
         window = new Window();
@@ -69,7 +58,8 @@ namespace rain
 	    input->init();
 
         // INIT CLOCK
-        m_clock.reset();
+        m_clock = new HighResolutionClock();
+        m_clock->reset();
 
         world = new World();
         world->init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
@@ -82,14 +72,14 @@ namespace rain
     {
         static const double dt = 0.01;
 
-        static double currentTime = m_clock.get_total_seconds();
+        static double currentTime = m_clock->get_total_seconds();
         static double accumulator = 0.0;
 
         input->update();
         renderer->update_camera();
-        m_clock.tick();
+        m_clock->tick();
 
-        double newTime = m_clock.get_total_seconds();
+        double newTime = m_clock->get_total_seconds();
         double frameTime = newTime - currentTime;
         if (frameTime > 0.25)
         {

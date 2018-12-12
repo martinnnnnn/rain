@@ -81,9 +81,9 @@ namespace rain
     {
         HitInfo info{};
 
-        const glm::vec3 va = _transformA.position - _transformA.previousPosition;
-        const glm::vec3 vb = _transformB.position - _transformB.previousPosition;
-        const glm::vec3 AB = _transformB.previousPosition - _transformA.previousPosition;
+        const glm::vec3 va = _transformA.position - _transformA.lastPosition;
+        const glm::vec3 vb = _transformB.position - _transformB.lastPosition;
+        const glm::vec3 AB = _transformB.lastPosition - _transformA.lastPosition;
         const glm::vec3 vab = va - vb;
 
         const f32 rab = _sphereA.radius + _sphereB.radius;

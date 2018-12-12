@@ -12,16 +12,21 @@ namespace rain
     {
         Transform()
             : position(glm::vec3(0.0f))
-            , previousPosition(glm::vec3(0.0f))
+            , lastPosition(glm::vec3(0.0f))
             , orientation(glm::quat(glm::vec3(0)))
-            , previousOrientation(glm::quat())
+            , lastOrientation(glm::quat())
+            , scale(glm::vec3(1.0f))
+            , lastScale(glm::vec3(1.0f))
         {}
 
         glm::vec3 position;
-        glm::vec3 previousPosition;
+        glm::vec3 lastPosition;
 
         glm::quat orientation;
-        glm::quat previousOrientation;
+        glm::quat lastOrientation;
+
+        glm::vec3 scale;
+        glm::vec3 lastScale;
     };
 
 }

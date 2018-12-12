@@ -2,9 +2,6 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "GL/glew.h"
-#include "gl/GL.h"
-#include "gl/GLU.h"
 #include <fbxsdk.h>
 
 #include "core/types.h"
@@ -29,24 +26,20 @@ namespace rain
             , vbo(0)
             , ebo(0)
         {}
+
         std::vector<Vertex> vertices;
         std::vector<u32> indices;
-        GLuint vao;
-        GLuint vbo;
-        GLuint ebo;
+        u32 vao;
+        u32 vbo;
+        u32 ebo;
 
-        //void read(FbxMesh* pMesh);
-        //void read_scene(const std::string& _path);
-        //void read_polygons(FbxMesh* pMesh);
-        //void read_node(fbxsdk::FbxNode* _node);
+        void load(const std::string& _path);
     };
 
-   
     struct Scene
     {
         std::vector<Mesh> meshes;
     };
-
 
     void read_scene_fbx(const std::string& _path, Scene* _scene);
     void read_mesh_fbx(fbxsdk::FbxMesh* _fbxMesh, Mesh* _mesh);
