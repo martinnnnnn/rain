@@ -12,6 +12,10 @@ namespace rain
     FilePath::FilePath(const std::string& _path)
         : path(_path)
     {
+        std::for_each(path.begin(), path.end(), [](char & c)
+        {
+            c = ::tolower(c);
+        });
     }
 
     std::string FilePath::get_exe_path()
@@ -37,6 +41,12 @@ namespace rain
     std::string FilePath::get_name()
     {
         size_t lastSlash = path.find_last_of("/");
+        return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
+    }
+
+    std::string FilePath::get_extention()
+    {
+        size_t lastSlash = path.find_first_of(".");
         return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
     }
 

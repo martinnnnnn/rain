@@ -11,6 +11,8 @@
 #include "physics/physics.h"
 #include "physics/spring.h"
 
+#include "data/data_system.h"
+
 
 namespace rain
 {
@@ -19,6 +21,9 @@ namespace rain
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
         
+        auto entity = registry.create();
+        DataHandle<Mesh> meshh = registry.assign<DataHandle<Mesh>>(entity);
+
         Scene scene;
         read_scene_fbx(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx", &scene);
         mesh = scene.meshes[0];

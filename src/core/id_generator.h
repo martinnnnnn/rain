@@ -24,11 +24,16 @@ namespace rain
         boost::uuids::uuid data;
     };
 
+    bool operator==(const unique_id& _a, const unique_id _b)
+    {
+        return _a.data == _b.data;
+    }
+
     struct IdGenerator
     {
         unique_id get_new_unique_id();
         unique_id get_new_unique_id(const std::string& _name);
-        std::string str(unique_id _id);
+        static std::string str(const unique_id _id);
 
         boost::uuids::random_generator gen;
 
@@ -36,3 +41,4 @@ namespace rain
 }
 
 #define RAIN_NEW_ID rain::Application::get().id_generator->get_new_unique_id()
+#define RAIN_NEW_NAME_ID(name) rain::Application::get().id_generator->get_new_unique_id(name)

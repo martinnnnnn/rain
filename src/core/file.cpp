@@ -1,6 +1,7 @@
 #include "file.h"
 
 #include <cassert>
+#include <sstream>
 
 #include "win32/win32_helper.h"
 #include "core/config.h"

@@ -26,7 +26,6 @@ namespace rain
             , vbo(0)
             , ebo(0)
         {}
-
         std::vector<Vertex> vertices;
         std::vector<u32> indices;
         u32 vao;
@@ -44,4 +43,5 @@ namespace rain
     void read_scene_fbx(const std::string& _path, Scene* _scene);
     void read_mesh_fbx(fbxsdk::FbxMesh* _fbxMesh, Mesh* _mesh);
 
+    void display_textures_info(fbxsdk::FbxGeometry* pGeometry);
 }

@@ -38,9 +38,12 @@ namespace rain
         config->init(FilePath::get_exe_path() + "/config.rain");
         
         // TEMP
-        DataHandler dataHandler;
-        dataHandler.meshes.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
-        dataHandler.textures.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
+        FilePathSystem file_system;
+        file_system.init(RAIN_CONFIG->data_root);
+
+        DataSystem data_system;
+        data_system.load_all_recursive(RAIN_CONFIG->data_root);
+        //data_system.meshes.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
 
 	    // INIT WINDOW
         window = new Window();

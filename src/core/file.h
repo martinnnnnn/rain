@@ -1,18 +1,11 @@
 #pragma once
 
 #include <fstream>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-#include <filesystem>
 
 #include "core/types.h"
 #include "core/string.h"
 #include "file_path.h"
-#include "core/logger.h"
-#include "win32/win32_application.h"
 
-namespace fs = std::filesystem;
 
 namespace rain
 {
@@ -38,29 +31,4 @@ namespace rain
 	private:
 		std::fstream m_stream;
 	};
-
-
-    //class DataSystem
-    //{
-    //public:
-    //    DataSystem(const std::string& _dataRoot)
-    //    {
-    //        for (auto& p : fs::recursive_directory_iterator(_dataRoot))
-    //        {
-    //            std::string path = p.path().string();
-    //            String::replace(path, "\\", "/");
-    //            FilePath filepath(path);
-    //            if (!p.is_directory())
-    //            {
-    //                RAIN_LOG("%s", filepath.get_path_relative().c_str());
-    //            }
-    //        }
-    //    }
-
-    //    // map [uuid -> path]
-
-    //};
-
-
-    
 }

@@ -6,170 +6,8 @@ namespace rain
 {
     void Mesh::load(const std::string& _path)
     {
-        Scene scene;
-        read_scene_fbx(_path, &scene);
-        vertices = scene.meshes[0].vertices;
-        indices = scene.meshes[0].indices;
-    }
-
-    void DisplayTextureInfo(fbxsdk::FbxTexture* pTexture, int pBlendMode)
-    {
-        fbxsdk::FbxFileTexture *lFileTexture = fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(pTexture);
-        fbxsdk::FbxProceduralTexture *lProceduralTexture = fbxsdk::FbxCast<fbxsdk::FbxProceduralTexture>(pTexture);
-
-        RAIN_LOG_RAW("            Name: '%s'\n", (char *)pTexture->GetName());
-        if (lFileTexture)
-        {
-            RAIN_LOG_RAW("            Type: File Texture\n");
-            RAIN_LOG_RAW("            File Name: '%s\n", (char *)lFileTexture->GetFileName());
-        }
-        else if (lProceduralTexture)
-        {
-            RAIN_LOG_RAW("            Type: Procedural Texture\n");
-        }
-        RAIN_LOG_RAW("            Scale U: %f\n", pTexture->GetScaleU());
-        RAIN_LOG_RAW("            Scale V: %f\n", pTexture->GetScaleV());
-        RAIN_LOG_RAW("            Translation U: %f\n", pTexture->GetTranslationU());
-        RAIN_LOG_RAW("            Translation V: %f\n", pTexture->GetTranslationV());
-        RAIN_LOG_RAW("            Swap UV: %d\n", pTexture->GetSwapUV());
-        RAIN_LOG_RAW("            Rotation U: %f\n", pTexture->GetRotationU());
-        RAIN_LOG_RAW("            Rotation V: %f\n", pTexture->GetRotationV());
-        RAIN_LOG_RAW("            Rotation W: %f\n", pTexture->GetRotationW());
-
-        const char* lAlphaSources[] = { "None", "RGB Intensity", "Black" };
-
-        RAIN_LOG_RAW("            Alpha Source: %s\n", lAlphaSources[pTexture->GetAlphaSource()]);
-        RAIN_LOG_RAW("            Cropping Left: %f\n", pTexture->GetCroppingLeft());
-        RAIN_LOG_RAW("            Cropping Top: %f\n", pTexture->GetCroppingTop());
-        RAIN_LOG_RAW("            Cropping Right: %f\n", pTexture->GetCroppingRight());
-        RAIN_LOG_RAW("            Cropping Bottom: %f\n", pTexture->GetCroppingBottom());
-
-        const char* lMappingTypes[] = { "Null", "Planar", "Spherical", "Cylindrical",
-            "Box", "Face", "UV", "Environment" };
-
-        RAIN_LOG_RAW("            Mapping Type: %s\n", lMappingTypes[pTexture->GetMappingType()]);
-
-        if (pTexture->GetMappingType() == fbxsdk::FbxTexture::ePlanar)
-        {
-            const char* lPlanarMappingNormals[] = { "X", "Y", "Z" };
-
-            RAIN_LOG_RAW("            Planar Mapping Normal: %s\n", lPlanarMappingNormals[pTexture->GetPlanarMappingNormal()]);
-        }
-
-        const char* lBlendModes[] = { "Translucent", "Additive", "Modulate", "Modulate2", "Over", "Normal", "Dissolve", "Darken", "ColorBurn", "LinearBurn",
-                                        "DarkerColor", "Lighten", "Screen", "ColorDodge", "LinearDodge", "LighterColor", "SoftLight", "HardLight", "VividLight",
-                                        "LinearLight", "PinLight", "HardMix", "Difference", "Exclusion", "Substract", "Divide", "Hue", "Saturation", "Color",
-                                        "Luminosity", "Overlay" };
-
-        if (pBlendMode >= 0)
-            RAIN_LOG_RAW("            Blend Mode: %s\n", lBlendModes[pBlendMode]);
-        RAIN_LOG_RAW("            Alpha: %f\n", pTexture->GetDefaultAlpha());
-
-        if (lFileTexture)
-        {
-            const char* lMaterialUses[] = { "Model Material", "Default Material" };
-            RAIN_LOG_RAW("            Material Use: %s\n", lMaterialUses[lFileTexture->GetMaterialUse()]);
-        }
-
-        const char* pTextureUses[] = { "Standard", "Shadow Map", "Light Map",
-            "Spherical Reflexion Map", "Sphere Reflexion Map", "Bump Normal Map" };
-
-        RAIN_LOG_RAW("            Texture Use: %s\n", pTextureUses[pTexture->GetTextureUse()]);
-        RAIN_LOG_RAW("\n");
-
-    }
-
-    void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex)
-    {
-
-        if (pProperty.IsValid())
-        {
-            int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
-
-            for (int j = 0; j < lTextureCount; ++j)
-            {
-                //Here we have to check if it's layeredtextures, or just textures:
-                FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
-                if (lLayeredTexture)
-                {
-                    RAIN_LOG_RAW("    Layered Texture: %d\n", j);
-                    int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
-                    for (int k = 0; k < lNbTextures; ++k)
-                    {
-                        FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
-                        if (lTexture)
-                        {
-
-                            if (pDisplayHeader) {
-                                RAIN_LOG_RAW("    Textures connected to Material ", pMaterialIndex);
-                                pDisplayHeader = false;
-                            }
-
-                            //NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
-                            //Why is that?  because one texture can be shared on different layered textures and might
-                            //have different blend modes.
-
-                            FbxLayeredTexture::EBlendMode lBlendMode;
-                            lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
-                            RAIN_LOG_RAW("    Textures for %s\n", pProperty.GetName());
-                            RAIN_LOG_RAW("        Texture %d\n", k);
-                            DisplayTextureInfo(lTexture, (int)lBlendMode);
-                        }
-
-                    }
-                }
-                else
-                {
-                    //no layered texture simply get on the property
-                    FbxTexture* lTexture = pProperty.GetSrcObject<FbxTexture>(j);
-                    if (lTexture)
-                    {
-                        //display connected Material header only at the first time
-                        if (pDisplayHeader) {
-                            RAIN_LOG_RAW("    Textures connected to Material %d\n", pMaterialIndex);
-                            pDisplayHeader = false;
-                        }
-
-                        RAIN_LOG_RAW("    Textures for %s\n", pProperty.GetName());
-                        RAIN_LOG_RAW("        Texture %d\n", j);
-                        DisplayTextureInfo(lTexture, -1);
-                    }
-                }
-            }
-        }//end if pProperty
-
-    }
-
-    void display_textures_info(fbxsdk::FbxGeometry* pGeometry)
-    {
-        int lMaterialIndex;
-        FbxProperty lProperty;
-        if (pGeometry->GetNode() == NULL)
-            return;
-        int lNbMat = pGeometry->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
-        for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++) {
-            FbxSurfaceMaterial *lMaterial = pGeometry->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
-            bool lDisplayHeader = true;
-
-            //go through all the possible textures
-            if (lMaterial) {
-
-                int lTextureIndex;
-                FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
-                {
-                    lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
-                    FindAndDisplayTextureInfoByProperty(lProperty, lDisplayHeader, lMaterialIndex);
-                }
-
-            }//end if(lMaterial)
-
-        }// end for lMaterialIndex     
-    }
-
-    void read_scene_fbx(const std::string& _path, Scene* _scene)
-    {
         const char* lFilename = _path.c_str();
-        
+
         fbxsdk::FbxManager* lSdkManager = fbxsdk::FbxManager::Create();
         fbxsdk::FbxIOSettings *ios = fbxsdk::FbxIOSettings::Create(lSdkManager, IOSROOT);
         lSdkManager->SetIOSettings(ios);
@@ -193,7 +31,70 @@ namespace rain
         {
             for (i32 i = 0; i < FbxRootNode->GetChildCount(); i++)
             {
-                fbxsdk::FbxNode* childNode =FbxRootNode->GetChild(i);
+                fbxsdk::FbxNode* childNode = FbxRootNode->GetChild(i);
+
+                fbxsdk::FbxNodeAttribute::EType lAttributeType;
+
+                if (childNode->GetNodeAttribute() == NULL)
+                {
+                    FBXSDK_printf("NULL Node Attribute\n\n");
+                }
+                else
+                {
+                    lAttributeType = (childNode->GetNodeAttribute()->GetAttributeType());
+
+                    if (lAttributeType == fbxsdk::FbxNodeAttribute::eMesh)
+                    {
+                        fbxsdk::FbxMesh* fbxMesh = (fbxsdk::FbxMesh*)childNode->GetNodeAttribute();
+                        read_mesh_fbx(fbxMesh, this);
+                        break;
+                    }
+                }
+            }
+        }
+
+        lSdkManager->Destroy();
+
+        /*Scene scene;
+
+        read_scene_fbx(_path, &scene);
+        vertices = scene.meshes[0].vertices;
+        indices = scene.meshes[0].indices;*/
+    }
+
+
+
+
+
+
+    void read_scene_fbx(const std::string& _path, Scene* _scene)
+    {
+        const char* lFilename = _path.c_str();
+
+        fbxsdk::FbxManager* lSdkManager = fbxsdk::FbxManager::Create();
+        fbxsdk::FbxIOSettings *ios = fbxsdk::FbxIOSettings::Create(lSdkManager, IOSROOT);
+        lSdkManager->SetIOSettings(ios);
+
+        fbxsdk::FbxImporter* lImporter = fbxsdk::FbxImporter::Create(lSdkManager, "");
+
+        if (!lImporter->Initialize(lFilename, -1, lSdkManager->GetIOSettings()))
+        {
+            RAIN_LOG("Call to fbxsdk::FbxImporter::Initialize() failed.\n");
+            RAIN_LOG("Error returned: %s\n\n", lImporter->GetStatus().GetErrorString());
+            return;
+        }
+
+        fbxsdk::FbxScene* lScene = fbxsdk::FbxScene::Create(lSdkManager, "scene");
+
+        lImporter->Import(lScene);
+        lImporter->Destroy();
+
+        fbxsdk::FbxNode* FbxRootNode = lScene->GetRootNode();
+        if (FbxRootNode)
+        {
+            for (i32 i = 0; i < FbxRootNode->GetChildCount(); i++)
+            {
+                fbxsdk::FbxNode* childNode = FbxRootNode->GetChild(i);
 
                 fbxsdk::FbxNodeAttribute::EType lAttributeType;
 
@@ -396,6 +297,162 @@ namespace rain
             } // for polygonSize
         } // for polygonCount
     }
+
+    void DisplayTextureInfo(fbxsdk::FbxTexture* pTexture, int pBlendMode)
+    {
+        fbxsdk::FbxFileTexture *lFileTexture = fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(pTexture);
+        fbxsdk::FbxProceduralTexture *lProceduralTexture = fbxsdk::FbxCast<fbxsdk::FbxProceduralTexture>(pTexture);
+
+        RAIN_LOG_RAW("            Name: '%s'\n", (char *)pTexture->GetName());
+        if (lFileTexture)
+        {
+            RAIN_LOG_RAW("            Type: File Texture\n");
+            RAIN_LOG_RAW("            File Name: '%s\n", (char *)lFileTexture->GetFileName());
+        }
+        else if (lProceduralTexture)
+        {
+            RAIN_LOG_RAW("            Type: Procedural Texture\n");
+        }
+        RAIN_LOG_RAW("            Scale U: %f\n", pTexture->GetScaleU());
+        RAIN_LOG_RAW("            Scale V: %f\n", pTexture->GetScaleV());
+        RAIN_LOG_RAW("            Translation U: %f\n", pTexture->GetTranslationU());
+        RAIN_LOG_RAW("            Translation V: %f\n", pTexture->GetTranslationV());
+        RAIN_LOG_RAW("            Swap UV: %d\n", pTexture->GetSwapUV());
+        RAIN_LOG_RAW("            Rotation U: %f\n", pTexture->GetRotationU());
+        RAIN_LOG_RAW("            Rotation V: %f\n", pTexture->GetRotationV());
+        RAIN_LOG_RAW("            Rotation W: %f\n", pTexture->GetRotationW());
+
+        const char* lAlphaSources[] = { "None", "RGB Intensity", "Black" };
+
+        RAIN_LOG_RAW("            Alpha Source: %s\n", lAlphaSources[pTexture->GetAlphaSource()]);
+        RAIN_LOG_RAW("            Cropping Left: %f\n", pTexture->GetCroppingLeft());
+        RAIN_LOG_RAW("            Cropping Top: %f\n", pTexture->GetCroppingTop());
+        RAIN_LOG_RAW("            Cropping Right: %f\n", pTexture->GetCroppingRight());
+        RAIN_LOG_RAW("            Cropping Bottom: %f\n", pTexture->GetCroppingBottom());
+
+        const char* lMappingTypes[] = { "Null", "Planar", "Spherical", "Cylindrical",
+            "Box", "Face", "UV", "Environment" };
+
+        RAIN_LOG_RAW("            Mapping Type: %s\n", lMappingTypes[pTexture->GetMappingType()]);
+
+        if (pTexture->GetMappingType() == fbxsdk::FbxTexture::ePlanar)
+        {
+            const char* lPlanarMappingNormals[] = { "X", "Y", "Z" };
+
+            RAIN_LOG_RAW("            Planar Mapping Normal: %s\n", lPlanarMappingNormals[pTexture->GetPlanarMappingNormal()]);
+        }
+
+        const char* lBlendModes[] = { "Translucent", "Additive", "Modulate", "Modulate2", "Over", "Normal", "Dissolve", "Darken", "ColorBurn", "LinearBurn",
+                                        "DarkerColor", "Lighten", "Screen", "ColorDodge", "LinearDodge", "LighterColor", "SoftLight", "HardLight", "VividLight",
+                                        "LinearLight", "PinLight", "HardMix", "Difference", "Exclusion", "Substract", "Divide", "Hue", "Saturation", "Color",
+                                        "Luminosity", "Overlay" };
+
+        if (pBlendMode >= 0)
+            RAIN_LOG_RAW("            Blend Mode: %s\n", lBlendModes[pBlendMode]);
+        RAIN_LOG_RAW("            Alpha: %f\n", pTexture->GetDefaultAlpha());
+
+        if (lFileTexture)
+        {
+            const char* lMaterialUses[] = { "Model Material", "Default Material" };
+            RAIN_LOG_RAW("            Material Use: %s\n", lMaterialUses[lFileTexture->GetMaterialUse()]);
+        }
+
+        const char* pTextureUses[] = { "Standard", "Shadow Map", "Light Map",
+            "Spherical Reflexion Map", "Sphere Reflexion Map", "Bump Normal Map" };
+
+        RAIN_LOG_RAW("            Texture Use: %s\n", pTextureUses[pTexture->GetTextureUse()]);
+        RAIN_LOG_RAW("\n");
+
+    }
+
+    void FindAndDisplayTextureInfoByProperty(FbxProperty pProperty, bool& pDisplayHeader, int pMaterialIndex)
+    {
+
+        if (pProperty.IsValid())
+        {
+            int lTextureCount = pProperty.GetSrcObjectCount<FbxTexture>();
+
+            for (int j = 0; j < lTextureCount; ++j)
+            {
+                //Here we have to check if it's layeredtextures, or just textures:
+                FbxLayeredTexture *lLayeredTexture = pProperty.GetSrcObject<FbxLayeredTexture>(j);
+                if (lLayeredTexture)
+                {
+                    RAIN_LOG_RAW("    Layered Texture: %d\n", j);
+                    int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
+                    for (int k = 0; k < lNbTextures; ++k)
+                    {
+                        FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
+                        if (lTexture)
+                        {
+
+                            if (pDisplayHeader) {
+                                RAIN_LOG_RAW("    Textures connected to Material ", pMaterialIndex);
+                                pDisplayHeader = false;
+                            }
+
+                            //NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
+                            //Why is that?  because one texture can be shared on different layered textures and might
+                            //have different blend modes.
+
+                            FbxLayeredTexture::EBlendMode lBlendMode;
+                            lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
+                            RAIN_LOG_RAW("    Textures for %s\n", pProperty.GetName());
+                            RAIN_LOG_RAW("        Texture %d\n", k);
+                            DisplayTextureInfo(lTexture, (int)lBlendMode);
+                        }
+
+                    }
+                }
+                else
+                {
+                    //no layered texture simply get on the property
+                    FbxTexture* lTexture = pProperty.GetSrcObject<FbxTexture>(j);
+                    if (lTexture)
+                    {
+                        //display connected Material header only at the first time
+                        if (pDisplayHeader) {
+                            RAIN_LOG_RAW("    Textures connected to Material %d\n", pMaterialIndex);
+                            pDisplayHeader = false;
+                        }
+
+                        RAIN_LOG_RAW("    Textures for %s\n", pProperty.GetName());
+                        RAIN_LOG_RAW("        Texture %d\n", j);
+                        DisplayTextureInfo(lTexture, -1);
+                    }
+                }
+            }
+        }//end if pProperty
+
+    }
+
+    void display_textures_info(fbxsdk::FbxGeometry* pGeometry)
+    {
+        int lMaterialIndex;
+        FbxProperty lProperty;
+        if (pGeometry->GetNode() == NULL)
+            return;
+        int lNbMat = pGeometry->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
+        for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++) {
+            FbxSurfaceMaterial *lMaterial = pGeometry->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
+            bool lDisplayHeader = true;
+
+            //go through all the possible textures
+            if (lMaterial) {
+
+                int lTextureIndex;
+                FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
+                {
+                    lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
+                    FindAndDisplayTextureInfoByProperty(lProperty, lDisplayHeader, lMaterialIndex);
+                }
+
+            }//end if(lMaterial)
+
+        }// end for lMaterialIndex     
+    }
+
+ 
 
 
     //void Mesh::read(FbxMesh* pMesh)

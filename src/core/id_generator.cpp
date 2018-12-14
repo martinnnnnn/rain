@@ -18,7 +18,7 @@ namespace rain
         return name_generator(_name);
     }
 
-    std::string IdGenerator::str(unique_id _id)
+    std::string IdGenerator::str(const unique_id _id)
     {
         return boost::uuids::to_string(_id.data);
     }
