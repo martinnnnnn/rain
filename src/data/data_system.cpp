@@ -35,27 +35,31 @@ namespace rain
         }
     }
 
-    Mesh* DataSystem::find_mesh(const std::string& _path)
+    Mesh* DataSystem::find_mesh(const FilePath& _path)
     {
+        Mesh* mesh = nullptr;
         for (u32 i = 0; i < meshes.datas.size(); ++i)
         {
-            DataHandle<Mesh>* mesh = meshes.datas[i];
-            if (!meshes.datas[i]->path.get_path_absolute().compare(_path))
+            DataHandle<Mesh>* mesh_handle = meshes.datas[i];
+            if (!meshes.datas[i]->path.get_path_absolute().compare(_path.get_path_absolute()))
             {
-                return mesh->data;
+                mesh =  mesh_handle->data;
             }
         }
+        return mesh;
     }
 
     Mesh* DataSystem::find_mesh(const unique_id _id)
     {
+        Mesh* mesh = nullptr;
         for (u32 i = 0; i < meshes.datas.size(); ++i)
         {
-            DataHandle<Mesh>* mesh = meshes.datas[i];
+            DataHandle<Mesh>* mesh_handle = meshes.datas[i];
             if (meshes.datas[i]->id == _id)
             {
-                return mesh->data;
+                mesh = mesh_handle->data;
             }
         }
+        return mesh;
     }
 }

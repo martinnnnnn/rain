@@ -1,6 +1,9 @@
 #include "collision.h"
 
 #include <cmath>
+#include <algorithm>
+#include <chrono>
+#include <ctime>
 
 #include "core/logger.h"
 
@@ -148,4 +151,11 @@ namespace rain
         _bodyA.momentum = glm::vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
         _bodyB.momentum = glm::vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _bodyB.mass;
     }
+
+    HitInfo detect_collision_gjk(const std::vector<glm::vec3>& _verticesA, const Transform& _transformA, const std::vector<glm::vec3>& _verticesB, const Transform& _transformB)
+    {
+
+        return HitInfo {};
+    }
+
 }

@@ -63,7 +63,7 @@ namespace rain
         void draw_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void draw_mesh();
 
-        void draw_text_2d(const std::string& _text, const GLfloat _x, const GLfloat _y, const GLfloat _scale, const glm::vec3& _color);
+        void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color);
 
         void update_camera();
         void resize(u32 _width, u32 _height);

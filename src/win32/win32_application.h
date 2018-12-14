@@ -13,6 +13,7 @@ namespace rain
     struct IdGenerator;
     struct World;
     struct Config;
+    struct DataSystem;
 
     class Window;
     class Renderer;
@@ -35,6 +36,7 @@ namespace rain
         Input* input;
         Logger* logger;
         IdGenerator* id_generator;
+        DataSystem* data_system;
     private:
         World* world;
         HINSTANCE hinstance;

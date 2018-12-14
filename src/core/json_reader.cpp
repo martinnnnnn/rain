@@ -5,6 +5,9 @@
 #include <rapidjson/stringbuffer.h>
 
 #include "core/logger.h"
+#include "core/config.h"
+#include "data/data_system.h"
+#include "gfx/ogl/ogl_renderer.h"
 
 namespace rain
 {
@@ -75,6 +78,17 @@ namespace rain
             {
                 Plane& plane = registry.assign<Plane>(entity);
                 plane = read_plane(world_object["BoundingPlane"]);
+            }
+            if (world_object.HasMember("Model"))
+            {
+                Model& model = registry.assign<Model>(entity);
+                read_model(world_object["Model"], model);
+
+                if (world_object.HasMember("MeshBound"))
+                {
+                    MeshBound& meshBound = registry.assign<MeshBound>(entity);
+                    read_mesh_bound(world_object["MeshBound"], model, meshBound);
+                }
             }
         }
     }
@@ -240,5 +254,26 @@ namespace rain
             return Plane(point1, point2, point3);
         }
         return Plane(glm::vec3{}, glm::vec3{});
+    }
+
+    void JsonReader::read_model(const rapidjson::Value& _json, Model& _model)
+    {
+        if (_json.HasMember("path"))
+        {
+            _model.path = FilePath(RAIN_CONFIG->data_root + std::string(_json["path"].GetString()));
+            _model.mesh = RAIN_FIND_DATA_FROM_PATH(_model.path.get_path_absolute());
+            assert(_model.mesh);
+            RAIN_RENDERER->load_mesh(_model.mesh);
+        }
+    }
+
+    void JsonReader::read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound)
+    {
+        _meshBound.points.resize(_model.mesh->vertices.size());
+
+        for (u32 i = 0; i < _model.mesh->vertices.size(); ++i)
+        {
+            _meshBound.points[i] = _model.mesh->vertices[i].position;
+        }
     }
 }

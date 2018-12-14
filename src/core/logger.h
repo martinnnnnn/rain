@@ -18,6 +18,7 @@ namespace rain
 
         static constexpr char* LOG_DEBUG = "[DEBUG]";
         static constexpr char* LOG_INFO = "[INFO]";
+        static constexpr char* LOG_PROFILE = "[PROFILE]";
         static constexpr char* LOG_WARNING = "[WARNING]";
         static constexpr char* LOG_ERROR = "[ERROR]";
 
@@ -46,6 +47,7 @@ namespace rain
 #ifdef _DEBUG
 #define RAIN_LOG(...) do { rain::Application::get().logger->log_level(Logger::LOG_INFO, __VA_ARGS__); } while(false)
 #define RAIN_LOG_DEBUG(...) do { rain::Application::get().logger->log_level(Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
+#define RAIN_LOG_PROFILE(...) do { rain::Application::get().logger->log_level(Logger::LOG_PROFILE, __VA_ARGS__); } while(false)
 #define RAIN_LOG_WARNING(...) do { rain::Application::get().logger->log_max(__FILE__, __LINE__, Logger::LOG_WARNING, __VA_ARGS__); } while(false)
 #define RAIN_LOG_ERROR(...) do { rain::Application::get().logger->log_max(__FILE__, __LINE__, Logger::LOG_ERROR, __VA_ARGS__); } while(false)
 #define RAIN_LOG_RAW(...) do { rain::Application::get().logger->log_raw(__VA_ARGS__); } while(false)

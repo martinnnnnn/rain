@@ -578,7 +578,7 @@ namespace rain
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_text_2d(const std::string& _text, const GLfloat _x, const GLfloat _y, const GLfloat _scale, const glm::vec3& _color)
+    void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color)
     {
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);

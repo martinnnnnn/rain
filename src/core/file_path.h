@@ -23,11 +23,11 @@ namespace rain
             path = src.path;
             return *this;
         }
-        std::string get_path_absolute();
-        std::string get_path_relative();
-        std::string get_name();
-        std::string get_extention();
-        std::string get_directory();
+        std::string get_path_absolute() const;
+        std::string get_path_relative() const;
+        std::string get_name() const;
+        std::string get_extention() const;
+        std::string get_directory() const;
 
         static std::string get_path_relative(const std::string& _path);
         static std::string get_directory(const std::string& _path);

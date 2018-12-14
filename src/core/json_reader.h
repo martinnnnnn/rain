@@ -13,6 +13,7 @@
 #include "physics/rigid_body.h"
 #include "physics/spring.h"
 #include "core/config.h"
+#include "data/geometry/mesh.h"
 
 namespace rain
 {
@@ -26,6 +27,8 @@ namespace rain
         Sphere read_bounding_sphere(const rapidjson::Value& _json);
         Spring read_spring2(const rapidjson::Value& _json);
         Plane read_plane(const rapidjson::Value& _json);
+        void read_model(const rapidjson::Value& _json, Model& _model);
+        void read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound);
         void read_world(const std::string& _json, World& _world);
         void read_config(const std::string& _path, Config& _config);
     };

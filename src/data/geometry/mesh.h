@@ -5,6 +5,7 @@
 #include <fbxsdk.h>
 
 #include "core/types.h"
+#include "core/file_path.h"
 
 namespace rain
 {
@@ -33,6 +34,12 @@ namespace rain
         u32 ebo;
 
         void load(const std::string& _path);
+    };
+
+    struct Model
+    {
+        FilePath path;
+        Mesh* mesh;
     };
 
     struct Scene

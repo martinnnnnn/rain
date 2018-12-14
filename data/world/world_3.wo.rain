@@ -5,16 +5,33 @@
     "objects":
     [
         {
-            "name":"skelet",
-            "id": 0,
+            "name":"skelet6",
+            "id": 6,
             "Transform" :
             {
                 "default": false,
 
-                    "position" : [5.2, 5.0, 0.2],
+                    "position" : [5.0, 32.0, 6.0],
                     "orientation" : [0.0, 0.0, 0.0, 1.0],
                     "scale" : [0.1, 0.1, 0.1]
+            },
+            "RigidBody":
+            {
+                "required": ["Transform"],
+                "default": false,
+                "mass": 1.0,
+                "size": 1.0,
+                "rotationInertia": "cube"
+            },
+            "Model":
+            {
+                "path": "/models/skelet/skeleton_animated.fbx"
+            },
+            "MeshBound":
+            {
+                "required": ["Model"]
             }
         }
+        
     ]
 }

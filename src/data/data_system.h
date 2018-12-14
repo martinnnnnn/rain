@@ -48,9 +48,8 @@ namespace rain
     {
         void load_all_recursive(const std::string& _root);
 
-        Mesh* find_mesh(const std::string& _path);
+        Mesh* find_mesh(const FilePath& _path);
         Mesh* find_mesh(const unique_id _id);
-
 
         std::vector<FilePath> paths;
 
@@ -59,3 +58,6 @@ namespace rain
         DataHandleContainer<Shader> shaders;
     };
 }
+
+#define RAIN_FIND_DATA_FROM_PATH(path) rain::Application::get().data_system->find_mesh(path) 
+#define RAIN_FIND_DATA_FROM_ID(id) rain::Application::get().data_system->find_mesh(id)

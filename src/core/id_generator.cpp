@@ -23,4 +23,9 @@ namespace rain
         return boost::uuids::to_string(_id.data);
     }
 
+    bool operator==(const unique_id& _a, const unique_id _b)
+    {
+        return _a.data == _b.data;
+    }
+
 }

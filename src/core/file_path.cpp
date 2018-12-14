@@ -18,39 +18,31 @@ namespace rain
         });
     }
 
-    std::string FilePath::get_exe_path()
-    {
-        char buffer[MAX_PATH];
-        GetModuleFileName(NULL, buffer, MAX_PATH);
-        std::string path = std::string(buffer).substr(0, std::string(buffer).find_last_of("\\/"));
-        String::replace(path, "\\", "/");
-        return path;
-    }
 
-    std::string FilePath::get_path_absolute()
+    std::string FilePath::get_path_absolute() const
     {
         return path;
     }
 
-    std::string FilePath::get_path_relative()
+    std::string FilePath::get_path_relative() const
     {
         static u32 lenght = RAIN_CONFIG->data_root.length();
         return path.substr(lenght);
     }
 
-    std::string FilePath::get_name()
+    std::string FilePath::get_name() const
     {
         size_t lastSlash = path.find_last_of("/");
         return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
     }
 
-    std::string FilePath::get_extention()
+    std::string FilePath::get_extention() const
     {
         size_t lastSlash = path.find_first_of(".");
         return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
     }
 
-    std::string FilePath::get_directory()
+    std::string FilePath::get_directory() const
     {
         return path.substr(0, path.find_last_of("/"));
     }
@@ -70,5 +62,14 @@ namespace rain
     std::string FilePath::get_directory(const std::string& _path)
     {
         return _path.substr(0, _path.find_last_of("/"));
+    }
+
+    std::string FilePath::get_exe_path()
+    {
+        char buffer[MAX_PATH];
+        GetModuleFileName(NULL, buffer, MAX_PATH);
+        std::string path = std::string(buffer).substr(0, std::string(buffer).find_last_of("\\/"));
+        String::replace(path, "\\", "/");
+        return path;
     }
 }

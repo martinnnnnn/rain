@@ -41,8 +41,9 @@ namespace rain
         FilePathSystem file_system;
         file_system.init(RAIN_CONFIG->data_root);
 
-        DataSystem data_system;
-        data_system.load_all_recursive(RAIN_CONFIG->data_root);
+        // LOADING DATA
+        data_system = new DataSystem();
+        data_system->load_all_recursive(RAIN_CONFIG->data_root);
         //data_system.meshes.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
 
 	    // INIT WINDOW
@@ -122,8 +123,6 @@ namespace rain
 
         renderer->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
         world->render(_alpha);
-
-
     }
 }
 

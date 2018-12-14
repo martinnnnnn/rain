@@ -25,7 +25,9 @@ namespace rain
         void update_physics(const float _deltaTime);
         void render(const float _alpha);
 
-        Mesh mesh;
+        //Mesh mesh;
+        //std::vector<glm::vec3> positions;
+
     };
 
 }

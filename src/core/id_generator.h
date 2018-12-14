@@ -24,10 +24,7 @@ namespace rain
         boost::uuids::uuid data;
     };
 
-    bool operator==(const unique_id& _a, const unique_id _b)
-    {
-        return _a.data == _b.data;
-    }
+    bool operator==(const unique_id& _a, const unique_id _b);
 
     struct IdGenerator
     {
