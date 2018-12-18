@@ -124,10 +124,16 @@ namespace rain
             Model& model = view.get<Model>(entity);
             Material& material = view.get<Material>(entity);
 
-            const char* hello = "hellsdfqsdfqsdfo";
-            send_data(RAIN_APPLICATION.client, hello, strlen(hello));
-            char buffer[1048];
-            check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
+            Packet p {};
+            p.senderId = 47;
+            p.sequenceNumber= 12;
+            const char* hello = "qslmdfqkldfh";
+            memcpy(p.data, hello, strlen(hello));
+            
+            SerializedPacket* serialized = (SerializedPacket*)p.Serialize();
+
+            send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
+            //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
             
             glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);

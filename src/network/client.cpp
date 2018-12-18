@@ -1,9 +1,9 @@
 #include "client.h"
 
+#include <glm/glm.hpp>
 
 namespace rain
 {
-
     void init_socket(Client* _client)
     {
         WSADATA wsaData;
@@ -27,7 +27,7 @@ namespace rain
     {
         if (sendto(_client->socket, _buffer, _size, 0, (sockaddr*)&_client->serverInfo, _client->serverInfoLenght) != SOCKET_ERROR)
         {
-            RAIN_LOG("sent package to server!");
+            RAIN_LOG_NETWORK("sent package to server! %d", _size);
         }
     }
 
@@ -35,9 +35,36 @@ namespace rain
     {
         if (recvfrom(_client->socket, _buffer, _size, 0, (sockaddr*)&_client->serverInfo, &_client->serverInfoLenght) != SOCKET_ERROR)
         {
-            RAIN_LOG("Receive response from server:\n%s", _buffer);
+            RAIN_LOG_NETWORK("Receive response from server: %s", _buffer);
         }
-
     }
 
+
+    void* Packet::Serialize()
+    {
+        struct SerializedPacket *s = new SerializedPacket();
+        s->senderId = htonl(this->senderId);
+        s->sequenceNumber = htonl(this->sequenceNumber);
+        memcpy(s->data, this->data, MaxDataSize);
+        return s;
+    }
+
+    void Packet::Deserialize(char *message)
+    {
+        struct SerializedPacket *s = (struct SerializedPacket*)message;
+        this->senderId = ntohl(s->senderId);
+        this->sequenceNumber = ntohl(s->sequenceNumber);
+        memcpy(this->data, s->data, MaxDataSize);
+    }
+
+
+    //void archive(const Transform& t, char* _buffer)
+    //{
+    //    u32 offset = 0;
+    //    memcpy(_buffer + offset, &(t.position), sizeof(glm::vec3));
+    //    offset += sizeof(glm::vec3);
+    //    memcpy(_buffer + offset, &(t.orientation), sizeof(glm::quat));
+    //    offset += sizeof(glm::quat);
+    //    memcpy(_buffer + offset, &(t.scale), sizeof(glm::vec3));
+    //}
 }
