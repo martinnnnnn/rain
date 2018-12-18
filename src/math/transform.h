@@ -19,6 +19,8 @@ namespace rain
             , lastScale(glm::vec3(1.0f))
         {}
 
+        const glm::mat4 Transform::get() const;
+
         glm::vec3 position;
         glm::vec3 lastPosition;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "core/id_generator.h"
 #include "core/file_path.h"
@@ -57,6 +58,14 @@ namespace rain
         DataHandleContainer<Texture> textures;
         DataHandleContainer<Shader> shaders;
     };
+
+    //struct ShadersInfo
+    //{
+    //    std::string vertex_path;
+    //    std::string fragment_path;
+    //    std::string geometry_path;
+    //};
+
 }
 
 #define RAIN_FIND_DATA_FROM_PATH(path) rain::Application::get().data_system->find_mesh(path) 

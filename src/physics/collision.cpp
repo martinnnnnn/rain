@@ -152,7 +152,7 @@ namespace rain
         _bodyB.momentum = glm::vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _bodyB.mass;
     }
 
-    HitInfo detect_collision_gjk(const std::vector<glm::vec3>& _verticesA, const Transform& _transformA, const std::vector<glm::vec3>& _verticesB, const Transform& _transformB)
+    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const Transform& _transformA, const MeshBound& _verticesB, const Transform& _transformB)
     {
 
         return HitInfo {};

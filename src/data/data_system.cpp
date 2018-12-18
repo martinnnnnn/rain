@@ -8,6 +8,7 @@ namespace rain
 {
     namespace fs = std::filesystem;
 
+
     void DataSystem::load_all_recursive(const std::string& _root)
     {
         for (auto& p : fs::recursive_directory_iterator(_root))
@@ -19,18 +20,11 @@ namespace rain
             {
                 paths.push_back(filepath);
                 std::string ext = filepath.get_extention();
-                RAIN_LOG("%s   -> (%s)", filepath.get_path_relative().c_str(), ext.c_str());
                 if (ext.compare("fbx") == 0)
                 {
                     meshes.load_data(filepath.get_path_absolute());
                 }
-                //else if (!ext.compare("tga"))
-                //{
-                //    textures.load_data(filepath.get_path_absolute());
-                //}
-                //else if (!ext.compare("vs"))
-                //{
-                //}
+
             }
         }
     }

@@ -42,13 +42,8 @@ namespace rain
         Mesh* mesh;
     };
 
-    struct Scene
-    {
-        std::vector<Mesh> meshes;
-    };
-
-    void read_scene_fbx(const std::string& _path, Scene* _scene);
     void read_mesh_fbx(fbxsdk::FbxMesh* _fbxMesh, Mesh* _mesh);
-
-    void display_textures_info(fbxsdk::FbxGeometry* pGeometry);
+    void display_metadata_connection(FbxObject* pObject);
+    void display_link(FbxGeometry* pGeometry);
+    void display_skeleton(FbxNode* pNode, std::string tab);
 }

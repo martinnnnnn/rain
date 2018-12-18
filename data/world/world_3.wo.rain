@@ -30,6 +30,11 @@
             "MeshBound":
             {
                 "required": ["Model"]
+            },
+            "Material":
+            {
+                "vertex":"/shaders/glsl/model.vs",
+                "fragment": "/shaders/glsl/model.fs"
             }
         }
         

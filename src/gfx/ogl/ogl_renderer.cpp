@@ -145,14 +145,12 @@ namespace rain
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_mesh(Mesh * _mesh, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale)
+    void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale)
     {
-        model.use();
-
-        model.use();
-        model.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
-        model.set("proj", proj_mat_perspective);
-        model.set("view", view_mat);
+        _material.shader.use();
+        _material.shader.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        _material.shader.set("proj", proj_mat_perspective);
+        _material.shader.set("view", view_mat);
 
         glBindVertexArray(_mesh->vao);
         glDrawElements(GL_TRIANGLES, _mesh->indices.size(), GL_UNSIGNED_INT, 0);

@@ -38,7 +38,6 @@ namespace rain
 
     void World::update_physics(const float _deltaTime)
     {
-        ConsoleProfiler profiler("physics");
         // applying springs
         auto spring2_view = registry.view<Spring>();
         for (auto entity : spring2_view)
@@ -115,19 +114,20 @@ namespace rain
 
     void World::render(const float _alpha)
     {
-        ConsoleProfiler profiler("render");
+        //ConsoleProfiler profiler("render");
 
-        auto view = registry.view<Transform, Model>();
+        auto view = registry.view<Transform, Model, Material>();
 
         for (auto entity : view)
         {
             Transform& transform = view.get<Transform>(entity);
             Model& model = view.get<Model>(entity);
+            Material& material = view.get<Material>(entity);
             glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
             //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
-            RAIN_RENDERER->draw_mesh(model.mesh, position, orientation, transform.scale);
+            RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
         }
     }
 

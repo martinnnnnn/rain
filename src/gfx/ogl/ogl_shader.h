@@ -20,7 +20,7 @@ namespace rain
 		GLuint id;
 
 		Shader();
-		void use();
+		void use() const;
 		bool load(const std::string& _vertex_file, const std::string& _fragment_file, const std::string& _geometry_file = "");
         void unload();
 

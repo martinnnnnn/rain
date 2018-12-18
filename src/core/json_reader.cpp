@@ -90,6 +90,11 @@ namespace rain
                     read_mesh_bound(world_object["MeshBound"], model, meshBound);
                 }
             }
+            if (world_object.HasMember("Material"))
+            {
+                Material& material = registry.assign<Material>(entity);
+                read_material(world_object["Material"], material);
+            }
         }
     }
 
@@ -276,4 +281,51 @@ namespace rain
             _meshBound.points[i] = _model.mesh->vertices[i].position;
         }
     }
+
+    void JsonReader::read_material(const rapidjson::Value& _json, Material& _material)
+    {
+        std::string vertex_path;
+        std::string fragment_path;
+        std::string geometry_path;
+
+        if (_json.HasMember("vertex"))
+        {
+            vertex_path = RAIN_CONFIG->data_root + _json["vertex"].GetString();
+        }
+        if (_json.HasMember("fragment"))
+        {
+            fragment_path = RAIN_CONFIG->data_root + _json["fragment"].GetString();
+        }
+        if (_json.HasMember("geometry"))
+        {
+            geometry_path = RAIN_CONFIG->data_root + _json["geometry"].GetString();
+        }
+
+        _material.shader.load(vertex_path, fragment_path, geometry_path);
+    }
+
+    //void read_shaders_info(const std::string& _json, std::vector<ShadersInfo>& _info)
+    //{
+    //    rapidjson::Document shaders_document;
+    //    shaders_document.Parse(_json.c_str());
+
+    //    auto info_json = shaders_document["shaders_info"].GetArray();
+    //    _info.resize(info_json.Size());
+
+    //    for (u32 i = 0; i < info_json.Size(); ++i)
+    //    {
+    //        if (info_json[i].HasMember("vertex"))
+    //        {
+    //            _info[i].vertex_path = info_json[i]["vertex"].GetString();
+    //        }
+    //        if (info_json[i].HasMember("fragment"))
+    //        {
+    //            _info[i].fragment_path = info_json[i]["fragment"].GetString();
+    //        }
+    //        if (info_json[i].HasMember("geometry"))
+    //        {
+    //            _info[i].geometry_path = info_json[i]["geometry"].GetString();
+    //        }
+    //    }
+    //}
 }

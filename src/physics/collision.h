@@ -106,5 +106,5 @@ namespace rain
     void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB);
 
 
-    HitInfo detect_collision_gjk(const std::vector<glm::vec3>& _verticesA, const Transform& _transformA, const std::vector<glm::vec3>& _verticesB, const Transform& _transformB);
+    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const Transform& _transformA, const MeshBound& _verticesB, const Transform& _transformB);
 }

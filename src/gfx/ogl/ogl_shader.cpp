@@ -98,7 +98,7 @@ namespace rain
         glDeleteProgram(id);
     }
 
-	void Shader::use()
+	void Shader::use() const
 	{
 		glUseProgram(id);
 	}
