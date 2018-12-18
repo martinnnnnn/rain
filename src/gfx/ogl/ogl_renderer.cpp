@@ -75,8 +75,6 @@ namespace rain
         default_phong.use();
         default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
         default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
-
-        model.load(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs", RAIN_CONFIG->data_root + "/shaders/glsl/model.fs");
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)

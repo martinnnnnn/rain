@@ -16,9 +16,11 @@
 #include "core/logger.h"
 #include "core/id_generator.h"
 #include "core/high_resolution_clock.h"
+#include "data/data_system.h"
 
 // TEMP
-#include "data/data_system.h"
+#include "network/client.h"
+
 
 namespace rain
 {
@@ -44,8 +46,10 @@ namespace rain
         // LOADING DATA
         data_system = new DataSystem();
         data_system->load_all_recursive(RAIN_CONFIG->data_root);
-        //data_system.meshes.load_data(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
 
+        client = new Client();
+        init_socket(client);
+        
 	    // INIT WINDOW
         window = new Window();
 	    window->init(hinstance, config->screen_width, config->screen_height, 0);
@@ -125,6 +129,19 @@ namespace rain
         world->render(_alpha);
     }
 }
+
+
+
+
+
+int main(int argc, char* argv[])
+{
+   
+
+    return 0;
+}
+
+
 
 
 

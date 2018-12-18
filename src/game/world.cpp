@@ -12,9 +12,9 @@
 #include "physics/spring.h"
 #include "core/high_resolution_clock.h"
 #include "core/profiler.h"
-
 #include "data/data_system.h"
 
+#include "network/client.h"
 
 namespace rain
 {
@@ -123,6 +123,12 @@ namespace rain
             Transform& transform = view.get<Transform>(entity);
             Model& model = view.get<Model>(entity);
             Material& material = view.get<Material>(entity);
+
+            const char* hello = "hellsdfqsdfqsdfo";
+            send_data(RAIN_APPLICATION.client, hello, strlen(hello));
+            char buffer[1048];
+            check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
+            
             glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 

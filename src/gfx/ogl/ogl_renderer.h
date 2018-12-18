@@ -101,7 +101,6 @@ namespace rain
         glm::mat4 view_mat;
 
         Shader default_phong;
-        Shader model;
         Shader default_pbr;
 
         std::unordered_map<GLchar, RChar> text_characters;
