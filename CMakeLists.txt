@@ -30,6 +30,7 @@ set(ENGINE_EXE_PATH "${CMAKE_SOURCE_DIR}/bin/rain_engine")
 
 
 #### GROUP CREATION ####
+add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 macro(GroupSources curdir)
     file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/${curdir}
     ${PROJECT_SOURCE_DIR}/${curdir}/*)
@@ -37,11 +38,31 @@ macro(GroupSources curdir)
     foreach(child ${children})
 
         if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-            GroupSources(${curdir}/${child}, ${dirName})
+            GroupSources(${curdir}/${child})
         else()
             string(REPLACE "/" "\\" groupname ${curdir})
             string(REPLACE "src" "" groupname ${groupname})
+            message(STATUS "1 : ${curdir}/${child}")
             source_group(${groupname} FILES ${PROJECT_SOURCE_DIR}/${curdir}/${child})
+
+        endif()
+    endforeach()
+endmacro()
+
+macro(GroupSources2 root_dir curdir)
+    file(GLOB children RELATIVE ${root_dir}/${curdir}
+            ${root_dir}/${curdir}/*)
+
+    foreach(child ${children})
+        message(STATUS "child : ${child}")
+        if(IS_DIRECTORY ${root_dir}/${curdir}/${child})
+            # message(STATUS "di")
+            GroupSources2(${root_dir} ${curdir}/${child})
+        else()
+            message(STATUS "file")
+            string(REPLACE "/" "\\" groupname ${curdir})
+            # string(REPLACE "src" "" groupname ${groupname})
+            source_group(${groupname} FILES ${curdir}/${child})
 
         endif()
     endforeach()

@@ -11,4 +11,6 @@ target_include_directories(${RAIN_SERVER} PUBLIC ${CORE_INCLUDE_PATH})
 
 set_target_properties(${RAIN_SERVER} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SERVER_EXE_PATH})
 
-GroupSources(src)
+# GroupSources(src)
+message(STATUS "server ${CMAKE_CURRENT_SOURCE_DIR}")
+GroupSources2(${CMAKE_CURRENT_SOURCE_DIR} server)
