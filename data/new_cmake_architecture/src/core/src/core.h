@@ -3,6 +3,17 @@
 
 
 #include "types.h"
-#include "input.h"
-#include "window.h"
-#include "renderer.h"
+#include "singleton.h"
+
+#include "input/input.h"
+
+#include "log/logger.h"
+
+#include "profile/profiler.h"
+
+#include "string/string.h"
+
+#include "time/high_resolution_clock.h"
+
+#include "window/window.h"
+#include "window/renderer.h"

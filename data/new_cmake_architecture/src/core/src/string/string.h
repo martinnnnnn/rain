@@ -6,7 +6,7 @@
 
 #include "types.h"
 
-namespace rain::engine
+namespace rain::core
 {
     namespace String
     {

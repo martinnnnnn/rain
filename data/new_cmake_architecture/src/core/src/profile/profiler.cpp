@@ -1,6 +1,6 @@
 #include "profiler.h"
 
-#include "core/logger.h"
+#include "log/logger.h"
 
 namespace rain
 {
@@ -13,7 +13,7 @@ namespace rain
     {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
-        RAIN_LOG_PROFILE((message + " %f").c_str(), elapsed_seconds.count() * 1000);
+        //RAIN_LOG_PROFILE((message + " %f").c_str(), elapsed_seconds.count() * 1000);
     }
 }
 

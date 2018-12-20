@@ -20,7 +20,7 @@ macro(GroupSources curdir)
     foreach(child ${children})
 
         if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/${curdir}/${child})
-            GroupSources(${curdir}/${child})
+            GroupSources(${curdir}/${child}, ${dirName})
         else()
             string(REPLACE "/" "\\" groupname ${curdir})
             string(REPLACE "src" "" groupname ${groupname})

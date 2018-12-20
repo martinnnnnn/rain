@@ -1,7 +1,5 @@
 #include "high_resolution_clock.h"
 
-#include "core/logger.h"
-
 
 namespace rain
 {

@@ -1,11 +1,28 @@
 #include "logger.h"
 
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <io.h>
+#include <fcntl.h>
+#include <iostream>
 
+#include "string/string.h"
 
-
-namespace rain::engine
+namespace rain::core
 {
+    void Logger::init(void(*_printOutput)(const char*))
+    {
+        printOutput = _printOutput;
+    }
+
+    void Logger::clean_buffers()
+    {
+        memset(message_buffer, 0, sizeof(message_buffer));
+        memset(header_buffer, 0, sizeof(header_buffer));
+    }
+
     void Logger::log_level(const char* _level, const char* _format, ...)
     {
         String::print_to_buffer(header_buffer, sizeof(header_buffer), "%s ", _level);
@@ -28,9 +45,9 @@ namespace rain::engine
 
     void Logger::print_log()
     {
-        OutputDebugStringA(header_buffer);
-        OutputDebugStringA(message_buffer);
-        OutputDebugStringA("\n");
+        printOutput(header_buffer);
+        printOutput(message_buffer);
+        printOutput("\n");
     }
 
     void Logger::log_raw(const char* _format, ...)
@@ -44,6 +61,9 @@ namespace rain::engine
 
     void Logger::print_log_raw()
     {
-        OutputDebugStringA(message_buffer);
+        printOutput(message_buffer);
     }
+
+    
+
 }
