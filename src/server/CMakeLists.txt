@@ -9,7 +9,6 @@ target_link_libraries(${RAIN_SERVER} ${RAIN_CORE})
 
 target_include_directories(${RAIN_SERVER} PUBLIC ${CORE_INCLUDE_PATH})
 
-set(SERVER_EXE_PATH "${CMAKE_SOURCE_DIR}/bin/rain_server")
 set_target_properties(${RAIN_SERVER} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SERVER_EXE_PATH})
 
 GroupSources(src)
