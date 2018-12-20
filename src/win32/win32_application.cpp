@@ -47,8 +47,8 @@ namespace rain
         data_system = new DataSystem();
         data_system->load_all_recursive(RAIN_CONFIG->data_root);
 
-        client = new Client();
-        init_socket(client);
+        //client = new Client();
+        //init_socket(client);
         
 	    // INIT WINDOW
         window = new Window();

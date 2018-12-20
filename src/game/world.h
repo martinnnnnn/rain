@@ -5,6 +5,7 @@
 
 #include "core/file.h"
 #include "data/geometry/mesh.h"
+#include "network/client.h"
 
 namespace rain
 {
@@ -29,6 +30,5 @@ namespace rain
         //std::vector<glm::vec3> positions;
 
     };
-
 }
 

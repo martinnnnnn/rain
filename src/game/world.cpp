@@ -114,7 +114,7 @@ namespace rain
 
     void World::render(const float _alpha)
     {
-        //ConsoleProfiler profiler("render");
+        ConsoleProfiler profiler("render");
 
         auto view = registry.view<Transform, Model, Material>();
 
@@ -124,15 +124,15 @@ namespace rain
             Model& model = view.get<Model>(entity);
             Material& material = view.get<Material>(entity);
 
-            Packet p {};
-            p.senderId = 47;
-            p.sequenceNumber= 12;
-            const char* hello = "qslmdfqkldfh";
-            memcpy(p.data, hello, strlen(hello));
-            
-            SerializedPacket* serialized = (SerializedPacket*)p.Serialize();
+            //Packet p {};
+            //p.senderId = 47;
+            //p.sequenceNumber= 12;
+            //const char* hello = "qslmdfqkldfh";
+            //memcpy(p.data, hello, strlen(hello));
+            //
+            //SerializedPacket* serialized = (SerializedPacket*)p.Serialize();
 
-            send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
+            //send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
             //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
             
             glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
