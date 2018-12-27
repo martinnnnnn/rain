@@ -3,17 +3,19 @@
 #include <chrono>
 #include <string>
 
-#include "types.h"
+#include "core/types.h"
 
 
-namespace rain
+namespace rain::core
 {
 
     struct ConsoleProfiler
     {
-        ConsoleProfiler(const std::string& _message);
+        ConsoleProfiler(void(*_printOutput)(const double), const std::string& _message);
 
         ~ConsoleProfiler();
+
+		void(*print_output)(const double _elapsedMs);
 
         std::string message;
         std::chrono::system_clock::time_point start;

@@ -14,3 +14,6 @@
 #if defined(max)
 #undef max
 #endif
+
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>

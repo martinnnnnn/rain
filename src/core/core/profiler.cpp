@@ -1,10 +1,10 @@
 #include "profiler.h"
 
-#include "log/logger.h"
-
-namespace rain
+namespace rain::core
 {
-    ConsoleProfiler::ConsoleProfiler(const std::string& _message) : message(_message)
+    ConsoleProfiler::ConsoleProfiler(void(*_printOutput)(const double), const std::string& _message)
+		: message(_message)
+		, print_output(_printOutput)
     {
         start = std::chrono::system_clock::now();
     }
@@ -13,7 +13,7 @@ namespace rain
     {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
-        //RAIN_LOG_PROFILE((message + " %f").c_str(), elapsed_seconds.count() * 1000);
+		print_output(elapsed_seconds.count() * 1000);
     }
 }
 

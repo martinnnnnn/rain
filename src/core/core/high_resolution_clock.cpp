@@ -1,7 +1,7 @@
 #include "high_resolution_clock.h"
 
 
-namespace rain
+namespace rain::core
 {
     HighResolutionClock::HighResolutionClock()
         : m_deltaTime(0)

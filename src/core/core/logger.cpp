@@ -8,7 +8,7 @@
 #include <fcntl.h>
 #include <iostream>
 
-#include "string/string.h"
+#include "core/string.h"
 
 namespace rain::core
 {

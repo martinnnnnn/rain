@@ -5,7 +5,7 @@
 
 
 
-namespace rain
+namespace rain::core
 {
     class HighResolutionClock
     {

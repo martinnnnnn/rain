@@ -2,7 +2,7 @@
 
 
 
-namespace rain
+namespace rain::core
 {
 	template<typename T>
 	class Singleton
