@@ -3,6 +3,9 @@
 #include <cassert>
 #include <cstdarg>
 
+
+#include "core/types.h"
+
 namespace rain::core
 {
     void String::replace(std::string & data, const std::string& toSearch, const std::string& replaceStr)

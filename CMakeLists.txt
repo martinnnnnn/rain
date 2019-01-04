@@ -45,6 +45,22 @@ macro(GroupSources root_dir curdir)
     endforeach()
 endmacro()
 
+#### SETTING WINDOWS SDK PATHS ####
+file(TO_CMAKE_PATH "$ENV{PROGRAMFILES\(X86\)}" _progFilePath)
+set(WINDOWS_SDK_INCLUDES "${_progFilePath}/Windows Kits/10/Include/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um/")
+set(WINDOWS_SDK_LIBS "${_progFilePath}/Windows Kits/10/Lib/${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}/um/x86")
+
+#### FBX SDK PACKAGE ####
+set(FBXSDK_VERSION "2019.0")
+set(FBXSDK_VS_VERSION "vs2015")
+find_package(FBX REQUIRED)
+
+#### GLEW PACKAGE ####
+set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glew-2.1.0")
+set(CMAKE_LIBRARY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/glew-2.1.0/lib/Release/Win32/")
+find_package(GLEW REQUIRED)
+
+
 add_subdirectory(src)
 
 

@@ -16,11 +16,11 @@ namespace rain::core
 
 		virtual ~Singleton() = default;
 
-        static T* instance;
+        //static T* instance;
 	public:
-		static T& get() noexcept(std::is_nothrow_constructible<T>::value)
+		static T* get() noexcept(std::is_nothrow_constructible<T>::value)
 		{
-            static T instance;
+            static T* instance = new T();
 
 			return instance;
 		}

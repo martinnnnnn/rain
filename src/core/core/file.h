@@ -2,15 +2,13 @@
 
 #include <fstream>
 
-#include "core/types.h"
-#include "core/string.h"
-#include "core/path.h"
-
+#include "core/core.h"
 
 namespace rain::core
 {
 	class File
 	{
+
 	public:
 
 		enum class Mode
@@ -24,6 +22,7 @@ namespace rain::core
 		bool is_open();
 		std::string read();
 		void close();
+        FilePath& get_path();
         std::fstream& get_stream();
         FilePath filepath;
 

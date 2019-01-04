@@ -4,8 +4,6 @@
 #include <vector>
 #include <utility>
 
-#include "core/types.h"
-
 namespace rain::core
 {
     namespace String
@@ -16,5 +14,6 @@ namespace rain::core
 
         void print_to_buffer(char* _dest, size_t _destSize, const char* _format, ...);
         void print_to_buffer_va(char* _dest, size_t _destSize, const char* _format, va_list args);
+
     };
 }

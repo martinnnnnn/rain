@@ -1,0 +1,76 @@
+#pragma once
+
+#include <vector>
+#include <string>
+
+#include "core/core.h"
+#include "engine/core/context.h"
+#include "engine/core/id_generator.h"
+#include "geometry/mesh.h"
+#include "texture/texture.h"
+#include "engine/gfx/ogl/ogl_shader.h"
+#include "engine/core/config.h"
+
+namespace rain::engine
+{
+    using core::FilePath;
+
+    template<typename T>
+    struct DataHandle
+    {
+        DataHandle(const std::string& _path)
+            : path(_path)
+            , id(RAIN_NEW_NAME_ID(path.get_path_relative(RAIN_CONFIG->data_root)))
+        {
+            data = new T();
+            data->load(path.get_path_absolute());
+        }
+
+        DataHandle()
+            : path("")
+            , id()
+            , data(nullptr) {}
+
+        FilePath path;
+        unique_id id;
+        T* data;
+    };
+
+    template <typename T>
+    struct DataHandleContainer
+    {
+        void load_data(const std::string& _path)
+        {
+            DataHandle<T>* handle = new DataHandle<T>(_path);
+            datas.push_back(handle);
+        }
+
+        std::vector<DataHandle<T>*> datas;
+    };
+
+
+    struct DataSystem
+    {
+        void load_all_recursive(const std::string& _root);
+
+        Mesh* find_mesh(const FilePath& _path);
+        Mesh* find_mesh(const unique_id _id);
+
+        std::vector<FilePath> paths;
+
+        DataHandleContainer<Mesh> meshes;
+        DataHandleContainer<Texture> textures;
+        DataHandleContainer<Shader> shaders;
+    };
+
+    //struct ShadersInfo
+    //{
+    //    std::string vertex_path;
+    //    std::string fragment_path;
+    //    std::string geometry_path;
+    //};
+
+}
+
+//#define RAIN_FIND_DATA_FROM_PATH(path) rain::engine::Application::get()->data_system->find_mesh(path) 
+//#define RAIN_FIND_DATA_FROM_ID(id) rain::engine::Application::get()->data_system->find_mesh(id)
