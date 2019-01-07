@@ -29,47 +29,45 @@ namespace rain::engine
     {
         hinstance = _hinstance;
 
-        Context* engine_context = Context::get();
-
         // INIT LOGGER
-        engine_context->logger = new Logger();
+        RAIN_CONTEXT->logger = new Logger();
 
         // INIT ID GENERATOR
-        engine_context->id_generator = new IdGenerator();
+        RAIN_CONTEXT->id_generator = new IdGenerator();
 
         // INIT CONFIG
-        engine_context->config = new Config();
-        engine_context->config->init(Win32::get_exe_path() + "/config.rain");
+        RAIN_CONFIG = new Config();
+        RAIN_CONFIG->init(Win32::get_exe_path() + RAIN_CONFIG_FILE_NAME);
         
         // TEMP
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
 
         // LOADING DATA
-        engine_context->data_system = new DataSystem();
-        engine_context->data_system->load_all_recursive(RAIN_CONFIG->data_root);
+        RAIN_CONTEXT->data_system = new DataSystem();
+        RAIN_CONTEXT->data_system->load_all_recursive(RAIN_CONFIG->data_root);
 
         //client = new Client();
         //init_socket(client);
         
 	    // INIT WINDOW
-        engine_context->window = new Window();
-	    engine_context->window->init(hinstance, RAIN_CONFIG->screen_width, RAIN_CONFIG->screen_height, 0);
+        RAIN_CONTEXT->window = new Window();
+	    RAIN_CONTEXT->window->init(hinstance, RAIN_CONFIG->screen_width, RAIN_CONFIG->screen_height, 0);
 
         // INIT RENDERER
-        engine_context->renderer = new Renderer();
-	    engine_context->renderer->init();
+        RAIN_CONTEXT->renderer = new Renderer();
+	    RAIN_CONTEXT->renderer->init();
 
         // SHOW WINDOW
-        engine_context->window->show();
+        RAIN_CONTEXT->window->show();
 
 	    // INIT INPUT
-        engine_context->input = new Input();
-	    engine_context->input->init();
+        RAIN_CONTEXT->input = new Input();
+	    RAIN_CONTEXT->input->init();
 
         // INIT CLOCK
-        engine_context->clock = new HighResolutionClock();
-        engine_context->clock->reset();
+        RAIN_CONTEXT->clock = new HighResolutionClock();
+        RAIN_CONTEXT->clock->reset();
 
         world = new World();
         world->init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);

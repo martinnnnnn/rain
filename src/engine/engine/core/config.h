@@ -6,7 +6,8 @@
 #include <cassert>
 
 #include "core/core.h"
-//#include "engine/win32/win32_application.h"
+
+#define RAIN_CONFIG_FILE_NAME "/config.rain"
 
 namespace rain::engine
 {

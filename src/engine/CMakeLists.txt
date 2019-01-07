@@ -2,6 +2,19 @@
 
 file(GLOB_RECURSE ENGINE_SOURCE_FILES "*.h" "*.hpp" "*.cpp" "*.inl")
 
+
+# FOREACH(FILE_NAME ${ENGINE_SOURCE_FILES})
+#     string(FIND ${FILE_NAME} "win32" retval)
+#     string(COMPARE NOTEQUAL ${retval}  "-1" is_not_equal)
+#     if (${is_not_equal})
+#         list(REMOVE_ITEM ENGINE_SOURCE_FILES ${FILE_NAME})
+#     endif()
+# ENDFOREACH()
+
+# FOREACH(FILE_NAME ${ENGINE_SOURCE_FILES})
+#     message(STATUS "<<${FILE_NAME}>>")
+# ENDFOREACH()
+
 add_executable(${RAIN_ENGINE} WIN32 ${ENGINE_SOURCE_FILES})
 
 

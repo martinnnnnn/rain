@@ -18,8 +18,6 @@ namespace rain::engine
     };
 
 
-
-
     struct Sphere
     {
         Sphere()
