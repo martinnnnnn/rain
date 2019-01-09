@@ -7,7 +7,7 @@
 #define RAIN_HALFPI 1.5707963267948966192313216916395
 #define RAIN_TWOPI  6.2831853071795864769252867665590
 
-namespace rain::engine::math
+namespace rain::core::math
 {
 
     inline f32 ToRad(const f32& _angle)

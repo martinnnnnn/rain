@@ -6,7 +6,7 @@
 #include "float.h"
 #include "math_basics.h"
 
-namespace rain::engine::math
+namespace rain::core::math
 {
     
     vec2 operator+(const vec2& _a, const vec2& _b)

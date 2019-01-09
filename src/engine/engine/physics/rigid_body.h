@@ -5,11 +5,12 @@
 #include <glm/gtc/quaternion.hpp>
 #include <vector>
 
-#include "engine/math/transform.h"
 #include "core/core.h"
 
 namespace rain::engine
 {
+    using core::math::Transform;
+
     struct RigidBody
     {
         RigidBody()

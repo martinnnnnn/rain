@@ -9,11 +9,7 @@
 
 namespace rain::engine
 {
-    struct Boid
-    {
-        glm::vec3 position;
-
-    };
+    using core::math::Transform;
 
     struct World
     {

@@ -3,7 +3,7 @@
 
 #include "core/core.h"
 
-namespace rain::engine::math
+namespace rain::core::math
 {
     struct vec2
     {

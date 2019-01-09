@@ -4,10 +4,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 
-namespace rain::engine
+namespace rain::core::math
 {
-    struct Archivist;
-
     struct Transform
     {
         Transform()

@@ -4,7 +4,7 @@
 #include <glm/trigonometric.hpp>
 
 
-namespace rain::engine
+namespace rain::core::math
 {
     const glm::mat4 Transform::get() const
     {

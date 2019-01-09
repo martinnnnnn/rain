@@ -347,4 +347,15 @@ namespace rain::engine
             } // for polygonSize
         } // for polygonCount
     }
+
+    bool operator==(const Vertex& _a, const Vertex& _b)
+    {
+        return _a.position == _b.position && _a.normal == _b.normal && _a.tangent == _b.tangent;
+    }
+
+    bool operator!=(const Vertex& _a, const Vertex& _b)
+    {
+        return !(_a == _b);
+    }
+
 }

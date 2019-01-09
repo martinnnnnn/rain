@@ -2,11 +2,9 @@
 
 #include <cassert>
 
-#include "core/core.h"
 #include "engine/core/context.h"
 #include "engine/win32/win32_application.h"
 #include "engine/core/json_reader.h"
-#include "engine/math/transform.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 #include "engine/physics/collision.h"
 #include "engine/physics/rigid_body.h"
@@ -17,6 +15,8 @@
 
 #include "engine/network/client.h"
 
+#define ITF_CRC32_POLY 0x04c11db7 /* AUTODIN II, Ethernet, & FDDI */ 
+
 namespace rain::engine
 {
     void World::init(const std::string& _path)
@@ -25,16 +25,13 @@ namespace rain::engine
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
 
-        //Scene scene;
-        //read_scene_fbx(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx", &scene);
-        //mesh = scene.meshes[0];
-        //RAIN_RENDERER->load_mesh(&mesh);
-
-        /*positions.resize(mesh.vertices.size());
-        for (u32 i = 0; i < positions.size(); ++i)
+        // TEMP
+        auto view = registry.view<Model>();
+        for (auto entity : view)
         {
-            positions[i] = mesh.vertices[0].position;
-        }*/
+            Model& model = view.get(entity);
+
+        }
     }
 
     void World::update_physics(const float _deltaTime)

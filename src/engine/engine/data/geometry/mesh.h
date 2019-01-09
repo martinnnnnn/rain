@@ -18,6 +18,10 @@ namespace rain::engine
         glm::vec2 texCoords[4];
     };
 
+    bool operator==(const Vertex& _a, const Vertex& _b);
+
+    bool operator!=(const Vertex& _a, const Vertex& _b);
+
 
     struct Mesh
     {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/core.h"
 
 #include "rigid_body.h"
 #include "collision.h"
@@ -7,7 +8,7 @@
 
 namespace rain::engine
 {
-
+    using core::math::Transform;
    
 
     namespace Physics
