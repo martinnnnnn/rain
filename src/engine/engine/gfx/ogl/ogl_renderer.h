@@ -77,6 +77,7 @@ namespace rain::engine
 
         void load_mesh(Mesh* _mesh);
         void draw_mesh(Mesh* _mesh, const Material& material, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale);
+        void release_mesh(Mesh* _mesh);
 
         static constexpr u32 debug_vertices_max_count = 8192;
 

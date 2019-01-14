@@ -99,9 +99,9 @@ namespace rain::engine
         glm::vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
         view_mat = {
-            glm::vec4(xaxis.x,            yaxis.x,            zaxis.x,      0),
-            glm::vec4(xaxis.y,            yaxis.y,            zaxis.y,      0),
-            glm::vec4(xaxis.z,            yaxis.z,            zaxis.z,      0),
+            glm::vec4(xaxis.x,                yaxis.x,                zaxis.x,                0),
+            glm::vec4(xaxis.y,                yaxis.y,                zaxis.y,                0),
+            glm::vec4(xaxis.z,                yaxis.z,                zaxis.z,                0),
             glm::vec4(-glm::dot(xaxis, _eye), -glm::dot(yaxis, _eye), -glm::dot(zaxis, _eye), 1)
         };
     }
@@ -140,6 +140,17 @@ namespace rain::engine
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
         glBindVertexArray(0);
+    }
+
+    void Renderer::release_mesh(Mesh* _mesh)
+    {
+        glDeleteBuffers(1, &_mesh->vbo);
+        glDeleteBuffers(1, &_mesh->ebo);
+        glDeleteVertexArrays(1, &_mesh->vao);
+
+        _mesh->vbo = 0;
+        _mesh->ebo = 0;
+        _mesh->vao = 0;
     }
 
     void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale)
@@ -280,7 +291,7 @@ namespace rain::engine
             1, 2, 3
         };
 
-        unsigned int VBO, VAO, EBO;
+        unsigned int VBO, EBO;
         glGenVertexArrays(1, &quadVAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);

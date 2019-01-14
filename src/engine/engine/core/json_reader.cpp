@@ -130,7 +130,14 @@ namespace rain::engine
         }
         if (_json.HasMember("orientation"))
         {
-            transform.orientation = read_quat(_json["orientation"]);
+            if (_json["orientation"].Size() == 4)
+            {
+                transform.orientation = read_quat(_json["orientation"]);
+            }
+            else if (_json["orientation"].Size() == 3)
+            {
+                transform.orientation = glm::quat(read_vec3(_json["orientation"]));
+            }
             transform.lastOrientation = transform.orientation;
         }
         if (_json.HasMember("scale"))

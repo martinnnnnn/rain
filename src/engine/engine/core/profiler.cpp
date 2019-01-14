@@ -15,7 +15,7 @@ namespace rain::engine
     {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
-        RAIN_LOG_PROFILE((message + " %f").c_str(), elapsed_seconds.count() * 1000);
+        RAIN_LOG_PROFILE((message + " : %fs").c_str(), elapsed_seconds.count());
     }
 
     WindowProfiler::WindowProfiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color)

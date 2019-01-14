@@ -15,6 +15,8 @@
 
 #include "engine/network/client.h"
 
+
+
 namespace rain::engine
 {
     void World::init(const std::string& _path)
@@ -23,14 +25,6 @@ namespace rain::engine
 
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
-
-        // TEMP
-        auto view = registry.view<Model>();
-        for (auto entity : view)
-        {
-            Model& model = view.get(entity);
-
-        }
     }
 
     void World::update_physics(const float _deltaTime)
@@ -99,7 +93,7 @@ namespace rain::engine
             for (auto ent_plane : plane_view)
             {
                 Plane& plane = plane_view.get(ent_plane);
-                RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
+
                 HitInfo info = detect_collision_sphere_plane(bound1, transform1, plane);
                 if (info.hit)
                 {
@@ -136,7 +130,6 @@ namespace rain::engine
             glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
             RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
         }
 
