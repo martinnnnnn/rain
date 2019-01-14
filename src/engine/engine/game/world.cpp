@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "engine/core/context.h"
-#include "engine/core/logger.h"
 #include "engine/win32/win32_application.h"
 #include "engine/core/json_reader.h"
 #include "engine/gfx/ogl/ogl_renderer.h"

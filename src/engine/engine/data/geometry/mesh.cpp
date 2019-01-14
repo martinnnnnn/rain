@@ -1,7 +1,6 @@
 #include "mesh.h"
 
 #include "engine/core/context.h"
-#include "engine/core/logger.h"
 
 namespace rain::engine
 {

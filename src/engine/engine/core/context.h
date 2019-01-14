@@ -18,7 +18,6 @@ namespace rain::engine
     class Window;
     class Renderer;
     class Input;
-    class Logger;
 
     struct Context : public core::Singleton<Context>
     {
@@ -28,7 +27,7 @@ namespace rain::engine
         Window* window;
         Renderer* renderer;
         Input* input;
-        Logger* logger;
+        core::Logger* logger;
         IdGenerator* id_generator;
         DataSystem* data_system;
         HighResolutionClock* clock;
@@ -50,12 +49,12 @@ namespace rain::engine
 #define RAIN_FIND_DATA_FROM_ID(id)      RAIN_CONTEXT->data_system->find_mesh(id)
 
 #ifdef _DEBUG
-#define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level(Logger::LOG_INFO, __VA_ARGS__); } while(false)
-#define RAIN_LOG_DEBUG(...)     do { RAIN_CONTEXT->logger->log_level(Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
-#define RAIN_LOG_NETWORK(...)   do { RAIN_CONTEXT->logger->log_level(Logger::LOG_NETWORK, __VA_ARGS__); } while(false)
-#define RAIN_LOG_PROFILE(...)   do { RAIN_CONTEXT->logger->log_level(Logger::LOG_PROFILE, __VA_ARGS__); } while(false)
-#define RAIN_LOG_WARNING(...)   do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, Logger::LOG_WARNING, __VA_ARGS__); } while(false)
-#define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, Logger::LOG_ERROR, __VA_ARGS__); } while(false)
+#define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_INFO, __VA_ARGS__); } while(false)
+#define RAIN_LOG_DEBUG(...)     do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
+#define RAIN_LOG_NETWORK(...)   do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_NETWORK, __VA_ARGS__); } while(false)
+#define RAIN_LOG_PROFILE(...)   do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_PROFILE, __VA_ARGS__); } while(false)
+#define RAIN_LOG_WARNING(...)   do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, rain::core::Logger::LOG_WARNING, __VA_ARGS__); } while(false)
+#define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, rain::core::Logger::LOG_ERROR, __VA_ARGS__); } while(false)
 #define RAIN_LOG_RAW(...)       do { RAIN_CONTEXT->logger->log_raw(__VA_ARGS__); } while(false)
 #else
 #define RAIN_LOG(...)

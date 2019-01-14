@@ -5,16 +5,14 @@
 #include <cstring>
 #include <cstdarg>
 
-#include "core/core.h"
-#include "engine/win32/win32_helpers.h"
-#include "engine/win32/win32_application.h"
+#include "core/types.h"
 
-namespace rain::engine
+namespace rain::core
 {
     class Logger
     {
     public:
-
+        Logger(void(*_printOutput)(const char*));
         static constexpr char* LOG_DEBUG = "[DEBUG]";
         static constexpr char* LOG_INFO = "[INFO]";
         static constexpr char* LOG_NETWORK = "[NETWORK]";
@@ -22,7 +20,7 @@ namespace rain::engine
         static constexpr char* LOG_WARNING = "[WARNING]";
         static constexpr char* LOG_ERROR = "[ERROR]";
 
-        void clean_buffers()
+        inline void clean_buffers()
         {
             memset(message_buffer, 0, sizeof(message_buffer));
             memset(header_buffer, 0, sizeof(header_buffer));
@@ -35,11 +33,10 @@ namespace rain::engine
 
         void print_log_raw();
                
-        void create_new_console(bool bindStdIn, bool bindStdOut, bool bindStdErr);
 
     private:
         char message_buffer[1024 * 4];
         char header_buffer[1024];
-
+        void (*printOutput) (const char*);
     };
 }

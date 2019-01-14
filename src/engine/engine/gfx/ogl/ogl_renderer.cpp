@@ -19,8 +19,6 @@
 #include "engine/win32/win32_window.h"
 #include "engine/gfx/gfx_camera.h"
 
-#include "engine/core/logger.h"
-
 #include <ft2build.h>
 #include FT_FREETYPE_H
 

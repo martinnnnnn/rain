@@ -1,7 +1,6 @@
 #include "context.h"
 
 #include "engine/win32/win32_helpers.h"
-#include "engine/core/logger.h"
 #include "engine/core/config.h"
 #include "engine/core/id_generator.h"
 #include "engine/data/data_system.h"

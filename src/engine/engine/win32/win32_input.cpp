@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "engine/core/context.h"
-#include "engine/core/logger.h"
 #include "engine/win32/win32_window.h"
 #include "engine/win32/win32_application.h"
 

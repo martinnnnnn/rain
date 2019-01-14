@@ -10,9 +10,9 @@
 #include "core/file.h"
 #include "core/type_id.h"
 #include "core/math/math.h"
+#include "core/logger.h"
 
 //#include "core/id_generator.h"
-//#include "core/logger.h"
 //#include "core/profiler.h"
 
 

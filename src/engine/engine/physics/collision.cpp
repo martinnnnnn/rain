@@ -1,7 +1,6 @@
 #include "collision.h"
 
 #include "engine/core/context.h"
-#include "engine/core/logger.h"
 
 /*
 1. generate convex hulls                                            X

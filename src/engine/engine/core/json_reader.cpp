@@ -5,7 +5,6 @@
 #include <rapidjson/stringbuffer.h>
 
 #include "engine/core/context.h"
-#include "engine/core/logger.h"
 #include "engine/core/config.h"
 #include "engine/data/data_system.h"
 #include "engine/gfx/ogl/ogl_renderer.h"

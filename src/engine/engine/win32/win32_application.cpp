@@ -12,7 +12,6 @@
 #include "engine/physics/spring.h"
 #include "engine/game/world.h"
 #include "engine/core/config.h"
-#include "engine/core/logger.h"
 #include "engine/core/id_generator.h"
 #include "engine/data/data_system.h"
 #include "engine/core/context.h"
@@ -24,12 +23,17 @@
 namespace rain::engine
 {
 
+    void print_to_log(const char* _msg)
+    {
+        OutputDebugStringA(_msg);
+    }
+
     int Application::init(HINSTANCE _hinstance, const std::string& _config)
     {
         hinstance = _hinstance;
 
         // INIT LOGGER
-        RAIN_CONTEXT->logger = new Logger();
+        RAIN_CONTEXT->logger = new core::Logger(print_to_log);
 
         // INIT ID GENERATOR
         RAIN_CONTEXT->id_generator = new IdGenerator();
