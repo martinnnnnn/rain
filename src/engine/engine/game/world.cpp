@@ -20,7 +20,8 @@ namespace rain::engine
 {
     void World::init(const std::string& _path)
     {
-        ConsoleProfiler profiler("init");
+        RAIN_PROFILE("init");
+
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
 

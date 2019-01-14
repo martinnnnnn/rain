@@ -39,3 +39,5 @@ namespace rain::engine
 
     };
 }
+
+#define RAIN_PROFILE(msg) rain::engine::ConsoleProfiler profiler("init")

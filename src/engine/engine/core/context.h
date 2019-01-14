@@ -60,6 +60,9 @@ namespace rain::engine
 #else
 #define RAIN_LOG(...)
 #define RAIN_LOG_DEBUG(...)
+#define RAIN_LOG_NETWORK(...)
+#define RAIN_LOG_PROFILE(...)
 #define RAIN_LOG_WARNING(...)
 #define RAIN_LOG_ERROR(...)
+#define RAIN_LOG_RAW(...)
 #endif
