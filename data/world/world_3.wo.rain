@@ -36,6 +36,36 @@
                 "vertex":"/shaders/glsl/model.vs",
                 "fragment": "/shaders/glsl/model.fs"
             }
+        },
+        {
+            "name":"third_sphere",
+            "id": 3,
+            "Transform" :
+            {
+                "default": false,
+                "position" : [-5.0, 20.0, 0.0],
+                "orientation" : [0.0, 0.0, 0.0, 1.0]
+            },
+            "RigidBody":
+            {
+                "default": true,
+                "required" : ["Transform"],
+                "mass": 1.0
+            },
+            "BoundingSphere" :
+            {
+                "radius": 0.5
+            }
+        },
+        {
+            "name": "it's a plane",
+            "id": 4,
+            "BoundingPlane":
+            {
+                "point1": [-1.0, 0.0, 0.0],
+                "point2": [0.0, -0.2, 0.0],
+                "point3": [0.0, 0.0, -1.0]
+            }
         }
         
     ]

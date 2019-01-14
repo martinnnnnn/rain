@@ -6,8 +6,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
 
-#include "ogl_shader.h"
 #include "core/core.h"
+#include "ogl_shader.h"
 #include "engine/core/config.h"
 #include "engine/win32/win32_application.h"
 #include "engine/data/geometry/mesh.h"
@@ -53,13 +53,14 @@ namespace rain::engine
 
         void draw_debug();
         void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color);
+        void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2);
         void draw_debug_cube(const glm::vec3& _center, const f32 _width, const f32 _height, const glm::vec3& _color);
         void draw_debug_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void draw_coord_view(const glm::vec3& _position);
 
         void draw_billboard();
         void draw_line();
-        void draw_quad();
+        void draw_quad(const core::math::Plane& _p, const glm::vec3 _position, const glm::vec3& _color);
         void draw_cube(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void draw_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)));
         void draw_mesh();
@@ -101,8 +102,8 @@ namespace rain::engine
         glm::mat4 proj_mat_orthogonal;
         glm::mat4 view_mat;
 
-        Shader default_phong;
-        Shader default_pbr;
+        Shader phong;
+        Shader pbr;
 
         std::unordered_map<GLchar, RChar> text_characters;
         Shader text_shader;
@@ -110,5 +111,3 @@ namespace rain::engine
         GLuint text_vbo;
     };
 }
-
-//#define RAIN_RENDERER rain::engine::Application::get()->renderer

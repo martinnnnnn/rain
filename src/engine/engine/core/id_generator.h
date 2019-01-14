@@ -36,7 +36,3 @@ namespace rain::engine
 
     };
 }
-
-//#define RAIN_NEW_ID rain::engine::Application::get()->id_generator->get_new_unique_id()
-//#define RAIN_NEW_NAME_ID(name) rain::engine::Application::get()->id_generator->get_new_unique_id(name)
-

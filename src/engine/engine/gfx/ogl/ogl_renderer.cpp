@@ -71,11 +71,11 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        default_phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
+        phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
 
-        default_phong.use();
-        default_phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
-        default_phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
+        phong.use();
+        phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
+        phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -165,9 +165,9 @@ namespace rain::engine
 
     void Renderer::draw_coord_view(const glm::vec3& _position)
     {
-        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(20.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 20.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        draw_debug_line(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        draw_debug_line(glm::vec3(200.0f, 0.0f, 0.0f), glm::vec3(-200.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        draw_debug_line(glm::vec3(0.0f, 200.0f, 0.0f), glm::vec3(0.0f, -200.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.5f, 1.0f));
+        draw_debug_line(glm::vec3(0.0f, 0.0f, 200.0f), glm::vec3(0.0f, 0.0f, -200.0f), glm::vec3(0.5f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.5f));
     }
 
 
@@ -251,6 +251,67 @@ namespace rain::engine
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
 
+        glBindVertexArray(0);
+    }
+
+    void Renderer::draw_quad(const core::math::Plane& _p, const glm::vec3 _position, const glm::vec3& _color)
+    {   
+        glm::vec3 u = glm::cross(_p.n, _position); // cross product -> note that u lies on the plane
+        glm::vec3 v = glm::cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
+
+        glm::vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
+        float  f = 20.0f;  // large enough
+        glm::vec3 fu = u * f;
+        glm::vec3 fv = v * f;
+        glm::vec3 A = P0 - fu - fv;
+        glm::vec3 B = P0 + fu - fv;
+        glm::vec3 C = P0 + fu + fv;
+        glm::vec3 D = P0 - fu + fv;
+
+        const float vertices[] =
+        {
+            A.x, A.y, A.z, _color.x, _color.y,_color.z,
+            B.x, B.y, B.z, _color.x, _color.y,_color.z,
+            C.x, C.y, C.z, _color.x, _color.y,_color.z,
+            D.x, D.y, D.z, _color.x, _color.y,_color.z
+        };
+
+        unsigned int indices[] =
+        {
+            0, 1, 3,
+            1, 2, 3
+        };
+
+        unsigned int VBO, VAO, EBO;
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(quadVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
+        debug_shader.use();
+        debug_shader.set("mvp", mvp);
+
+        //phong.use();
+        //phong.set("model", glm::translate(glm::mat4(1), glm::vec3(0,0,0)));
+        //phong.set("proj", proj_mat_perspective);
+        //phong.set("view", view_mat);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
@@ -382,7 +443,6 @@ namespace rain::engine
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_cbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(glm::vec3), m_debug_colors);
 
-        glEnable(GL_MULTISAMPLE);
         glDisable(GL_BLEND);
 
         glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
@@ -399,11 +459,10 @@ namespace rain::engine
         glDisableVertexAttribArray(0);
         glBindVertexArray(0);
 
-        glDisable(GL_MULTISAMPLE);
+        glEnable(GL_BLEND);
 
         m_debug_vertex_count = 0;
     }
-
 
     void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color)
     {
@@ -413,6 +472,19 @@ namespace rain::engine
             m_debug_vertices[m_debug_vertex_count + 1] = _point2;
             m_debug_colors[m_debug_vertex_count + 0] = _color;
             m_debug_colors[m_debug_vertex_count + 1] = _color;
+
+            m_debug_vertex_count += 2;
+        }
+    }
+
+    void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2)
+    {
+        if (m_debug_vertex_count + 2 < debug_vertices_max_count)
+        {
+            m_debug_vertices[m_debug_vertex_count + 0] = _point1;
+            m_debug_vertices[m_debug_vertex_count + 1] = _point2;
+            m_debug_colors[m_debug_vertex_count + 0] = _color1;
+            m_debug_colors[m_debug_vertex_count + 1] = _color2;
 
             m_debug_vertex_count += 2;
         }
@@ -463,17 +535,33 @@ namespace rain::engine
         assert(false);
     }
 
-    void Renderer::draw_quad()
-    {
-        assert(false);
-    }
+    //void Renderer::draw_quad(const core::math::Plane& _p, const glm::vec3 _position, const glm::vec3& _color)
+    //{
+    //    glm::vec3 z(0.0f, 0.0f, 1.0f);
+    //    glm::vec3 u = glm::cross(_p.n, _position); // cross product -> note that u lies on the plane
+    //    glm::vec3 v = glm::cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
+
+    //    glm::vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
+    //    float  f = 200.0f;  // large enough
+    //    glm::vec3 fu = u * f;
+    //    glm::vec3 fv = v * f;
+    //    glm::vec3 A = P0 - fu - fv;
+    //    glm::vec3 B = P0 + fu - fv;
+    //    glm::vec3 C = P0 + fu + fv;
+    //    glm::vec3 D = P0 - fu + fv;
+
+    //    draw_debug_line(A, B, _color);
+    //    draw_debug_line(B, C, _color);
+    //    draw_debug_line(C, D, _color);
+    //    draw_debug_line(D, A, _color);
+    //}
 
     void Renderer::draw_cube(const glm::vec3& _position, const f32 _scale,  const glm::quat& _orientation)
     {
-        default_phong.use();
-        default_phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
-        default_phong.set("proj", proj_mat_perspective);
-        default_phong.set("view", view_mat);
+        phong.use();
+        phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        phong.set("proj", proj_mat_perspective);
+        phong.set("view", view_mat);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -482,14 +570,18 @@ namespace rain::engine
 
     void Renderer::draw_sphere(const glm::vec3& _center, const f32 _scale, const glm::quat& orientation)
     {
-        default_phong.use();
-        default_phong.set("model", glm::translate(glm::mat4(1), _center) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
-        default_phong.set("proj", proj_mat_perspective);
-        default_phong.set("view", view_mat);
+        phong.use();
+        phong.set("model", glm::translate(glm::mat4(1), _center) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        phong.set("proj", proj_mat_perspective);
+        phong.set("view", view_mat);
 
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        //glBindVertexArray(quadVAO);
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //glBindVertexArray(0);
     }
 
     void Renderer::draw_mesh()

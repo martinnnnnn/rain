@@ -51,5 +51,3 @@ namespace rain::engine
     };
 
 }
-
-//#define RAIN_INPUT rain::engine::Application::get()->input

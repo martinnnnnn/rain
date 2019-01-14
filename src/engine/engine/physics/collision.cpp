@@ -1,18 +1,20 @@
 #include "collision.h"
 
-#include <cmath>
-#include <algorithm>
-#include <chrono>
-#include <ctime>
-
+#include "engine/core/context.h"
 #include "engine/core/logger.h"
+
+/*
+1. generate convex hulls                                            X
+2. get collision detection working with EJK                         X
+3. concave hull -> convex hull algorithm implementation             X
+4. collision response with manifold etc.                            X
+5. collision detection and response simplified for basic shapes     X
+*/
+
+
 
 namespace rain::engine
 {
-
-
-    
-
     //HitInfo detect_collision(BoundingSphere& _boundA, Transform& _transformA, BoundingSphere& _boundB, Transform& _transformB)
     //{
     //    HitInfo info{};
@@ -31,24 +33,23 @@ namespace rain::engine
     {
         HitInfo info{};
 
-        //const f32 d0 = _plane.distance_to_point(_transform.previousPosition);
-        //const f32 d1 = _plane.distance_to_point(_transform.position);
+        const f32 d0 = core::math::distance_point_to_plane(_transform.lastPosition, _plane);
+        const f32 d1 = core::math::distance_point_to_plane(_transform.position, _plane);
 
-        //// check if it was touching on previous frame
-        //if (fabs(d0) <= _sphere.radius)
-        //{
-        //    info.hit = true;
-        //    info.positionObjA = _transform.previousPosition;
-        //    info.normalizedTime = 0;
-        //}
-        //// check if the sphere penetrated during this frame
-        //else if (d0 > _sphere.radius && d1 < _sphere.radius)
-        //{
-        //    info.hit = true;
-        //    info.normalizedTime = (d0 - _sphere.radius) / (d0 - d1);	//normalized time
-        //    info.positionObjA = (1 - info.normalizedTime) * _transform.previousPosition + info.normalizedTime * _transform.position;	//point of first contact
-        //}
-
+        // check if it was touching on previous frame
+        if (fabs(d0) <= _sphere.radius)
+        {
+            info.hit = true;
+            //info.positionObjA = _transform.lastPosition;
+            info.normalizedTime = 0;
+        }
+        // check if the sphere penetrated during this frame
+        else if (d0 > _sphere.radius && d1 < _sphere.radius)
+        {
+            info.hit = true;
+            info.normalizedTime = (d0 - _sphere.radius) / (d0 - d1);	//normalized time
+            //info.positionObjA = (1 - info.normalizedTime) * _transform.lastPosition + info.normalizedTime * _transform.position;	//point of first contact
+        }
         return info;
     }
 
@@ -63,22 +64,7 @@ namespace rain::engine
         return glm::vec2(-b - h, -b + h);
     }
 
-    bool get_quadratic_roots(const f32 _a, const f32 _b, const f32 _c, f32& _r1, f32& _r2)
-    {
-        if ((_a >= 0) && (_b >= 0) && (_c >= 0))
-        {
-            const f32 q = (_b * _b) - (4 * _a * _c);
-            if (q >= 0.0f)
-            {
-                const f32 sq = sqrt(q);
-                const f32 d = 1.0f / (2.0f * _a);
-                _r1 = (-_b + sq) * d;
-                _r2 = (-_b - sq) * d;
-                return true;
-            }
-        }
-        return false;
-    }
+
     
     HitInfo detect_collision_sphere(const Sphere& _sphereA, const Transform& _transformA, const Sphere& _sphereB, const Transform& _transformB)
     {
@@ -100,7 +86,7 @@ namespace rain::engine
             info.hit = true;
             info.normalizedTime = 0;
         }
-        if (get_quadratic_roots(a, b, c, info.normalizedTime, u1))
+        if (core::math::get_quadratic_roots(a, b, c, info.normalizedTime, u1))
         {
             info.hit = true;
             if (info.normalizedTime > u1)

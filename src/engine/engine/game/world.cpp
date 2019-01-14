@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "engine/core/context.h"
+#include "engine/core/logger.h"
 #include "engine/win32/win32_application.h"
 #include "engine/core/json_reader.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
@@ -14,8 +15,6 @@
 #include "engine/data/data_system.h"
 
 #include "engine/network/client.h"
-
-#define ITF_CRC32_POLY 0x04c11db7 /* AUTODIN II, Ethernet, & FDDI */ 
 
 namespace rain::engine
 {
@@ -72,12 +71,12 @@ namespace rain::engine
         //    }
         //}
         // updating collision
-        //auto sphere_view = registry.view<RigidBody, Sphere, Transform>();
-        //for (auto entity1 : sphere_view)
-        //{
-        //    RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
-        //    Sphere& bound1 = sphere_view.get<Sphere>(entity1);
-        //    Transform& transform1 = sphere_view.get<Transform>(entity1);
+        auto sphere_view = registry.view<RigidBody, Sphere, Transform>();
+        for (auto entity1 : sphere_view)
+        {
+            RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
+            Sphere& bound1 = sphere_view.get<Sphere>(entity1);
+            Transform& transform1 = sphere_view.get<Transform>(entity1);
         //    for (auto entity2 : sphere_view)
         //    {
         //        if (entity1 == entity2)
@@ -96,18 +95,19 @@ namespace rain::engine
         //        }
         //    }
 
-        //    auto plane_view = registry.view<Plane>();
-        //    for (auto ent_plane : plane_view)
-        //    {
-        //        Plane& planeBound = plane_view.get(ent_plane);
-        //        HitInfo info = detect_collision_sphere_plane(bound1, transform1, planeBound);
-        //        if (info.hit)
-        //        {
-        //            collision_response(body1, transform1, planeBound.project(transform1.position));
-        //        }
-        //    }
+            auto plane_view = registry.view<Plane>();
+            for (auto ent_plane : plane_view)
+            {
+                Plane& plane = plane_view.get(ent_plane);
+                RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
+                HitInfo info = detect_collision_sphere_plane(bound1, transform1, plane);
+                if (info.hit)
+                {
+                    collision_response(body1, transform1, project_on_plane(transform1.position, plane));
+                }
+            }
 
-        //}
+        }
     }
 
     void World::render(const float _alpha)
@@ -138,6 +138,25 @@ namespace rain::engine
 
             //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
             RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
+        }
+
+        auto view2 = registry.view<Transform, Sphere>();
+
+        for (auto entity : view2)
+        {
+            Transform& transform = view2.get<Transform>(entity);
+            
+            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+
+            RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
+        }
+
+        auto plane_view = registry.view<Plane>();
+        for (auto ent_plane : plane_view)
+        {
+            Plane& plane = plane_view.get(ent_plane);
+            RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
         }
     }
 

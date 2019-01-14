@@ -77,6 +77,8 @@ namespace rain::engine
 
     void Application::update()
     {
+        RAIN_RENDERER->clear();
+
         static const double dt = 0.01;
 
         static double currentTime = RAIN_CLOCK->get_total_seconds();
@@ -118,7 +120,6 @@ namespace rain::engine
 
     void Application::render(float _alpha)
     {
-        RAIN_RENDERER->clear();
         RAIN_RENDERER->draw();
 
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));

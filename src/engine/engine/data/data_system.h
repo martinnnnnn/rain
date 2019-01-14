@@ -71,6 +71,3 @@ namespace rain::engine
     //};
 
 }
-
-//#define RAIN_FIND_DATA_FROM_PATH(path) rain::engine::Application::get()->data_system->find_mesh(path) 
-//#define RAIN_FIND_DATA_FROM_ID(id) rain::engine::Application::get()->data_system->find_mesh(id)

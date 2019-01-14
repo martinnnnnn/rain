@@ -43,18 +43,3 @@ namespace rain::engine
 
     };
 }
-
-//#ifdef _DEBUG
-//#define RAIN_LOG(...) do { rain::engine::Application::get()->logger->log_level(Logger::LOG_INFO, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_DEBUG(...) do { rain::engine::Application::get()->logger->log_level(Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_NETWORK(...) do { rain::engine::Application::get()->logger->log_level(Logger::LOG_NETWORK, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_PROFILE(...) do { rain::engine::Application::get()->logger->log_level(Logger::LOG_PROFILE, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_WARNING(...) do { rain::engine::Application::get()->logger->log_max(__FILE__, __LINE__, Logger::LOG_WARNING, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_ERROR(...) do { rain::engine::Application::get()->logger->log_max(__FILE__, __LINE__, Logger::LOG_ERROR, __VA_ARGS__); } while(false)
-//#define RAIN_LOG_RAW(...) do { rain::engine::Application::get()->logger->log_raw(__VA_ARGS__); } while(false)
-//#else
-//#define RAIN_LOG(...)
-//#define RAIN_LOG_DEBUG(...)
-//#define RAIN_LOG_WARNING(...)
-//#define RAIN_LOG_ERROR(...)
-//#endif

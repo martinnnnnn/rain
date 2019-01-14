@@ -8,8 +8,8 @@
 #include "engine/win32/win32_helpers.h"
 
 
-#define RAIN_WNDCLASSNAME "RainClass"
-#define RAIN_WNDNAME "Rain Engine"
+constexpr char* RAIN_WNDCLASSNAME = "RainClass";
+constexpr char* RAIN_WNDNAME = "Rain Engine";
 
 
 namespace rain::engine
@@ -48,5 +48,3 @@ namespace rain::engine
 
 	LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 }
-
-//#define RAIN_WINDOW rain::engine::Application::get()->window
