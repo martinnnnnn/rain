@@ -5,8 +5,8 @@
     "objects":
     [
         {
-            "name":"skelet6",
-            "id": 6,
+            "name":"skelet",
+            "id": 0,
             "Transform" :
             {
                 "default": false,
@@ -39,7 +39,7 @@
         },
         {
             "name":"third_sphere",
-            "id": 3,
+            "id": 1,
             "Transform" :
             {
                 "default": false,
@@ -58,8 +58,19 @@
             }
         },
         {
+            "name":"still_sphere",
+            "id": 2,
+            "Transform" :
+            {
+                "default": false,
+                "parent": 0,
+                "position" : [1.0, 1.0, 0.0],
+                "orientation" : [0.0, 0.0, 0.0, 1.0]
+            }
+        },
+        {
             "name": "it's a plane",
-            "id": 4,
+            "id": 3,
             "BoundingPlane":
             {
                 "point1": [-1.0, 0.0, 0.0],
@@ -70,7 +81,7 @@
         ,
         {
             "name":"fps",
-            "id": 5,
+            "id": 4,
             "Transform" :
             {
                 "default": false,

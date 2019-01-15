@@ -1,5 +1,0 @@
-compile & run
-rename filepath -> path
-rename config -> engine config
-try crtp for win32 classes
-make nice json interface in core

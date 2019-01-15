@@ -57,7 +57,21 @@ namespace rain::engine
             if (world_object.HasMember("Transform"))
             {
                 Transform& transform = registry.assign<Transform>(entity);
-                transform = read_transform(world_object["Transform"]);
+                read_transform(world_object["Transform"], transform);
+
+                if (world_object["Transform"].HasMember("parent"))
+                {
+                    u32 parentId = world_object["Transform"]["parent"].GetUint();
+                    auto id_view = registry.view<u32, Transform>();
+                    for (auto id_ent : id_view)
+                    {
+                        if (id_view.get<u32>(id_ent) == parentId)
+                        {
+                            transform.parent = &(id_view.get<Transform>(id_ent));
+                        }
+
+                    }
+                }
             }
             if (world_object.HasMember("RigidBody"))
             {
@@ -133,32 +147,30 @@ namespace rain::engine
         return orientation;
     }
 
-    Transform JsonReader::read_transform(const rapidjson::Value& _json)
+    void JsonReader::read_transform(const rapidjson::Value& _json, Transform& _transform)
     {
-        Transform transform;
         if (_json.HasMember("position"))
         {
-            transform.position = read_vec3(_json["position"]);
-            transform.lastPosition = transform.position;
+            _transform.position = read_vec3(_json["position"]);
+            _transform.lastWorldPosition = _transform.position;
         }
         if (_json.HasMember("orientation"))
         {
             if (_json["orientation"].Size() == 4)
             {
-                transform.orientation = read_quat(_json["orientation"]);
+                _transform.orientation = read_quat(_json["orientation"]);
             }
             else if (_json["orientation"].Size() == 3)
             {
-                transform.orientation = glm::quat(read_vec3(_json["orientation"]));
+                _transform.orientation = glm::quat(read_vec3(_json["orientation"]));
             }
-            transform.lastOrientation = transform.orientation;
+            _transform.lastWorldOrientation = _transform.orientation;
         }
         if (_json.HasMember("scale"))
         {
-            transform.scale = read_vec3(_json["scale"]);
-            transform.lastScale = transform.scale;
+            _transform.scale = read_vec3(_json["scale"]);
+            _transform.lastScale = _transform.scale;
         }
-        return transform;
     }
 
     RigidBody JsonReader::read_rigid_body(const rapidjson::Value& _json)
