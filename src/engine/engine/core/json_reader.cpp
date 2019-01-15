@@ -95,12 +95,25 @@ namespace rain::engine
                 Material& material = registry.assign<Material>(entity);
                 read_material(world_object["Material"], material);
             }
+            if (world_object.HasMember("Camera"))
+            {
+                Camera& camera = registry.assign<Camera>(entity);
+                read_camera(world_object["Camera"], camera);
+            }
+        }
+    }
+
+    void JsonReader::read_camera(const rapidjson::Value& _json, Camera& _camera)
+    {
+        if (_json.HasMember("movement_speed"))
+        {
+            _camera.movement_speed = _json["movement_speed"].GetFloat();
         }
     }
 
     glm::vec3 JsonReader::read_vec3(const rapidjson::Value& _json)
     {
-        glm::vec3 position;
+        glm::vec3 position{ 0, 0, 0 };
         for (u32 i = 0; i < _json.Size(); i++)
         {
             position[i] = _json[i].GetFloat();
@@ -111,7 +124,7 @@ namespace rain::engine
 
     glm::quat JsonReader::read_quat(const rapidjson::Value& _json)
     {
-        glm::quat orientation;
+        glm::quat orientation{ 0, 0, 0, 1 };
         for (u32 i = 0; i < _json.Size(); i++)
         {
             orientation[i] = _json[i].GetFloat();

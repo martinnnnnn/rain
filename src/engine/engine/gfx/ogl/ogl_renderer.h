@@ -67,7 +67,6 @@ namespace rain::engine
 
         void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color);
 
-        void update_camera();
         void resize(u32 _width, u32 _height);
         void set_perspective_projection_matrix(const glm::mat4& _projection);
         void set_orthogonal_projection_matrix(const glm::mat4& _projection);
@@ -89,7 +88,6 @@ namespace rain::engine
         u32      m_debug_cbo;
         Shader debug_shader;
 
-        Camera* camera;
         GLuint lineVAO;
         u32 line_index_count;
 	    GLuint quadVAO;

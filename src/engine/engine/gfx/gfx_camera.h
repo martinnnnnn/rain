@@ -1,14 +1,15 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "core/core.h"
 
 namespace rain::engine
 {
-
+    using core::math::Transform;
 
 	struct Camera
 	{
-		glm::vec3 position;
+		Camera();
+
 		float movement_speed;
 		float yaw;
 		float pitch;
@@ -18,11 +19,9 @@ namespace rain::engine
 		glm::vec3 worldUp;
 
 
-		void init();
-		void update();
-
-        
 	};
 
+
+    void update(Camera& _camera, Transform& _transform);
 	
 }

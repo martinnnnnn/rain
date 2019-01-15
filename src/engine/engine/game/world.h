@@ -19,6 +19,7 @@ namespace rain::engine
 
         void init(const std::string& _path);
 
+        void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
         void render(const float _alpha);
 

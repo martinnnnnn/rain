@@ -48,9 +48,6 @@ namespace rain::engine
         init_debug();
         init_shapes();
         init_text_2d();
-
-        camera = new Camera();
-        camera->init();
     }
 
     void Renderer::resize(u32 _width, u32 _height)
@@ -59,12 +56,6 @@ namespace rain::engine
         set_perspective_projection_matrix(glm::perspective(glm::radians(45.0f), (f32)_width / (f32)_height, 0.1f, 10000.0f));
         set_orthogonal_projection_matrix(glm::ortho(0.0f, (f32)_width, 0.0f, (f32)_height));
         
-    }
-
-    void Renderer::update_camera()
-    {
-        camera->update();
-        set_view_matrix(camera->position, camera->position + camera->front, camera->up);
     }
 
     void Renderer::init_default_shaders()

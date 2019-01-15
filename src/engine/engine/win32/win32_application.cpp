@@ -89,7 +89,6 @@ namespace rain::engine
         static double accumulator = 0.0;
 
         RAIN_INPUT->update();
-        RAIN_RENDERER->update_camera();
         RAIN_CLOCK->tick();
 
         double newTime = RAIN_CLOCK->get_total_seconds();
@@ -103,7 +102,7 @@ namespace rain::engine
 
         while (accumulator >= dt)
         {
-
+            world->update_camera((float)dt);
             world->update_physics((float)dt);
             accumulator -= dt;
         }

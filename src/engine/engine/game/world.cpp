@@ -27,6 +27,18 @@ namespace rain::engine
         JsonReader::read_world(file.read(), *this);
     }
 
+    void World::update_camera(const float _deltaTime)
+    {
+        auto camera_view = registry.view<Transform, Camera>();
+        for (auto entity : camera_view)
+        {
+            Transform& transform = camera_view.get<Transform>(entity);
+            Camera& camera = camera_view.get<Camera>(entity);
+            update(camera, transform);
+            RAIN_RENDERER->set_view_matrix(transform.position, transform.position + camera.front, camera.up);
+        }
+    }
+
     void World::update_physics(const float _deltaTime)
     {
         // applying springs
