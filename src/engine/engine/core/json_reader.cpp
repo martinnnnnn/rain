@@ -152,7 +152,7 @@ namespace rain::engine
         if (_json.HasMember("position"))
         {
             _transform.position = read_vec3(_json["position"]);
-            _transform.lastWorldPosition = _transform.position;
+            _transform.lastPosition = _transform.position;
         }
         if (_json.HasMember("orientation"))
         {
@@ -164,7 +164,7 @@ namespace rain::engine
             {
                 _transform.orientation = glm::quat(read_vec3(_json["orientation"]));
             }
-            _transform.lastWorldOrientation = _transform.orientation;
+            _transform.lastOrientation = _transform.orientation;
         }
         if (_json.HasMember("scale"))
         {
