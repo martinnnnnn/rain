@@ -1,15 +1,14 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "GL/glew.h"
 #include "gl/GL.h"
 #include "gl/GLU.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/quaternion.hpp"
 
 #include "core/core.h"
 #include "ogl_shader.h"
 #include "engine/core/config.h"
-#include "engine/win32/win32_application.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/data/material/material.h"
 
@@ -20,8 +19,6 @@ namespace rain::engine
     {
         GLuint vao;
     };
-
-    struct Camera;
 
     struct RChar
     {

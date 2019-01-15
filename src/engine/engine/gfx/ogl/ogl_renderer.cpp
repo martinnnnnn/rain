@@ -1,23 +1,13 @@
 #include "ogl_renderer.h"
 
-#include "stdio.h"
-#include <iostream>
+//#include "stdio.h"
+//#include <iostream>
 #include <vector>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/trigonometric.hpp>
-#include <glm/gtc/quaternion.hpp>
-
-
 
 #include "core/core.h"
 #include "ogl_shader.h"
 #include "engine/core/context.h"
-#include "engine/win32/win32_application.h"
 #include "engine/win32/win32_window.h"
-#include "engine/gfx/gfx_camera.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
