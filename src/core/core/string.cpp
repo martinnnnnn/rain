@@ -8,7 +8,7 @@
 
 namespace rain::core
 {
-    void String::replace(std::string & data, const std::string& toSearch, const std::string& replaceStr)
+    void string::replace(std::string & data, const std::string& toSearch, const std::string& replaceStr)
     {
         size_t pos = data.find(toSearch);
 
@@ -19,7 +19,7 @@ namespace rain::core
         }
     }
 
-    std::vector<std::string> String::split(const std::string& _tosplit, const std::string& _delimiter)
+    std::vector<std::string> string::split(const std::string& _tosplit, const std::string& _delimiter)
     {
         std::vector<std::string> splited;
 
@@ -37,7 +37,7 @@ namespace rain::core
         return splited;
     }
 
-    std::pair<std::string, std::string> String::pair_split(const std::string& _tosplit, const std::string& _delimiter)
+    std::pair<std::string, std::string> string::pair_split(const std::string& _tosplit, const std::string& _delimiter)
     {
         std::vector<std::string> splited;
 
@@ -51,7 +51,7 @@ namespace rain::core
         return std::make_pair(first, second);
     }
 
-    void String::print_to_buffer(char* _dest, size_t _destSize, const char* _format, ...)
+    void string::print_to_buffer(char* _dest, size_t _destSize, const char* _format, ...)
     {
         va_list args;
         va_start(args, _format);
@@ -60,7 +60,7 @@ namespace rain::core
         va_end(args);
     }
 
-    void String::print_to_buffer_va(char* _dest, size_t _destSize, const char* _format, va_list args)
+    void string::print_to_buffer_va(char* _dest, size_t _destSize, const char* _format, va_list args)
     {
         std::vsnprintf(_dest, _destSize, _format, args);
     }
