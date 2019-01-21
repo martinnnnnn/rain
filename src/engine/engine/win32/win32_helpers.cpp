@@ -15,7 +15,7 @@ namespace rain::engine
             char buffer[MAX_PATH];
             GetModuleFileName(NULL, buffer, MAX_PATH);
             std::string path = std::string(buffer).substr(0, std::string(buffer).find_last_of("\\/"));
-            core::String::replace(path, "\\", "/");
+            core::string::replace(path, "\\", "/");
             return path;
         }
 

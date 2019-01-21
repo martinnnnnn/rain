@@ -14,7 +14,7 @@ namespace rain::engine
         for (auto& p : fs::recursive_directory_iterator(_root))
         {
             std::string path = p.path().string();
-            core::String::replace(path, "\\", "/");
+            core::string::replace(path, "\\", "/");
             FilePath filepath(path);
             if (!p.is_directory())
             {
