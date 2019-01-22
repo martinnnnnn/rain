@@ -78,20 +78,20 @@ namespace rain::engine
                 RigidBody& body = registry.assign<RigidBody>(entity);
                 body = read_rigid_body(world_object["RigidBody"]);
             }
-            if (world_object.HasMember("BoundingSphere"))
+            if (world_object.HasMember("Sphere"))
             {
                 Sphere& sphere = registry.assign<Sphere>(entity);
-                sphere = read_bounding_sphere(world_object["BoundingSphere"]);
+                sphere = read_bounding_sphere(world_object["Sphere"]);
             }
             if (world_object.HasMember("Spring"))
             {
                 Spring& spring = registry.assign<Spring>(entity);
                 spring = read_spring2(world_object["Spring"]);
             }
-            if (world_object.HasMember("BoundingPlane"))
+            if (world_object.HasMember("Plane"))
             {
                 Plane& plane = registry.assign<Plane>(entity);
-                plane = read_plane(world_object["BoundingPlane"]);
+                plane = read_plane(world_object["Plane"]);
             }
             if (world_object.HasMember("Model"))
             {
