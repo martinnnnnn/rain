@@ -20,7 +20,7 @@
                 "required" : ["Transform"],
                 "mass": 0.5
             },
-            "BoundingSphere" :
+            "Sphere" :
             {
                 "radius": 0.5
             }
@@ -44,7 +44,7 @@
                 "applygravity": false,
                 "infiniteMass": true
             },
-            "BoundingSphere":
+            "Sphere":
             {
                 "radius": 0.5
             }
@@ -78,7 +78,7 @@
                 "required" : ["Transform"],
                 "mass": 1.0
             },
-            "BoundingSphere" :
+            "gSphere" :
             {
                 "radius": 0.5
             }
@@ -86,7 +86,7 @@
         {
             "name": "it's a plane",
             "id": 4,
-            "BoundingPlane":
+            "Plane":
             {
                 "point1": [-1.0, 0.0, 0.0],
                 "point2": [0.0, -0.2, 0.0],

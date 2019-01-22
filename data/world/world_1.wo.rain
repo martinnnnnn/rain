@@ -21,7 +21,7 @@
                 "size": 1.0,
                 "mass": 0.5
             },
-            "BoundingSphere" :
+            "Sphere" :
             {
                 "radius": 0.5
             }
@@ -44,7 +44,7 @@
                 "rotationInertia": "cube",
                 "applygravity": true
             },
-            "BoundingSphere":
+            "Sphere":
             {
                 "radius": 0.5
             }

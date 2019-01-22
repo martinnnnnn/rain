@@ -52,7 +52,7 @@
                 "required" : ["Transform"],
                 "mass": 1.0
             },
-            "BoundingSphere" :
+            "Sphere" :
             {
                 "radius": 0.5
             }
@@ -67,7 +67,7 @@
                 "position" : [1.0, 1.0, 0.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0]
             },
-            "BoundingSphere" :
+            "Sphere" :
             {
                 "radius": 0.5
             }
@@ -75,7 +75,7 @@
         {
             "name": "it's a plane",
             "id": 3,
-            "BoundingPlane":
+            "Plane":
             {
                 "point1": [-1.0, 0.0, 0.0],
                 "point2": [0.0, -0.2, 0.0],
