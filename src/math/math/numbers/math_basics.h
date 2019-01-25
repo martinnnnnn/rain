@@ -1,13 +1,14 @@
 #pragma once
 
 
-#include "core/types.h"
+#include <cmath>
+#include "../core/core/types.h"
 
 constexpr f64 RAIN_PI = 3.1415926535897932384626433832795;
 constexpr f64 RAIN_HALFPI = 1.5707963267948966192313216916395;
 constexpr f64 RAIN_TWOPI = 6.2831853071795864769252867665590;
 
-namespace rain::core::math
+namespace rain::math
 {
 
     inline f32 ToRad(const f32& _angle)

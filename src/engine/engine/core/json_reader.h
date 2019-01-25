@@ -4,10 +4,8 @@
 #include <string.h>
 #include <rapidjson/document.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-
 #include "core/core.h"
+#include "math/math.h"
 #include "engine/game/world.h"
 #include "engine/physics/collision.h"
 #include "engine/physics/rigid_body.h"
@@ -23,8 +21,8 @@ namespace rain::engine
     namespace JsonReader
     {
         std::string get_string(const rapidjson::Value& _json_value);
-        glm::vec3 read_vec3(const rapidjson::Value& _json);
-        glm::quat read_quat(const rapidjson::Value& _json);
+        vec3 read_vec3(const rapidjson::Value& _json);
+        quat read_quat(const rapidjson::Value& _json);
         RigidBody read_rigid_body(const rapidjson::Value& _json);
         Sphere read_bounding_sphere(const rapidjson::Value& _json);
         Spring read_spring2(const rapidjson::Value& _json);

@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace rain::core::math
+namespace rain::math
 {
     struct Quad
     {

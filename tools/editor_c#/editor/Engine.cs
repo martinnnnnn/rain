@@ -9,11 +9,7 @@ namespace editor
 {
     public class EngineDLL
     {
-        [DllImport("rain_lib.dll")]
-        public static extern void LoadGame(string path);
-
-        [DllImport("rain_lib.dll")]
-        public static extern void OpenWindow(IntPtr wndHandle);
-
+        [DllImport("rain_engine_export.dll")]
+        public static extern void launch_rain_engine(IntPtr wndHandle);
     }
 }

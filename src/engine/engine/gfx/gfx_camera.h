@@ -1,10 +1,13 @@
 #pragma once
 
 #include "core/core.h"
+#include "math/math.h"
 
 namespace rain::engine
 {
-    using core::math::Transform;
+    using Transform = math::Transform;
+    using vec3 = math::vec3;
+
 
 	struct Camera
 	{
@@ -13,12 +16,10 @@ namespace rain::engine
 		float movement_speed;
 		float yaw;
 		float pitch;
-		glm::vec3 front;
-		glm::vec3 right;
-		glm::vec3 up;
-		glm::vec3 worldUp;
-
-
+		vec3 front;
+		vec3 right;
+		vec3 up;
+		vec3 worldUp;
 	};
 
 

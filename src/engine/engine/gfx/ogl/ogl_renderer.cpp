@@ -13,6 +13,8 @@
 #include FT_FREETYPE_H
 
 
+#include "math/geometry/algorithms/quick_hull.h"
+
 namespace rain::engine
 {
 
@@ -43,8 +45,8 @@ namespace rain::engine
     void Renderer::resize(u32 _width, u32 _height)
     {
         glViewport(0, 0, _width, _height);
-        set_perspective_projection_matrix(glm::perspective(glm::radians(45.0f), (f32)_width / (f32)_height, 0.1f, 10000.0f));
-        set_orthogonal_projection_matrix(glm::ortho(0.0f, (f32)_width, 0.0f, (f32)_height));
+        set_perspective_projection_matrix(perspective(radians(45.0f), (f32)_width / (f32)_height, 0.1f, 10000.0f));
+        set_orthogonal_projection_matrix(ortho(0.0f, (f32)_width, 0.0f, (f32)_height));
         
     }
 
@@ -57,44 +59,98 @@ namespace rain::engine
         phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
-    void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
+    void Renderer::set_perspective_projection_matrix(const mat4& _projection)
     {
         proj_mat_perspective = _projection;
     }
 
-    void Renderer::set_orthogonal_projection_matrix(const glm::mat4& _projection)
+    void Renderer::set_orthogonal_projection_matrix(const mat4& _projection)
     {
         proj_mat_orthogonal = _projection;
-        proj_mat_orthogonal = glm::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
+        proj_mat_orthogonal = ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
-    void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
+    void Renderer::set_view_matrix(const vec3& _eye, float _pitch, float _yaw)
     {
         float cosPitch = cos(_pitch);
         float sinPitch = sin(_pitch);
         float cosYaw = cos(_yaw);
         float sinYaw = sin(_yaw);
 
-        glm::vec3 xaxis = { cosYaw, 0, -sinYaw };
-        glm::vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
-        glm::vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
+        vec3 xaxis = { cosYaw, 0, -sinYaw };
+        vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
+        vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
         view_mat = {
-            glm::vec4(xaxis.x,                yaxis.x,                zaxis.x,                0),
-            glm::vec4(xaxis.y,                yaxis.y,                zaxis.y,                0),
-            glm::vec4(xaxis.z,                yaxis.z,                zaxis.z,                0),
-            glm::vec4(-glm::dot(xaxis, _eye), -glm::dot(yaxis, _eye), -glm::dot(zaxis, _eye), 1)
+            vec4(xaxis.x,                yaxis.x,                zaxis.x,                0),
+            vec4(xaxis.y,                yaxis.y,                zaxis.y,                0),
+            vec4(xaxis.z,                yaxis.z,                zaxis.z,                0),
+            vec4(-dot(xaxis, _eye), -dot(yaxis, _eye), -dot(zaxis, _eye), 1)
         };
     }
 
-    void Renderer::set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up)
+    void Renderer::set_view_matrix(const vec3& _eye, const vec3& _center, const vec3& _up)
     {
-        view_mat = glm::lookAt(_eye, _center, _up);
+        view_mat = lookAt(_eye, _center, _up);
     }
 
-    void Renderer::set_view_matrix(const glm::mat4& _matrix)
+    void Renderer::set_view_matrix(const mat4& _matrix)
     {
         view_mat = _matrix;
+    }
+
+
+    u32 Renderer::load_primitive(vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count)
+    {
+        u32 vao,
+            vbo_vertices, ebo_vertices_indices,
+            vbo_normals, ebo_normals_indices;
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glGenBuffers(1, &vbo_vertices);
+        glGenBuffers(1, &ebo_vertices_indices);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+        glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(vec3), vertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_vertices_indices);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertices_indices_count * sizeof(u32), vertices_indices, GL_STATIC_DRAW);
+
+
+        //glGenBuffers(1, &vbo_normals);
+        //glGenBuffers(1, &ebo_normals_indices);
+
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo_normals);
+        //glBufferData(GL_ARRAY_BUFFER, normals_count * sizeof(vec3), normals, GL_STATIC_DRAW);
+        //glEnableVertexAttribArray(1);
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_normals_indices);
+        //glBufferData(GL_ELEMENT_ARRAY_BUFFER, normals_indices_count * sizeof(u32), normals_indices, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        return vao;
+    }
+
+    void Renderer::draw_primitive(const u32 vao, const u32 nindices, const Material& material, const vec3& position, const quat& orientation, const vec3& scale)
+    {
+        material.shader.use();
+        material.shader.set("model", translate(mat4(1), position) * mat4_cast(orientation) * scale(mat4(1), vec3(scale)));
+        material.shader.set("proj", proj_mat_perspective);
+        material.shader.set("view", view_mat);
+
+        glBindVertexArray(vao);
+        glEnableVertexAttribArray(0);
+        //glEnableVertexAttribArray(1);
+
+        glDrawElements(GL_TRIANGLES, nindices, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
     }
 
     void Renderer::load_mesh(Mesh * _mesh)
@@ -134,10 +190,10 @@ namespace rain::engine
         _mesh->vao = 0;
     }
 
-    void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const glm::vec3& _position, const glm::quat& _orientation, const glm::vec3& _scale)
+    void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const vec3& _position, const quat& _orientation, const vec3& _scale)
     {
         _material.shader.use();
-        _material.shader.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        _material.shader.set("model", translate(mat4(1), _position) * mat4_cast(_orientation) * scale(mat4(1), vec3(_scale)));
         _material.shader.set("proj", proj_mat_perspective);
         _material.shader.set("view", view_mat);
 
@@ -153,11 +209,11 @@ namespace rain::engine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::draw_coord_view(const glm::vec3& _position)
+    void Renderer::draw_coord_view(const vec3& _position)
     {
-        draw_debug_line(glm::vec3(200.0f, 0.0f, 0.0f), glm::vec3(-200.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        draw_debug_line(glm::vec3(0.0f, 200.0f, 0.0f), glm::vec3(0.0f, -200.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.5f, 1.0f));
-        draw_debug_line(glm::vec3(0.0f, 0.0f, 200.0f), glm::vec3(0.0f, 0.0f, -200.0f), glm::vec3(0.5f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.5f));
+        draw_debug_line(vec3(200.0f, 0.0f, 0.0f), vec3(-200.0f, 0.0f, 0.0f), vec3(1.0f, 0.5f, 0.0f), vec3(0.5f, 1.0f, 0.0f));
+        draw_debug_line(vec3(0.0f, 200.0f, 0.0f), vec3(0.0f, -200.0f, 0.0f), vec3(0.0f, 1.0f, 0.5f), vec3(0.0f, 0.5f, 1.0f));
+        draw_debug_line(vec3(0.0f, 0.0f, 200.0f), vec3(0.0f, 0.0f, -200.0f), vec3(0.5f, 0.0f, 1.0f), vec3(1.0f, 0.0f, 0.5f));
     }
 
 
@@ -244,19 +300,19 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_quad(const core::math::Plane& _p, const glm::vec3 _position, const glm::vec3& _color)
+    void Renderer::draw_quad(const core::math::Plane& _p, const vec3 _position, const vec3& _color)
     {   
-        glm::vec3 u = glm::cross(_p.n, _position); // cross product -> note that u lies on the plane
-        glm::vec3 v = glm::cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
+        vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
+        vec3 v = cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
 
-        glm::vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
+        vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
         float  f = 20.0f;  // large enough
-        glm::vec3 fu = u * f;
-        glm::vec3 fv = v * f;
-        glm::vec3 A = P0 - fu - fv;
-        glm::vec3 B = P0 + fu - fv;
-        glm::vec3 C = P0 + fu + fv;
-        glm::vec3 D = P0 - fu + fv;
+        vec3 fu = u * f;
+        vec3 fv = v * f;
+        vec3 A = P0 - fu - fv;
+        vec3 B = P0 + fu - fv;
+        vec3 C = P0 + fu + fv;
+        vec3 D = P0 - fu + fv;
 
         const float vertices[] =
         {
@@ -293,12 +349,12 @@ namespace rain::engine
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
+        mat4 mvp = proj_mat_perspective * view_mat * mat4(1.0f);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
         //phong.use();
-        //phong.set("model", glm::translate(glm::mat4(1), glm::vec3(0,0,0)));
+        //phong.set("model", translate(mat4(1), vec3(0,0,0)));
         //phong.set("proj", proj_mat_perspective);
         //phong.set("view", view_mat);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -313,9 +369,9 @@ namespace rain::engine
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);
 
-        std::vector<glm::vec3> positions;
-        std::vector<glm::vec2> uv;
-        std::vector<glm::vec3> normals;
+        std::vector<vec3> positions;
+        std::vector<vec2> uv;
+        std::vector<vec3> normals;
         std::vector<unsigned int> indices;
 
         const unsigned int X_SEGMENTS = 64;
@@ -331,9 +387,9 @@ namespace rain::engine
                 float yPos = std::cos(ySegment * PI);
                 float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
 
-                positions.push_back(glm::vec3(xPos, yPos, zPos));
-                uv.push_back(glm::vec2(xSegment, ySegment));
-                normals.push_back(glm::vec3(xPos, yPos, zPos));
+                positions.push_back(vec3(xPos, yPos, zPos));
+                uv.push_back(vec2(xSegment, ySegment));
+                normals.push_back(vec3(xPos, yPos, zPos));
             }
         }
 
@@ -400,12 +456,12 @@ namespace rain::engine
 
         glGenBuffers(1, &m_debug_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_vbo);
-        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(glm::vec3), &m_debug_vertices[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(vec3), &m_debug_vertices[0], GL_DYNAMIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
 
         glGenBuffers(1, &m_debug_cbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_cbo);
-        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(glm::vec3), &m_debug_colors[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(vec3), &m_debug_colors[0], GL_DYNAMIC_DRAW);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
 
         glEnableVertexAttribArray(0);
@@ -416,7 +472,7 @@ namespace rain::engine
 
     void Renderer::draw()
     {
-        draw_coord_view(glm::vec3(0.0f, 0.0f, 0.0f));
+        draw_coord_view(vec3(0.0f, 0.0f, 0.0f));
         draw_debug();
     }
 
@@ -428,14 +484,14 @@ namespace rain::engine
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(glm::vec3), m_debug_vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(vec3), m_debug_vertices);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_cbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(glm::vec3), m_debug_colors);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(vec3), m_debug_colors);
 
         glDisable(GL_BLEND);
 
-        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1.0f);
+        mat4 mvp = proj_mat_perspective * view_mat * mat4(1.0f);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -454,7 +510,7 @@ namespace rain::engine
         m_debug_vertex_count = 0;
     }
 
-    void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color)
+    void Renderer::draw_debug_line(const vec3& _point1, const vec3& _point2, const vec3& _color)
     {
         if (m_debug_vertex_count + 2 < debug_vertices_max_count)
         {
@@ -467,7 +523,7 @@ namespace rain::engine
         }
     }
 
-    void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2)
+    void Renderer::draw_debug_line(const vec3& _point1, const vec3& _point2, const vec3& _color1, const vec3& _color2)
     {
         if (m_debug_vertex_count + 2 < debug_vertices_max_count)
         {
@@ -480,19 +536,19 @@ namespace rain::engine
         }
     }
 
-    void Renderer::draw_debug_cube(const glm::vec3& _center, const f32 _width, const f32 _height, const glm::vec3& _color)
+    void Renderer::draw_debug_cube(const vec3& _center, const f32 _width, const f32 _height, const vec3& _color)
     {
         float halfWidth = _width / 2.0f;
         float halfHeight = _height / 2.0f;
 
-        glm::vec3 A(_center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight);
-        glm::vec3 B(_center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight);
-        glm::vec3 C(_center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight);
-        glm::vec3 D(_center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight);
-        glm::vec3 E(_center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight);
-        glm::vec3 F(_center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight);
-        glm::vec3 G(_center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight);
-        glm::vec3 H(_center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight);
+        vec3 A(_center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight);
+        vec3 B(_center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight);
+        vec3 C(_center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight);
+        vec3 D(_center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight);
+        vec3 E(_center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight);
+        vec3 F(_center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight);
+        vec3 G(_center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight);
+        vec3 H(_center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight);
 
         draw_debug_line(A, B, _color);
         draw_debug_line(B, C, _color);
@@ -510,7 +566,7 @@ namespace rain::engine
         draw_debug_line(H, E, _color);
     }
 
-    void Renderer::draw_debug_sphere(const glm::vec3& _position, const f32 _scale, const glm::quat& orientation)
+    void Renderer::draw_debug_sphere(const vec3& _position, const f32 _scale, const quat& orientation)
     {
         assert(false);
     }
@@ -525,20 +581,20 @@ namespace rain::engine
         assert(false);
     }
 
-    //void Renderer::draw_quad(const core::math::Plane& _p, const glm::vec3 _position, const glm::vec3& _color)
+    //void Renderer::draw_quad(const core::math::Plane& _p, const vec3 _position, const vec3& _color)
     //{
-    //    glm::vec3 z(0.0f, 0.0f, 1.0f);
-    //    glm::vec3 u = glm::cross(_p.n, _position); // cross product -> note that u lies on the plane
-    //    glm::vec3 v = glm::cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
+    //    vec3 z(0.0f, 0.0f, 1.0f);
+    //    vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
+    //    vec3 v = cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
 
-    //    glm::vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
+    //    vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
     //    float  f = 200.0f;  // large enough
-    //    glm::vec3 fu = u * f;
-    //    glm::vec3 fv = v * f;
-    //    glm::vec3 A = P0 - fu - fv;
-    //    glm::vec3 B = P0 + fu - fv;
-    //    glm::vec3 C = P0 + fu + fv;
-    //    glm::vec3 D = P0 - fu + fv;
+    //    vec3 fu = u * f;
+    //    vec3 fv = v * f;
+    //    vec3 A = P0 - fu - fv;
+    //    vec3 B = P0 + fu - fv;
+    //    vec3 C = P0 + fu + fv;
+    //    vec3 D = P0 - fu + fv;
 
     //    draw_debug_line(A, B, _color);
     //    draw_debug_line(B, C, _color);
@@ -546,10 +602,10 @@ namespace rain::engine
     //    draw_debug_line(D, A, _color);
     //}
 
-    void Renderer::draw_cube(const glm::vec3& _position, const f32 _scale,  const glm::quat& _orientation)
+    void Renderer::draw_cube(const vec3& _position, const f32 _scale,  const quat& _orientation)
     {
         phong.use();
-        phong.set("model", glm::translate(glm::mat4(1), _position) * glm::mat4_cast(_orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        phong.set("model", translate(mat4(1), _position) * mat4_cast(_orientation) * scale(mat4(1), vec3(_scale)));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 
@@ -558,10 +614,10 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_sphere(const glm::vec3& _center, const f32 _scale, const glm::quat& orientation)
+    void Renderer::draw_sphere(const vec3& _center, const f32 _scale, const quat& orientation)
     {
         phong.use();
-        phong.set("model", glm::translate(glm::mat4(1), _center) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), glm::vec3(_scale)));
+        phong.set("model", translate(mat4(1), _center) * mat4_cast(orientation) * scale(mat4(1), vec3(_scale)));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 
@@ -635,8 +691,8 @@ namespace rain::engine
             RChar character =
             {
                 texture,
-                glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                 GLuint(face->glyph->advance.x)
             };
             text_characters.insert(std::pair<GLchar, RChar>(c, character));
@@ -657,7 +713,7 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color)
+    void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const vec3& _color)
     {
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);

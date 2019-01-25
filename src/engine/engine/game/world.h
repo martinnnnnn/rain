@@ -4,12 +4,13 @@
 #include <entt.hpp>
 
 #include "core/core.h"
+#include "math/math.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
 
 namespace rain::engine
 {
-    using core::math::Transform;
+    using Transform = math::Transform;
 
     struct World
     {
@@ -22,7 +23,7 @@ namespace rain::engine
         void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
         void render(const float _alpha);
-
+        u32 temp_vao;
         //Mesh mesh;
         //std::vector<glm::vec3> positions;
 

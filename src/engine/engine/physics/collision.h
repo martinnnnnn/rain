@@ -2,30 +2,31 @@
 
 
 #include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 #include "core/core.h"
+#include "math/math.h"
 #include "engine/physics/rigid_body.h"
 
 namespace rain::engine
 {
-    using core::math::Plane;
-    using core::math::Transform;
-    using core::math::Sphere;
-    using core::math::Ray;
+    using math::Plane;
+    using math::Transform;
+    using math::Sphere;
+    using math::Ray;
+    using math::vec2;
+    using math::vec3;
 
     struct MeshBound
     {
-        std::vector<glm::vec3> points;
+        std::vector<vec3> points;
     };
 
     struct HitInfo
     {
         bool hit;
         f32 normalizedTime;
-        glm::vec3 contactPoint;
-        glm::vec3 contactNormal;
+        vec3 contactPoint;
+        vec3 contactNormal;
     };
 
 
@@ -33,9 +34,9 @@ namespace rain::engine
     HitInfo detect_collision_sphere(const Sphere& _sphereA, const Transform& _transformA, const Sphere& _sphereB, const Transform& _transformB);
     HitInfo detect_collision_sphere_plane( Sphere& _sphere, Transform& _transform, Plane& _plane);
 
-    glm::vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere);
+    vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere);
 
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position);
+    void collision_response(RigidBody& _bodyA, Transform& _transformA, vec3& _position);
     void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB);
 
 

@@ -8,6 +8,8 @@
 #include "core/core.h"
 #include "engine/win32/win32_helpers.h"
 
+extern "C" __declspec(dllexport) void launch_rain_engine(HINSTANCE hinstance);
+
 namespace rain::engine
 {
     struct World;

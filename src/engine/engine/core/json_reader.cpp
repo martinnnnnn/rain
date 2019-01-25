@@ -58,20 +58,6 @@ namespace rain::engine
             {
                 Transform& transform = registry.assign<Transform>(entity);
                 read_transform(world_object["Transform"], transform);
-
-                if (world_object["Transform"].HasMember("parent"))
-                {
-                    u32 parentId = world_object["Transform"]["parent"].GetUint();
-                    auto id_view = registry.view<u32, Transform>();
-                    for (auto id_ent : id_view)
-                    {
-                        if (id_view.get<u32>(id_ent) == parentId)
-                        {
-                            transform.parent = &(id_view.get<Transform>(id_ent));
-                        }
-
-                    }
-                }
             }
             if (world_object.HasMember("RigidBody"))
             {
@@ -125,9 +111,9 @@ namespace rain::engine
         }
     }
 
-    glm::vec3 JsonReader::read_vec3(const rapidjson::Value& _json)
+    vec3 JsonReader::read_vec3(const rapidjson::Value& _json)
     {
-        glm::vec3 position{ 0, 0, 0 };
+        vec3 position{ 0, 0, 0 };
         for (u32 i = 0; i < _json.Size(); i++)
         {
             position[i] = _json[i].GetFloat();
@@ -136,9 +122,9 @@ namespace rain::engine
         return position;
     }
 
-    glm::quat JsonReader::read_quat(const rapidjson::Value& _json)
+    quat JsonReader::read_quat(const rapidjson::Value& _json)
     {
-        glm::quat orientation{ 0, 0, 0, 1 };
+        quat orientation{ 0, 0, 0, 1 };
         for (u32 i = 0; i < _json.Size(); i++)
         {
             orientation[i] = _json[i].GetFloat();
@@ -162,7 +148,7 @@ namespace rain::engine
             }
             else if (_json["orientation"].Size() == 3)
             {
-                _transform.orientation = glm::quat(read_vec3(_json["orientation"]));
+                _transform.orientation = quat(read_vec3(_json["orientation"]));
             }
             _transform.lastOrientation = _transform.orientation;
         }
@@ -269,12 +255,12 @@ namespace rain::engine
 
     Plane JsonReader::read_plane(const rapidjson::Value& _json)
     {
-        glm::vec3 position {};
-        glm::vec3 normal {};
+        vec3 position {};
+        vec3 normal {};
 
-        glm::vec3 point1 {};
-        glm::vec3 point2 {};
-        glm::vec3 point3 {};
+        vec3 point1 {};
+        vec3 point2 {};
+        vec3 point3 {};
 
         if (_json.HasMember("position") && _json.HasMember("normal"))
         {
@@ -290,7 +276,7 @@ namespace rain::engine
             point3 = read_vec3(_json["point3"]);
             return Plane(point1, point2, point3);
         }
-        return Plane(glm::vec3{}, glm::vec3{});
+        return Plane(vec3{}, vec3{});
     }
 
     void JsonReader::read_model(const rapidjson::Value& _json, Model& _model)

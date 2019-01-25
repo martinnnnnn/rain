@@ -32,11 +32,13 @@ target_link_libraries(${RAIN_ENGINE} ${LIBS} optimized ${FBXSDK_LIBRARY} debug $
 target_include_directories(${RAIN_ENGINE} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(${RAIN_ENGINE}
     ${RAIN_CORE}
+    ${RAIN_MATH}
     )
 target_include_directories(${RAIN_ENGINE} PUBLIC
     ${CORE_INCLUDE_PATH}
+    ${MATH_INCLUDE_PATH}
     ${ENGINE_INCLUDE_PATH}
-    ${CMAKE_SOURCE_DIR}/external/glm
+    # ${CMAKE_SOURCE_DIR}/external/glm
     ${CMAKE_SOURCE_DIR}/external/json
     ${FBXSDK_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/external/entt/
@@ -61,9 +63,11 @@ target_link_libraries("${RAIN_ENGINE_EXPORT}" ${LIBS} optimized ${FBXSDK_LIBRARY
 target_include_directories("${RAIN_ENGINE_EXPORT}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries("${RAIN_ENGINE_EXPORT}"
     ${RAIN_CORE}
+    ${RAIN_MATH}
     )
 target_include_directories("${RAIN_ENGINE_EXPORT}" PUBLIC
     ${CORE_INCLUDE_PATH}
+    ${MATH_INCLUDE_PATH}
     ${ENGINE_INCLUDE_PATH}
     ${CMAKE_SOURCE_DIR}/external/glm
     ${CMAKE_SOURCE_DIR}/external/json

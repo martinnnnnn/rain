@@ -17,7 +17,7 @@ namespace rain::engine
     //HitInfo detect_collision(BoundingSphere& _boundA, Transform& _transformA, BoundingSphere& _boundB, Transform& _transformB)
     //{
     //    HitInfo info{};
-    //    float length = glm::length(_transformA.position - _transformB.position);
+    //    float length = length(_transformA.position - _transformB.position);
     //    float sumradius = _boundA.radius + _boundB.radius;
 
     //    if (length <= sumradius)
@@ -32,8 +32,8 @@ namespace rain::engine
     {
         HitInfo info{};
 
-        const f32 d0 = core::math::distance_point_to_plane(_transform.lastPosition, _plane);
-        const f32 d1 = core::math::distance_point_to_plane(_transform.position, _plane);
+        const f32 d0 = math::distance_point_to_plane(_transform.lastPosition, _plane);
+        const f32 d1 = math::distance_point_to_plane(_transform.position, _plane);
 
         // check if it was touching on previous frame
         if (fabs(d0) <= _sphere.radius)
@@ -52,15 +52,15 @@ namespace rain::engine
         return info;
     }
 
-    glm::vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere)
+    vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere)
     {
-        glm::vec3 oc = _ray.origin - _sphere.offset;
-        float b = glm::dot(oc, _ray.direction);
-        float c = glm::dot(oc, oc) - _sphere.radius * _sphere.radius;
+        vec3 oc = _ray.origin - _sphere.offset;
+        float b = dot(oc, _ray.direction);
+        float c = dot(oc, oc) - _sphere.radius * _sphere.radius;
         float h = b * b - c;
-        if (h < 0.0) return glm::vec2(-1.0f); // no intersection
+        if (h < 0.0) return vec2{ -1.0f, -1.0f }; // no intersection
         h = sqrt(h);
-        return glm::vec2(-b - h, -b + h);
+        return vec2{ -b - h, -b + h };
     }
 
 
@@ -69,23 +69,23 @@ namespace rain::engine
     {
         HitInfo info{};
 
-        const glm::vec3 va = _transformA.position - _transformA.lastPosition;
-        const glm::vec3 vb = _transformB.position - _transformB.lastPosition;
-        const glm::vec3 AB = _transformB.lastPosition - _transformA.lastPosition;
-        const glm::vec3 vab = va - vb;
+        const vec3 va = _transformA.position - _transformA.lastPosition;
+        const vec3 vb = _transformB.position - _transformB.lastPosition;
+        const vec3 AB = _transformB.lastPosition - _transformA.lastPosition;
+        const vec3 vab = va - vb;
 
         const f32 rab = _sphereA.radius + _sphereB.radius;
-        const f32 a = glm::dot(vab, vab);
-        const f32 b = -2.0f * glm::dot(AB, vab);
-        const f32 c = glm::dot(AB, AB) - rab * rab;
+        const f32 a = dot(vab, vab);
+        const f32 b = -2.0f * dot(AB, vab);
+        const f32 c = dot(AB, AB) - rab * rab;
 
         f32 u1;
-        if (glm::dot(AB, AB) <= rab * rab)
+        if (dot(AB, AB) <= rab * rab)
         {
             info.hit = true;
             info.normalizedTime = 0;
         }
-        if (core::math::get_quadratic_roots(a, b, c, info.normalizedTime, u1))
+        if (math::get_quadratic_roots(a, b, c, info.normalizedTime, u1))
         {
             info.hit = true;
             if (info.normalizedTime > u1)
@@ -97,44 +97,44 @@ namespace rain::engine
     }
 
 
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, glm::vec3& _position)
+    void collision_response(RigidBody& _bodyA, Transform& _transformA, vec3& _position)
     {
-        glm::vec3 x = glm::normalize(_transformA.position - _position);
+        vec3 x = normalized(_transformA.position - _position);
 
-        glm::vec3 v1 = _bodyA.velocity;
-        f32 x1 = glm::dot(x, v1);
-        glm::vec3 v1x = x * x1;
-        glm::vec3 v1y = v1 - v1x;
+        vec3 v1 = _bodyA.velocity;
+        f32 x1 = dot(x, v1);
+        vec3 v1x = x * x1;
+        vec3 v1y = v1 - v1x;
         f32 m1 = _bodyA.mass;
 
         x = x * -1.0f;
-        glm::vec3 v2 = glm::vec3(0.0f, 0.0f, 0.0f);
-        f32 x2 = glm::dot(x, v2);
-        glm::vec3 v2x = x * x2;
+        vec3 v2{};
+        f32 x2 = dot(x, v2);
+        vec3 v2x = x * x2;
         f32 m2 = 100.0f;
 
-        _bodyA.momentum = glm::vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
+        _bodyA.momentum = vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
     }
 
     void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB)
     {
-        glm::vec3 x = glm::normalize(_transformA.position - _transformB.position);
+        vec3 x = normalized(_transformA.position - _transformB.position);
 
-        glm::vec3 v1 = _bodyA.velocity;
-        f32 x1 = glm::dot(x, v1);
-        glm::vec3 v1x = x * x1;
-        glm::vec3 v1y = v1 - v1x;
+        vec3 v1 = _bodyA.velocity;
+        f32 x1 = dot(x, v1);
+        vec3 v1x = x * x1;
+        vec3 v1y = v1 - v1x;
         f32 m1 = _bodyA.mass;
 
         x = x * -1.0f;
-        glm::vec3 v2 = _bodyB.velocity;
-        f32 x2 = glm::dot(x, v2);
-        glm::vec3 v2x = x * x2;
-        glm::vec3 v2y = v2 - v2x;
+        vec3 v2 = _bodyB.velocity;
+        f32 x2 = dot(x, v2);
+        vec3 v2x = x * x2;
+        vec3 v2y = v2 - v2x;
         f32 m2 = _bodyB.mass;
 
-        _bodyA.momentum = glm::vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
-        _bodyB.momentum = glm::vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _bodyB.mass;
+        _bodyA.momentum = vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
+        _bodyB.momentum = vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _bodyB.mass;
     }
 
     HitInfo detect_collision_gjk(const MeshBound& _verticesA, const Transform& _transformA, const MeshBound& _verticesB, const Transform& _transformB)

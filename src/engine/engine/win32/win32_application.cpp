@@ -19,6 +19,38 @@
 // TEMP
 #include "engine/network/client.h"
 
+void launch_rain_engine(HINSTANCE hinstance)
+{
+    rain::engine::Application application;
+
+    if (application.init(hinstance, "") != 0)
+    {
+        return;
+    }
+
+    MSG msg;
+    bool quit = false;
+    while (!quit)
+    {
+        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+                quit = true;
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        application.update();
+
+        if (GetAsyncKeyState(VK_ESCAPE))
+        {
+            RAIN_WINDOW->shutdown();
+        }
+    }
+
+}
+
 
 namespace rain::engine
 {
@@ -34,6 +66,7 @@ namespace rain::engine
 
         // INIT LOGGER
         RAIN_CONTEXT->logger = new core::Logger(print_to_log);
+
 
         // INIT ID GENERATOR
         RAIN_CONTEXT->id_generator = new IdGenerator();
@@ -128,7 +161,7 @@ namespace rain::engine
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
-        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, vec3{ 0.5, 0.8f, 0.2f });
         world->render(_alpha);
     }
 }

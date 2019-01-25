@@ -11,8 +11,8 @@ namespace rain::engine
 {
     Camera::Camera()
     {
-        worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-        front = glm::vec3(0.0f, 0.0f, -1.0f);
+        worldUp = vec3{ 0.0f, 1.0f, 0.0f };
+        front = vec3{ 0.0f, 0.0f, -1.0f };
         movement_speed = 0.0f;
         yaw = -90.0f;
         pitch = 0.0f;
@@ -20,7 +20,7 @@ namespace rain::engine
 
     void update(Camera& _camera, Transform& _transform)
     {
-        glm::vec3 movement(0.0f, 0.0f, 0.0f);
+        vec3 movement{ 0.0f, 0.0f, 0.0f };
 
         if (RAIN_INPUT->mouse_lock)
         {
@@ -48,14 +48,14 @@ namespace rain::engine
 
         _camera.pitch = std::clamp(_camera.pitch, -89.0f, 89.0f);
 
-        _camera.front.x = cos(glm::radians(_camera.yaw)) * cos(glm::radians(_camera.pitch));
-        _camera.front.y = sin(glm::radians(_camera.pitch));
-        _camera.front.z = sin(glm::radians(_camera.yaw)) * cos(glm::radians(_camera.pitch));
-        _camera.front = glm::normalize(_camera.front);
+        _camera.front.x = cos(radians(_camera.yaw)) * cos(radians(_camera.pitch));
+        _camera.front.y = sin(radians(_camera.pitch));
+        _camera.front.z = sin(radians(_camera.yaw)) * cos(radians(_camera.pitch));
+        _camera.front = normalized(_camera.front);
 
-        _camera.right = glm::normalize(glm::cross(_camera.front, _camera.worldUp));
+        _camera.right = normalized(cross(_camera.front, _camera.worldUp));
 
-        _camera.up = glm::normalize(glm::cross(_camera.right, _camera.front));
+        _camera.up = normalized(cross(_camera.right, _camera.front));
 
     }
 }

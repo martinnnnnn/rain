@@ -19,4 +19,6 @@ namespace rain::core::memory
     void init_linear_allocator(LinearAllocator * const _allocator, void * const _memory, const u32 _capacity);
     void clear_allocator(LinearAllocator * const _allocator);
     void* get_memory(LinearAllocator * const _allocator, u32 _memsize, u8 _aligment);
+
+
 }

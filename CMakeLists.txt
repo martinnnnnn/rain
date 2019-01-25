@@ -17,15 +17,18 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT $
 
 #### SETTING PROJECT MAIN PATHS AND NAMES ####
 set(RAIN_CORE rain_core)
+set(RAIN_MATH rain_math)
 set(RAIN_SERVER rain_server)
 set(RAIN_ENGINE rain_engine)
 set(RAIN_ENGINE_EXPORT rain_engine_export)
 
 set(CORE_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/core")
+set(MATH_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/math")
 set(SERVER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/server")
 set(ENGINE_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/src/engine")
 
 set(CORE_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/bin/rain_core")
+set(MATH_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/bin/rain_math")
 set(SERVER_EXE_PATH "${CMAKE_SOURCE_DIR}/bin/rain_server")
 set(ENGINE_EXE_PATH "${CMAKE_SOURCE_DIR}/bin/rain_engine")
 set(ENGINE_EXPORT_PATH "${CMAKE_SOURCE_DIR}/bin/rain_engine_export")

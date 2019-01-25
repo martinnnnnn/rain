@@ -26,17 +26,17 @@ namespace editor
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Form2 newMDIChild = new Form2();
-            // Set the Parent Form of the Child window.  
-            newMDIChild.MdiParent = this;
-            // Display the new form.  
-            newMDIChild.Show();
+            //Form2 newMDIChild = new Form2();
+            //// Set the Parent Form of the Child window.  
+            //newMDIChild.MdiParent = this;
+            //// Display the new form.  
+            //newMDIChild.Show();
         }
 
         private void launchEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IntPtr handle = m_form.Handle;
-            EngineDLL.OpenWindow(handle/*, "D:/_MARTIN/programming/_projects/rain_engine/resources"*/);
+            EngineDLL.launch_rain_engine(handle);
         }
     }
 }

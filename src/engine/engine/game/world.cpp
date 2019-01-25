@@ -15,16 +15,37 @@
 
 #include "engine/network/client.h"
 
-
+#include "physics/quick_hull.h"
 
 namespace rain::engine
 {
     void World::init(const std::string& _path)
     {
-        RAIN_PROFILE("init");
+        RAIN_PROFILE("world init");
 
         file.open(_path);
         JsonReader::read_world(file.read(), *this);
+
+        auto entity = registry.create();
+        Transform& transform = registry.assign<Transform>(entity);       
+        Material& material = registry.assign<Material>(entity);
+        material.shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
+        physics::mesh& mesh = registry.assign<physics::mesh>(entity);
+
+        Model model;
+        model.path = FilePath(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
+        model.mesh = RAIN_FIND_DATA_FROM_PATH(model.path.get_path_absolute());
+
+        using vec3 = core::math::vec3;
+        u32 vertices_count = model.mesh->vertices.size();
+        vec3* vertices = (vec3*)malloc(vertices_count * sizeof(vec3));
+        for (u32 i = 0; i < vertices_count; ++i)
+        {
+            memcpy(&vertices[i], &model.mesh->vertices[i].position, sizeof(glm::vec3));
+        }
+
+        quick_hull(vertices, vertices_count, &mesh);
+        temp_vao = RAIN_RENDERER->load_primitive(mesh.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
     }
 
     void World::update_camera(const float _deltaTime)
@@ -145,6 +166,19 @@ namespace rain::engine
             RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
         }
 
+        auto test_view = registry.view<Transform, physics::mesh, Material>();
+        for (auto entity : test_view)
+        {
+            Transform& transform = test_view.get<Transform>(entity);
+            physics::mesh& mesh = test_view.get<physics::mesh>(entity);
+            Material& material = test_view.get<Material>(entity);
+
+            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+
+            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
+        }
+
         auto view2 = registry.view<Transform, Sphere>();
 
         for (auto entity : view2)
@@ -157,12 +191,12 @@ namespace rain::engine
             RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
         }
 
-        auto plane_view = registry.view<Plane>();
-        for (auto ent_plane : plane_view)
-        {
-            Plane& plane = plane_view.get(ent_plane);
-            RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
-        }
+        //auto plane_view = registry.view<Plane>();
+        //for (auto ent_plane : plane_view)
+        //{
+        //    Plane& plane = plane_view.get(ent_plane);
+        //    RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
+        //}
     }
 
 }

@@ -16,12 +16,12 @@ namespace rain::engine
             // update orientation
             _body.angularMomentum += _body.torque * _deltaTime;
             _body.angularVelocity = _body.angularMomentum * _body.rotationInertiaInverse;
-            _body.spin = 0.5f * glm::quat(0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z) * _transform.orientation;
+            _body.spin = 0.5f * quat{ 0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z } *_transform.orientation;
             _transform.orientation += _body.spin * _deltaTime;
-            _transform.orientation = glm::normalize(_transform.orientation);
+            _transform.orientation = math::normalized(_transform.orientation);
         }
 
-        _body.force = glm::vec3(0.0f);
-        _body.torque = glm::vec3(0.0f);
+        _body.force = vec3{};
+        _body.torque = vec3{};
     }
 }
