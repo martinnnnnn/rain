@@ -142,6 +142,9 @@ namespace rain::engine
 
     void Renderer::draw_primitive(const u32 vao, const u32 nindices, const Material& material, const vec3& position, const quat& orientation, const vec3& scale)
     {
+        //mat4 model = identity_mat4();
+        //model = translate(model, position);
+
         material.shader.use();
         material.shader.set("model", translate(identity_mat4(), position) * mat4_cast(orientation) * math::scale(identity_mat4(), scale));
         material.shader.set("proj", proj_mat_perspective);

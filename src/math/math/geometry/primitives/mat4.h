@@ -101,7 +101,7 @@ namespace rain::math
         return vec4{ v.x, v.y, v.z, 0.0f } * m;
     }
 
-   inline  mat4 mat4_cast(mat3& m3)
+    inline  mat4 mat4_cast(mat3& m3)
     {
         mat4 m4 = identity_mat4();
         m4[0] = vec4{ m3[0].x, m3[0].y, m3[0].z, 0.0f };
@@ -111,16 +111,16 @@ namespace rain::math
         return m4;
     }
 
-   inline mat4 translate(const mat4& m, const vec3& v)
+    inline mat4 translate(const mat4& m, const vec3& v)
     {
-        mat4 mat;
+        mat4 mat(m);
         mat[3] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3];
         return mat;
     }
 
-   inline mat4 scale(const mat4& mat, const vec3& scale)
+    inline mat4 scale(const mat4& mat, const vec3& scale)
     {
-        mat4 scaled;
+        mat4 scaled{};
         scaled[0] = mat[0] * scale[0];
         scaled[1] = mat[1] * scale[1];
         scaled[2] = mat[2] * scale[2];
