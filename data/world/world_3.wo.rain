@@ -11,9 +11,9 @@
             {
                 "default": false,
 
-                    "position" : [5.0, 32.0, 6.0],
-                    "orientation" : [0.0, 0.0, 0.0, 1.0],
-                    "scale" : [0.1, 0.1, 0.1]
+                "position" : [5.0, 32.0, 6.0],
+                "orientation" : [0.0, 0.0, 0.0, 1.0],
+                "scale" : [0.1, 0.1, 0.1]
             },
             "RigidBody":
             {
@@ -63,7 +63,6 @@
             "Transform" :
             {
                 "default": false,
-                "parent": 0,
                 "position" : [1.0, 1.0, 0.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0]
             },

@@ -198,7 +198,7 @@ namespace rain::engine
     void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const vec3& _position, const quat& _orientation, const vec3& _scale)
     {
         _material.shader.use();
-        _material.shader.set("model", translate(identity_mat4(), _position) * mat4_cast(_orientation) * scale(identity_mat4(), _scale));
+        _material.shader.set("model", math::translate(identity_mat4(), _position) * math::mat4_cast(_orientation) * math::scale(identity_mat4(), _scale));
         _material.shader.set("proj", proj_mat_perspective);
         _material.shader.set("view", view_mat);
 
@@ -219,9 +219,6 @@ namespace rain::engine
         draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
         draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
         draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
-        //draw_debug_line(vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-        //draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-        //draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.0f, 0.0f, 1.0f }, vec3{ 0.0f, 0.0f, 1.0f });
     }
 
 
@@ -610,10 +607,10 @@ namespace rain::engine
     //    draw_debug_line(D, A, _color);
     //}
 
-    void Renderer::draw_cube(const vec3& _position, const f32 _scale,  const quat& _orientation)
+    void Renderer::draw_cube(const vec3& position, const quat& orientation, const vec3& scale)
     {
         phong.use();
-        phong.set("model", translate(identity_mat4(), _position) * mat4_cast(_orientation) * scale(identity_mat4(), vec3{ _scale,_scale,_scale }));
+        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 
@@ -622,10 +619,10 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_sphere(const vec3& _center, const f32 _scale, const quat& orientation)
+    void Renderer::draw_sphere(const vec3& position, const quat& orientation, const vec3& scale)
     {
         phong.use();
-        phong.set("model", translate(identity_mat4(), _center) * mat4_cast(orientation) * scale(identity_mat4(), vec3{ _scale,_scale,_scale }));
+        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 

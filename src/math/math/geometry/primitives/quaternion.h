@@ -83,10 +83,10 @@ namespace rain::math
         vec3 c = cos(v * 0.5f);
         vec3 s = sin(v * 0.5f);
 
-        q.w = c.x * c.y * c.z + s.x * s.y * s.z;
         q.x = s.x * c.y * c.z - c.x * s.y * s.z;
         q.y = c.x * s.y * c.z + s.x * c.y * s.z;
         q.z = c.x * c.y * s.z - s.x * s.y * c.z;
+        q.w = c.x * c.y * c.z + s.x * s.y * s.z;
         return q;
     }
 
@@ -108,10 +108,10 @@ namespace rain::math
     inline quat operator*(const quat& q1, const quat& q2)
     {
         quat q;
-        q.w = q2.w * q1.w - q2.x * q1.x - q2.y * q1.y - q2.z * q1.z;
         q.x = q2.w * q1.x + q2.x * q1.w + q2.y * q1.z - q2.z * q1.y;
         q.y = q2.w * q1.y + q2.y * q1.w + q2.z * q1.x - q2.x * q1.z;
         q.z = q2.w * q1.z + q2.z * q1.w + q2.x * q1.y - q2.y * q1.x;
+        q.w = q2.w * q1.w - q2.x * q1.x - q2.y * q1.y - q2.z * q1.z;
         return q;
     }
 
@@ -142,7 +142,7 @@ namespace rain::math
         f32 len = length(q);
         if (len <= 0.0f)
         {
-            q = quat{ 1.0f, 0.0f, 0.0f, 0.0f };
+            q = quat{ 0.0f, 0.0f, 0.0f, 1.0f };
         }
         f32 oneOverLen = 1.0f / len;
         q = quat{ q.x * oneOverLen, q.y * oneOverLen, q.z * oneOverLen, q.w * oneOverLen };
@@ -153,7 +153,7 @@ namespace rain::math
         f32 len = length(q);
         if (len <= 0.0f)
         {
-            return quat{ 1.0f, 0.0f, 0.0f, 0.0f };
+            return quat{ 0.0f, 0.0f, 0.0f, 1.0f };
         }
         f32 oneOverLen = 1.0f / len;
         return quat{ q.x * oneOverLen, q.y * oneOverLen, q.z * oneOverLen, q.w * oneOverLen };

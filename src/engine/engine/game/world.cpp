@@ -29,6 +29,7 @@ namespace rain::engine
 
         auto entity = registry.create();
         Transform& transform = registry.assign<Transform>(entity);
+        transform.scale = vec3{ 0.1f, 0.1f, 0.1f };
         Material& material = registry.assign<Material>(entity);
         material.shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
         math::mesh& mesh = registry.assign<math::mesh>(entity);
@@ -163,7 +164,7 @@ namespace rain::engine
             vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            //RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
+            RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
         }
 
         auto test_view = registry.view<Transform, mesh, Material>();
@@ -176,7 +177,7 @@ namespace rain::engine
             vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            //RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
+            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
         }
 
         auto view2 = registry.view<Transform, Sphere>();
@@ -188,7 +189,7 @@ namespace rain::engine
             vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
+            RAIN_RENDERER->draw_sphere(position, orientation, vec3{ 1.0f, 1.0f, 1.0f });
         }
 
         //auto plane_view = registry.view<Plane>();

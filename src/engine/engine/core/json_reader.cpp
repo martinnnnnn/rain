@@ -52,7 +52,6 @@ namespace rain::engine::JsonReader
 
             auto entity = registry.create();
 
-            // TODO (martin) : should really be a struct idenfier there
             u32& id = registry.assign<u32>(entity);
             id = world_object["id"].GetUint();
 
@@ -115,7 +114,7 @@ namespace rain::engine::JsonReader
 
     vec3 read_vec3(const rapidjson::Value& _json)
     {
-        vec3 position{ 0, 0, 0 };
+        vec3 position{};
         for (u32 i = 0; i < _json.Size(); i++)
         {
             position[i] = _json[i].GetFloat();
