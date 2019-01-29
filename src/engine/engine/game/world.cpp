@@ -15,10 +15,11 @@
 
 #include "engine/network/client.h"
 
-#include "physics/quick_hull.h"
 
 namespace rain::engine
 {
+    using namespace rain::math;
+
     void World::init(const std::string& _path)
     {
         RAIN_PROFILE("world init");
@@ -27,21 +28,20 @@ namespace rain::engine
         JsonReader::read_world(file.read(), *this);
 
         auto entity = registry.create();
-        Transform& transform = registry.assign<Transform>(entity);       
+        Transform& transform = registry.assign<Transform>(entity);
         Material& material = registry.assign<Material>(entity);
         material.shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
-        physics::mesh& mesh = registry.assign<physics::mesh>(entity);
+        math::mesh& mesh = registry.assign<math::mesh>(entity);
 
         Model model;
         model.path = FilePath(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
         model.mesh = RAIN_FIND_DATA_FROM_PATH(model.path.get_path_absolute());
 
-        using vec3 = core::math::vec3;
         u32 vertices_count = model.mesh->vertices.size();
         vec3* vertices = (vec3*)malloc(vertices_count * sizeof(vec3));
         for (u32 i = 0; i < vertices_count; ++i)
         {
-            memcpy(&vertices[i], &model.mesh->vertices[i].position, sizeof(glm::vec3));
+            memcpy(&vertices[i], &model.mesh->vertices[i].position, sizeof(vec3));
         }
 
         quick_hull(vertices, vertices_count, &mesh);
@@ -160,23 +160,23 @@ namespace rain::engine
             //send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
             //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
             
-            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
+            //RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
         }
 
-        auto test_view = registry.view<Transform, physics::mesh, Material>();
+        auto test_view = registry.view<Transform, mesh, Material>();
         for (auto entity : test_view)
         {
             Transform& transform = test_view.get<Transform>(entity);
-            physics::mesh& mesh = test_view.get<physics::mesh>(entity);
+            math::mesh& mesh = test_view.get<math::mesh>(entity);
             Material& material = test_view.get<Material>(entity);
 
-            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
+            //RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
         }
 
         auto view2 = registry.view<Transform, Sphere>();
@@ -185,10 +185,10 @@ namespace rain::engine
         {
             Transform& transform = view2.get<Transform>(entity);
             
-            glm::vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
+            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
+            //RAIN_RENDERER->draw_sphere(position, 1.0f, orientation);
         }
 
         //auto plane_view = registry.view<Plane>();

@@ -8,9 +8,6 @@
 
 namespace rain::engine
 {
-    using math::Transform;
-    using math::quat;
-    using math::vec3;
 
     struct RigidBody
     {
@@ -38,14 +35,14 @@ namespace rain::engine
         f32 mass_inverse;
         f32 size;
 
-        vec3 force;
-        vec3 momentum;
-        vec3 velocity;
+        math::vec3 force;
+        math::vec3 momentum;
+        math::vec3 velocity;
 
-        vec3 torque;
-        vec3 angularMomentum;
-        vec3 angularVelocity;
-        quat spin;
+        math::vec3 torque;
+        math::vec3 angularMomentum;
+        math::vec3 angularVelocity;
+        math::quat spin;
         f32 rotationInertia;
         f32 rotationInertiaInverse;
 
@@ -54,6 +51,6 @@ namespace rain::engine
     };
 
 
-    void apply_physics(RigidBody& _body, Transform& _transform, const f32 _deltaTime);
+    void apply_physics(RigidBody& _body, math::Transform& _transform, const f32 _deltaTime);
 
 }

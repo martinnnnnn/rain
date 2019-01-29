@@ -7,7 +7,6 @@
 
 namespace rain::engine
 {
-    using vec3 = math::vec3;
     struct Spring
     {
         Spring()
@@ -22,8 +21,8 @@ namespace rain::engine
 
         u32 entityA;
         u32 entityB;
-        vec3 anchorPointA;
-        vec3 anchorPointB;
+        math::vec3 anchorPointA;
+        math::vec3 anchorPointB;
         f32 distance;
         f32 k;
         f32 b;

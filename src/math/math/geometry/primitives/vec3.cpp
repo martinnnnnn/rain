@@ -31,6 +31,11 @@ namespace rain::math
         return vec3{ _a.x * _b, _a.y * _b, _a.z * _b };
     }
 
+    vec3 operator*(const f32 _b, const vec3& _a)
+    {
+        return vec3{ _a.x * _b, _a.y * _b, _a.z * _b };
+    }
+
 
     vec3 operator/(const vec3& _a, const vec3& _b)
     {

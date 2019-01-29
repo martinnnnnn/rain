@@ -27,6 +27,8 @@ namespace rain::engine
 
     //    return info;
     //}
+    using namespace rain::math;
+
 
     HitInfo detect_collision_sphere_plane(Sphere& _sphere, Transform& _transform, Plane& _plane)
     {

@@ -4,6 +4,7 @@
 #include <entt.hpp>
 
 #include "core/core.h"
+#include "math/math.h"
 #include "engine/win32/win32_input.h"
 #include "engine/core/context.h"
 
@@ -11,16 +12,16 @@ namespace rain::engine
 {
     Camera::Camera()
     {
-        worldUp = vec3{ 0.0f, 1.0f, 0.0f };
-        front = vec3{ 0.0f, 0.0f, -1.0f };
+        worldUp = math::vec3{ 0.0f, 1.0f, 0.0f };
+        front = math::vec3{ 0.0f, 0.0f, -1.0f };
         movement_speed = 0.0f;
         yaw = -90.0f;
         pitch = 0.0f;
     }
 
-    void update(Camera& _camera, Transform& _transform)
+    void update(Camera& _camera, math::Transform& _transform)
     {
-        vec3 movement{ 0.0f, 0.0f, 0.0f };
+        math::vec3 movement{ 0.0f, 0.0f, 0.0f };
 
         if (RAIN_INPUT->mouse_lock)
         {
@@ -48,9 +49,9 @@ namespace rain::engine
 
         _camera.pitch = std::clamp(_camera.pitch, -89.0f, 89.0f);
 
-        _camera.front.x = cos(radians(_camera.yaw)) * cos(radians(_camera.pitch));
-        _camera.front.y = sin(radians(_camera.pitch));
-        _camera.front.z = sin(radians(_camera.yaw)) * cos(radians(_camera.pitch));
+        _camera.front.x = math::cos(math::to_rad(_camera.yaw)) * math::cos(math::to_rad(_camera.pitch));
+        _camera.front.y = math::sin(math::to_rad(_camera.pitch));
+        _camera.front.z = math::sin(math::to_rad(_camera.yaw)) * math::cos(math::to_rad(_camera.pitch));
         _camera.front = normalized(_camera.front);
 
         _camera.right = normalized(cross(_camera.front, _camera.worldUp));

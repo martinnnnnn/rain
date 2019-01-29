@@ -10,7 +10,6 @@
 
 namespace rain::engine
 {
-    using Transform = math::Transform;
 
     struct World
     {
@@ -24,8 +23,6 @@ namespace rain::engine
         void update_physics(const float _deltaTime);
         void render(const float _alpha);
         u32 temp_vao;
-        //Mesh mesh;
-        //std::vector<glm::vec3> positions;
 
     };
 }

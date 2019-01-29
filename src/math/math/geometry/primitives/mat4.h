@@ -52,34 +52,53 @@ namespace rain::math
         mat[0] = vec4{ 1.0f, 0.0f, 0.0f, 0.0f };
         mat[1] = vec4{ 0.0f, 1.0f, 0.0f, 0.0f };
         mat[2] = vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
-        mat[4] = vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
+        mat[3] = vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
         return mat;
     }
 
-    inline mat4 operator*(const mat4& m, const vec3& v)
+
+
+    inline vec4 operator*(const mat4& m, const vec4& v)
     {
-        assert(false && "not implemented");
-        return identity_mat4();
+        return vec4
+        {
+
+            m[0][0] * v[0] + m[1][0] * v[1] + m[2][0] * v[2] + m[3][0] * v[3],
+            m[0][1] * v[0] + m[1][1] * v[1] + m[2][1] * v[2] + m[3][1] * v[3],
+            m[0][2] * v[0] + m[1][2] * v[1] + m[2][2] * v[2] + m[3][2] * v[3],
+            m[0][3] * v[0] + m[1][3] * v[1] + m[2][3] * v[2] + m[3][3] * v[3]
+        };
+    }
+
+    inline vec4 operator*(const vec4& v, const mat4& m)
+    {
+        return vec4
+        {
+            m[0][0] * v[0] + m[0][1] * v[1] + m[0][2] * v[2] + m[0][3] * v[3],
+            m[1][0] * v[0] + m[1][1] * v[1] + m[1][2] * v[2] + m[1][3] * v[3],
+            m[2][0] * v[0] + m[2][1] * v[1] + m[2][2] * v[2] + m[2][3] * v[3],
+            m[3][0] * v[0] + m[3][1] * v[1] + m[3][2] * v[2] + m[3][3] * v[3]
+        };
     }
 
     inline mat4 operator*(const mat4& m1, const mat4& m2)
     {
-        const vec4 SrcA0 = m1[0];
-        const vec4 SrcA1 = m1[1];
-        const vec4 SrcA2 = m1[2];
-        const vec4 SrcA3 = m1[3];
-
-        const vec4 SrcB0 = m2[0];
-        const vec4 SrcB1 = m2[1];
-        const vec4 SrcB2 = m2[2];
-        const vec4 SrcB3 = m2[3];
-
         mat4 mat;
         mat[0] = m1[0] * m2[0][0] + m1[1] * m2[0][1] + m1[2] * m2[0][2] + m1[3] * m2[0][3];
         mat[1] = m1[0] * m2[1][0] + m1[1] * m2[1][1] + m1[2] * m2[1][2] + m1[3] * m2[1][3];
         mat[2] = m1[0] * m2[2][0] + m1[1] * m2[2][1] + m1[2] * m2[2][2] + m1[3] * m2[2][3];
         mat[3] = m1[0] * m2[3][0] + m1[1] * m2[3][1] + m1[2] * m2[3][2] + m1[3] * m2[3][3];
         return mat;
+    }
+
+    inline vec4 operator*(const mat4& m, const vec3& v)
+    {
+        return m * vec4{ v.x, v.y, v.z, 0.0f };
+    }
+
+    inline vec4 operator*(const vec3& v, const mat4& m)
+    {
+        return vec4{ v.x, v.y, v.z, 0.0f } * m;
     }
 
    inline  mat4 mat4_cast(mat3& m3)

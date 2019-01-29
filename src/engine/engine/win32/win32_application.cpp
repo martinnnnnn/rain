@@ -1,15 +1,12 @@
 #include "win32_application.h"
 
+#include "math/math.h"
 #include "win32_window.h"
 #include "engine/win32/win32_input.h"
 #include "engine/win32/win32_window.h"
 #include "engine/core/event.h"
 #include "engine/core/config.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
-#include "engine/physics/physics.h"
-#include "engine/physics/rigid_body.h"
-#include "engine/physics/collision.h"
-#include "engine/physics/spring.h"
 #include "engine/game/world.h"
 #include "engine/core/config.h"
 #include "engine/core/id_generator.h"
@@ -161,24 +158,10 @@ namespace rain::engine
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
-        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, vec3{ 0.5, 0.8f, 0.2f });
+        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, math::vec3{ 0.5, 0.8f, 0.2f });
         world->render(_alpha);
     }
 }
-
-
-
-
-
-int main(int argc, char* argv[])
-{
-   
-
-    return 0;
-}
-
-
-
 
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)

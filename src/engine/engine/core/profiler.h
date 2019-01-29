@@ -2,9 +2,9 @@
 
 #include <chrono>
 #include <string>
-#include <glm/glm.hpp>
 
 #include "core/core.h"
+#include "math/math.h"
 
 
 namespace rain::engine
@@ -25,7 +25,7 @@ namespace rain::engine
 
     struct WindowProfiler
     {
-        WindowProfiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const glm::vec3& _color);
+        WindowProfiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
 
         ~WindowProfiler();
 
@@ -33,7 +33,7 @@ namespace rain::engine
         f32 x;
         f32 y;
         f32 scale;
-        glm::vec3 color;
+        math::vec3 color;
         std::chrono::system_clock::time_point start;
         std::chrono::system_clock::time_point end;
 

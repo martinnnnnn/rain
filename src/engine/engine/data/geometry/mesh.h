@@ -1,21 +1,22 @@
 #pragma once
 
 #include <vector>
-#include <glm/glm.hpp>
 #include <fbxsdk.h>
 
 #include "core/core.h"
+#include "math/math.h"
 
 namespace rain::engine
 {
+
     struct Vertex
     {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec3 binormal;
-        glm::vec3 tangent;
-        glm::vec3 bitangent;
-        glm::vec2 texCoords[4];
+        math::vec3 position;
+        math::vec3 normal;
+        math::vec3 binormal;
+        math::vec3 tangent;
+        math::vec3 bitangent;
+        math::vec2 texCoords[4];
     };
 
     bool operator==(const Vertex& _a, const Vertex& _b);

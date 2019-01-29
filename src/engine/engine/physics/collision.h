@@ -9,38 +9,32 @@
 
 namespace rain::engine
 {
-    using math::Plane;
-    using math::Transform;
-    using math::Sphere;
-    using math::Ray;
-    using math::vec2;
-    using math::vec3;
-
+    
     struct MeshBound
     {
-        std::vector<vec3> points;
+        std::vector<math::vec3> points;
     };
 
     struct HitInfo
     {
         bool hit;
         f32 normalizedTime;
-        vec3 contactPoint;
-        vec3 contactNormal;
+        math::vec3 contactPoint;
+        math::vec3 contactNormal;
     };
 
 
 
-    HitInfo detect_collision_sphere(const Sphere& _sphereA, const Transform& _transformA, const Sphere& _sphereB, const Transform& _transformB);
-    HitInfo detect_collision_sphere_plane( Sphere& _sphere, Transform& _transform, Plane& _plane);
+    HitInfo detect_collision_sphere(const math::Sphere& _sphereA, const math::Transform& _transformA, const math::Sphere& _sphereB, const math::Transform& _transformB);
+    HitInfo detect_collision_sphere_plane(math::Sphere& _sphere, math::Transform& _transform, math::Plane& _plane);
 
-    vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere);
+    math::vec2 detect_collision_ray_sphere(const math::Ray& _ray, const math::Sphere& _sphere);
 
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, vec3& _position);
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB);
+    void collision_response(RigidBody& _bodyA, math::Transform& _transformA, math::vec3& _position);
+    void collision_response(RigidBody& _bodyA, math::Transform& _transformA, RigidBody& _bodyB, math::Transform& _transformB);
 
 
-    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const Transform& _transformA, const MeshBound& _verticesB, const Transform& _transformB);
+    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const math::Transform& _transformA, const MeshBound& _verticesB, const math::Transform& _transformB);
 
 
     //namespace convex_hull

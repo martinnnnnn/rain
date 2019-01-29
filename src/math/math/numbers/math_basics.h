@@ -11,13 +11,13 @@ constexpr f64 RAIN_TWOPI = 6.2831853071795864769252867665590;
 namespace rain::math
 {
 
-    inline f32 ToRad(const f32& _angle)
+    inline f32 to_rad(const f32& _angle)
     {
         return (_angle * f32(RAIN_PI)) / 180.f;
     }
 
 
-    inline f32 ToDeg(const f32& _angle)
+    inline f32 to_degre(const f32& _angle)
     {
         return (_angle * 180.f) / f32(RAIN_PI);
     }

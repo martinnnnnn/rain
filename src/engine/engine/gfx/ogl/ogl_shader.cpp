@@ -145,24 +145,24 @@ namespace rain::engine
         return parameter_id;
     }
 
-    u32 Shader::set(const std::string &_name, const glm::fvec2 &_vector) const
+    u32 Shader::set(const std::string &_name, const math::vec2 &_vector) const
 	{
         u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
         glUniform2f(parameter_id, _vector.x, _vector.y);
         return parameter_id;
     }
 
-    u32 Shader::set(const std::string &_name, const glm::fvec3 &_vector) const
+    u32 Shader::set(const std::string &_name, const math::vec3 &_vector) const
 	{
         u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
         glUniform3f(parameter_id, _vector.x, _vector.y, _vector.z);
         return parameter_id;
     }
 
-    u32 Shader::set(const std::string &_name, const glm::fmat4 &_matrix) const
+    u32 Shader::set(const std::string &_name, const math::mat4 &_matrix) const
 	{
         u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
-        glUniformMatrix4fv(parameter_id, 1, GL_FALSE, glm::value_ptr(_matrix));
+        glUniformMatrix4fv(parameter_id, 1, GL_FALSE, math::value_ptr(_matrix));
         return parameter_id;
     }
 
@@ -190,18 +190,18 @@ namespace rain::engine
     {
         glUniform4f(_parameterID, _x, _y, _z, _w);
     }
-    void Shader::set(u32 _parameterID, const glm::fvec2& _vector) const
+    void Shader::set(u32 _parameterID, const math::vec2& _vector) const
     {
         glUniform2f(_parameterID, _vector.x, _vector.y);
     }
-    void Shader::set(u32 _parameterID, const glm::fvec3& _vector) const
+    void Shader::set(u32 _parameterID, const math::vec3& _vector) const
     {
         glUniform3f(_parameterID, _vector.x, _vector.y, _vector.z);
 
     }
-    void Shader::set(u32 _parameterID, const glm::fmat4& _matrix) const
+    void Shader::set(u32 _parameterID, const math::mat4& _matrix) const
     {
-        glUniformMatrix4fv(_parameterID, 1, GL_FALSE, glm::value_ptr(_matrix));
+        glUniformMatrix4fv(_parameterID, 1, GL_FALSE, math::value_ptr(_matrix));
     }
 
 	void Shader::check_compile_errors(unsigned int _shader, const std::string& _type)

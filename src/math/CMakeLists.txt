@@ -8,6 +8,6 @@ target_include_directories(${RAIN_MATH} PUBLIC
     ${CMAKE_SOURCE_DIR}/external/glm
     ${MATH_INCLUDE_PATH})
 
-set_target_properties(${RAIN_MATH} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${MATH_LIBRARY_PATH})
+set_target_properties(${RAIN_MATH} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${MATH_LIBRARY_PATH})
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR} math)

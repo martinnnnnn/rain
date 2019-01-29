@@ -1,6 +1,7 @@
 #include "pool_allocator.h"
 
 #include "memory_utility.h"
+
 #include <cmath>
 
 namespace rain::core::memory

@@ -17,6 +17,7 @@
 
 namespace rain::engine
 {
+    using namespace rain::math;
 
     void Renderer::init()
     {
@@ -45,8 +46,8 @@ namespace rain::engine
     void Renderer::resize(u32 _width, u32 _height)
     {
         glViewport(0, 0, _width, _height);
-        set_perspective_projection_matrix(perspective(radians(45.0f), (f32)_width / (f32)_height, 0.1f, 10000.0f));
-        set_orthogonal_projection_matrix(ortho(0.0f, (f32)_width, 0.0f, (f32)_height));
+        set_perspective_projection_matrix(math::perspective(to_rad(45.0f), f32(_width) / f32(_height), 0.1f, 10000.0f));
+        set_orthogonal_projection_matrix(math::ortho(0.0f, f32(_width), 0.0f, f32(_height)));
         
     }
 
@@ -67,7 +68,7 @@ namespace rain::engine
     void Renderer::set_orthogonal_projection_matrix(const mat4& _projection)
     {
         proj_mat_orthogonal = _projection;
-        proj_mat_orthogonal = ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
+        proj_mat_orthogonal = math::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
     void Renderer::set_view_matrix(const vec3& _eye, float _pitch, float _yaw)
@@ -81,17 +82,18 @@ namespace rain::engine
         vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
         vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
-        view_mat = {
-            vec4(xaxis.x,                yaxis.x,                zaxis.x,                0),
-            vec4(xaxis.y,                yaxis.y,                zaxis.y,                0),
-            vec4(xaxis.z,                yaxis.z,                zaxis.z,                0),
-            vec4(-dot(xaxis, _eye), -dot(yaxis, _eye), -dot(zaxis, _eye), 1)
+        view_mat =
+        {
+            vec4{ xaxis.x,              yaxis.x,                zaxis.x,                0 },
+            vec4{ xaxis.y,              yaxis.y,                zaxis.y,                0 },
+            vec4{ xaxis.z,              yaxis.z,                zaxis.z,                0 },
+            vec4{ -dot(xaxis, _eye),    -dot(yaxis, _eye),      -dot(zaxis, _eye),      1 }
         };
     }
 
     void Renderer::set_view_matrix(const vec3& _eye, const vec3& _center, const vec3& _up)
     {
-        view_mat = lookAt(_eye, _center, _up);
+        view_mat = look_at(_eye, _center, _up);
     }
 
     void Renderer::set_view_matrix(const mat4& _matrix)
@@ -141,7 +143,7 @@ namespace rain::engine
     void Renderer::draw_primitive(const u32 vao, const u32 nindices, const Material& material, const vec3& position, const quat& orientation, const vec3& scale)
     {
         material.shader.use();
-        material.shader.set("model", translate(mat4(1), position) * mat4_cast(orientation) * scale(mat4(1), vec3(scale)));
+        material.shader.set("model", translate(identity_mat4(), position) * mat4_cast(orientation) * math::scale(identity_mat4(), scale));
         material.shader.set("proj", proj_mat_perspective);
         material.shader.set("view", view_mat);
 
@@ -193,7 +195,7 @@ namespace rain::engine
     void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const vec3& _position, const quat& _orientation, const vec3& _scale)
     {
         _material.shader.use();
-        _material.shader.set("model", translate(mat4(1), _position) * mat4_cast(_orientation) * scale(mat4(1), vec3(_scale)));
+        _material.shader.set("model", translate(identity_mat4(), _position) * mat4_cast(_orientation) * scale(identity_mat4(), _scale));
         _material.shader.set("proj", proj_mat_perspective);
         _material.shader.set("view", view_mat);
 
@@ -211,9 +213,12 @@ namespace rain::engine
 
     void Renderer::draw_coord_view(const vec3& _position)
     {
-        draw_debug_line(vec3(200.0f, 0.0f, 0.0f), vec3(-200.0f, 0.0f, 0.0f), vec3(1.0f, 0.5f, 0.0f), vec3(0.5f, 1.0f, 0.0f));
-        draw_debug_line(vec3(0.0f, 200.0f, 0.0f), vec3(0.0f, -200.0f, 0.0f), vec3(0.0f, 1.0f, 0.5f), vec3(0.0f, 0.5f, 1.0f));
-        draw_debug_line(vec3(0.0f, 0.0f, 200.0f), vec3(0.0f, 0.0f, -200.0f), vec3(0.5f, 0.0f, 1.0f), vec3(1.0f, 0.0f, 0.5f));
+        //draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
+        //draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
+        //draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
+        draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.0f, 0.0f, 1.0f }, vec3{ 0.0f, 0.0f, 1.0f });
     }
 
 
@@ -300,7 +305,7 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_quad(const core::math::Plane& _p, const vec3 _position, const vec3& _color)
+    void Renderer::draw_quad(const Plane& _p, const vec3 _position, const vec3& _color)
     {   
         vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
         vec3 v = cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
@@ -349,7 +354,7 @@ namespace rain::engine
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        mat4 mvp = proj_mat_perspective * view_mat * mat4(1.0f);
+        mat4 mvp = proj_mat_perspective * view_mat * identity_mat4();
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -383,13 +388,13 @@ namespace rain::engine
             {
                 float xSegment = (float)x / (float)X_SEGMENTS;
                 float ySegment = (float)y / (float)Y_SEGMENTS;
-                float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-                float yPos = std::cos(ySegment * PI);
-                float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+                float xPos = math::cos(xSegment * 2.0f * PI) * math::sin(ySegment * PI);
+                float yPos = math::cos(ySegment * PI);
+                float zPos = math::sin(xSegment * 2.0f * PI) * math::sin(ySegment * PI);
 
-                positions.push_back(vec3(xPos, yPos, zPos));
-                uv.push_back(vec2(xSegment, ySegment));
-                normals.push_back(vec3(xPos, yPos, zPos));
+                positions.push_back(vec3{ xPos, yPos, zPos });
+                uv.push_back(vec2{ xSegment, ySegment });
+                normals.push_back(vec3{ xPos, yPos, zPos });
             }
         }
 
@@ -472,7 +477,7 @@ namespace rain::engine
 
     void Renderer::draw()
     {
-        draw_coord_view(vec3(0.0f, 0.0f, 0.0f));
+        draw_coord_view(vec3 {});
         draw_debug();
     }
 
@@ -491,7 +496,7 @@ namespace rain::engine
 
         glDisable(GL_BLEND);
 
-        mat4 mvp = proj_mat_perspective * view_mat * mat4(1.0f);
+        mat4 mvp = proj_mat_perspective * view_mat * identity_mat4();
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -541,14 +546,14 @@ namespace rain::engine
         float halfWidth = _width / 2.0f;
         float halfHeight = _height / 2.0f;
 
-        vec3 A(_center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight);
-        vec3 B(_center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight);
-        vec3 C(_center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight);
-        vec3 D(_center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight);
-        vec3 E(_center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight);
-        vec3 F(_center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight);
-        vec3 G(_center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight);
-        vec3 H(_center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight);
+        vec3 A{ _center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight };
+        vec3 B{ _center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight };
+        vec3 C{ _center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight };
+        vec3 D{ _center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight };
+        vec3 E{ _center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight };
+        vec3 F{ _center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight };
+        vec3 G{ _center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight };
+        vec3 H{ _center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight };
 
         draw_debug_line(A, B, _color);
         draw_debug_line(B, C, _color);
@@ -605,7 +610,7 @@ namespace rain::engine
     void Renderer::draw_cube(const vec3& _position, const f32 _scale,  const quat& _orientation)
     {
         phong.use();
-        phong.set("model", translate(mat4(1), _position) * mat4_cast(_orientation) * scale(mat4(1), vec3(_scale)));
+        phong.set("model", translate(identity_mat4(), _position) * mat4_cast(_orientation) * scale(identity_mat4(), vec3{ _scale,_scale,_scale }));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 
@@ -617,7 +622,7 @@ namespace rain::engine
     void Renderer::draw_sphere(const vec3& _center, const f32 _scale, const quat& orientation)
     {
         phong.use();
-        phong.set("model", translate(mat4(1), _center) * mat4_cast(orientation) * scale(mat4(1), vec3(_scale)));
+        phong.set("model", translate(identity_mat4(), _center) * mat4_cast(orientation) * scale(identity_mat4(), vec3{ _scale,_scale,_scale }));
         phong.set("proj", proj_mat_perspective);
         phong.set("view", view_mat);
 
@@ -691,8 +696,8 @@ namespace rain::engine
             RChar character =
             {
                 texture,
-                ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                {face->glyph->bitmap.width, face->glyph->bitmap.rows},
+                {face->glyph->bitmap_left, face->glyph->bitmap_top},
                 GLuint(face->glyph->advance.x)
             };
             text_characters.insert(std::pair<GLchar, RChar>(c, character));
@@ -730,13 +735,14 @@ namespace rain::engine
         {
             RChar ch = text_characters[*c];
 
-            GLfloat xpos = x + ch.bearing.x * _scale;
-            GLfloat ypos = _y - (ch.size.y - ch.bearing.y) * _scale;
+            GLfloat xpos = x + ch.bearing[0] * _scale;
+            GLfloat ypos = _y - (ch.size[1] - ch.bearing[1]) * _scale;
 
-            GLfloat w = ch.size.x * _scale;
-            GLfloat h = ch.size.y * _scale;
+            GLfloat w = ch.size[0] * _scale;
+            GLfloat h = ch.size[1] * _scale;
 
-            GLfloat vertices[6][4] = {
+            GLfloat vertices[6][4] =
+            {
                 { xpos,     ypos + h,   0.0, 0.0 },
                 { xpos,     ypos,       0.0, 1.0 },
                 { xpos + w, ypos,       1.0, 1.0 },

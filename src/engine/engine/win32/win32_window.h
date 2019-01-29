@@ -2,7 +2,6 @@
 
 
 #include <algorithm>
-#include <glm/glm.hpp>
 
 #include "engine/gfx/ogl/ogl_renderer.h"
 #include "engine/win32/win32_helpers.h"
@@ -27,22 +26,22 @@ namespace rain::engine
 		void fullscreen(bool _fullscreen);
 		void recover_display_mode();
 		bool is_initialized() { return initialized; }
-		glm::vec2 get_center_pos_absolute();
+		math::vec2 get_center_pos_absolute();
 		HWND m_hwnd;
 
-        glm::u32vec2 size() const;
+        math::vec2 size() const;
 
 	private:
 
-		int center_pos_x;
-		int center_pos_y;
+		i32 center_pos_x;
+		i32 center_pos_y;
 		HDC m_hdc;
 		HGLRC m_hglrc;
 		RECT m_rect;
 		bool m_fullscreen;
-		int m_width;
-		int m_height;
-		int m_depth;
+		i32 m_width;
+		i32 m_height;
+		i32 m_depth;
 		bool initialized;
 	};
 

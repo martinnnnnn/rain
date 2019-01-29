@@ -210,7 +210,7 @@ namespace rain::engine
             {
                 int vertexIndex = _fbxMesh->GetPolygonVertex(i, j);
                 _mesh->indices.push_back(vertexIndex);
-                _mesh->vertices[vertexIndex].position = glm::vec3(bfxVertices[vertexIndex][0], bfxVertices[vertexIndex][2], -bfxVertices[vertexIndex][1]);
+                _mesh->vertices[vertexIndex].position = math::vec3{ f32(bfxVertices[vertexIndex][0]), f32(bfxVertices[vertexIndex][2]), f32(-bfxVertices[vertexIndex][1]) };
                 
                 for (i32 binormalIndex = 0; binormalIndex < _fbxMesh->GetElementUVCount(); ++binormalIndex)
                 {
@@ -253,22 +253,22 @@ namespace rain::engine
                         switch (currentNormal->GetReferenceMode())
                         {
                         case fbxsdk::FbxGeometryElement::eDirect:
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentNormal->GetDirectArray().GetAt(vertexId)[0],
-                                currentNormal->GetDirectArray().GetAt(vertexId)[1],
-                                currentNormal->GetDirectArray().GetAt(vertexId)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentNormal->GetDirectArray().GetAt(vertexId)[0]),
+                                f32(currentNormal->GetDirectArray().GetAt(vertexId)[1]),
+                                f32(currentNormal->GetDirectArray().GetAt(vertexId)[2])
+                            };
                             break;
                         case fbxsdk::FbxGeometryElement::eIndexToDirect:
                         {
                             int id = currentNormal->GetIndexArray().GetAt(vertexId);
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentNormal->GetDirectArray().GetAt(id)[0],
-                                currentNormal->GetDirectArray().GetAt(id)[1],
-                                currentNormal->GetDirectArray().GetAt(id)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentNormal->GetDirectArray().GetAt(id)[0]),
+                                f32(currentNormal->GetDirectArray().GetAt(id)[1]),
+                                f32(currentNormal->GetDirectArray().GetAt(id)[2])
+                            };
                         }
                         break;
                         default:
@@ -285,22 +285,22 @@ namespace rain::engine
                         switch (currentTangent->GetReferenceMode())
                         {
                         case fbxsdk::FbxGeometryElement::eDirect:
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentTangent->GetDirectArray().GetAt(vertexId)[0],
-                                currentTangent->GetDirectArray().GetAt(vertexId)[1],
-                                currentTangent->GetDirectArray().GetAt(vertexId)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentTangent->GetDirectArray().GetAt(vertexId)[0]),
+                                f32(currentTangent->GetDirectArray().GetAt(vertexId)[1]),
+                                f32(currentTangent->GetDirectArray().GetAt(vertexId)[2])
+                            };
                             break;
                         case fbxsdk::FbxGeometryElement::eIndexToDirect:
                         {
                             int id = currentTangent->GetIndexArray().GetAt(vertexId);
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentTangent->GetDirectArray().GetAt(id)[0],
-                                currentTangent->GetDirectArray().GetAt(id)[1],
-                                currentTangent->GetDirectArray().GetAt(id)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentTangent->GetDirectArray().GetAt(id)[0]),
+                                f32(currentTangent->GetDirectArray().GetAt(id)[1]),
+                                f32(currentTangent->GetDirectArray().GetAt(id)[2])
+                            };
                         }
                         break;
                         default:
@@ -319,22 +319,22 @@ namespace rain::engine
                         switch (currentBinormal->GetReferenceMode())
                         {
                         case fbxsdk::FbxGeometryElement::eDirect:
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentBinormal->GetDirectArray().GetAt(vertexId)[0],
-                                currentBinormal->GetDirectArray().GetAt(vertexId)[1],
-                                currentBinormal->GetDirectArray().GetAt(vertexId)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentBinormal->GetDirectArray().GetAt(vertexId)[0]),
+                                f32(currentBinormal->GetDirectArray().GetAt(vertexId)[1]),
+                                f32(currentBinormal->GetDirectArray().GetAt(vertexId)[2])
+                            };
                             break;
                         case fbxsdk::FbxGeometryElement::eIndexToDirect:
                         {
                             int id = currentBinormal->GetIndexArray().GetAt(vertexId);
-                            _mesh->vertices[vertexIndex].normal = glm::vec3
-                            (
-                                currentBinormal->GetDirectArray().GetAt(id)[0],
-                                currentBinormal->GetDirectArray().GetAt(id)[1],
-                                currentBinormal->GetDirectArray().GetAt(id)[2]
-                            );
+                            _mesh->vertices[vertexIndex].normal = math::vec3
+                            {
+                                f32(currentBinormal->GetDirectArray().GetAt(id)[0]),
+                                f32(currentBinormal->GetDirectArray().GetAt(id)[1]),
+                                f32(currentBinormal->GetDirectArray().GetAt(id)[2])
+                            };
                         }
                         break;
                         default:

@@ -2,6 +2,7 @@
 
 
 #include "math/numbers/math_basics.h"
+#include "math/numbers/float.h"
 
 namespace rain::math
 {
@@ -19,14 +20,22 @@ namespace rain::math
             f32 data[3];
         };
 
-        f32& operator[](int i) { return data[i]; }
-        const f32& operator[](int i) const { return data[i]; }
+        inline f32& operator[](int i) { return data[i]; }
+        inline const f32& operator[](int i) const { return data[i]; }
+        inline vec3& operator=(const vec3& q)
+        {
+            this->x = q.x;
+            this->y = q.y;
+            this->z = q.z;
+            return *this;
+        }
     };
 
     vec3 operator+(const vec3& _a, const vec3& _b);
     vec3 operator-(const vec3& _a, const vec3& _b);
     vec3 operator*(const vec3& _a, const vec3& _b);
     vec3 operator*(const vec3& _a, f32 _b);
+    vec3 operator*(const f32 _b, const vec3& _a);
     vec3 operator/(const vec3& _a, const vec3& _b);
     vec3 operator/(const vec3& _a, f32 _b);
     bool operator==(const vec3& _a, const vec3& _b);
@@ -37,6 +46,11 @@ namespace rain::math
     vec3& operator*=(vec3& _a, const f32 _b);
     vec3& operator/=(vec3& _a, const vec3& _b);
     vec3& operator/=(vec3& _a, const f32 _b);
+
+    inline vec3 operator-(const vec3& v)
+    {
+        return vec3{ -v.x, -v.y, -v.z };
+    }
 
     f32 dot(const vec3& _a, const vec3& _b);
     f32 magnitude(const vec3& _v);
@@ -50,4 +64,24 @@ namespace rain::math
     vec3 project(const vec3& _length, const vec3& _direction);
     vec3 perpendicular(const vec3& _length, const vec3& _direction);
     vec3 reflection(const vec3& _vec, const vec3& _normal);
+
+    inline vec3 cos(const vec3& v)
+    {
+        return vec3
+        {
+            cos(v.x),
+            cos(v.y),
+            cos(v.z)
+        };
+    }
+
+    inline vec3 sin(const vec3& v)
+    {
+        return vec3
+        {
+            sin(v.x),
+            sin(v.y),
+            sin(v.z)
+        };
+    }
 }

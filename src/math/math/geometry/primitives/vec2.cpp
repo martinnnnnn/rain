@@ -127,7 +127,7 @@ namespace rain::math
 
     vec2 rotate(const vec2& _vec, f32 _deg)
     {
-        const f32 rad = ToRad(_deg);
+        const f32 rad = to_rad(_deg);
         f32 s = sinf(rad);
         f32 c = cosf(rad);
 

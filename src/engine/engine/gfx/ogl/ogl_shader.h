@@ -3,12 +3,12 @@
 #include "GL/glew.h"
 #include "gl/GL.h"
 #include "gl/GLU.h"
-#include "glm/glm.hpp"
 
 #include <string>
 #include <vector>
 
 #include "core/core.h"
+#include "math/math.h"
 
 
 namespace rain::engine
@@ -30,9 +30,9 @@ namespace rain::engine
 		u32 set(const std::string& _name, float _x, float _y) const;
 		u32 set(const std::string& _name, float _x, float _y, float _z) const;
 		u32 set(const std::string& _name, float _x, float _y, float _z, float _w) const;
-		u32 set(const std::string& _name, const glm::fvec2& _vector) const;
-		u32 set(const std::string& _name, const glm::fvec3& _vector) const;
-		u32 set(const std::string& _name, const glm::fmat4& _matrix) const;
+        u32 set(const std::string& _name, const math::vec2& _vector) const;
+        u32 set(const std::string& _name, const math::vec3& _vector) const;
+        u32 set(const std::string& _name, const math::mat4& _matrix) const;
 
         void set(u32 _parameterID, bool _value) const;
         void set(u32 _parameterID, int _value) const;
@@ -40,9 +40,9 @@ namespace rain::engine
         void set(u32 _parameterID, float _x, float _y) const;
         void set(u32 _parameterID, float _x, float _y, float _z) const;
         void set(u32 _parameterID, float _x, float _y, float _z, float _w) const;
-        void set(u32 _parameterID, const glm::fvec2& _vector) const;
-        void set(u32 _parameterID, const glm::fvec3& _vector) const;
-        void set(u32 _parameterID, const glm::fmat4& _matrix) const;
+        void set(u32 _parameterID, const math::vec2& _vector) const;
+        void set(u32 _parameterID, const math::vec3& _vector) const;
+        void set(u32 _parameterID, const math::mat4& _matrix) const;
 
 	private:
 		

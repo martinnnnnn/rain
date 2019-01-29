@@ -2,15 +2,12 @@
 
 
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/trigonometric.hpp>
-
 #include "engine/core/context.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 
 namespace rain::engine
 {
+    using namespace rain::math;
 
     void Physics::apply_gravity(RigidBody& _body)
     {
@@ -23,18 +20,18 @@ namespace rain::engine
     void Physics::apply_spring(const Spring& _spring, const Transform& _transformA, RigidBody& _bodyA, const Transform& _transformB, RigidBody& _bodyB)
     {
 
-        vec3 position_anchorA = translate(mat4(1), _transformA.position) * mat4_cast(_transformA.orientation) * vec4(_spring.anchorPointA, 1.0);
-        vec3 position_anchorB = translate(mat4(1), _transformB.position) * mat4_cast(_transformB.orientation) * vec4(_spring.anchorPointB, 1.0);
+        vec3 position_anchorA {};/* = translate(identity_mat4(), _transformA.position) * mat4_cast(_transformA.orientation) * vec4 { _spring.anchorPointA.x, _spring.anchorPointA.y, _spring.anchorPointA.z, 1.0f };*/
+        vec3 position_anchorB {};/* = translate(identity_mat4(), _transformB.position) * mat4_cast(_transformB.orientation) * vec4 { _spring.anchorPointB.x, _spring.anchorPointB.y, _spring.anchorPointB.z, 1.0f };*/
 
         RAIN_RENDERER->draw_debug_line(position_anchorA, position_anchorB, vec3{ 0.0f, 1.0f, 0.0f });
 
         vec3 point_velocityA = _bodyA.velocity + cross(_bodyA.angularVelocity, (position_anchorA, _transformA.position));
         vec3 point_velocityB = _bodyB.velocity + cross(_bodyB.angularVelocity, (position_anchorB, _transformB.position));
 
-        f32 distance = distance(position_anchorA, position_anchorB);
+        f32 dist = math::distance(position_anchorA, position_anchorB);
         vec3 directionAtoB = normalized(position_anchorB - position_anchorA);
-        //vec3 spring_forceA = -_spring.k * (distance - _spring.distance) * -directionAtoB - _spring.b * point_velocityA;
-        //vec3 spring_forceB = -_spring.k * (distance - _spring.distance) * directionAtoB - _spring.b * point_velocityB;
+        //vec3 spring_forceA = -_spring.k * (dist - _spring.distance) * -directionAtoB - _spring.b * point_velocityA;
+        //vec3 spring_forceB = -_spring.k * (dist - _spring.distance) * directionAtoB - _spring.b * point_velocityB;
 
         vec3 spring_forceA = -_spring.k * (_transformA.position - _spring.anchorPointA);
         vec3 spring_forceB = -_spring.k * (_transformB.position - _spring.anchorPointB);

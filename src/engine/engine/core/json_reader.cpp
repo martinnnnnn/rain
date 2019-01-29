@@ -9,9 +9,11 @@
 #include "engine/data/data_system.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 
-namespace rain::engine
+namespace rain::engine::JsonReader
 {
-    std::string JsonReader::get_string(const rapidjson::Value& _json_value)
+    using namespace rain::math;
+
+    std::string get_string(const rapidjson::Value& _json_value)
     {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -19,7 +21,7 @@ namespace rain::engine
         return buffer.GetString();
     }
     
-    void JsonReader::read_config(const std::string& _json, Config& _config)
+    void read_config(const std::string& _json, Config& _config)
     {
         rapidjson::Document config_document;
         config_document.Parse(_json.c_str());
@@ -34,7 +36,7 @@ namespace rain::engine
         _config.full_screen = config_document["full_screen"].GetBool();
     }
 
-    void JsonReader::read_world(const std::string& _json, World& _world)
+    void read_world(const std::string& _json, World& _world)
     {
         rapidjson::Document world_document;
         world_document.Parse(_json.c_str());
@@ -103,7 +105,7 @@ namespace rain::engine
         }
     }
 
-    void JsonReader::read_camera(const rapidjson::Value& _json, Camera& _camera)
+    void read_camera(const rapidjson::Value& _json, Camera& _camera)
     {
         if (_json.HasMember("movement_speed"))
         {
@@ -111,7 +113,7 @@ namespace rain::engine
         }
     }
 
-    vec3 JsonReader::read_vec3(const rapidjson::Value& _json)
+    vec3 read_vec3(const rapidjson::Value& _json)
     {
         vec3 position{ 0, 0, 0 };
         for (u32 i = 0; i < _json.Size(); i++)
@@ -122,7 +124,7 @@ namespace rain::engine
         return position;
     }
 
-    quat JsonReader::read_quat(const rapidjson::Value& _json)
+    quat read_quat(const rapidjson::Value& _json)
     {
         quat orientation{ 0, 0, 0, 1 };
         for (u32 i = 0; i < _json.Size(); i++)
@@ -133,7 +135,7 @@ namespace rain::engine
         return orientation;
     }
 
-    void JsonReader::read_transform(const rapidjson::Value& _json, Transform& _transform)
+    void read_transform(const rapidjson::Value& _json, Transform& _transform)
     {
         if (_json.HasMember("position"))
         {
@@ -148,7 +150,8 @@ namespace rain::engine
             }
             else if (_json["orientation"].Size() == 3)
             {
-                _transform.orientation = quat(read_vec3(_json["orientation"]));
+                vec3 v = read_vec3(_json["orientation"]);
+                _transform.orientation = from_euler(v);
             }
             _transform.lastOrientation = _transform.orientation;
         }
@@ -159,7 +162,7 @@ namespace rain::engine
         }
     }
 
-    RigidBody JsonReader::read_rigid_body(const rapidjson::Value& _json)
+    RigidBody read_rigid_body(const rapidjson::Value& _json)
     {
         RigidBody body;
 
@@ -200,7 +203,7 @@ namespace rain::engine
         return body;
     }
 
-    Sphere JsonReader::read_bounding_sphere(const rapidjson::Value& _json)
+    Sphere read_bounding_sphere(const rapidjson::Value& _json)
     {
         Sphere bound;
 
@@ -217,7 +220,7 @@ namespace rain::engine
     }
 
 
-    Spring JsonReader::read_spring2(const rapidjson::Value& _json)
+    Spring read_spring2(const rapidjson::Value& _json)
     {
         Spring spring;
 
@@ -253,11 +256,11 @@ namespace rain::engine
         return spring;
     }
 
-    Plane JsonReader::read_plane(const rapidjson::Value& _json)
+    Plane read_plane(const rapidjson::Value& _json)
     {
         vec3 position {};
         vec3 normal {};
-
+        
         vec3 point1 {};
         vec3 point2 {};
         vec3 point3 {};
@@ -279,7 +282,7 @@ namespace rain::engine
         return Plane(vec3{}, vec3{});
     }
 
-    void JsonReader::read_model(const rapidjson::Value& _json, Model& _model)
+    void read_model(const rapidjson::Value& _json, Model& _model)
     {
         if (_json.HasMember("path"))
         {
@@ -290,7 +293,7 @@ namespace rain::engine
         }
     }
 
-    void JsonReader::read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound)
+    void read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound)
     {
         _meshBound.points.resize(_model.mesh->vertices.size());
 
@@ -300,7 +303,7 @@ namespace rain::engine
         }
     }
 
-    void JsonReader::read_material(const rapidjson::Value& _json, Material& _material)
+    void read_material(const rapidjson::Value& _json, Material& _material)
     {
         std::string vertex_path;
         std::string fragment_path;
