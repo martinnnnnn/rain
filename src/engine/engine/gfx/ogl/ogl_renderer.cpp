@@ -46,7 +46,7 @@ namespace rain::engine
     void Renderer::resize(u32 _width, u32 _height)
     {
         glViewport(0, 0, _width, _height);
-        set_perspective_projection_matrix(math::perspective(to_rad(45.0f), f32(_width) / f32(_height), 0.1f, 10000.0f));
+        set_perspective_projection_matrix(math::perspective_rh_no(to_rad(45.0f), f32(_width) / f32(_height), 0.1f, 10000.0f));
         set_orthogonal_projection_matrix(math::ortho(0.0f, f32(_width), 0.0f, f32(_height)));
         
     }
@@ -213,12 +213,12 @@ namespace rain::engine
 
     void Renderer::draw_coord_view(const vec3& _position)
     {
-        //draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
-        //draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
-        //draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
-        draw_debug_line(vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-        draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
-        draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.0f, 0.0f, 1.0f }, vec3{ 0.0f, 0.0f, 1.0f });
+        draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
+        draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
+        draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
+        //draw_debug_line(vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        //draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        //draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.0f, 0.0f, 1.0f }, vec3{ 0.0f, 0.0f, 1.0f });
     }
 
 

@@ -46,11 +46,24 @@ namespace rain::math
         return &(vec.x);
     }
 
-    inline mat4 perspective(f32 fovy, f32 aspect, f32 z_near, f32 z_far)
+    inline mat4 perspective_rh_no(f32 fovy, f32 aspect, f32 z_near, f32 z_far)
+    {
+        const f32 tanHalfFovy = tan(fovy / 2.0f);
+
+        mat4 Result {};
+        Result[0][0] = 1.0f / (aspect * tanHalfFovy);
+        Result[1][1] = 1.0f / (tanHalfFovy);
+        Result[2][2] = -(z_far + z_near) / (z_far - z_near);
+        Result[2][3] = -1.0f;
+        Result[3][2] = - (2.0f * z_far * z_near) / (z_far - z_near);
+        return Result;
+    }
+
+    inline mat4 perspective_lh_zo(f32 fovy, f32 aspect, f32 z_near, f32 z_far)
     {
         const f32 tan_half_fovy = tan(fovy / 2.0f);
 
-        mat4 m {};
+        mat4 m{};
         m[0][0] = 1.0f / (aspect * tan_half_fovy);
         m[1][1] = 1.0f / (tan_half_fovy);
         m[2][2] = z_far / (z_far - z_near);
