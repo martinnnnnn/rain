@@ -4,8 +4,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "engine/core/context.h"
 #include "engine/win32/win32_helpers.h"

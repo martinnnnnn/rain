@@ -196,7 +196,7 @@ namespace rain::engine
         //for (auto ent_plane : plane_view)
         //{
         //    Plane& plane = plane_view.get(ent_plane);
-        //    RAIN_RENDERER->draw_quad(plane, project_on_plane(glm::vec3(0, 15, 0), plane), glm::vec3(0.7f, 0.7f, 0));
+        //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
     }
 

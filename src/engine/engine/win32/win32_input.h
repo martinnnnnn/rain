@@ -7,8 +7,6 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#include <glm/glm.hpp>
-
 #include "engine/core/event.h"
 #include "engine/win32/win32_keycodes.h"
 #include "engine/win32/win32_application.h"
