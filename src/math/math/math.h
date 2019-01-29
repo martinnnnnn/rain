@@ -69,25 +69,47 @@ namespace rain::math
         return m;
     }
 
-    inline mat4 look_at(const vec3& eye, const vec3& center, const vec3& up)
+    inline mat4 look_at_lh(const vec3& eye, const vec3& center, const vec3& up)
     {
         const vec3 f(normalized(center - eye));
         const vec3 s(normalized(cross(up, f)));
         const vec3 u(cross(f, s));
 
-        mat4 Result = identity_mat4();
-        Result[0][0] = s.x;
-        Result[1][0] = s.y;
-        Result[2][0] = s.z;
-        Result[0][1] = u.x;
-        Result[1][1] = u.y;
-        Result[2][1] = u.z;
-        Result[0][2] = f.x;
-        Result[1][2] = f.y;
-        Result[2][2] = f.z;
-        Result[3][0] = -dot(s, eye);
-        Result[3][1] = -dot(u, eye);
-        Result[3][2] = -dot(f, eye);
-        return Result;
+        mat4 m = identity_mat4();
+        m[0][0] = s.x;
+        m[1][0] = s.y;
+        m[2][0] = s.z;
+        m[0][1] = u.x;
+        m[1][1] = u.y;
+        m[2][1] = u.z;
+        m[0][2] = f.x;
+        m[1][2] = f.y;
+        m[2][2] = f.z;
+        m[3][0] = -dot(s, eye);
+        m[3][1] = -dot(u, eye);
+        m[3][2] = -dot(f, eye);
+        return m;
+    }
+
+    inline mat4 look_at_rh(const vec3& eye, const vec3& center, const vec3& up)
+    {
+        const vec3 f(normalized(center - eye));
+        const vec3 s(normalized(cross(f, up)));
+        const vec3 u(cross(s, f));
+
+        mat4 m = identity_mat4();
+        m[0][0] = s.x;
+        m[1][0] = s.y;
+        m[2][0] = s.z;
+        m[0][1] = u.x;
+        m[1][1] = u.y;
+        m[2][1] = u.z;
+        m[0][2] = -f.x;
+        m[1][2] = -f.y;
+        m[2][2] = -f.z;
+        m[3][0] = -dot(s, eye);
+        m[3][1] = -dot(u, eye);
+        m[3][2] = dot(f, eye);
+        return m;
     }
 }

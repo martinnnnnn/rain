@@ -93,7 +93,7 @@ namespace rain::engine
 
     void Renderer::set_view_matrix(const vec3& _eye, const vec3& _center, const vec3& _up)
     {
-        view_mat = look_at(_eye, _center, _up);
+        view_mat = look_at_rh(_eye, _center, _up);
     }
 
     void Renderer::set_view_matrix(const mat4& _matrix)
@@ -216,7 +216,7 @@ namespace rain::engine
         //draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
         //draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
         //draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
-        draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
+        draw_debug_line(vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
         draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.0f });
         draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.0f, 0.0f, 1.0f }, vec3{ 0.0f, 0.0f, 1.0f });
     }
