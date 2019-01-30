@@ -2,6 +2,7 @@
 
 
 #include <rapidjson/writer.h>
+#include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
 #include "engine/core/context.h"
@@ -59,6 +60,7 @@ namespace rain::engine::JsonReader
             {
                 Transform& transform = registry.assign<Transform>(entity);
                 read_transform(world_object["Transform"], transform);
+                RAIN_LOG_RAW("%s\n", json_writer::serialize(transform).c_str());
             }
             if (world_object.HasMember("RigidBody"))
             {
@@ -348,4 +350,39 @@ namespace rain::engine::JsonReader
     //        }
     //    }
     //}
+}
+
+namespace rain::engine::json_writer
+{
+    std::string serialize(const math::Transform& t)
+    {
+        rapidjson::Document d;
+        rapidjson::Value json_transform(rapidjson::kObjectType);
+        {
+            rapidjson::Value json_position(rapidjson::kArrayType);
+            json_position.PushBack(t.position.x, d.GetAllocator());
+            json_position.PushBack(t.position.y, d.GetAllocator());
+            json_position.PushBack(t.position.z, d.GetAllocator());
+
+            rapidjson::Value json_orientation(rapidjson::kArrayType);
+            json_orientation.PushBack(t.orientation.x, d.GetAllocator());
+            json_orientation.PushBack(t.orientation.y, d.GetAllocator());
+            json_orientation.PushBack(t.orientation.z, d.GetAllocator());
+            json_orientation.PushBack(t.orientation.w, d.GetAllocator());
+
+            rapidjson::Value json_scale(rapidjson::kArrayType);
+            json_scale.PushBack(t.scale.x, d.GetAllocator());
+            json_scale.PushBack(t.scale.y, d.GetAllocator());
+            json_scale.PushBack(t.scale.z, d.GetAllocator());
+            
+            json_transform.AddMember("position", json_position, d.GetAllocator());
+            json_transform.AddMember("orientation", json_orientation, d.GetAllocator());
+            json_transform.AddMember("scale", json_scale, d.GetAllocator());
+        }
+
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+        json_transform.Accept(writer);
+        return std::string(buffer.GetString());
+    }
 }

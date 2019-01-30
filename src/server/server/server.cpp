@@ -8,6 +8,7 @@ void InitWinsock()
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 }
 
+
 struct Vec3
 {
     float x;

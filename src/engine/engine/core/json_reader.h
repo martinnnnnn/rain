@@ -37,4 +37,9 @@ namespace rain::engine
         void read_config(const std::string& _path, Config& _config);
         //void read_shaders_info(const std::string& _path, std::vector<ShadersInfo>& _info);
     };
+
+    namespace json_writer
+    {
+        std::string serialize(const math::Transform& t);
+    }
 }
