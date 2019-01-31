@@ -37,18 +37,14 @@ namespace rain::core
         return splited;
     }
 
-    std::pair<std::string, std::string> string::pair_split(const std::string& _tosplit, const std::string& _delimiter)
+    void string::pair_split(const std::string& _tosplit, const std::string& _delimiter, std::string& first, std::string& second)
     {
-        std::vector<std::string> splited;
-
         u32 start = 0U;
         std::string::size_type delimPos = _tosplit.find(_delimiter);
         assert(delimPos != std::string::npos);
 
-        std::string first = _tosplit.substr(start, delimPos - start);
-        std::string second = _tosplit.substr(delimPos + 1, (second.length() - 1) - delimPos);
-
-        return std::make_pair(first, second);
+        first = _tosplit.substr(start, delimPos - start);
+        second = _tosplit.substr(delimPos + 1, (second.length() - 1) - delimPos);
     }
 
     void string::print_to_buffer(char* _dest, size_t _destSize, const char* _format, ...)

@@ -14,7 +14,8 @@
 #include "engine/core/context.h"
 
 // TEMP
-#include "engine/network/client.h"
+#include "engine/network/network.h"
+#include "engine/network/server.h"
 
 void launch_rain_engine(HINSTANCE hinstance)
 {
@@ -73,6 +74,11 @@ namespace rain::engine
         RAIN_CONFIG->init(Win32::get_exe_path() + RAIN_CONFIG_FILE_NAME);
         
         // TEMP
+        network::init();
+        start_tcp_client("127.0.0.1", "9999");
+        //network::start_server("127.0.0.1", "9998");
+        network::start_server_thread("127.0.0.1:9998");
+        //network::terminate();
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
 
