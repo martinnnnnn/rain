@@ -9,7 +9,6 @@
 #include "engine/gfx/ogl/ogl_renderer.h"
 #include "engine/game/world.h"
 #include "engine/core/config.h"
-#include "engine/core/id_generator.h"
 #include "engine/data/data_system.h"
 #include "engine/core/context.h"
 
@@ -64,10 +63,6 @@ namespace rain::engine
 
         // INIT LOGGER
         RAIN_CONTEXT->logger = new core::Logger(print_to_log);
-
-
-        // INIT ID GENERATOR
-        RAIN_CONTEXT->id_generator = new IdGenerator();
 
         // INIT CONFIG
         RAIN_CONFIG = new Config();

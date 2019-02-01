@@ -28,7 +28,6 @@ namespace rain::engine
         Renderer* renderer;
         Input* input;
         core::Logger* logger;
-        IdGenerator* id_generator;
         DataSystem* data_system;
         HighResolutionClock* clock;
     };
@@ -43,8 +42,6 @@ namespace rain::engine
 #define RAIN_INPUT                      RAIN_CONTEXT->input
 #define RAIN_DATA                       RAIN_CONTEXT->data_system
 
-#define RAIN_NEW_ID                     RAIN_CONTEXT->id_generator->get_new_unique_id()
-#define RAIN_NEW_NAME_ID(name)          RAIN_CONTEXT->id_generator->get_new_unique_id(name)
 #define RAIN_FIND_DATA_FROM_PATH(path)  RAIN_CONTEXT->data_system->find_mesh(path) 
 #define RAIN_FIND_DATA_FROM_ID(id)      RAIN_CONTEXT->data_system->find_mesh(id)
 

@@ -5,7 +5,6 @@
 
 #include "core/core.h"
 #include "engine/core/context.h"
-#include "engine/core/id_generator.h"
 #include "geometry/mesh.h"
 #include "texture/texture.h"
 #include "engine/gfx/ogl/ogl_shader.h"
@@ -20,7 +19,7 @@ namespace rain::engine
     {
         DataHandle(const std::string& _path)
             : path(_path)
-            , id(RAIN_NEW_NAME_ID(path.get_path_relative(RAIN_CONFIG->data_root)))
+            , id(core::uuid::from_name(path.get_path_relative(RAIN_CONFIG->data_root)))
         {
             data = new T();
             data->load(path.get_path_absolute());
@@ -32,7 +31,7 @@ namespace rain::engine
             , data(nullptr) {}
 
         FilePath path;
-        unique_id id;
+        core::uuid id;
         T* data;
     };
 
@@ -54,7 +53,7 @@ namespace rain::engine
         void load_all_recursive(const std::string& _root);
 
         Mesh* find_mesh(const FilePath& _path);
-        Mesh* find_mesh(const unique_id _id);
+        Mesh* find_mesh(const core::uuid _id);
 
         std::vector<FilePath> paths;
 

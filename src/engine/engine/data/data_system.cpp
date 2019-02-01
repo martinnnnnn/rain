@@ -43,7 +43,7 @@ namespace rain::engine
         return mesh;
     }
 
-    Mesh* DataSystem::find_mesh(const unique_id _id)
+    Mesh* DataSystem::find_mesh(const core::uuid _id)
     {
         Mesh* mesh = nullptr;
         for (u32 i = 0; i < meshes.datas.size(); ++i)

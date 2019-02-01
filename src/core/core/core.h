@@ -11,8 +11,8 @@
 #include "core/type_id.h"
 #include "core/logger.h"
 #include "core/network/network.h"
+#include "core/uuid.h"
 
-//#include "core/id_generator.h"
 //#include "core/profiler.h"
 
 
