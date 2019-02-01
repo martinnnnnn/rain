@@ -13,8 +13,6 @@ namespace rain::math
         return vec3{ _a.x + _b.x, _a.y + _b.y, _a.z + _b.z };
     }
 
-
-
     vec3 operator-(const vec3& _a, const vec3& _b)
     {
         return vec3{ _a.x - _b.x, _a.y - _b.y, _a.z - _b.z };

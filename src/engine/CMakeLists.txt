@@ -38,8 +38,7 @@ target_include_directories(${RAIN_ENGINE} PUBLIC
     ${CORE_INCLUDE_PATH}
     ${MATH_INCLUDE_PATH}
     ${ENGINE_INCLUDE_PATH}
-    # ${CMAKE_SOURCE_DIR}/external/glm
-    ${CMAKE_SOURCE_DIR}/external/json
+    ${CMAKE_SOURCE_DIR}/external/json/
     ${FBXSDK_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/external/entt/
     ${CMAKE_SOURCE_DIR}/external/freetype/

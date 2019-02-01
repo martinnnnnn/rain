@@ -19,15 +19,15 @@
 namespace rain::engine
 {
 
-    namespace JsonReader
+    namespace json_reader
     {
         std::string get_string(const rapidjson::Value& _json_value);
-        math::vec3 read_vec3(const rapidjson::Value& _json);
-        math::quat read_quat(const rapidjson::Value& _json);
-        RigidBody read_rigid_body(const rapidjson::Value& _json);
-        math::Sphere read_bounding_sphere(const rapidjson::Value& _json);
-        Spring read_spring2(const rapidjson::Value& _json);
-        math::Plane read_plane(const rapidjson::Value& _json);
+        void read_vec3(const rapidjson::Value& _json, math::vec3& vec);
+        void read_quat(const rapidjson::Value& _json, math::quat& quat);
+        void read_rigid_body(const rapidjson::Value& _json, RigidBody& rigid_body);
+        void read_sphere(const rapidjson::Value& _json, math::Sphere& sphere);
+        void read_spring(const rapidjson::Value& _json, Spring& spring);
+        void read_plane(const rapidjson::Value& _json, math::Plane& plane);
         void read_transform(const rapidjson::Value& _json, math::Transform& _transform);
         void read_model(const rapidjson::Value& _json, Model& _model);
         void read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound);
@@ -36,7 +36,9 @@ namespace rain::engine
         void read_world(const std::string& _json, World& _world);
         void read_config(const std::string& _path, Config& _config);
         //void read_shaders_info(const std::string& _path, std::vector<ShadersInfo>& _info);
-    };
+
+        void read_transform(const std::string & json_str, math::Transform& t);
+    }
 
     namespace json_writer
     {

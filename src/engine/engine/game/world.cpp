@@ -25,7 +25,7 @@ namespace rain::engine
         RAIN_PROFILE("world init");
 
         file.open(_path);
-        JsonReader::read_world(file.read(), *this);
+        json_reader::read_world(file.read(), *this);
 
         auto entity = registry.create();
         Transform& transform = registry.assign<Transform>(entity);
@@ -105,23 +105,23 @@ namespace rain::engine
             RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
             Sphere& bound1 = sphere_view.get<Sphere>(entity1);
             Transform& transform1 = sphere_view.get<Transform>(entity1);
-        //    for (auto entity2 : sphere_view)
-        //    {
-        //        if (entity1 == entity2)
-        //        {
-        //            break;
-        //        }
+            //for (auto entity2 : sphere_view)
+            //{
+            //    if (entity1 == entity2)
+            //    {
+            //        break;
+            //    }
 
-        //        RigidBody& body2 = sphere_view.get<RigidBody>(entity2);
-        //        Sphere& bound2 = sphere_view.get<Sphere>(entity2);
-        //        Transform& transform2 = sphere_view.get<Transform>(entity2);
+            //    RigidBody& body2 = sphere_view.get<RigidBody>(entity2);
+            //    Sphere& bound2 = sphere_view.get<Sphere>(entity2);
+            //    Transform& transform2 = sphere_view.get<Transform>(entity2);
 
-        //        HitInfo info = detect_collision_sphere(bound1, transform1, bound2, transform2);
-        //        if (info.hit)
-        //        {
-        //            collision_response(body1, transform1, body2, transform2);
-        //        }
-        //    }
+            //    HitInfo info = detect_collision_sphere(bound1, transform1, bound2, transform2);
+            //    if (info.hit)
+            //    {
+            //        collision_response(body1, transform1, body2, transform2);
+            //    }
+            //}
 
             auto plane_view = registry.view<Plane>();
             for (auto ent_plane : plane_view)

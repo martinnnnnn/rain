@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "vec3.h"
 #include "quaternion.h"
 #include "mat4.h"
@@ -23,4 +24,5 @@ namespace rain::math
     {
         return translate(identity_mat4(), t.position) * mat4_cast(t.orientation) * scale(identity_mat4(), t.scale);
     }
+
 }

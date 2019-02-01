@@ -4,13 +4,14 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
+#include <nlohmann/json.hpp>
 
 #include "engine/core/context.h"
 #include "engine/core/config.h"
 #include "engine/data/data_system.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 
-namespace rain::engine::JsonReader
+namespace rain::engine::json_reader
 {
     using namespace rain::math;
 
@@ -64,23 +65,23 @@ namespace rain::engine::JsonReader
             }
             if (world_object.HasMember("RigidBody"))
             {
-                RigidBody& body = registry.assign<RigidBody>(entity);
-                body = read_rigid_body(world_object["RigidBody"]);
+                RigidBody& rigid_body = registry.assign<RigidBody>(entity);
+                read_rigid_body(world_object["RigidBody"], rigid_body);
             }
             if (world_object.HasMember("Sphere"))
             {
                 Sphere& sphere = registry.assign<Sphere>(entity);
-                sphere = read_bounding_sphere(world_object["Sphere"]);
+                read_sphere(world_object["Sphere"], sphere);
             }
             if (world_object.HasMember("Spring"))
             {
                 Spring& spring = registry.assign<Spring>(entity);
-                spring = read_spring2(world_object["Spring"]);
+                read_spring(world_object["Spring"], spring);
             }
             if (world_object.HasMember("Plane"))
             {
                 Plane& plane = registry.assign<Plane>(entity);
-                plane = read_plane(world_object["Plane"]);
+                read_plane(world_object["Plane"], plane);
             }
             if (world_object.HasMember("Model"))
             {
@@ -114,117 +115,104 @@ namespace rain::engine::JsonReader
         }
     }
 
-    vec3 read_vec3(const rapidjson::Value& _json)
+    void read_vec3(const rapidjson::Value& _json, math::vec3& vec)
     {
-        vec3 position{};
         for (u32 i = 0; i < _json.Size(); i++)
         {
-            position[i] = _json[i].GetFloat();
+            vec[i] = _json[i].GetFloat();
         }
-
-        return position;
     }
 
-    quat read_quat(const rapidjson::Value& _json)
+    void read_quat(const rapidjson::Value& _json, math::quat& q)
     {
-        quat orientation{ 0, 0, 0, 1 };
         for (u32 i = 0; i < _json.Size(); i++)
         {
-            orientation[i] = _json[i].GetFloat();
+            q[i] = _json[i].GetFloat();
         }
-
-        return orientation;
     }
 
     void read_transform(const rapidjson::Value& _json, Transform& _transform)
     {
-        if (_json.HasMember("position"))
-        {
-            _transform.position = read_vec3(_json["position"]);
-            _transform.lastPosition = _transform.position;
-        }
-        if (_json.HasMember("orientation"))
-        {
-            if (_json["orientation"].Size() == 4)
-            {
-                _transform.orientation = read_quat(_json["orientation"]);
-            }
-            else if (_json["orientation"].Size() == 3)
-            {
-                vec3 v = read_vec3(_json["orientation"]);
-                _transform.orientation = from_euler(v);
-            }
-            _transform.lastOrientation = _transform.orientation;
-        }
-        if (_json.HasMember("scale"))
-        {
-            _transform.scale = read_vec3(_json["scale"]);
-            _transform.lastScale = _transform.scale;
-        }
+        read_transform(get_string(_json), _transform);
+
+        //if (_json.HasMember("position"))
+        //{
+        //     read_vec3(_json["position"], _transform.position);
+        //    _transform.lastPosition = _transform.position;
+        //}
+        //if (_json.HasMember("orientation"))
+        //{
+        //    if (_json["orientation"].Size() == 4)
+        //    {
+        //         read_quat(_json["orientation"], _transform.orientation);
+        //    }
+        //    else if (_json["orientation"].Size() == 3)
+        //    {
+        //        vec3 v{};
+        //        read_vec3(_json["orientation"], v);
+        //        _transform.orientation = from_euler(v);
+        //    }
+        //    _transform.lastOrientation = _transform.orientation;
+        //}
+        //if (_json.HasMember("scale"))
+        //{
+        //     read_vec3(_json["scale"], _transform.scale);
+        //    _transform.lastScale = _transform.scale;
+        //}
     }
 
-    RigidBody read_rigid_body(const rapidjson::Value& _json)
+    void read_rigid_body(const rapidjson::Value& _json, RigidBody& rigid_body)
     {
-        RigidBody body;
-
         if (_json.HasMember("mass"))
         {
-            body.mass = _json["mass"].GetFloat();
-            body.mass_inverse = 1.0f / body.mass;
+            rigid_body.mass = _json["mass"].GetFloat();
+            rigid_body.mass_inverse = 1.0f / rigid_body.mass;
         }
         if (_json.HasMember("size"))
         {
-            body.size = _json["size"].GetFloat();
+            rigid_body.size = _json["size"].GetFloat();
         }
         if (_json.HasMember("momentum"))
         {
-            body.momentum = read_vec3(_json["momentum"]);
+            read_vec3(_json["momentum"], rigid_body.momentum);
         }
         if (_json.HasMember("angularMomentum"))
         {
-            body.angularMomentum = read_vec3(_json["angularMomentum"]);
+             read_vec3(_json["angularMomentum"], rigid_body.angularMomentum);
         }
         if (_json.HasMember("rotationInertia"))
         {
             if (!strcmp(_json["rotationInertia"].GetString(), "cube"))
             {
-                body.rotationInertia = (1.0f / 6.0f) * body.mass * powf(body.size, 2);;
-                body.rotationInertiaInverse = 1.0f / body.rotationInertia;
+                rigid_body.rotationInertia = (1.0f / 6.0f) * rigid_body.mass * powf(rigid_body.size, 2);;
+                rigid_body.rotationInertiaInverse = 1.0f / rigid_body.rotationInertia;
             }
         }
         if (_json.HasMember("applygravity"))
         {
-            body.applyGravity = _json["applygravity"].GetBool();
+            rigid_body.applyGravity = _json["applygravity"].GetBool();
         }
         if (_json.HasMember("infiniteMass"))
         {
-            body.infiniteMass = _json["infiniteMass"].GetBool();
+            rigid_body.infiniteMass = _json["infiniteMass"].GetBool();
         }
-
-        return body;
     }
 
-    Sphere read_bounding_sphere(const rapidjson::Value& _json)
+    void read_sphere(const rapidjson::Value& _json, math::Sphere& sphere)
     {
-        Sphere bound;
-
         if (_json.HasMember("offset"))
         {
-            bound.offset = read_vec3(_json["offset"]);
+             read_vec3(_json["offset"], sphere.offset);
         }
         if (_json.HasMember("radius"))
         {
-            bound.radius = _json["radius"].GetFloat();
+            sphere.radius = _json["radius"].GetFloat();
         }
-
-        return bound;
     }
 
 
-    Spring read_spring2(const rapidjson::Value& _json)
+    void read_spring(const rapidjson::Value& _json, Spring& spring)
     {
-        Spring spring;
-
         if (_json.HasMember("entityA"))
         {
             spring.entityA = _json["entityA"].GetUint();
@@ -235,11 +223,11 @@ namespace rain::engine::JsonReader
         }
         if (_json.HasMember("anchorPointA"))
         {
-            spring.anchorPointA = read_vec3(_json["anchorPointA"]);
+            read_vec3(_json["anchorPointA"], spring.anchorPointA);
         }
         if (_json.HasMember("anchorPointB"))
         {
-            spring.anchorPointB = read_vec3(_json["anchorPointB"]);
+             read_vec3(_json["anchorPointB"], spring.anchorPointB);
         }
         if (_json.HasMember("distance"))
         {
@@ -253,11 +241,9 @@ namespace rain::engine::JsonReader
         {
             spring.b = _json["b"].GetFloat();
         }
-
-        return spring;
     }
 
-    Plane read_plane(const rapidjson::Value& _json)
+    void read_plane(const rapidjson::Value& _json, math::Plane& plane)
     {
         vec3 position {};
         vec3 normal {};
@@ -268,19 +254,17 @@ namespace rain::engine::JsonReader
 
         if (_json.HasMember("position") && _json.HasMember("normal"))
         {
-            position = read_vec3(_json["position"]);
-            normal = read_vec3(_json["normal"]);
-            auto hello = Plane(position, normal);
-            return Plane(position, normal);
+            read_vec3(_json["position"], position);
+            read_vec3(_json["normal"], normal);
+            plane = Plane(position, normal);
         }
         else if (_json.HasMember("point1") && _json.HasMember("point2") && _json.HasMember("point3"))
         {
-            point1 = read_vec3(_json["point1"]);
-            point2 = read_vec3(_json["point2"]);
-            point3 = read_vec3(_json["point3"]);
-            return Plane(point1, point2, point3);
+            read_vec3(_json["point1"], point1);
+            read_vec3(_json["point2"], point2);
+            read_vec3(_json["point3"], point3);
+            plane = Plane(point1, point2, point3);
         }
-        return Plane(vec3{}, vec3{});
     }
 
     void read_model(const rapidjson::Value& _json, Model& _model)
@@ -350,6 +334,27 @@ namespace rain::engine::JsonReader
     //        }
     //    }
     //}
+
+    void read_transform(const std::string & json_str, math::Transform& t)
+    {
+        nlohmann::json j = nlohmann::json::parse(json_str);
+        auto pos = j["position"];
+        u32 i = 0;
+        for (nlohmann::json::iterator it = j["position"].begin(); it != j["position"].end(); ++it, ++i)
+        {
+            t.position[i] = *it;
+        }
+        i = 0;
+        for (nlohmann::json::iterator it = j["orientation"].begin(); it != j["orientation"].end(); ++it, ++i)
+        {
+            t.orientation[i] = *it;
+        }
+        i = 0;
+        for (nlohmann::json::iterator it = j["scale"].begin(); it != j["scale"].end(); ++it, ++i)
+        {
+            t.scale[i] = *it;
+        }
+    }
 }
 
 namespace rain::engine::json_writer
