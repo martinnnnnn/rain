@@ -8,7 +8,7 @@ This is my attempt at making a small game engine, mostly for learning purposes.
 
 To clone the repo, you need to use the recursive features of git clone, some external libraries being set as submodules :
 
-`git clone --recurse-submodules -j8 git://github.com/foo/bar.git`
+`git clone --recurse-submodules -j8 https://github.com/martinnnnnn/rain.git`
 
 ## Dependencies
 
