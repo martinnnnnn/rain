@@ -8,7 +8,7 @@
 namespace rain::math
 {
 
-    struct Transform
+    struct transform
     {
         vec3 position;
         vec3 lastPosition;
@@ -20,7 +20,7 @@ namespace rain::math
         vec3 lastScale;
     };
 
-    inline mat4 get_transform_matrix(const Transform& t)
+    inline mat4 get_transform_matrix(const transform& t)
     {
         return translate(identity_mat4(), t.position) * mat4_cast(t.orientation) * scale(identity_mat4(), t.scale);
     }

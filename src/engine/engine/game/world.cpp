@@ -28,8 +28,8 @@ namespace rain::engine
         json_reader::read_world(file.read(), *this);
 
         auto entity = registry.create();
-        Transform& transform = registry.assign<Transform>(entity);
-        transform.scale = vec3{ 0.1f, 0.1f, 0.1f };
+        transform& t = registry.assign<transform>(entity);
+        t.scale = vec3{ 0.1f, 0.1f, 0.1f };
         Material& material = registry.assign<Material>(entity);
         material.shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
         math::mesh& mesh = registry.assign<math::mesh>(entity);
@@ -51,13 +51,13 @@ namespace rain::engine
 
     void World::update_camera(const float _deltaTime)
     {
-        auto camera_view = registry.view<Transform, Camera>();
+        auto camera_view = registry.view<transform, Camera>();
         for (auto entity : camera_view)
         {
-            Transform& transform = camera_view.get<Transform>(entity);
+            transform& t = camera_view.get<transform>(entity);
             Camera& camera = camera_view.get<Camera>(entity);
-            update(camera, transform);
-            RAIN_RENDERER->set_view_matrix(transform.position, transform.position + camera.front, camera.up);
+            update(camera, t);
+            RAIN_RENDERER->set_view_matrix(t.position, t.position + camera.front, camera.up);
         }
     }
 
@@ -69,19 +69,19 @@ namespace rain::engine
         {
             Spring& spring2 = spring2_view.get(entity);
             RigidBody& bodyA = registry.get<RigidBody>(spring2.entityA);
-            Transform& transformA = registry.get<Transform>(spring2.entityA);
+            transform& transformA = registry.get<transform>(spring2.entityA);
             RigidBody& bodyB = registry.get<RigidBody>(spring2.entityB);
-            Transform& transformB = registry.get<Transform>(spring2.entityB);
+            transform& transformB = registry.get<transform>(spring2.entityB);
             Physics::apply_spring(spring2, transformA, bodyA, transformB, bodyB);
         }
 
         // updating physics
-        auto physics_view = registry.view<RigidBody, Transform>();
+        auto physics_view = registry.view<RigidBody, transform>();
         for (auto entity : physics_view)
         {
             RigidBody& body = physics_view.get<RigidBody>(entity);
             Physics::apply_gravity(body);
-            Physics::update(body, physics_view.get<Transform>(entity), _deltaTime);
+            Physics::update(body, physics_view.get<transform>(entity), _deltaTime);
         }
 
         //auto transform_view = registry.view<Transform>();
@@ -99,12 +99,12 @@ namespace rain::engine
         //    }
         //}
         // updating collision
-        auto sphere_view = registry.view<RigidBody, Sphere, Transform>();
+        auto sphere_view = registry.view<RigidBody, sphere, transform>();
         for (auto entity1 : sphere_view)
         {
             RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
-            Sphere& bound1 = sphere_view.get<Sphere>(entity1);
-            Transform& transform1 = sphere_view.get<Transform>(entity1);
+            sphere& bound1 = sphere_view.get<sphere>(entity1);
+            transform& transform1 = sphere_view.get<transform>(entity1);
             //for (auto entity2 : sphere_view)
             //{
             //    if (entity1 == entity2)
@@ -123,10 +123,10 @@ namespace rain::engine
             //    }
             //}
 
-            auto plane_view = registry.view<Plane>();
+            auto plane_view = registry.view<plane>();
             for (auto ent_plane : plane_view)
             {
-                Plane& plane = plane_view.get(ent_plane);
+                plane& plane = plane_view.get(ent_plane);
 
                 HitInfo info = detect_collision_sphere_plane(bound1, transform1, plane);
                 if (info.hit)
@@ -142,11 +142,11 @@ namespace rain::engine
     {
         //ConsoleProfiler profiler("render");
 
-        auto view = registry.view<Transform, Model, Material>();
+        auto view = registry.view<transform, Model, Material>();
 
         for (auto entity : view)
         {
-            Transform& transform = view.get<Transform>(entity);
+            transform& t = view.get<transform>(entity);
             Model& model = view.get<Model>(entity);
             Material& material = view.get<Material>(entity);
 
@@ -161,33 +161,33 @@ namespace rain::engine
             //send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
             //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
             
-            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+            quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, transform.scale);
+            RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, t.scale);
         }
 
-        auto test_view = registry.view<Transform, mesh, Material>();
+        auto test_view = registry.view<transform, mesh, Material>();
         for (auto entity : test_view)
         {
-            Transform& transform = test_view.get<Transform>(entity);
+            transform& t = test_view.get<transform>(entity);
             math::mesh& mesh = test_view.get<math::mesh>(entity);
             Material& material = test_view.get<Material>(entity);
 
-            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+            quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, transform.position, transform.orientation, transform.scale);
+            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
         }
 
-        auto view2 = registry.view<Transform, Sphere>();
+        auto view2 = registry.view<transform, sphere>();
 
         for (auto entity : view2)
         {
-            Transform& transform = view2.get<Transform>(entity);
+            transform& t = view2.get<transform>(entity);
             
-            vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
-            quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
+            vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+            quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
             RAIN_RENDERER->draw_sphere(position, orientation, vec3{ 1.0f, 1.0f, 1.0f });
         }

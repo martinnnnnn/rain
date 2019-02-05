@@ -305,7 +305,7 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_quad(const Plane& _p, const vec3 _position, const vec3& _color)
+    void Renderer::draw_quad(const plane& _p, const vec3 _position, const vec3& _color)
     {   
         vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
         vec3 v = cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  

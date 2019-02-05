@@ -3,7 +3,7 @@
 
 namespace rain::math
 {
-    struct Quad
+    struct quad
     {
 
     };

@@ -13,7 +13,7 @@ namespace rain::engine
     namespace Physics
     {
         void apply_gravity(RigidBody& _body);
-        void apply_spring(const Spring& _spring, const math::Transform& _transformA, RigidBody& _bodyA, const math::Transform& _transformB, RigidBody& _bodyB);
-        void update(RigidBody& _body, math::Transform& _transform, float _deltaTime);
+        void apply_spring(const Spring& _spring, const math::transform& _transformA, RigidBody& _bodyA, const math::transform& _transformB, RigidBody& _bodyB);
+        void update(RigidBody& _body, math::transform& _transform, float _deltaTime);
     };
 }

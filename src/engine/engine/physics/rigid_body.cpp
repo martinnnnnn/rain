@@ -3,7 +3,7 @@
 
 namespace rain::engine
 {
-    void apply_physics(RigidBody& _body, math::Transform& _transform, const f32 _deltaTime)
+    void apply_physics(RigidBody& _body, math::transform& _transform, const f32 _deltaTime)
     {
         if (!_body.infiniteMass)
         {

@@ -4,7 +4,7 @@
 
 namespace rain::math
 {
-    struct Ray
+    struct ray
     {
         vec3 origin;
         vec3 direction;

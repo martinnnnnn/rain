@@ -19,7 +19,7 @@ namespace rain::engine
         pitch = 0.0f;
     }
 
-    void update(Camera& _camera, math::Transform& _transform)
+    void update(Camera& _camera, math::transform& _transform)
     {
         math::vec3 movement{ 0.0f, 0.0f, 0.0f };
 

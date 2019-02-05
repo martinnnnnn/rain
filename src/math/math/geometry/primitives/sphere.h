@@ -4,13 +4,13 @@
 
 namespace rain::math
 {
-    struct Sphere
+    struct sphere
     {
-        Sphere()
-            : Sphere(0.0f, vec3{})
+        sphere()
+            : sphere(0.0f, vec3{})
         {}
 
-        Sphere(float _radius, vec3 _offset)
+        sphere(float _radius, vec3 _offset)
             : radius(_radius)
             , offset(_offset)
         {}

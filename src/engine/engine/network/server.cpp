@@ -52,21 +52,21 @@ namespace rain::engine
 
         i32 start_server_thread(const char* ip_address)
         {
-            DWORD   dwThreadIdArray;
-            HANDLE  hThreadArray;
+            DWORD   thread_id;
+            HANDLE  thread_handle;
 
             ip_ptr address = new ip();
             address->address = "127.0.0.1:9998";
 
-            hThreadArray = CreateThread(
+            thread_handle = CreateThread(
                 NULL,                   // default security attributes
                 0,                      // use default stack size  
                 start_server,           // thread function name
-                address,                    // argument to thread function 
+                address,                // argument to thread function 
                 0,                      // use default creation flags   
-                &dwThreadIdArray);      // returns the thread identifier 
+                &thread_id);      // returns the thread identifier 
 
-            if (hThreadArray == NULL)
+            if (thread_handle == NULL)
             {
                 ErrorHandler(TEXT("CreateThread"));
                 ExitProcess(3);

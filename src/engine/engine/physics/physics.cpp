@@ -17,7 +17,7 @@ namespace rain::engine
         }
     }
 
-    void Physics::apply_spring(const Spring& _spring, const Transform& _transformA, RigidBody& _bodyA, const Transform& _transformB, RigidBody& _bodyB)
+    void Physics::apply_spring(const Spring& _spring, const transform& _transformA, RigidBody& _bodyA, const transform& _transformB, RigidBody& _bodyB)
     {
 
         vec3 position_anchorA {};/* = translate(identity_mat4(), _transformA.position) * mat4_cast(_transformA.orientation) * vec4 { _spring.anchorPointA.x, _spring.anchorPointA.y, _spring.anchorPointA.z, 1.0f };*/
@@ -60,7 +60,7 @@ namespace rain::engine
     }
 
 
-    void Physics::update(RigidBody& _body, Transform& _transform, float _deltaTime)
+    void Physics::update(RigidBody& _body, transform& _transform, float _deltaTime)
     {
         _transform.lastPosition = _transform.position;
         _transform.lastOrientation = _transform.orientation;

@@ -30,7 +30,7 @@ namespace rain::engine
     using namespace rain::math;
 
 
-    HitInfo detect_collision_sphere_plane(Sphere& _sphere, Transform& _transform, Plane& _plane)
+    HitInfo detect_collision_sphere_plane(sphere& _sphere, transform& _transform, plane& _plane)
     {
         HitInfo info{};
 
@@ -54,7 +54,7 @@ namespace rain::engine
         return info;
     }
 
-    vec2 detect_collision_ray_sphere(const Ray& _ray, const Sphere& _sphere)
+    vec2 detect_collision_ray_sphere(const ray& _ray, const sphere& _sphere)
     {
         vec3 oc = _ray.origin - _sphere.offset;
         float b = dot(oc, _ray.direction);
@@ -67,7 +67,7 @@ namespace rain::engine
 
 
     
-    HitInfo detect_collision_sphere(const Sphere& _sphereA, const Transform& _transformA, const Sphere& _sphereB, const Transform& _transformB)
+    HitInfo detect_collision_sphere(const sphere& _sphereA, const transform& _transformA, const sphere& _sphereB, const transform& _transformB)
     {
         HitInfo info{};
 
@@ -99,7 +99,7 @@ namespace rain::engine
     }
 
 
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, vec3& _position)
+    void collision_response(RigidBody& _bodyA, transform& _transformA, vec3& _position)
     {
         vec3 x = normalized(_transformA.position - _position);
 
@@ -118,7 +118,7 @@ namespace rain::engine
         _bodyA.momentum = vec3(v1x*(m1 - m2) / (m1 + m2) + v2x * (2 * m2) / (m1 + m2) + v1y) * _bodyA.mass;
     }
 
-    void collision_response(RigidBody& _bodyA, Transform& _transformA, RigidBody& _bodyB, Transform& _transformB)
+    void collision_response(RigidBody& _bodyA, transform& _transformA, RigidBody& _bodyB, transform& _transformB)
     {
         vec3 x = normalized(_transformA.position - _transformB.position);
 
@@ -139,7 +139,7 @@ namespace rain::engine
         _bodyB.momentum = vec3(v1x*(2 * m1) / (m1 + m2) + v2x * (m2 - m1) / (m1 + m2) + v2y) * _bodyB.mass;
     }
 
-    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const Transform& _transformA, const MeshBound& _verticesB, const Transform& _transformB)
+    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const transform& _transformA, const MeshBound& _verticesB, const transform& _transformB)
     {
 
         return HitInfo {};

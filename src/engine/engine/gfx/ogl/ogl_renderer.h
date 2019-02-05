@@ -58,7 +58,7 @@ namespace rain::engine
 
         void draw_billboard();
         void draw_line();
-        void draw_quad(const math::Plane& _p, const math::vec3 _position, const math::vec3& _color);
+        void draw_quad(const math::plane& _p, const math::vec3 _position, const math::vec3& _color);
         void draw_cube(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
         void draw_sphere(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
         void draw_mesh();

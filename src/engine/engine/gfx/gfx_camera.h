@@ -20,6 +20,6 @@ namespace rain::engine
 	};
 
 
-    void update(Camera& _camera, math::Transform& _transform);
+    void update(Camera& _camera, math::transform& _transform);
 	
 }
