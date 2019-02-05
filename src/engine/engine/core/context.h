@@ -3,7 +3,6 @@
 #include "core/core.h"
 #include "engine/win32/win32_helpers.h"
 
-
 namespace rain::engine
 {
     using core::HighResolutionClock;
@@ -11,9 +10,9 @@ namespace rain::engine
     struct IdGenerator;
     struct World;
     struct Config;
-    struct DataSystem;
     struct Client;
 
+    class data_system;
     class Application;
     class Window;
     class Renderer;
@@ -28,7 +27,7 @@ namespace rain::engine
         Renderer* renderer;
         Input* input;
         core::Logger* logger;
-        DataSystem* data_system;
+        data_system* data_sys;
         HighResolutionClock* clock;
     };
 }
@@ -40,10 +39,10 @@ namespace rain::engine
 #define RAIN_RENDERER                   RAIN_CONTEXT->renderer
 #define RAIN_WINDOW                     RAIN_CONTEXT->window
 #define RAIN_INPUT                      RAIN_CONTEXT->input
-#define RAIN_DATA                       RAIN_CONTEXT->data_system
+#define RAIN_DATA                       RAIN_CONTEXT->data_sys
 
-#define RAIN_FIND_DATA_FROM_PATH(path)  RAIN_CONTEXT->data_system->find_mesh(path) 
-#define RAIN_FIND_DATA_FROM_ID(id)      RAIN_CONTEXT->data_system->find_mesh(id)
+#define RAIN_FIND_DATA_FROM_PATH(type, path)  RAIN_CONTEXT->data_sys->find_data<type>(path) 
+#define RAIN_FIND_DATA_FROM_ID(type, id)      RAIN_CONTEXT->data_sys->find_data<type>(id)
 
 #ifdef _DEBUG
 #define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_INFO, __VA_ARGS__); } while(false)

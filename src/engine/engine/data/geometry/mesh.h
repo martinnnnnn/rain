@@ -5,6 +5,7 @@
 
 #include "core/core.h"
 #include "math/math.h"
+#include "engine/data/data_handle.h"
 
 namespace rain::engine
 {
@@ -42,8 +43,8 @@ namespace rain::engine
 
     struct Model
     {
-        core::FilePath path;
-        Mesh* mesh;
+        core::file_path path;
+        handle<Mesh> const * mesh;
     };
 
     void read_mesh_fbx(fbxsdk::FbxMesh* _fbxMesh, Mesh* _mesh);

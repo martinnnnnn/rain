@@ -35,14 +35,14 @@ namespace rain::engine
         math::mesh& mesh = registry.assign<math::mesh>(entity);
 
         Model model;
-        model.path = FilePath(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
-        model.mesh = RAIN_FIND_DATA_FROM_PATH(model.path.get_path_absolute());
+        model.path = file_path(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
+        model.mesh = RAIN_FIND_DATA_FROM_PATH(Mesh, model.path.get_path_absolute());
 
-        u32 vertices_count = model.mesh->vertices.size();
+        u32 vertices_count = model.mesh->data->vertices.size();
         vec3* vertices = (vec3*)malloc(vertices_count * sizeof(vec3));
         for (u32 i = 0; i < vertices_count; ++i)
         {
-            memcpy(&vertices[i], &model.mesh->vertices[i].position, sizeof(vec3));
+            memcpy(&vertices[i], &(model.mesh->data->vertices[i].position), sizeof(vec3));
         }
 
         quick_hull(vertices, vertices_count, &mesh);
@@ -164,7 +164,7 @@ namespace rain::engine
             vec3 position = transform.position * _alpha + transform.lastPosition * (1.0f - _alpha);
             quat orientation = transform.orientation * _alpha + transform.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_mesh(model.mesh, material, position, orientation, transform.scale);
+            RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, transform.scale);
         }
 
         auto test_view = registry.view<Transform, mesh, Material>();

@@ -8,15 +8,15 @@
 
 namespace rain::core
 {
-    struct FilePath
+    struct file_path
     {
-        FilePath() :
+        file_path() :
             path("")
         {
 
         }
-        FilePath(const std::string& _path);
-        const FilePath& operator = (const FilePath& src)
+        file_path(const std::string& _path);
+        const file_path& operator = (const file_path& src)
         {
             path = src.path;
             return *this;
@@ -68,7 +68,7 @@ namespace rain::core
     {
         void init(const std::string _root);
 
-        std::vector<FilePath> paths;
+        std::vector<file_path> paths;
     };
 
 }

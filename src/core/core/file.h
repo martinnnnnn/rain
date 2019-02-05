@@ -22,9 +22,9 @@ namespace rain::core
 		bool is_open();
 		std::string read();
 		void close();
-        FilePath& get_path();
+        file_path& get_path();
         std::fstream& get_stream();
-        FilePath filepath;
+        file_path filepath;
 
 	private:
 		std::fstream m_stream;

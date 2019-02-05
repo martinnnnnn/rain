@@ -17,6 +17,6 @@ namespace rain::engine
         , renderer(nullptr)
         , input(nullptr)
         , logger(nullptr)
-        , data_system(nullptr)
+        , data_sys(nullptr)
         , clock(nullptr) {}
 }

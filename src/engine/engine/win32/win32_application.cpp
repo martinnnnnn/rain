@@ -15,6 +15,8 @@
 // TEMP
 #include "engine/network/network.h"
 #include "engine/network/server.h"
+#include <filesystem>
+
 
 void launch_rain_engine(HINSTANCE hinstance)
 {
@@ -78,11 +80,8 @@ namespace rain::engine
         //file_system.init(RAIN_CONFIG->data_root);
 
         // LOADING DATA
-        RAIN_CONTEXT->data_system = new DataSystem();
-        RAIN_CONTEXT->data_system->load_all_recursive(RAIN_CONFIG->data_root);
-
-        //client = new Client();
-        //init_socket(client);
+        RAIN_CONTEXT->data_sys = new data_system();
+        RAIN_CONTEXT->data_sys->load_all_recursive(RAIN_CONFIG->data_root);
         
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();

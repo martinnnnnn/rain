@@ -2,8 +2,10 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 #include "core/core.h"
+#include "data_handle.h"
 #include "engine/core/context.h"
 #include "geometry/mesh.h"
 #include "texture/texture.h"
@@ -12,61 +14,90 @@
 
 namespace rain::engine
 {
-    using core::FilePath;
+    using core::file_path;
+
+    struct id_container
+    {
+        std::vector<u32> id;
+    };
 
     template<typename T>
-    struct DataHandle
+    struct handle_pool : public id_container
     {
-        DataHandle(const std::string& _path)
-            : path(_path)
-            , id(core::uuid::from_name(path.get_path_relative(RAIN_CONFIG->data_root)))
+        void add_data(handle<T> new_data_handle)
         {
-            data = new T();
-            data->load(path.get_path_absolute());
+            handles.push_back(new_data_handle);
         }
 
-        DataHandle()
-            : path("")
-            , id()
-            , data(nullptr) {}
-
-        FilePath path;
-        core::uuid id;
-        T* data;
-    };
-
-    template <typename T>
-    struct DataHandleContainer
-    {
-        void load_data(const std::string& _path)
+        handle<T> const * find_data(const core::uuid& id)
         {
-            DataHandle<T>* handle = new DataHandle<T>(_path);
-            datas.push_back(handle);
+            for (u32 i = 0; i < handles.size(); ++i)
+            {
+                if (handles[i].id == id)
+                {
+                    return &(handles[i]);
+                }
+            }
+            return nullptr;
         }
 
-        std::vector<DataHandle<T>*> datas;
+        handle<T> const * find_data(const file_path& path)
+        {
+            for (u32 i = 0; i < handles.size(); ++i)
+            {
+                if (handles[i].path.get_path_absolute().compare(path.get_path_absolute()))
+                {
+                    return &(handles[i]);
+                }
+            }
+            return nullptr;
+        }
+
+        std::vector<handle<T>> handles;
     };
 
-
-    struct DataSystem
+    class data_system
     {
-        void load_all_recursive(const std::string& _root);
+    public:
+        template<typename T>
+        static handle<T> load_data(const file_path& path, const core::uuid& id)
+        {
+            handle<T> new_handle{ path, id };
+            new_handle.data = new T();
+            new_handle.data->load(path.get_path_absolute());
+            return new_handle;
+        }
 
-        Mesh* find_mesh(const FilePath& _path);
-        Mesh* find_mesh(const core::uuid _id);
+        template<typename T>
+        void add_data(handle<T> new_data_handle)
+        {
+            u32 t_id = core::type_id<T>::get<T>();
+            if (t_id >= containers.size())
+            {
+                containers.resize(t_id + 1);
+                containers[t_id] = new handle_pool<T>();
+            }
 
-        std::vector<FilePath> paths;
+            static_cast<handle_pool<T>*>(containers[t_id])->add_data(new_data_handle);
+        }
 
-        DataHandleContainer<Mesh> meshes;
-        DataHandleContainer<Texture> textures;
-        DataHandleContainer<Shader> shaders;
+        template<typename T>
+        handle<T> const * find_data(const core::uuid& id)
+        {
+            u32 t_id = core::type_id<T>::get<T>();
+            return static_cast<handle_pool<T>*>(containers[t_id])->find_data(id);
+        }
+
+        template<typename T>
+        handle<T> const * find_data(const file_path& path)
+        {
+            u32 t_id = core::type_id<T>::get<T>();
+            return static_cast<handle_pool<T>*>(containers[t_id])->find_data(path);
+        }
+
+        // temp function until a tool parses the data directory, records [files path, uuid] and assigns these uuids to world entities that need them
+        void load_all_recursive(const std::string& root);
+        
+        std::vector<id_container*> containers;
     };
-
-    //struct ShadersInfo
-    //{
-    //    std::string vertex_path;
-    //    std::string fragment_path;
-    //    std::string geometry_path;
-    //};
-
 }

@@ -271,20 +271,20 @@ namespace rain::engine::json_reader
     {
         if (_json.HasMember("path"))
         {
-            _model.path = FilePath(RAIN_CONFIG->data_root + std::string(_json["path"].GetString()));
-            _model.mesh = RAIN_FIND_DATA_FROM_PATH(_model.path.get_path_absolute());
-            assert(_model.mesh);
-            RAIN_RENDERER->load_mesh(_model.mesh);
+            _model.path = file_path(RAIN_CONFIG->data_root + std::string(_json["path"].GetString()));
+            _model.mesh = RAIN_FIND_DATA_FROM_PATH(Mesh, _model.path.get_path_absolute());
+            //assert(_model.mesh);
+            RAIN_RENDERER->load_mesh(_model.mesh->data);
         }
     }
 
     void read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound)
     {
-        _meshBound.points.resize(_model.mesh->vertices.size());
+        _meshBound.points.resize(_model.mesh->data->vertices.size());
 
-        for (u32 i = 0; i < _model.mesh->vertices.size(); ++i)
+        for (u32 i = 0; i < _model.mesh->data->vertices.size(); ++i)
         {
-            _meshBound.points[i] = _model.mesh->vertices[i].position;
+            _meshBound.points[i] = _model.mesh->data->vertices[i].position;
         }
     }
 
