@@ -134,6 +134,9 @@ namespace rain::engine::json_reader
     void read_transform(const rapidjson::Value& _json, Transform& _transform)
     {
         read_transform(get_string(_json), _transform);
+        _transform.lastPosition = _transform.position;
+        _transform.lastOrientation = _transform.orientation;
+        _transform.lastScale = _transform.scale;
 
         //if (_json.HasMember("position"))
         //{

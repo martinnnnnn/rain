@@ -41,10 +41,12 @@ namespace rain::engine
         void load(const std::string& _path);
     };
 
+    typedef handle<Mesh> mesh_handle;
+
     struct Model
     {
         core::file_path path;
-        handle<Mesh> const * mesh;
+        mesh_handle const * mesh;
     };
 
     void read_mesh_fbx(fbxsdk::FbxMesh* _fbxMesh, Mesh* _mesh);

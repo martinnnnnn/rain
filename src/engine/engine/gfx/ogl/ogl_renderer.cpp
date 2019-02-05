@@ -158,19 +158,19 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::load_mesh(Mesh * _mesh)
+    void Renderer::load_mesh(Mesh * mesh)
     {
-        glGenVertexArrays(1, &_mesh->vao);
-        glGenBuffers(1, &_mesh->vbo);
-        glGenBuffers(1, &_mesh->ebo);
+        glGenVertexArrays(1, &mesh->vao);
+        glGenBuffers(1, &mesh->vbo);
+        glGenBuffers(1, &mesh->ebo);
 
-        glBindVertexArray(_mesh->vao);
+        glBindVertexArray(mesh->vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, _mesh->vbo);
-        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(Vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh->indices.size() * sizeof(unsigned int), &_mesh->indices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -184,26 +184,26 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::release_mesh(Mesh* _mesh)
+    void Renderer::release_mesh(Mesh* mesh)
     {
-        glDeleteBuffers(1, &_mesh->vbo);
-        glDeleteBuffers(1, &_mesh->ebo);
-        glDeleteVertexArrays(1, &_mesh->vao);
+        glDeleteBuffers(1, &mesh->vbo);
+        glDeleteBuffers(1, &mesh->ebo);
+        glDeleteVertexArrays(1, &mesh->vao);
 
-        _mesh->vbo = 0;
-        _mesh->ebo = 0;
-        _mesh->vao = 0;
+        mesh->vbo = 0;
+        mesh->ebo = 0;
+        mesh->vao = 0;
     }
 
-    void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const vec3& _position, const quat& _orientation, const vec3& _scale)
+    void Renderer::draw_mesh(Mesh * mesh, const Material& material, const vec3& position, const quat& orientation, const vec3& scale)
     {
-        _material.shader.use();
-        _material.shader.set("model", math::translate(identity_mat4(), _position) * math::mat4_cast(_orientation) * math::scale(identity_mat4(), _scale));
-        _material.shader.set("proj", proj_mat_perspective);
-        _material.shader.set("view", view_mat);
+        material.shader.use();
+        material.shader.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
+        material.shader.set("proj", proj_mat_perspective);
+        material.shader.set("view", view_mat);
 
-        glBindVertexArray(_mesh->vao);
-        glDrawElements(GL_TRIANGLES, _mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(mesh->vao);
+        glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
     }

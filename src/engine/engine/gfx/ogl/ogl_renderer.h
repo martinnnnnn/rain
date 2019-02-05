@@ -75,9 +75,9 @@ namespace rain::engine
         u32 load_primitive(math::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, math::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
         void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const math::vec3& position, const math::quat& _orientation, const math::vec3& scale);
 
-        void load_mesh(Mesh* _mesh);
-        void draw_mesh(Mesh* _mesh, const Material& material, const math::vec3& _position, const math::quat& _orientation, const math::vec3& _scale);
-        void release_mesh(Mesh* _mesh);
+        void load_mesh(Mesh* mesh);
+        void draw_mesh(Mesh* mesh, const Material& material, const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
+        void release_mesh(Mesh* mesh);
 
         static constexpr u32 debug_vertices_max_count = 8192;
 
