@@ -64,7 +64,7 @@
             "Transform" :
             {
                 "default": false,
-                "position" : [1.0, 1.0, 0.0],
+                "position" : [14.0, 12.0, 0.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0],
                 "scale" : [1.0,1.0,1.0]
             },

@@ -189,7 +189,7 @@ namespace rain::engine
             vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
             quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_sphere(position, orientation, vec3{ 1.0f, 1.0f, 1.0f });
+            RAIN_RENDERER->draw_sphere(position, orientation, transform.scale);
         }
 
         //auto plane_view = registry.view<Plane>();

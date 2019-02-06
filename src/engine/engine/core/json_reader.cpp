@@ -134,6 +134,7 @@ namespace rain::engine::json_reader
     void read_transform(const rapidjson::Value& _json, transform& _transform)
     {
         read_transform(get_string(_json), _transform);
+
         _transform.lastPosition = _transform.position;
         _transform.lastOrientation = _transform.orientation;
         _transform.lastScale = _transform.scale;
@@ -341,22 +342,19 @@ namespace rain::engine::json_reader
     void read_transform(const std::string & json_str, math::transform& t)
     {
         nlohmann::json j = nlohmann::json::parse(json_str);
-        auto pos = j["position"];
-        u32 i = 0;
-        for (nlohmann::json::iterator it = j["position"].begin(); it != j["position"].end(); ++it, ++i)
-        {
-            t.position[i] = *it;
-        }
-        i = 0;
-        for (nlohmann::json::iterator it = j["orientation"].begin(); it != j["orientation"].end(); ++it, ++i)
-        {
-            t.orientation[i] = *it;
-        }
-        i = 0;
-        for (nlohmann::json::iterator it = j["scale"].begin(); it != j["scale"].end(); ++it, ++i)
-        {
-            t.scale[i] = *it;
-        }
+
+		for (u32 i = 0; i < j["position"].size(); ++i)
+		{
+			t.position[i] = j["position"][i];
+		}
+		for (u32 i = 0; i < j["orientation"].size(); ++i)
+		{
+			t.orientation[i] = j["orientation"][i];
+		}
+		for (u32 i = 0; i < j["scale"].size(); ++i)
+		{
+			t.scale[i] = j["scale"][i];
+		}
     }
 }
 
