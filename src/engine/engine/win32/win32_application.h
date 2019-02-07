@@ -6,9 +6,6 @@
 #include <functional>
 
 #include "core/core.h"
-#include "engine/win32/win32_helpers.h"
-
-extern "C" __declspec(dllexport) void launch_rain_engine(HINSTANCE hinstance);
 
 namespace rain::engine
 {
@@ -18,13 +15,13 @@ namespace rain::engine
     {
     public:
 
-        int init(HINSTANCE _hinstance, const std::string& _config);
+        int init(void* _hinstance, const std::string& _config);
         void shutdown();
         void update();
         void render(float _alpha);
 
     private:
         World* world;
-        HINSTANCE hinstance;
+        void* hinstance;
     };
 }

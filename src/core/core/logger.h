@@ -13,12 +13,6 @@ namespace rain::core
     {
     public:
         Logger(void(*_printOutput)(const char*));
-        static constexpr char* LOG_DEBUG = "[DEBUG]";
-        static constexpr char* LOG_INFO = "[INFO]";
-        static constexpr char* LOG_NETWORK = "[NETWORK]";
-        static constexpr char* LOG_PROFILE = "[PROFILE]";
-        static constexpr char* LOG_WARNING = "[WARNING]";
-        static constexpr char* LOG_ERROR = "[ERROR]";
 
         inline void clean_buffers()
         {

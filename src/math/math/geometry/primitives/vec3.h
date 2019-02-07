@@ -27,7 +27,7 @@ namespace rain::math
             this->x = q.x;
             this->y = q.y;
             this->z = q.z;
-            return *this;
+            return *this; 
         }
     };
 

@@ -32,7 +32,7 @@ int Input::init()
     if (FAILED(hr))
         return hr;
 
-    hr = m_keyboard->SetCooperativeLevel(RAIN_WINDOW->m_hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+    hr = m_keyboard->SetCooperativeLevel(RAIN_WINDOW->hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     if (FAILED(hr))
         return hr;
 
@@ -44,7 +44,7 @@ int Input::init()
     if (FAILED(hr))
         return hr;
 
-    hr = m_mouse->SetCooperativeLevel(RAIN_WINDOW->m_hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+    hr = m_mouse->SetCooperativeLevel(RAIN_WINDOW->hwnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
     if (FAILED(hr))
         return hr;
 
@@ -124,7 +124,13 @@ void Input::update()
     // MOUSE
     if (is_key_released(DIK_C))
     {
+        RAIN_LOG("C");
         mouse_lock = !mouse_lock;
+    }
+
+    if (is_key_released(DIK_M))
+    {
+        RAIN_WINDOW->toggle_fullscreen();
     }
 
     DIMOUSESTATE2 dims2;

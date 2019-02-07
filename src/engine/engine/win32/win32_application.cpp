@@ -11,45 +11,11 @@
 #include "engine/core/config.h"
 #include "engine/data/data_system.h"
 #include "engine/core/context.h"
-
+#include "engine/core/profiler.h"
 // TEMP
 #include "engine/network/network.h"
 #include "engine/network/server.h"
 #include <filesystem>
-
-
-void launch_rain_engine(HINSTANCE hinstance)
-{
-    rain::engine::Application application;
-
-    if (application.init(hinstance, "") != 0)
-    {
-        return;
-    }
-
-    MSG msg;
-    bool quit = false;
-    while (!quit)
-    {
-        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
-        {
-            if (msg.message == WM_QUIT)
-                quit = true;
-
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-
-        application.update();
-
-        if (GetAsyncKeyState(VK_ESCAPE))
-        {
-            RAIN_WINDOW->shutdown();
-        }
-    }
-
-}
-
 
 namespace rain::engine
 {
@@ -59,7 +25,7 @@ namespace rain::engine
         OutputDebugStringA(_msg);
     }
 
-    int Application::init(HINSTANCE _hinstance, const std::string& _config)
+    int Application::init(void* _hinstance, const std::string& _config)
     {
         hinstance = _hinstance;
 
@@ -79,13 +45,14 @@ namespace rain::engine
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
 
+
         // LOADING DATA
         RAIN_CONTEXT->data_sys = new data_system();
         RAIN_CONTEXT->data_sys->load_all_recursive(RAIN_CONFIG->data_root);
         
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();
-	    RAIN_CONTEXT->window->init(hinstance, RAIN_CONFIG->screen_width, RAIN_CONFIG->screen_height, 0);
+	    RAIN_CONTEXT->window->init((HINSTANCE)hinstance, RAIN_CONFIG->screen_width, RAIN_CONFIG->screen_height, 0);
 
         // INIT RENDERER
         RAIN_CONTEXT->renderer = new Renderer();
@@ -139,10 +106,12 @@ namespace rain::engine
 
         const double alpha = accumulator / dt;
         render(float(alpha));
-        if (RAIN_WINDOW->is_initialized())
+
+        if (RAIN_WINDOW->initialized)
         {
             RAIN_WINDOW->present();
         }
+
     }
 
     void Application::shutdown()
@@ -158,7 +127,7 @@ namespace rain::engine
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
-        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, math::vec3{ 0.5, 0.8f, 0.2f });
+        //RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, math::vec3{ 0.5, 0.8f, 0.2f });
         world->render(_alpha);
     }
 }

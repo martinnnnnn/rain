@@ -140,7 +140,7 @@ namespace rain::engine
 
     void World::render(const float _alpha)
     {
-        //ConsoleProfiler profiler("render");
+        RAIN_WPROFILE("world render ", 25.0f, 25.0f, 0.2f, (math::vec3{ 0.5, 0.8f, 0.2f }));
 
         auto view = registry.view<transform, Model, Material>();
 
@@ -189,7 +189,7 @@ namespace rain::engine
             vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
             quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_sphere(position, orientation, transform.scale);
+            RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
         }
 
         //auto plane_view = registry.view<Plane>();

@@ -10,24 +10,32 @@
 namespace rain::engine
 {
 
-    struct ConsoleProfiler
+    struct console_profiler
     {
-        ConsoleProfiler(const std::string& _message);
+        console_profiler(const std::string& _message);
 
-        ~ConsoleProfiler();
+        ~console_profiler();
 
         std::string message;
         std::chrono::system_clock::time_point start;
         std::chrono::system_clock::time_point end;
+    };
 
+    struct profiler
+    {
+        profiler();
+        f64 get_time();
+
+        std::chrono::system_clock::time_point start;
+        std::chrono::system_clock::time_point end;
     };
 
 
-    struct WindowProfiler
+    struct window_profiler
     {
-        WindowProfiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
+        window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
 
-        ~WindowProfiler();
+        ~window_profiler();
 
         std::string message;
         f32 x;
@@ -40,4 +48,5 @@ namespace rain::engine
     };
 }
 
-#define RAIN_PROFILE(msg) rain::engine::ConsoleProfiler profiler("init")
+#define RAIN_PROFILE(msg) rain::engine::console_profiler p(msg)
+#define RAIN_WPROFILE(msg, x, y, scale, color) rain::engine::window_profiler p(msg, x, y, scale, color)

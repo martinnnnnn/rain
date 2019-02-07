@@ -967,7 +967,8 @@ void qh__build_hull(qh_context_t* context, float epsilon)
 
 void qh_mesh_export(qh_mesh_t const* mesh, char const* filename)
 {
-    FILE* objfile = fopen(filename, "wt");
+    FILE* objfile;
+    fopen_s(&objfile, filename, "wt");
     fprintf(objfile, "o\n");
 
     for (unsigned int i = 0; i < mesh->nvertices; ++i) {

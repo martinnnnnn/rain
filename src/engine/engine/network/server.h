@@ -20,6 +20,13 @@ namespace rain::engine
             std::string address;
         } ip, *ip_ptr;
 
+        enum class packet_type
+        {
+            world_update,
+            textual_chat,
+            vocal_chat
+        };
+
         i32 start_server_thread(const char* ip_address);
         DWORD _stdcall start_server(LPVOID lpParam);
     }

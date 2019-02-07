@@ -23,13 +23,15 @@ namespace rain::engine
 		void show();
 		void hide();
 		void resize(int _width, int _height);
-		void fullscreen(bool _fullscreen);
+        void toggle_fullscreen();
+        void fullscreen(bool _fullscreen);
 		void recover_display_mode();
-		bool is_initialized() { return initialized; }
 		math::vec2 get_center_pos_absolute();
-		HWND m_hwnd;
 
         math::vec2 size() const;
+
+		bool initialized;
+		HWND hwnd;
 
 	private:
 
@@ -38,11 +40,10 @@ namespace rain::engine
 		HDC m_hdc;
 		HGLRC m_hglrc;
 		RECT m_rect;
-		bool m_fullscreen;
+		bool full_screen;
 		i32 m_width;
 		i32 m_height;
 		i32 m_depth;
-		bool initialized;
 	};
 
 	LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

@@ -45,12 +45,12 @@ namespace rain::engine
 #define RAIN_FIND_DATA_FROM_ID(type, id)      RAIN_CONTEXT->data_sys->find_data<type>(id)
 
 #ifdef _DEBUG
-#define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_INFO, __VA_ARGS__); } while(false)
-#define RAIN_LOG_DEBUG(...)     do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_DEBUG, __VA_ARGS__); } while(false)
-#define RAIN_LOG_NETWORK(...)   do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_NETWORK, __VA_ARGS__); } while(false)
-#define RAIN_LOG_PROFILE(...)   do { RAIN_CONTEXT->logger->log_level(rain::core::Logger::LOG_PROFILE, __VA_ARGS__); } while(false)
-#define RAIN_LOG_WARNING(...)   do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, rain::core::Logger::LOG_WARNING, __VA_ARGS__); } while(false)
-#define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, rain::core::Logger::LOG_ERROR, __VA_ARGS__); } while(false)
+#define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level("[INFO]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_DEBUG(...)     do { RAIN_CONTEXT->logger->log_level("[DEBUG]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_NETWORK(...)   do { RAIN_CONTEXT->logger->log_level("[NETWORK]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_PROFILE(...)   do { RAIN_CONTEXT->logger->log_level("[PROFILE]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_WARNING(...)   do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, "[WARNING]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, "[ERROR]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_RAW(...)       do { RAIN_CONTEXT->logger->log_raw(__VA_ARGS__); } while(false)
 #else
 #define RAIN_LOG(...)

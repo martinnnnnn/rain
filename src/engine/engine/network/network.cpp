@@ -28,6 +28,7 @@ namespace rain::engine
                 RAIN_LOG_NETWORK("WSAStartup failed with error: %d\n", i_result);
                 return 1;
             }
+            return 0;
         }
 
         void terminate()
@@ -103,7 +104,8 @@ namespace rain::engine
 
         char input[512];
         RAIN_LOG("You : ");
-        FILE* file = fopen("D:/_MARTIN/programming/_projects/editor/test_blazor_server/test.txt", "r");
+        FILE* file;
+        fopen_s(&file, "D:/_MARTIN/programming/_projects/editor/test_blazor_server/test.txt", "r");
         fgets(input, sizeof(input), file);
         while (strcmp(input, "exit") != 0)
         {

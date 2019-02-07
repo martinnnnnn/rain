@@ -6,19 +6,31 @@
 
 namespace rain::engine
 {
-    ConsoleProfiler::ConsoleProfiler(const std::string& _message) : message(_message)
+    console_profiler::console_profiler(const std::string& _message) : message(_message)
     {
         start = std::chrono::system_clock::now();
     }
 
-    ConsoleProfiler::~ConsoleProfiler()
+    console_profiler::~console_profiler()
     {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
         RAIN_LOG_PROFILE((message + " : %fs").c_str(), elapsed_seconds.count());
     }
 
-    WindowProfiler::WindowProfiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color)
+    profiler::profiler()
+    {
+        start = std::chrono::system_clock::now();
+    }
+
+    f64 profiler::get_time()
+    {
+        end = std::chrono::system_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        return elapsed_seconds.count();
+    }
+
+    window_profiler::window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color)
         : message(_message)
         , x(_x)
         , y(_y)
@@ -28,16 +40,13 @@ namespace rain::engine
         start = std::chrono::system_clock::now();
     }
 
-    WindowProfiler::~WindowProfiler()
+    window_profiler::~window_profiler()
     {
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
-
-        //char m[1024];
-        //String::print_to_buffer(header_buffer, sizeof(header_buffer), "%s ", _level);
-        RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, math::vec3{ 0.5, 0.8f, 0.2f });
-
-        RAIN_LOG_PROFILE((message + " %f").c_str(), elapsed_seconds.count() * 1000);
+        char buffer[512];
+        core::string::print_to_buffer(buffer, 512, (message + " %f ms").c_str(), elapsed_seconds.count() * 1000.0);
+        RAIN_RENDERER->draw_text_2d(buffer, x, y, scale, color);
     }
 }
 

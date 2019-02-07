@@ -35,7 +35,7 @@ namespace rain::engine
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        resize(RAIN_WINDOW->size().x, RAIN_WINDOW->size().y);
+        resize(u32(RAIN_WINDOW->size().x), u32(RAIN_WINDOW->size().y));
 
         init_default_shaders();
         init_debug();
@@ -65,10 +65,10 @@ namespace rain::engine
         proj_mat_perspective = _projection;
     }
 
-    void Renderer::set_orthogonal_projection_matrix(const mat4& _projection)
+    void Renderer::set_orthogonal_projection_matrix(const mat4& mat)
     {
-        proj_mat_orthogonal = _projection;
-        proj_mat_orthogonal = math::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
+        proj_mat_orthogonal = mat;
+        //proj_mat_orthogonal = math::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
     void Renderer::set_view_matrix(const vec3& _eye, float _pitch, float _yaw)
@@ -104,9 +104,8 @@ namespace rain::engine
 
     u32 Renderer::load_primitive(vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count)
     {
-        u32 vao,
-            vbo_vertices, ebo_vertices_indices,
-            vbo_normals, ebo_normals_indices;
+        u32 vao, vbo_vertices, ebo_vertices_indices;
+        //u32 vbo_normals, ebo_normals_indices;
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -644,9 +643,6 @@ namespace rain::engine
     {
         text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
 
-        text_shader.use();
-        text_shader.set("projection", proj_mat_orthogonal);
-
         FT_Library ft;
 
         if (FT_Init_FreeType(&ft))
@@ -725,6 +721,7 @@ namespace rain::engine
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         text_shader.use();
         text_shader.set("textColor", _color);
+        text_shader.set("projection", proj_mat_orthogonal);
 
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(text_vao);
