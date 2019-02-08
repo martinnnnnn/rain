@@ -44,6 +44,7 @@ namespace rain::engine
         //network::terminate();
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
+		UI.init();
         
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();
@@ -86,6 +87,8 @@ namespace rain::engine
 
         RAIN_INPUT->update();
         RAIN_CLOCK->tick();
+
+		UI.update();
 
         double newTime = RAIN_CLOCK->get_total_seconds();
         double frameTime = newTime - currentTime;

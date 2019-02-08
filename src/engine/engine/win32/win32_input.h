@@ -22,15 +22,15 @@ namespace rain::engine
         void shutdown();
         void update();
 
-        void set_cursor_pos(u32 _x, u32 _y);
+        void set_cursor_pos(const i32 _x, const i32 _y);
 
         bool is_key_pressed(u32 _code) const;
         bool is_key_released(u32 _code)  const;
 
-        i32 x_offset;
-        i32 y_offset;
-        i32 x_from_center;
-        i32 y_from_center;
+        i32 x_frame_offset;
+        i32 y_frame_offset;
+        i32 x_from_topleft;
+        i32 y_from_topleft;
         bool mouse_lock;
         bool mouseclick_left;
         bool mouseclick_right;

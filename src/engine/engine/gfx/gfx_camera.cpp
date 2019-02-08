@@ -43,8 +43,8 @@ namespace rain::engine
             }
             _transform.position += movement;
 
-            _camera.yaw += f32(RAIN_INPUT->x_offset * 0.1f);
-            _camera.pitch += f32(RAIN_INPUT->y_offset * 0.1f);
+            _camera.yaw += f32(RAIN_INPUT->x_frame_offset * 0.1f);
+            _camera.pitch += f32(RAIN_INPUT->y_frame_offset * 0.1f);
         }
 
         _camera.pitch = std::clamp(_camera.pitch, -89.0f, 89.0f);
