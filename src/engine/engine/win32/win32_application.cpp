@@ -44,11 +44,6 @@ namespace rain::engine
         //network::terminate();
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
-
-
-        // LOADING DATA
-        RAIN_CONTEXT->data_sys = new data_system();
-        RAIN_CONTEXT->data_sys->load_all_recursive(RAIN_CONFIG->data_root);
         
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();
@@ -60,6 +55,10 @@ namespace rain::engine
 
         // SHOW WINDOW
         RAIN_CONTEXT->window->show();
+
+        // LOADING DATA
+        RAIN_CONTEXT->data_sys = new data_system();
+        RAIN_CONTEXT->data_sys->load_all_recursive(RAIN_CONFIG->data_root);
 
 	    // INIT INPUT
         RAIN_CONTEXT->input = new Input();
@@ -80,10 +79,10 @@ namespace rain::engine
     {
         RAIN_RENDERER->clear();
 
-        static const double dt = 0.01;
+        static const f64 dt = 0.01;
 
-        static double currentTime = RAIN_CLOCK->get_total_seconds();
-        static double accumulator = 0.0;
+        static f64 currentTime = RAIN_CLOCK->get_total_seconds();
+        static f64 accumulator = 0.0;
 
         RAIN_INPUT->update();
         RAIN_CLOCK->tick();
@@ -99,8 +98,8 @@ namespace rain::engine
 
         while (accumulator >= dt)
         {
-            world->update_camera((float)dt);
             world->update_physics((float)dt);
+            world->update_camera((float)dt);
             accumulator -= dt;
         }
 
@@ -127,7 +126,6 @@ namespace rain::engine
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
-        //RAIN_RENDERER->draw_text_2d("hello", 25.0f, 25.0f, 1.0f, math::vec3{ 0.5, 0.8f, 0.2f });
         world->render(_alpha);
     }
 }
@@ -146,18 +144,18 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
     bool quit = false;
     while (!quit)
     {
-        if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
+        if (::PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
                 quit = true;
 
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            ::TranslateMessage(&msg);
+            ::DispatchMessage(&msg);
         }
 
         application.update();
 
-        if (GetAsyncKeyState(VK_ESCAPE))
+        if (::GetAsyncKeyState(VK_ESCAPE))
         {
             RAIN_WINDOW->shutdown();
         }

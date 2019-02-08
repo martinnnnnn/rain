@@ -13,7 +13,6 @@ namespace rain::engine
     struct console_profiler
     {
         console_profiler(const std::string& _message);
-
         ~console_profiler();
 
         std::string message;
@@ -34,7 +33,6 @@ namespace rain::engine
     struct window_profiler
     {
         window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
-
         ~window_profiler();
 
         std::string message;
@@ -44,7 +42,6 @@ namespace rain::engine
         math::vec3 color;
         std::chrono::system_clock::time_point start;
         std::chrono::system_clock::time_point end;
-
     };
 }
 

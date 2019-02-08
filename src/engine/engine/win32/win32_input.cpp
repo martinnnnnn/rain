@@ -10,9 +10,24 @@ using namespace rain::engine;
 
 
 Input::Input()
-    : mouse_lock(true)
+    : x_frame_offset(0)
+    , y_frame_offset(0)
+    , x_from_center(0)
+    , y_from_center(0)
+    , mouse_lock(0)
+    , mouseclick_left(0)
+    , mouseclick_right(0)
+    , mouse_wheel(0)
+    , m_inputEvents(0)
+    , m_diObject(0)
+    , m_keyboard(0)
+    , m_mouse(0)
     , m_keysCurrent(&m_keysA)
+    , x_center(0)
+    , y_center(0)
+
 {
+
     ZeroMemory(m_keysA.data(), m_keysA.size());
     ZeroMemory(m_keysB.data(), m_keysB.size());
 }
@@ -122,22 +137,19 @@ void Input::update()
     }
 
     // MOUSE
-    if (is_key_released(DIK_C))
+    if (is_key_released(DIK_C) && is_key_pressed(DIK_LCONTROL))
     {
-        RAIN_LOG("C");
         mouse_lock = !mouse_lock;
     }
 
-    if (is_key_released(DIK_M))
+    if (is_key_released(DIK_V) && is_key_pressed(DIK_LCONTROL))
     {
         RAIN_WINDOW->toggle_fullscreen();
     }
 
-    DIMOUSESTATE2 dims2;
-    ZeroMemory(&dims2, sizeof(dims2));
+    DIMOUSESTATE2 dims2{};
 
-    hr = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE2),
-        &dims2);
+    hr = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &dims2);
     if (FAILED(hr))
     {
         hr = m_mouse->Acquire();
@@ -150,15 +162,20 @@ void Input::update()
             return;
     }
 
-    x_offset = dims2.lX;
-    y_offset = -dims2.lY;
-    x_screen_pos += x_offset;
-    y_screen_pos += y_offset;
-
+    x_frame_offset = dims2.lX;
+    y_frame_offset = -dims2.lY;
+    mouse_wheel = dims2.lZ;
+    mouseclick_left = dims2.rgbButtons[0];
+    mouseclick_right = dims2.rgbButtons[1];
+    
     if (mouse_lock)
     {
         set_cursor_pos(x_center, y_center);
     }
+
+    char buffer[512];
+    core::string::print_to_buffer(buffer, 512, "(%d, %d)",RAIN_WINDOW->get_rect().top, RAIN_WINDOW->get_rect().left);
+    RAIN_RENDERER->draw_text_2d(buffer, 25, 50, 0.5f, math::vec3{ 0.0f, 1.0f, 0.0f });
 }
 
 
@@ -187,10 +204,4 @@ bool Input::is_key_released(u32 _code) const
 void Input::set_cursor_pos(u32 _x, u32 _y)
 {
     ::SetCursorPos(_x, _y);
-}
-
-void Input::update_absolute_mouse_pos(u32 _x, u32 _y)
-{
-    x_screen_pos = _x;
-    y_screen_pos = _y;
 }

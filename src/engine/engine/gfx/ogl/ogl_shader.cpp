@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iostream>
 
+
+
 #include "engine/core/context.h"
 #include "engine/win32/win32_helpers.h"
 
@@ -12,10 +14,13 @@ namespace rain::engine
 {
 	
 	Shader::Shader()
+        : vertex_object(0)
+        , fragment_object(0)
+        , geometry_object(0)
 	{
 	}
 
-	bool Shader::load(const std::string& _vertex_file, const std::string& _fragment_file, const std::string& _geometry_file)
+	bool Shader::load(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path)
 	{
         bool success = false;
 
@@ -23,17 +28,17 @@ namespace rain::engine
         std::string fragment_code = "";
         std::string geometry_code = "";
 
-        if (m_vertex_file.open(_vertex_file))
+        if (vertex_file.open(vertex_path))
         {
-            vertex_code = m_vertex_file.read();
+            vertex_code = vertex_file.read();
         }
-        if (m_fragment_file.open(_fragment_file))
+        if (fragment_file.open(fragment_path))
         {
-            fragment_code = m_fragment_file.read();
+            fragment_code = fragment_file.read();
         }
-        if (m_geometry_file.open(_geometry_file))
+        if (geometry_file.open(geometry_path))
         {
-            geometry_code = m_geometry_file.read();
+            geometry_code = geometry_file.read();
         }
 
         if (vertex_code != "" && fragment_code != "")
@@ -42,52 +47,51 @@ namespace rain::engine
             success = true;
         }
 
-		m_vertex_file.close();
-		m_fragment_file.close();
-		m_geometry_file.close();
+		vertex_file.close();
+		fragment_file.close();
+		geometry_file.close();
 
 		return success;
 	}
 
-
 	void Shader::load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code)
 	{
 		id = glCreateProgram();
-		m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		vertex_object = glCreateShader(GL_VERTEX_SHADER);
+		fragment_object = glCreateShader(GL_FRAGMENT_SHADER);
 
-		glShaderSource(m_vertexShader, 1, &_vertex_code, NULL);
-		glCompileShader(m_vertexShader);
-		check_compile_errors(m_vertexShader, "VERTEX");
+		glShaderSource(vertex_object, 1, &_vertex_code, NULL);
+		glCompileShader(vertex_object);
+		check_compile_errors(vertex_object, "VERTEX");
 
-		glShaderSource(m_fragmentShader, 1, &_fragment_code, NULL);
-		glCompileShader(m_fragmentShader);	
-		check_compile_errors(m_fragmentShader, "FRAGMENT");
+		glShaderSource(fragment_object, 1, &_fragment_code, NULL);
+		glCompileShader(fragment_object);	
+		check_compile_errors(fragment_object, "FRAGMENT");
 
 		if (_geometry_code != nullptr)
 		{
-			m_geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-			glShaderSource(m_geometryShader, 1, &_geometry_code, NULL);
-			glCompileShader(m_geometryShader);
-			check_compile_errors(m_geometryShader, "GEOMETRY");
+			geometry_object = glCreateShader(GL_GEOMETRY_SHADER);
+			glShaderSource(geometry_object, 1, &_geometry_code, NULL);
+			glCompileShader(geometry_object);
+			check_compile_errors(geometry_object, "GEOMETRY");
 		}
 
-		glAttachShader(id, m_vertexShader);
-		glAttachShader(id, m_fragmentShader);
+		glAttachShader(id, vertex_object);
+		glAttachShader(id, fragment_object);
 		if (_geometry_code != nullptr)
 		{
-			glAttachShader(id, m_geometryShader);
+			glAttachShader(id, geometry_object);
 		}
 
 		glLinkProgram(id);
 		check_compile_errors(id, "PROGRAM");
 
 
-		glDeleteShader(m_vertexShader);
-		glDeleteShader(m_fragmentShader);
+		glDeleteShader(vertex_object);
+		glDeleteShader(fragment_object);
         if (_geometry_code != nullptr)
         {
-		    glDeleteShader(m_geometryShader);
+		    glDeleteShader(geometry_object);
         }
 	}
 

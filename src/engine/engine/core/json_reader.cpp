@@ -9,6 +9,7 @@
 #include "engine/core/context.h"
 #include "engine/core/config.h"
 #include "engine/data/data_system.h"
+#include "engine/data/data_handle.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 
 namespace rain::engine::json_reader
@@ -297,20 +298,21 @@ namespace rain::engine::json_reader
         std::string vertex_path;
         std::string fragment_path;
         std::string geometry_path;
+        handle<Shader> const * handle = nullptr;
 
         if (_json.HasMember("vertex"))
         {
             vertex_path = RAIN_CONFIG->data_root + _json["vertex"].GetString();
+            handle = RAIN_FIND_DATA_FROM_PATH(Shader, vertex_path);
         }
-        if (_json.HasMember("fragment"))
-        {
-            fragment_path = RAIN_CONFIG->data_root + _json["fragment"].GetString();
-        }
-        if (_json.HasMember("geometry"))
-        {
-            geometry_path = RAIN_CONFIG->data_root + _json["geometry"].GetString();
-        }
-
+        //if (_json.HasMember("fragment"))
+        //{
+        //    fragment_path = RAIN_CONFIG->data_root + _json["fragment"].GetString();
+        //}
+        //if (_json.HasMember("geometry"))
+        //{
+        //    geometry_path = RAIN_CONFIG->data_root + _json["geometry"].GetString();
+        //}
         _material.shader.load(vertex_path, fragment_path, geometry_path);
     }
 

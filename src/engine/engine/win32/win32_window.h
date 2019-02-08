@@ -17,6 +17,14 @@ namespace rain::engine
 	{
 	public:
 
+        struct rect
+        {
+            i32 left;
+            i32 top;
+            i32 right;
+            i32 bottom;
+        };
+
 		int init(HINSTANCE _hinstance, int _width, int _height, int _depth);
 		void present();
 		void shutdown();
@@ -26,6 +34,7 @@ namespace rain::engine
         void toggle_fullscreen();
         void fullscreen(bool _fullscreen);
 		void recover_display_mode();
+        rect get_rect();
 		math::vec2 get_center_pos_absolute();
 
         math::vec2 size() const;
@@ -39,7 +48,7 @@ namespace rain::engine
 		i32 center_pos_y;
 		HDC m_hdc;
 		HGLRC m_hglrc;
-		RECT m_rect;
+		rect m_rect;
 		bool full_screen;
 		i32 m_width;
 		i32 m_height;

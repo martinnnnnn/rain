@@ -18,10 +18,17 @@ namespace rain::engine
                 std::string ext = filepath.get_extention();
                 if (ext.compare("fbx") == 0)
                 {
-                    handle<Mesh> new_mesh_handle = load_data<Mesh>(filepath, core::uuid::random());
+                    handle<Mesh> new_mesh_handle = load_data<Mesh>(filepath, core::uuid::random(), filepath);
                     add_data<Mesh>(new_mesh_handle);
                 }
-
+                if (ext.compare("vs") == 0)
+                {
+                    std::string vertex = filepath.get_directory() + filepath.get_name() + ".vs";
+                    std::string fragment = filepath.get_directory() + filepath.get_name() + ".fs";
+                    std::string geometry = filepath.get_directory() + filepath.get_name() + ".ge";
+                    handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
+                    add_data<Shader>(new_shader_handle);
+                }
             }
         }
     }

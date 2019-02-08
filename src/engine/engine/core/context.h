@@ -1,13 +1,11 @@
 #pragma once
 
 #include "core/core.h"
-#include "engine/win32/win32_helpers.h"
 
 namespace rain::engine
 {
     using core::HighResolutionClock;
 
-    struct IdGenerator;
     struct World;
     struct Config;
     struct Client;

@@ -20,20 +20,21 @@ namespace rain::engine
 
         int init();
         void shutdown();
-
         void update();
 
         void set_cursor_pos(u32 _x, u32 _y);
-        void update_absolute_mouse_pos(u32 _x, u32 _y);
 
         bool is_key_pressed(u32 _code) const;
         bool is_key_released(u32 _code)  const;
 
         i32 x_offset;
         i32 y_offset;
-        u32 x_screen_pos;
-        u32 y_screen_pos;
+        i32 x_from_center;
+        i32 y_from_center;
         bool mouse_lock;
+        bool mouseclick_left;
+        bool mouseclick_right;
+        i8 mouse_wheel;
     private:
         static constexpr u32 KEYS_COUNT = 256;
 

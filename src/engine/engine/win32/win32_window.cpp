@@ -173,7 +173,7 @@ namespace rain::engine
 
 		    if (full_screen)
 		    {
-			    ::GetWindowRect(hwnd, &m_rect);
+			    ::GetWindowRect(hwnd, (RECT*)&m_rect);
 
 			    UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 
@@ -220,6 +220,12 @@ namespace rain::engine
     void Window::recover_display_mode()
     {
 	    ChangeDisplaySettings(NULL, 0);
+    }
+
+    Window::rect Window::get_rect()
+    {
+        ::GetWindowRect(hwnd, (RECT*)&m_rect);
+        return m_rect;
     }
 
     math::vec2 Window::get_center_pos_absolute()

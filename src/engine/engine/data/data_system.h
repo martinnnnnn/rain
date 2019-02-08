@@ -59,12 +59,12 @@ namespace rain::engine
     class data_system
     {
     public:
-        template<typename T>
-        static handle<T> load_data(const file_path& path, const core::uuid& id)
+        template<typename T, typename... Args>
+        static handle<T> load_data(const file_path& path, const core::uuid& id, Args &&... args)
         {
             handle<T> new_handle{ path, id };
             new_handle.data = new T();
-            new_handle.data->load(path.get_path_absolute());
+            new_handle.data->load(std::forward<Args>(args)...);
             return new_handle;
         }
 

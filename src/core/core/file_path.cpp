@@ -22,20 +22,24 @@ namespace rain::core
 
     std::string file_path::get_path_relative(const std::string& _root) const
     {
-        static u32 lenght = _root.length();
+        u32 lenght = _root.length();
         return path.substr(lenght);
     }
 
     std::string file_path::get_name() const
     {
-        size_t lastSlash = path.find_last_of("/");
-        return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
+        size_t last_slash = path.find_last_of("/");
+        size_t point = path.find_first_of(".");
+        u32 size_with_extension = (path.length() - 1) - last_slash;
+        u32 extension_size = (path.length() - 1) - point;
+
+        return path.substr(last_slash, size_with_extension - extension_size);
     }
 
     std::string file_path::get_extention() const
     {
-        size_t lastSlash = path.find_first_of(".");
-        return path.substr(lastSlash + 1, (path.length() - 1) - lastSlash);
+        size_t point = path.find_first_of(".");
+        return path.substr(point + 1, (path.length() - 1) - point);
     }
 
     std::string file_path::get_directory() const

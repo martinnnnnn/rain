@@ -4,7 +4,7 @@
 
 namespace rain::engine
 {
-    void Mesh::load(const std::string& _path)
+    void Mesh::load(const core::file_path& path)
     {
         fbxsdk::FbxManager* sdkManager = fbxsdk::FbxManager::Create();
         fbxsdk::FbxIOSettings *ios = fbxsdk::FbxIOSettings::Create(sdkManager, IOSROOT);
@@ -12,7 +12,7 @@ namespace rain::engine
 
         fbxsdk::FbxImporter* importer = fbxsdk::FbxImporter::Create(sdkManager, "");
 
-        if (!importer->Initialize(_path.c_str(), -1, sdkManager->GetIOSettings()))
+        if (!importer->Initialize(path.get_path_absolute().c_str(), -1, sdkManager->GetIOSettings()))
         {
             RAIN_LOG("Call to fbxsdk::FbxImporter::Initialize() failed.\n");
             RAIN_LOG("Error returned: %s\n\n", importer->GetStatus().GetErrorString());

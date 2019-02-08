@@ -38,7 +38,7 @@ namespace rain::engine
         u32 vbo;
         u32 ebo;
 
-        void load(const std::string& _path);
+        void load(const core::file_path& path);
     };
 
     typedef handle<Mesh> mesh_handle;
