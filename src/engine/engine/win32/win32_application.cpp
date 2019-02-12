@@ -44,6 +44,7 @@ namespace rain::engine
         //network::terminate();
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
+		UI.init();
         
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();
@@ -87,6 +88,8 @@ namespace rain::engine
         RAIN_INPUT->update();
         RAIN_CLOCK->tick();
 
+		UI.update();
+
         double newTime = RAIN_CLOCK->get_total_seconds();
         double frameTime = newTime - currentTime;
         if (frameTime > 0.25)
@@ -122,7 +125,6 @@ namespace rain::engine
     void Application::render(float _alpha)
     {
         RAIN_RENDERER->draw();
-
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 

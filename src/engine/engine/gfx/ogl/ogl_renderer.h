@@ -46,6 +46,8 @@ namespace rain::engine
         void init_sphere();
 
         void init_text_2d();
+		void init_quad_2d();
+		void draw_quad_2d();
 
         void draw();
 
@@ -88,6 +90,10 @@ namespace rain::engine
         u32      m_debug_vbo;
         u32      m_debug_cbo;
 
+		Shader shape_2d_shader;
+		u32		quad_2d_vao;
+        Shader debug_shader;
+
         GLuint lineVAO;
         u32 line_index_count;
 	    GLuint quadVAO;
@@ -110,5 +116,20 @@ namespace rain::engine
         std::unordered_map<GLchar, RChar> text_characters;
         GLuint text_vao;
         GLuint text_vbo;
-    };
+
+		static constexpr u32 ui_quad_max_vertex_count = 8192;
+		u32 ui_quad_vertex_count;
+		u32 ui_quad_vao;
+		u32 ui_quad_vbo;
+		u32 ui_quad_cbo;
+		math::vec3 ui_quad_vertices[ui_quad_max_vertex_count];
+		math::vec3 ui_quad_colors[ui_quad_max_vertex_count];
+		Shader ui_shader;
+		void init_ui();
+		void draw_ui();
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color);
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color);
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color, const math::vec3& c_color);
+		void draw_ui_quad(const math::vec3& top_left, const u32& width, const u32& height, const math::vec3& color);
+	};
 }

@@ -66,9 +66,6 @@ namespace rain::engine
         m_rect.left = posx;
         m_rect.right = posx + m_width;
 
-        center_pos_x = m_width / 2;
-        center_pos_y = m_height / 2;
-
 
         if ((m_hdc = GetDC(hwnd)) == NULL)
         {
@@ -143,6 +140,9 @@ namespace rain::engine
     {
 	    m_width = std::max(1, _width);
 	    m_height = std::max(1, _height);
+
+		center_pos_x = m_width / 2;
+		center_pos_y = m_height / 2;
 
 	    glViewport(0, 0, m_width, m_height);
 	    glMatrixMode(GL_PROJECTION);
@@ -230,6 +230,7 @@ namespace rain::engine
 
     math::vec2 Window::get_center_pos_absolute()
     {
+		get_rect();
         return math::vec2{ f32(m_rect.left + center_pos_x), f32(m_rect.top + center_pos_y) };
     }
 

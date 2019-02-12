@@ -12,8 +12,8 @@ using namespace rain::engine;
 Input::Input()
     : x_frame_offset(0)
     , y_frame_offset(0)
-    , x_from_center(0)
-    , y_from_center(0)
+    , x_from_topleft(0)
+    , y_from_topleft(0)
     , mouse_lock(0)
     , mouseclick_left(0)
     , mouseclick_right(0)
@@ -79,9 +79,7 @@ int Input::init()
     m_keyboard->Acquire();
     m_mouse->Acquire();
 
-    auto pos = RAIN_WINDOW->get_center_pos_absolute();
-    x_center = u32(pos.x);
-    y_center = u32(pos.y);
+
 
     return 0;
 }
@@ -164,17 +162,27 @@ void Input::update()
 
     x_frame_offset = dims2.lX;
     y_frame_offset = -dims2.lY;
-    mouse_wheel = dims2.lZ;
+    mouse_wheel = i8(dims2.lZ);
     mouseclick_left = dims2.rgbButtons[0];
     mouseclick_right = dims2.rgbButtons[1];
     
     if (mouse_lock)
     {
+		auto pos = RAIN_WINDOW->get_center_pos_absolute();
+		x_center = u32(pos.x);
+		y_center = u32(pos.y);
         set_cursor_pos(x_center, y_center);
     }
 
+	Window::rect rect = RAIN_WINDOW->get_rect();
+	POINT monitor_position;
+	::GetCursorPos(&monitor_position);
+
+	x_from_topleft = monitor_position.x - rect.left;
+	y_from_topleft = monitor_position.y - rect.top;
+
     char buffer[512];
-    core::string::print_to_buffer(buffer, 512, "(%d, %d)",RAIN_WINDOW->get_rect().top, RAIN_WINDOW->get_rect().left);
+    core::string::print_to_buffer(buffer, 512, "(%d, %d)", x_from_topleft, y_from_topleft);
     RAIN_RENDERER->draw_text_2d(buffer, 25, 50, 0.5f, math::vec3{ 0.0f, 1.0f, 0.0f });
 }
 
@@ -201,7 +209,7 @@ bool Input::is_key_released(u32 _code) const
     return false;
 }
 
-void Input::set_cursor_pos(u32 _x, u32 _y)
+void Input::set_cursor_pos(const i32 _x, const i32 _y)
 {
     ::SetCursorPos(_x, _y);
 }

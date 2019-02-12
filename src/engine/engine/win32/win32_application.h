@@ -7,6 +7,8 @@
 
 #include "core/core.h"
 
+#include "engine/ui/text_field.h"
+
 namespace rain::engine
 {
     struct World;
@@ -23,5 +25,6 @@ namespace rain::engine
     private:
         World* world;
         void* hinstance;
+		ui::ui UI;
     };
 }
