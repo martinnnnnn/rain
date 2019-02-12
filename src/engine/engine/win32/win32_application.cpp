@@ -129,7 +129,6 @@ namespace rain::engine
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
         world->render(_alpha);
-		RAIN_RENDERER->draw_ui();
     }
 }
 

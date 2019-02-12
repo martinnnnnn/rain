@@ -480,6 +480,7 @@ namespace rain::engine
     {
         draw_coord_view(vec3 {});
 		draw_debug();
+		draw_ui();
     }
 
     void Renderer::draw_debug()
@@ -806,7 +807,6 @@ namespace rain::engine
         text_shader.use();
         text_shader.set("textColor", _color);
         text_shader.set("projection", proj_mat_orthogonal);
-
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(text_vao);
 
@@ -866,7 +866,7 @@ namespace rain::engine
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
-		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
+		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/ui.vs", RAIN_CONFIG->data_root + "/shaders/glsl/ui.fs");
 	}
 
 	void Renderer::draw_ui()
@@ -881,7 +881,6 @@ namespace rain::engine
 
 		glBindBuffer(GL_ARRAY_BUFFER, ui_quad_cbo);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, ui_quad_vertex_count * sizeof(vec3), ui_quad_colors);
-
 
 		ui_shader.use();
 		ui_shader.set("projection", proj_mat_orthogonal);
@@ -913,14 +912,14 @@ namespace rain::engine
 	{
 		if (m_debug_vertex_count + 3 < debug_vertices_max_count)
 		{
-			m_debug_vertices[m_debug_vertex_count + 0] = a;
-			m_debug_vertices[m_debug_vertex_count + 1] = b;
-			m_debug_vertices[m_debug_vertex_count + 2] = c;
-			m_debug_colors[m_debug_vertex_count + 0] = a_color;
-			m_debug_colors[m_debug_vertex_count + 1] = b_color;
-			m_debug_colors[m_debug_vertex_count + 2] = c_color;
+			ui_quad_vertices[ui_quad_vertex_count + 0] = a;
+			ui_quad_vertices[ui_quad_vertex_count + 1] = b;
+			ui_quad_vertices[ui_quad_vertex_count + 2] = c;
+			ui_quad_colors[ui_quad_vertex_count + 0] = a_color;
+			ui_quad_colors[ui_quad_vertex_count + 1] = b_color;
+			ui_quad_colors[m_debug_vertex_count + 2] = c_color;
 
-			m_debug_vertex_count += 3;
+			ui_quad_vertex_count += 3;
 		}
 	}
 
