@@ -34,12 +34,10 @@ namespace rain::engine::ui
 		i32 x_click = RAIN_INPUT->x_from_topleft;
 		i32 y_click = RAIN_INPUT->y_from_topleft;
 
-		//if (x_click > field.posx && x_click < field.posx + field.width) RAIN_LOG("click?");
 		if (RAIN_INPUT->mouseclick_left
 			&& x_click > field.posx && x_click < field.posx + field.width
 			&& y_click > field.posy && y_click < field.posy + field.height)
 		{
-			RAIN_LOG("click");
 			field.is_focused = true;
 		}
 		else

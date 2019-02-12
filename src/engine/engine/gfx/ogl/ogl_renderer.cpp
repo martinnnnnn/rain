@@ -39,8 +39,10 @@ namespace rain::engine
 
         init_default_shaders();
         init_debug();
+		init_ui();
         init_shapes();
         init_text_2d();
+		init_quad_2d();
     }
 
     void Renderer::resize(u32 _width, u32 _height)
@@ -477,7 +479,7 @@ namespace rain::engine
     void Renderer::draw()
     {
         draw_coord_view(vec3 {});
-        draw_debug();
+		draw_debug();
     }
 
     void Renderer::draw_debug()
@@ -714,6 +716,88 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
+	void Renderer::init_quad_2d()
+	{
+		shape_2d_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/2d_shape.vs", RAIN_CONFIG->data_root + "/shaders/glsl/2d_shape.fs");
+
+		//float vertices[] =
+		//{
+		//	0.5f,  0.5f, 0.0f,  // top right
+		//	0.5f, -0.5f, 0.0f,  // bottom right
+		//	-0.5f, -0.5f, 0.0f,  // bottom left
+		//	-0.5f,  0.5f, 0.0f   // top left 
+		//};
+		//unsigned int indices[] =
+		//{
+		//	0, 1, 3,
+		//	1, 2, 3 
+		//};
+
+		float vertices[] = {
+	-0.5f, -0.5f, 0.0f,
+	 0.5f, -0.5f, 0.0f,
+	 0.0f,  0.5f, 0.0f
+		};
+
+		//float vertices[] = {
+		//	// first triangle
+		//	 0.5f,  0.5f, 0.0f,  // top right
+		//	 0.5f, -0.5f, 0.0f,  // bottom right
+		//	-0.5f,  0.5f, 0.0f,  // top left 
+		//	// second triangle
+		//	 0.5f, -0.5f, 0.0f,  // bottom right
+		//	-0.5f, -0.5f, 0.0f,  // bottom left
+		//	-0.5f,  0.5f, 0.0f   // top left
+		//};
+
+		unsigned int VBO;
+		glGenBuffers(1, &quad_2d_vao);
+		glGenBuffers(1, &VBO);
+
+		glBindVertexArray(quad_2d_vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+
+		//unsigned int VBO, EBO;
+		//glGenVertexArrays(1, &quad_2d_vao);
+		//glGenBuffers(1, &VBO);
+		//glGenBuffers(1, &EBO);
+		//// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+		//glBindVertexArray(quad_2d_vao);
+
+		//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		//glEnableVertexAttribArray(0);
+
+		//// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		//// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+		////glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+		//// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+		//glBindVertexArray(0);
+	}
+
+	void Renderer::draw_quad_2d()
+	{
+		shape_2d_shader.use();
+		glBindVertexArray(quad_2d_vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	}
+
     void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const vec3& _color)
     {
         glEnable(GL_CULL_FACE);
@@ -763,4 +847,90 @@ namespace rain::engine
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+
+	void Renderer::init_ui()
+	{
+		glGenVertexArrays(1, &ui_quad_vao);
+		glBindVertexArray(ui_quad_vao);
+
+		glGenBuffers(1, &ui_quad_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, ui_quad_vbo);
+		glBufferData(GL_ARRAY_BUFFER, ui_quad_max_vertex_count * sizeof(vec3), &ui_quad_vertices[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+		glGenBuffers(1, &ui_quad_cbo);
+		glBindBuffer(GL_ARRAY_BUFFER, ui_quad_cbo);
+		glBufferData(GL_ARRAY_BUFFER, ui_quad_max_vertex_count * sizeof(vec3), &ui_quad_colors[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+		glEnableVertexAttribArray(0);
+		glBindVertexArray(0);
+
+		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
+	}
+
+	void Renderer::draw_ui()
+	{
+		if (ui_quad_vertex_count == 0)
+		{
+			return;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, ui_quad_vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, ui_quad_vertex_count * sizeof(vec3), ui_quad_vertices);
+
+		glBindBuffer(GL_ARRAY_BUFFER, ui_quad_cbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, ui_quad_vertex_count * sizeof(vec3), ui_quad_colors);
+
+
+		ui_shader.use();
+		ui_shader.set("projection", proj_mat_orthogonal);
+
+		glBindVertexArray(ui_quad_vao);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glDrawArrays(GL_TRIANGLES, 0, ui_quad_vertex_count);
+
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
+
+		ui_quad_vertex_count = 0;
+	}
+
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color)
+	{
+		draw_ui_triangle(a, b, c, a_color, a_color, a_color);
+	}
+
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color, const vec3& b_color)
+	{
+		draw_ui_triangle(a, b, c, a_color, b_color, a_color);
+	}
+
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color, const vec3& b_color, const vec3& c_color)
+	{
+		if (m_debug_vertex_count + 3 < debug_vertices_max_count)
+		{
+			m_debug_vertices[m_debug_vertex_count + 0] = a;
+			m_debug_vertices[m_debug_vertex_count + 1] = b;
+			m_debug_vertices[m_debug_vertex_count + 2] = c;
+			m_debug_colors[m_debug_vertex_count + 0] = a_color;
+			m_debug_colors[m_debug_vertex_count + 1] = b_color;
+			m_debug_colors[m_debug_vertex_count + 2] = c_color;
+
+			m_debug_vertex_count += 3;
+		}
+	}
+
+	void Renderer::draw_ui_quad(const vec3& top_left, const u32& width, const u32& height, const vec3& color)
+	{
+		vec3 top_right{ top_left.x + width, top_left.y, top_left.z };
+		vec3 bottom_left{ top_left.x, top_left.y - height, top_left.z };
+		vec3 bottom_right{ top_left.x + width, top_left.y - height, top_left.z };
+
+		draw_ui_triangle(top_left, top_right, bottom_left, color);
+		draw_ui_triangle(top_left, top_right, bottom_left, color);
+	}
 }

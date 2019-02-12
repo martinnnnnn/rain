@@ -125,11 +125,11 @@ namespace rain::engine
     void Application::render(float _alpha)
     {
         RAIN_RENDERER->draw();
-
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
 
         world->render(_alpha);
+		RAIN_RENDERER->draw_ui();
     }
 }
 
