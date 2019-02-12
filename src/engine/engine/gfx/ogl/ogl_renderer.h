@@ -12,7 +12,7 @@
 #include "engine/core/config.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/data/material/material.h"
-
+#include "engine/data/data_handle.h"
 
 namespace rain::engine
 {
@@ -87,7 +87,6 @@ namespace rain::engine
         u32      m_debug_vao;
         u32      m_debug_vbo;
         u32      m_debug_cbo;
-        Shader debug_shader;
 
         GLuint lineVAO;
         u32 line_index_count;
@@ -102,11 +101,13 @@ namespace rain::engine
         math::mat4 proj_mat_orthogonal;
         math::mat4 view_mat;
 
-        Shader phong;
-        Shader pbr;
+        Shader debug_shader;
+        handle<Shader> const * debug_shader_handle;
+        Shader phong_shader;
+        Shader pbr_shader;
+        Shader text_shader;
 
         std::unordered_map<GLchar, RChar> text_characters;
-        Shader text_shader;
         GLuint text_vao;
         GLuint text_vbo;
     };

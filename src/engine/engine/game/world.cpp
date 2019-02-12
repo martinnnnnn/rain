@@ -27,6 +27,7 @@ namespace rain::engine
         file.open(_path);
         json_reader::read_world(file.read(), *this);
 
+        // ---- temp
         auto entity = registry.create();
         transform& t = registry.assign<transform>(entity);
         t.scale = vec3{ 0.1f, 0.1f, 0.1f };
@@ -47,6 +48,7 @@ namespace rain::engine
 
         quick_hull(vertices, vertices_count, &mesh);
         temp_vao = RAIN_RENDERER->load_primitive(mesh.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
+        // ---- /temp
     }
 
     void World::update_camera(const float _deltaTime)
@@ -167,7 +169,7 @@ namespace rain::engine
             RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, t.scale);
         }
 
-        auto test_view = registry.view<transform, mesh, Material>();
+        auto test_view = registry.view<transform, math::mesh, Material>();
         for (auto entity : test_view)
         {
             transform& t = test_view.get<transform>(entity);

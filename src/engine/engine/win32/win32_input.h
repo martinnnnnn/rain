@@ -27,8 +27,8 @@ namespace rain::engine
         bool is_key_pressed(u32 _code) const;
         bool is_key_released(u32 _code)  const;
 
-        i32 x_offset;
-        i32 y_offset;
+        i32 x_frame_offset;
+        i32 y_frame_offset;
         i32 x_from_center;
         i32 y_from_center;
         bool mouse_lock;

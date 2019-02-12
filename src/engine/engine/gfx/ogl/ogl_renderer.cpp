@@ -8,6 +8,7 @@
 #include "ogl_shader.h"
 #include "engine/core/context.h"
 #include "engine/win32/win32_window.h"
+#include "engine/data/data_system.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -53,11 +54,12 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
-
-        phong.use();
-        phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
-        phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
+        phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
+        std::string hello = RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs";
+        debug_shader_handle = RAIN_FIND_DATA_FROM_PATH(Shader, hello);
+        phong_shader.use();
+        phong_shader.set("lightDiff", 0.3f, 0.3f, 0.3f);
+        phong_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
     void Renderer::set_perspective_projection_matrix(const mat4& _projection)
@@ -608,10 +610,10 @@ namespace rain::engine
 
     void Renderer::draw_cube(const vec3& position, const quat& orientation, const vec3& scale)
     {
-        phong.use();
-        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
-        phong.set("proj", proj_mat_perspective);
-        phong.set("view", view_mat);
+        phong_shader.use();
+        phong_shader.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
+        phong_shader.set("proj", proj_mat_perspective);
+        phong_shader.set("view", view_mat);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -620,10 +622,10 @@ namespace rain::engine
 
     void Renderer::draw_sphere(const vec3& position, const quat& orientation, const vec3& scale)
     {
-        phong.use();
-        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
-        phong.set("proj", proj_mat_perspective);
-        phong.set("view", view_mat);
+        phong_shader.use();
+        phong_shader.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
+        phong_shader.set("proj", proj_mat_perspective);
+        phong_shader.set("view", view_mat);
 
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
