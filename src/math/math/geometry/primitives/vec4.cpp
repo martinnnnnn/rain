@@ -160,7 +160,6 @@ namespace rain::math
     }
 
 
-
     vec4 perpendicular(const vec4& _length, const vec4& _direction)
     {
         return _length - project(_length, _direction);

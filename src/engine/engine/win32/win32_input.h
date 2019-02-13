@@ -32,10 +32,24 @@ namespace rain::engine
 
         i32 x_from_topleft;
         i32 y_from_topleft;
+
+        enum class mouse_state
+        {
+            pressed,
+            released,
+        };
+
+        mouse_state mouseclick_left;
+        f64 mouseclick_left_time;
+        mouse_state mouseclick_right;
+        f64 mouseclick_right_time;
         bool mouse_lock;
-        bool mouseclick_left;
-        bool mouseclick_right;
         i8 mouse_wheel;
+        void update_mouse_click(const bool input_state, mouse_state& state, f64& time);
+
+        u32 alphanum_codes[37];
+        void init_alphanum_codes();
+        char get_char(u32 key_code);
     private:
         static constexpr u32 KEYS_COUNT = 256;
 

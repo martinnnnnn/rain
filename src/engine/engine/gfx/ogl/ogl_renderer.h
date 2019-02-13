@@ -36,18 +36,12 @@ namespace rain::engine
 
         void clear();
 
-
         void init_default_shaders();
-
         void init_debug();
-
         void init_shapes();
 	    void init_cube();
         void init_sphere();
-
-        void init_text_2d();
-		void init_quad_2d();
-		void draw_quad_2d();
+        void init_data();
 
         void draw();
 
@@ -64,8 +58,6 @@ namespace rain::engine
         void draw_cube(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
         void draw_sphere(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
         void draw_mesh();
-
-        void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
 
         void resize(u32 _width, u32 _height);
         void set_perspective_projection_matrix(const math::mat4& _projection);
@@ -84,15 +76,12 @@ namespace rain::engine
         static constexpr u32 debug_vertices_max_count = 8192;
 
         u32      m_debug_vertex_count;
+        Shader debug_shader;
         math::vec3 m_debug_vertices[debug_vertices_max_count];
         math::vec3 m_debug_colors[debug_vertices_max_count];
         u32      m_debug_vao;
         u32      m_debug_vbo;
         u32      m_debug_cbo;
-
-		Shader shape_2d_shader;
-		u32		quad_2d_vao;
-        Shader debug_shader;
 
         GLuint lineVAO;
         u32 line_index_count;
@@ -107,29 +96,40 @@ namespace rain::engine
         math::mat4 proj_mat_orthogonal;
         math::mat4 view_mat;
 
-        Shader debug_shader;
         handle<Shader> const * debug_shader_handle;
         Shader phong_shader;
         Shader pbr_shader;
-        Shader text_shader;
 
+        struct text
+        {
+            std::string value;
+            f32 x;
+            f32 y;
+            f32 scale;
+            math::vec4 color;
+        };
+        std::vector<text> texts;
+        Shader text_shader;
         std::unordered_map<GLchar, RChar> text_characters;
         GLuint text_vao;
         GLuint text_vbo;
+        void init_text_2d();
+        void draw_text_2d();
+        void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const math::vec4& _color);
 
-		static constexpr u32 ui_quad_max_vertex_count = 8192;
-		u32 ui_quad_vertex_count;
-		u32 ui_quad_vao;
-		u32 ui_quad_vbo;
-		u32 ui_quad_cbo;
-		math::vec3 ui_quad_vertices[ui_quad_max_vertex_count];
-		math::vec3 ui_quad_colors[ui_quad_max_vertex_count];
+		static constexpr u32 ui_max_vertex_count = 8192;
+		u32 ui_vertex_count;
+		u32 ui_vao;
+		u32 ui_vbo;
+		u32 ui_cbo;
+		math::vec3 ui_vertices[ui_max_vertex_count];
+		math::vec3 ui_colors[ui_max_vertex_count];
 		Shader ui_shader;
 		void init_ui();
 		void draw_ui();
 		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color);
 		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color);
 		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color, const math::vec3& c_color);
-		void draw_ui_quad(const math::vec3& top_left, const u32& width, const u32& height, const math::vec3& color);
-	};
+        void draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const math::vec3& color);
+    };
 }

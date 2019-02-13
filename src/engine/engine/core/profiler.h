@@ -32,14 +32,14 @@ namespace rain::engine
 
     struct window_profiler
     {
-        window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec3& _color);
+        window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec4& _color);
         ~window_profiler();
 
         std::string message;
         f32 x;
         f32 y;
         f32 scale;
-        math::vec3 color;
+        math::vec4 color;
         std::chrono::system_clock::time_point start;
         std::chrono::system_clock::time_point end;
     };

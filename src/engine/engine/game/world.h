@@ -21,7 +21,7 @@ namespace rain::engine
 
         void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
-        void render(const float _alpha);
+        void draw(const float _alpha);
         u32 temp_vao;
 
     };

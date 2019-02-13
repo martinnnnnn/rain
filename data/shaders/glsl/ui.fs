@@ -1,12 +1,12 @@
 
 #version 420 core
 
-in vec4 in_color;
+in vec4 vs_out_color;
 
 out vec4 color;
 
 
 void main()
 {    
-    color = in_color;
+    color = vs_out_color;
 }  

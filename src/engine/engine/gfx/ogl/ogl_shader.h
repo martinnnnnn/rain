@@ -35,6 +35,7 @@ namespace rain::engine
 		u32 set(const std::string& _name, float _x, float _y, float _z, float _w) const;
         u32 set(const std::string& _name, const math::vec2& _vector) const;
         u32 set(const std::string& _name, const math::vec3& _vector) const;
+        u32 set(const std::string& _name, const math::vec4& _vector) const;
         u32 set(const std::string& _name, const math::mat4& _matrix) const;
 
         void set(u32 _parameterID, bool _value) const;
@@ -45,6 +46,7 @@ namespace rain::engine
         void set(u32 _parameterID, float _x, float _y, float _z, float _w) const;
         void set(u32 _parameterID, const math::vec2& _vector) const;
         void set(u32 _parameterID, const math::vec3& _vector) const;
+        void set(u32 _parameterID, const math::vec4& _vector) const;
         void set(u32 _parameterID, const math::mat4& _matrix) const;
 
 	private:

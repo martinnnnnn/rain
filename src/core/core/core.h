@@ -2,6 +2,8 @@
 
 
 
+#define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
+
 #include "core/types.h"
 #include "core/singleton.h"
 #include "core/high_resolution_clock.h"

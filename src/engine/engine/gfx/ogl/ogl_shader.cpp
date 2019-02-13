@@ -140,10 +140,10 @@ namespace rain::engine
         return parameter_id;
     }
 
-    u32 Shader::set(const std::string &_name, float _x, float _y, float _z, float _w) const
+    u32 Shader::set(const std::string &_name, float x, float y, float z, float w) const
 	{
         u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
-        glUniform4f(parameter_id, _x, _y, _z, _w);
+        glUniform4f(parameter_id, x, y, z, w);
         return parameter_id;
     }
 
@@ -158,6 +158,13 @@ namespace rain::engine
 	{
         u32 parameter_id = (u32)glGetUniformLocation(id, _name.c_str());
         glUniform3f(parameter_id, _vector.x, _vector.y, _vector.z);
+        return parameter_id;
+    }
+
+    u32 Shader::set(const std::string& name, const math::vec4& v) const
+    {
+        u32 parameter_id = (u32)glGetUniformLocation(id, name.c_str());
+        glUniform4f(parameter_id, v.x, v.y, v.z, v.w);
         return parameter_id;
     }
 
@@ -199,7 +206,10 @@ namespace rain::engine
     void Shader::set(u32 _parameterID, const math::vec3& _vector) const
     {
         glUniform3f(_parameterID, _vector.x, _vector.y, _vector.z);
-
+    }
+    void Shader::set(u32 _parameterID, const math::vec4& v) const
+    {
+        glUniform4f(_parameterID, v.x, v.y, v.z, v.w);
     }
     void Shader::set(u32 _parameterID, const math::mat4& _matrix) const
     {

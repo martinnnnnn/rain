@@ -61,6 +61,8 @@ namespace rain::engine
         RAIN_CONTEXT->data_sys = new data_system();
         RAIN_CONTEXT->data_sys->load_all_recursive(RAIN_CONFIG->data_root);
 
+        RAIN_CONTEXT->renderer->init_data();
+
 	    // INIT INPUT
         RAIN_CONTEXT->input = new Input();
 	    RAIN_CONTEXT->input->init();
@@ -124,11 +126,12 @@ namespace rain::engine
 
     void Application::render(float _alpha)
     {
+        UI.draw();
+        world->draw(_alpha);
         RAIN_RENDERER->draw();
+
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
-
-        world->render(_alpha);
     }
 }
 

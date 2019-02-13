@@ -141,9 +141,9 @@ namespace rain::engine
 
     }
 
-    void World::render(const float _alpha)
+    void World::draw(const float _alpha)
     {
-        RAIN_WPROFILE("world render ", 25.0f, 25.0f, 0.2f, (math::vec3{ 0.5, 0.8f, 0.2f }));
+        RAIN_WPROFILE("world render ", 25.0f, 25.0f, 0.2f, (math::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
 
         auto view = registry.view<transform, Model, Material>();
 
@@ -194,8 +194,7 @@ namespace rain::engine
 
             RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
         }
-		RAIN_RENDERER->draw_ui_triangle(math::vec3{ 10, 10, 0 }, math::vec3{ 10, 20, 0 }, math::vec3{ 20, 10, 0 }, math::vec3{ 1, 0, 0 });
-		RAIN_RENDERER->draw_ui_triangle(math::vec3{ 100, 100, 0 }, math::vec3{ 300, 100, 0 }, math::vec3{ 200, 200, 0 }, math::vec3{ 1, 0, 0 });
+
 
         //auto plane_view = registry.view<Plane>();
         //for (auto ent_plane : plane_view)
