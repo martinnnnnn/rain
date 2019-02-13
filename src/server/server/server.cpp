@@ -1,109 +1,241 @@
-#include <winsock2.h>
-#include <stdio.h>
+#include "server.h"
+
+
+
 #pragma comment (lib, "Ws2_32.lib")
+#pragma comment (lib, "Mswsock.lib")
+#pragma comment (lib, "AdvApi32.lib")
 
-void InitWinsock()
+
+#define DEFAULT_BUFLEN 512
+
+
+namespace rain::server
 {
-    WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
-}
 
+    void ErrorHandler(LPTSTR lpszFunction)
+    {
+        LPVOID lpMsgBuf;
+        LPVOID lpDisplayBuf;
+        DWORD dw = GetLastError();
 
-struct Vec3
-{
-    float x;
-    float y;
-    float z;
-};
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&lpMsgBuf,
+            0, NULL);
 
-struct Vec4
-{
-    float x;
-    float y;
-    float z;
-    float w;
-};
+        // Display the error message.
 
-struct Transform
-{
-    Vec3 position;
-    Vec4 orientation;
-    Vec3 scale;
-};
+        lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+            (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
+        StringCchPrintf((LPTSTR)lpDisplayBuf,
+            LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+            TEXT("%s failed with error %d: %s"),
+            lpszFunction, dw, lpMsgBuf);
+        MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
+        // Free error-handling buffer allocations.
 
-#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
-const int MaxDataSize = 1082;
+        LocalFree(lpMsgBuf);
+        LocalFree(lpDisplayBuf);
+    }
 
-class Packet
-{
-public:
-    int senderId;
-    int sequenceNumber;
-    char data[MaxDataSize];
-public:
-    void* Serialize();
-    void Deserialize(char *message);
-};
+    i32 init_winsock()
+    {
+        WSADATA wsa_data;
+        i32 i_result = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+        if (i_result != 0)
+        {
+            printf("WSAStartup failed with error: %d\n", i_result);
+            return 1;
+        }
+        return 0;
+    }
 
-PACK(
-    struct SerializedPacket {
-    int senderId;
-    int sequenceNumber;
-    char data[MaxDataSize];
-});
+    i32 shutdown_winsock()
+    {
+        WSACleanup();
+        return 0;
+    }
 
-void* Packet::Serialize()
-{
-    struct SerializedPacket *s = new SerializedPacket();
-    s->senderId = htonl(this->senderId);
-    s->sequenceNumber = htonl(this->sequenceNumber);
-    memcpy(s->data, this->data, MaxDataSize);
-    return s;
-}
+    i32 server::init(const char* ip, const char* port)
+    {
+        int i_result;
 
-void Packet::Deserialize(char *message)
-{
-    struct SerializedPacket *s = (struct SerializedPacket*)message;
-    this->senderId = ntohl(s->senderId);
-    this->sequenceNumber = ntohl(s->sequenceNumber);
-    memcpy(this->data, s->data, MaxDataSize);
+        listen_socket = INVALID_SOCKET;
+
+        struct addrinfo *result = NULL;
+        struct addrinfo hints;
+
+        ZeroMemory(&hints, sizeof(hints));
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = IPPROTO_TCP;
+        hints.ai_flags = AI_PASSIVE;
+
+        //std::string ip;
+        //std::string port;
+        //core::string::pair_split(ip_address_and_port->address, ":", ip, port);
+
+        // Resolve the server address and port
+        i_result = getaddrinfo(ip, port, &hints, &result);
+        if (i_result != 0) {
+            printf("getaddrinfo failed with error: %d\n", i_result);
+            return 1;
+        }
+
+        // Create a SOCKET for connecting to server
+        listen_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        if (listen_socket == INVALID_SOCKET) {
+            printf("socket failed with error: %ld\n", WSAGetLastError());
+            freeaddrinfo(result);
+            return 1;
+        }
+
+        // Setup the TCP listening socket
+        i_result = bind(listen_socket, result->ai_addr, (int)result->ai_addrlen);
+        if (i_result == SOCKET_ERROR) {
+            printf("bind failed with error: %d\n", WSAGetLastError());
+            freeaddrinfo(result);
+            closesocket(listen_socket);
+            return 1;
+        }
+
+        freeaddrinfo(result);
+
+        return 0;
+    }
+
+    i32 server::close_server()
+    {
+        closesocket(listen_socket);
+        return 0;
+    }
+
+    i32 server::start_listening()
+    {
+        i32 i_result;
+        while (1)
+        {
+            i_result = listen(listen_socket, SOMAXCONN);
+            if (i_result == SOCKET_ERROR) {
+                printf("listen failed with error: %d\n", WSAGetLastError());
+                closesocket(listen_socket);
+                return 1;
+            }
+
+            SOCKET ClientSocket = INVALID_SOCKET;
+            ClientSocket = accept(listen_socket, NULL, NULL);
+            if (ClientSocket == INVALID_SOCKET)
+            {
+                printf("accept failed with error: %d\n", WSAGetLastError());
+                closesocket(listen_socket);
+                return 1;
+
+            }
+
+            client_sockets.push_back(ClientSocket);
+            DWORD   thread_id;
+            HANDLE  thread_handle;
+
+            thread_handle = CreateThread(
+                NULL,                               // default security attributes
+                0,                                  // use default stack size  
+                launch_client_socket_static,        // thread function name
+                (void*)this,                        // argument to thread function 
+                0,                                  // use default creation flags   
+                &thread_id);                        // returns the thread identifier 
+
+            if (thread_handle == NULL)
+            {
+                ErrorHandler(TEXT("CreateThread"));
+                ExitProcess(3);
+            }
+        }
+        // No longer need server socket
+    }
+
+    DWORD WINAPI server::launch_client_socket_static(void* Param)
+    {
+        server* This = (server*)Param;
+        return This->launch_client_socket();
+    }
+
+    DWORD server::launch_client_socket()
+    {
+        SOCKET client_socket = client_sockets.back();
+        i32 i_result = 0;
+        char recvbuf[DEFAULT_BUFLEN];
+
+        // Receive until the peer shuts down the connection
+        do {
+            i_result = recv(client_socket, recvbuf, DEFAULT_BUFLEN, 0);
+            if (i_result > 0)
+            {
+                printf("Bytes received: %d\n", i_result);
+
+                // Echo the buffer back to the sender
+                i32 iSendResult = 0;
+                for (u32 i = 0; i < client_sockets.size(); ++i)
+                {
+                    iSendResult = send(client_socket, recvbuf, i_result, 0);
+                    if (iSendResult == SOCKET_ERROR)
+                    {
+                        printf("send failed with error: %d\n", WSAGetLastError());
+                        closesocket(client_socket);
+                        WSACleanup();
+                        return 1;
+                    }
+                    printf("Bytes sent: %d\n", iSendResult);
+                }
+            }
+            else if (i_result == 0)
+            {
+                printf("Connection closing...\n");
+            }
+            else
+            {
+                printf("recv failed with error: %d\n", WSAGetLastError());
+                closesocket(client_socket);
+
+                WSACleanup();
+                return 1;
+            }
+        } while (i_result > 0);
+
+        // shutdown the connection since we're done
+        i_result = shutdown(client_socket, SD_SEND);
+        if (i_result == SOCKET_ERROR)
+        {
+            printf("shutdown failed with error: %d\n", WSAGetLastError());
+            closesocket(client_socket);
+            WSACleanup();
+            return 1;
+        }
+
+        // cleanup
+        closesocket(client_socket);
+        return 0;
+    }
 }
 
 int main(int argc, char* argv[])
 {
-    SOCKET socketS;
+    using namespace rain::server;
 
-    InitWinsock();
-    struct sockaddr_in local;
-    struct sockaddr_in from;
-    int fromlen = sizeof(from);
-    local.sin_family = AF_INET;
-    local.sin_port = htons(1234);
-    local.sin_addr.s_addr = INADDR_ANY;
+    printf("hello");
 
-    socketS = socket(AF_INET, SOCK_DGRAM, 0);
-    bind(socketS, (sockaddr*)&local, sizeof(local));
-    while (1)
-    {
-        char buffer[2048];
-        ZeroMemory(buffer, sizeof(buffer));
-        printf("Server : Waiting for paquet...\n");
-        if (recvfrom(socketS, buffer, sizeof(buffer), 0, (sockaddr*)&from, &fromlen) != SOCKET_ERROR)
-        {
-            Packet p;
-            p.Deserialize(buffer);
+    init_winsock();
+    //ip_ptr address = new ip();
+    //address->address = "127.0.0.1:9998";
 
-
-            printf("senderId : %d\nsequenceNumber : %d\ndata %s\n",
-                p.senderId, p.sequenceNumber, p.data);
-
-            //printf("Server : Received message from %s: %s\n", inet_ntoa(from.sin_addr), buffer);
-            //sendto(socketS, buffer, sizeof(buffer), 0, (sockaddr*)&from, fromlen);
-        }
-        Sleep(500);
-    }
-    closesocket(socketS);
-
-    return 0;
+    server* rain_server = new server();
+    rain_server->init("127.0.0.1", "5001");
+    rain_server->start_listening();
+    shutdown_winsock();
 }

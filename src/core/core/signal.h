@@ -18,7 +18,7 @@ namespace rain::core
         signal& operator=(signal const& other) = delete;
 
         template <typename T>
-        int connect_member(T *inst, void (T::*func)(Args...))
+        int connect_member(T* inst, void (T::*func)(Args...))
         {
             return connect([=](Args... args)
             {
@@ -27,7 +27,7 @@ namespace rain::core
         }
 
         template <typename T>
-        int connect_member(T *inst, void (T::*func)(Args...) const)
+        int connect_member(T* inst, void (T::*func)(Args...) const)
         {
             return connect([=](Args... args)
             {
@@ -35,13 +35,13 @@ namespace rain::core
             });
         }
 
-        int connect(std::function<void(Args...)> const& slot) const
+        i32 connect(std::function<void(Args...)> const& slot) const
         {
             slots.insert(std::make_pair(++current_id, slot));
             return current_id;
         }
 
-        void disconnect(int id) const
+        void disconnect(i32 id) const
         {
             slots.erase(id);
         }

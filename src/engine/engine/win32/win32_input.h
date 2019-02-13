@@ -4,12 +4,10 @@
 #include <array>
 #include <algorithm>
 
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-
 #include "engine/core/event.h"
 #include "engine/win32/win32_keycodes.h"
 #include "engine/win32/win32_application.h"
+#include "engine/win32/win32_helpers.h"
 
 namespace rain::engine
 {

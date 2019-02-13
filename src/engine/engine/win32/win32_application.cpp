@@ -13,7 +13,6 @@
 #include "engine/core/context.h"
 #include "engine/core/profiler.h"
 // TEMP
-#include "engine/network/network.h"
 #include "engine/network/server.h"
 #include <filesystem>
 
@@ -38,7 +37,7 @@ namespace rain::engine
         
         // TEMP
         network::init();
-        start_tcp_client("127.0.0.1", "9999");
+        network::start_tcp_client(info, "127.0.0.1", "5001");
         //network::start_server("127.0.0.1", "9998");
         network::start_server_thread("127.0.0.1:9998");
         //network::terminate();
@@ -89,6 +88,11 @@ namespace rain::engine
 
         RAIN_INPUT->update();
         RAIN_CLOCK->tick();
+
+        if (RAIN_INPUT->is_key_pressed(DIK_H))
+        {
+            network::send_packet(info, "pushing H");
+        }
 
 		UI.update();
 

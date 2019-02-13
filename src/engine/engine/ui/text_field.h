@@ -20,6 +20,7 @@ namespace rain::engine::ui
         bool is_focused;
         math::vec4 color;
         std::string default_text;
+        core::signal<std::string> on_validate_callbacks;
     };
 
     struct ui
@@ -34,6 +35,5 @@ namespace rain::engine::ui
         void add_letter(text_field& field, char letter);
         void remove_letter(text_field& field);
         void clear(text_field& field);
-        void on_validate(text_field& field);
     };
 }

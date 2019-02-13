@@ -14,6 +14,7 @@
 #include "core/logger.h"
 #include "core/network/network.h"
 #include "core/uuid.h"
+#include "core/signal.h"
 
 //#include "core/profiler.h"
 

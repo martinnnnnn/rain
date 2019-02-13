@@ -7,7 +7,6 @@
 
 namespace rain::engine::ui
 {
-
 	void ui::remove_letter(text_field& field)
 	{
 		if (field.is_focused && field.next_index > 0)
@@ -38,6 +37,7 @@ namespace rain::engine::ui
         }
         else
         {
+            assert(field.next_index < NELEMS(field.buffer));
             RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), field.posx, field.posy, 0.5f, field.color);
         }
 	}
@@ -76,11 +76,13 @@ namespace rain::engine::ui
             }
             if (RAIN_INPUT->is_key_released(DIK_RETURN))
             {
-                RAIN_LOG("enter");
+                field.on_validate_callbacks.emit(std::string(field.buffer, field.next_index));
                 clear(field);
             }
         }
 	}
+
+
 
 
 
@@ -92,7 +94,8 @@ namespace rain::engine::ui
         field.width = 100;
         field.height = 100;
         field.color = math::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
-        field.default_text = "hi !";
+        field.default_text = std::string("Type to chat");
+        field.on_validate_callbacks;
     }
 
 }

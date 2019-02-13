@@ -7,7 +7,9 @@
 
 #include "core/core.h"
 
+//temp
 #include "engine/ui/text_field.h"
+#include "engine/network/network.h"
 
 namespace rain::engine
 {
@@ -26,5 +28,8 @@ namespace rain::engine
         World* world;
         void* hinstance;
 		ui::ui UI;
+
+        // temp
+        network::connexion_info info;
     };
 }

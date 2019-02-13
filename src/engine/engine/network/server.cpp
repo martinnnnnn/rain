@@ -1,13 +1,6 @@
 #include "server.h"
 #include "network.h"
 
-
-
-#pragma comment (lib, "Ws2_32.lib")
-#pragma comment (lib, "Mswsock.lib")
-#pragma comment (lib, "AdvApi32.lib")
-
-
 #include "engine/core/context.h"
 
 #define DEFAULT_BUFLEN 512
