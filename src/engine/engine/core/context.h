@@ -20,6 +20,7 @@ namespace rain::engine
     {
         Context();
 
+        Application* application;
         Config* config;
         Window* window;
         Renderer* renderer;

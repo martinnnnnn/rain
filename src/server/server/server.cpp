@@ -138,7 +138,7 @@ namespace rain::server
                 return 1;
 
             }
-
+            printf("new client connected !\n");
             client_sockets.push_back(ClientSocket);
             DWORD   thread_id;
             HANDLE  thread_handle;
@@ -178,20 +178,24 @@ namespace rain::server
             if (i_result > 0)
             {
                 printf("Bytes received: %d\n", i_result);
+                printf("Text received : %s\n", recvbuf);
 
                 // Echo the buffer back to the sender
                 i32 iSendResult = 0;
                 for (u32 i = 0; i < client_sockets.size(); ++i)
                 {
-                    iSendResult = send(client_socket, recvbuf, i_result, 0);
-                    if (iSendResult == SOCKET_ERROR)
+                    if (client_sockets[i] != client_socket)
                     {
-                        printf("send failed with error: %d\n", WSAGetLastError());
-                        closesocket(client_socket);
-                        WSACleanup();
-                        return 1;
+                        iSendResult = send(client_sockets[i], recvbuf, i_result, 0);
+                        if (iSendResult == SOCKET_ERROR)
+                        {
+                            printf("send failed with error: %d\n", WSAGetLastError());
+                            closesocket(client_socket);
+                            WSACleanup();
+                            return 1;
+                        }
+                        printf("Bytes sent: %d\n", iSendResult);
                     }
-                    printf("Bytes sent: %d\n", iSendResult);
                 }
             }
             else if (i_result == 0)
@@ -228,7 +232,7 @@ int main(int argc, char* argv[])
 {
     using namespace rain::server;
 
-    printf("hello");
+    printf("hello\n");
 
     init_winsock();
     //ip_ptr address = new ip();

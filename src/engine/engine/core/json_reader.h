@@ -15,6 +15,7 @@
 #include "engine/data/data_system.h"
 #include "engine/data/material/material.h"
 #include "engine/gfx/gfx_camera.h"
+#include "engine/ui/text_field.h"
 
 namespace rain::engine
 {
@@ -23,6 +24,7 @@ namespace rain::engine
     {
         std::string get_string(const rapidjson::Value& _json_value);
         void read_vec3(const rapidjson::Value& _json, math::vec3& vec);
+        void read_vec4(const rapidjson::Value& _json, math::vec4& vec);
         void read_quat(const rapidjson::Value& _json, math::quat& quat);
         void read_rigid_body(const rapidjson::Value& _json, RigidBody& rigid_body);
         void read_sphere(const rapidjson::Value& _json, math::sphere& sphere);
@@ -35,6 +37,8 @@ namespace rain::engine
         void read_camera(const rapidjson::Value& _json, Camera& _camera);
         void read_world(const std::string& _json, World& _world);
         void read_config(const std::string& _path, Config& _config);
+        void read_text_field(const rapidjson::Value& _json, ui::text_field& field);
+        void read_text_list(const rapidjson::Value& _json, ui::text_list& list);
         //void read_shaders_info(const std::string& _path, std::vector<ShadersInfo>& _info);
 
         void read_transform(const std::string & json_str, math::transform& t);

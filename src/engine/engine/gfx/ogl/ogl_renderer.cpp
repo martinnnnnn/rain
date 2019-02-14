@@ -832,32 +832,33 @@ namespace rain::engine
 		ui_vertex_count = 0;
 	}
 
-	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color)
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec4& a_color)
 	{
 		draw_ui_triangle(a, b, c, a_color, a_color, a_color);
 	}
 
-	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color, const vec3& b_color)
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec4& a_color, const vec4& b_color)
 	{
 		draw_ui_triangle(a, b, c, a_color, b_color, a_color);
 	}
 
-	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec3& a_color, const vec3& b_color, const vec3& c_color)
+	void Renderer::draw_ui_triangle(const vec3& a, const vec3& b, const vec3& c, const vec4& a_color, const vec4& b_color, const vec4& c_color)
 	{
 		if (m_debug_vertex_count + 3 < debug_vertices_max_count)
 		{
 			ui_vertices[ui_vertex_count + 0] = a;
 			ui_vertices[ui_vertex_count + 1] = b;
 			ui_vertices[ui_vertex_count + 2] = c;
-			ui_colors[ui_vertex_count + 0] = a_color;
-			ui_colors[ui_vertex_count + 1] = b_color;
-			ui_colors[ui_vertex_count + 2] = c_color;
+            
+            ui_colors[ui_vertex_count + 0] = math::vec3{ a_color.x, a_color.y, a_color.z };
+            ui_colors[ui_vertex_count + 1] = math::vec3{ b_color.x, b_color.y, b_color.z };
+            ui_colors[ui_vertex_count + 2] = math::vec3{ c_color.x, c_color.y, c_color.z };
 
 			ui_vertex_count += 3;
 		}
 	}
 
-    void Renderer::draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const vec3& color)
+    void Renderer::draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const vec4& color)
     {
         vec3 bottom_left{ x_bottom_left, y_bottom_left };
         vec3 bottom_right{ x_bottom_left + width, y_bottom_left, 0 };

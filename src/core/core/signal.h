@@ -14,8 +14,7 @@ namespace rain::core
     public:
 
         signal() : current_id(0) {}
-        signal(signal const& other) = delete;
-        signal& operator=(signal const& other) = delete;
+        signal(signal const& other) : current_id(0) {}
 
         template <typename T>
         int connect_member(T* inst, void (T::*func)(Args...))

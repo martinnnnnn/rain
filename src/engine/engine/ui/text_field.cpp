@@ -7,7 +7,7 @@
 
 namespace rain::engine::ui
 {
-	void ui::remove_letter(text_field& field)
+	void remove_letter(text_field& field)
 	{
 		if (field.is_focused && field.next_index > 0)
 		{
@@ -15,12 +15,12 @@ namespace rain::engine::ui
 		}
 	}
 
-    void ui::clear(text_field& field)
+    void clear(text_field& field)
     {
         field.next_index = 0;
     }
 
-	void ui::add_letter(text_field& field, char letter)
+	void add_letter(text_field& field, char letter)
 	{
 		if (field.is_focused && field.next_index < sizeof(field.buffer))
 		{
@@ -28,29 +28,40 @@ namespace rain::engine::ui
 		}
 	}
 
-	void ui::draw()
-	{
-        RAIN_RENDERER->draw_ui_quad(f32(field.posx), f32(field.posy), f32(field.width), f32(field.height), math::vec3{ 1, 0, 0 });
-        if (field.next_index == 0)
+    void add_message(text_list& list, const std::string& message)
+    {
+        list.messages.push_front(message);
+        if (list.messages.size() >= list.max_count)
         {
-            RAIN_RENDERER->draw_text_2d(field.default_text, field.posx, field.posy, 0.5f, math::vec4{ field.color.x, field.color.y, field.color.z, 0.5f });
+            list.messages.pop_back();
         }
-        else
-        {
-            assert(field.next_index < NELEMS(field.buffer));
-            RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), field.posx, field.posy, 0.5f, field.color);
-        }
-	}
+    }
 
-	void ui::update()
+    void draw(const text_field& field)
+    {
+        RAIN_RENDERER->draw_ui_quad(f32(field.x), f32(field.y), f32(field.width), f32(field.height), field.color_bg);
+
+        assert(field.next_index < NELEMS(field.buffer));
+        RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), field.x + 2, field.y + 2, 0.25f, field.color_txt);
+    }
+
+    void draw(const text_list& list)
+    {
+        for (u32 i = 0; i < list.messages.size(); ++i)
+        {
+            RAIN_RENDERER->draw_text_2d(list.messages[i], list.x, list.y + i * 10, 0.25f, list.color);
+        }
+    }
+
+	void update(text_field& field)
 	{
 		i32 x_click = RAIN_INPUT->x_from_topleft;
 		i32 y_click = (RAIN_WINDOW->get_rect().bottom - RAIN_WINDOW->get_rect().top) - RAIN_INPUT->y_from_topleft;
 
         if (RAIN_INPUT->mouseclick_left == Input::mouse_state::pressed && RAIN_INPUT->mouseclick_left_time == 0.0)
         {
-            if (u32(x_click) > field.posx && u32(x_click) < field.posx + field.width
-                && u32(y_click) > field.posy && u32(y_click) < field.posy + field.height)
+            if (u32(x_click) > field.x && u32(x_click) < field.x + field.width
+                && u32(y_click) > field.y && u32(y_click) < field.y + field.height)
             {
                 field.is_focused = true;
             }
@@ -76,26 +87,9 @@ namespace rain::engine::ui
             }
             if (RAIN_INPUT->is_key_released(DIK_RETURN))
             {
-                field.on_validate_callbacks.emit(std::string(field.buffer, field.next_index));
+                field.on_validate.emit(std::string(field.buffer, field.next_index));
                 clear(field);
             }
         }
 	}
-
-
-
-
-
-    void ui::init()
-    {
-        memset(&field, 0, sizeof(text_field));
-        field.posx = 100;
-        field.posy = 100;
-        field.width = 100;
-        field.height = 100;
-        field.color = math::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
-        field.default_text = std::string("Type to chat");
-        field.on_validate_callbacks;
-    }
-
 }

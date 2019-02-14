@@ -105,6 +105,16 @@ namespace rain::engine::json_reader
                 Camera& camera = registry.assign<Camera>(entity);
                 read_camera(world_object["Camera"], camera);
             }
+            if (world_object.HasMember("text_field"))
+            {
+                ui::text_field& field = registry.assign<ui::text_field>(entity);
+                read_text_field(world_object["text_field"], field);
+            }
+            if (world_object.HasMember("text_list"))
+            {
+                ui::text_list& list = registry.assign<ui::text_list>(entity);
+                read_text_list(world_object["text_list"], list);
+            }
         }
     }
 
@@ -117,6 +127,14 @@ namespace rain::engine::json_reader
     }
 
     void read_vec3(const rapidjson::Value& _json, math::vec3& vec)
+    {
+        for (u32 i = 0; i < _json.Size(); i++)
+        {
+            vec[i] = _json[i].GetFloat();
+        }
+    }
+
+    void read_vec4(const rapidjson::Value& _json, math::vec4& vec)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -316,6 +334,67 @@ namespace rain::engine::json_reader
         _material.shader.load(vertex_path, fragment_path, geometry_path);
     }
 
+
+    void read_text_field(const rapidjson::Value& _json, ui::text_field& field)
+    {
+        memset(field.buffer, 0, sizeof(field.buffer));
+        field.next_index = 0;
+        field.is_focused = false;
+
+        if (_json.HasMember("uuid"))
+        {
+            field.id = core::uuid::from_string(_json["uuid"].GetString());
+        }
+        if (_json.HasMember("x"))
+        {
+            field.x = _json["x"].GetUint();
+        }
+        if (_json.HasMember("y"))
+        {
+            field.y = _json["y"].GetUint();
+        }
+        if (_json.HasMember("width"))
+        {
+            field.width = _json["width"].GetUint();
+        }
+        if (_json.HasMember("height"))
+        {
+            field.height = _json["height"].GetUint();
+        }
+        if (_json.HasMember("default_text"))
+        {
+            field.default_text = _json["default_text"].GetString();
+        }
+        if (_json.HasMember("color_bg"))
+        {
+            read_vec4(_json["color_bg"], field.color_bg);
+        }
+        if (_json.HasMember("color_txt"))
+        {
+            read_vec4(_json["color_txt"], field.color_txt);
+        }
+    }
+
+    void read_text_list(const rapidjson::Value& _json, ui::text_list& list)
+    {
+        if (_json.HasMember("max_count"))
+        {
+            list.max_count = _json["max_count"].GetUint();
+        }
+        if (_json.HasMember("x"))
+        {
+            list.x = _json["x"].GetUint();
+        }
+        if (_json.HasMember("y"))
+        {
+            list.y = _json["y"].GetUint();
+        }
+        if (_json.HasMember("color"))
+        {
+            read_vec4(_json["color"], list.color);
+        }
+    }
+
     //void read_shaders_info(const std::string& _json, std::vector<ShadersInfo>& _info)
     //{
     //    rapidjson::Document shaders_document;
@@ -358,6 +437,7 @@ namespace rain::engine::json_reader
 			t.scale[i] = j["scale"][i];
 		}
     }
+
 }
 
 namespace rain::engine::json_writer

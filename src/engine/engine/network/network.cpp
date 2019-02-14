@@ -1,7 +1,10 @@
 #include "network.h"
 
-#include "engine/core/context.h"
+#include <string>
 
+#include "engine/core/context.h"
+#include "engine/win32/win32_application.h"
+#include "engine/ui/text_field.h"
 
 namespace rain::engine::network
 {
@@ -109,8 +112,10 @@ namespace rain::engine::network
 
     i32 send_packet(const connexion_info& info, const char* buffer)
     {
-        RAIN_LOG_NETWORK("Send : %s", buffer);
-        i32 i_result = send(info.socket, buffer, (i32)strlen(buffer), 0);
+        RAIN_LOG_NETWORK("you : %s", buffer);
+        std::string message = std::string("you : ") + buffer;
+        //RAIN_CONTEXT->application->UI.add_message(message);
+        i32 i_result = send(info.socket, buffer, (i32)strlen(buffer) + 1, 0);
         if (i_result == SOCKET_ERROR)
         {
             RAIN_LOG_NETWORK("send failed with error: %d\n", WSAGetLastError());

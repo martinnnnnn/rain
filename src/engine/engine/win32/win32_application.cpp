@@ -24,9 +24,16 @@ namespace rain::engine
         OutputDebugStringA(_msg);
     }
 
+    void Application::send_to_network(const std::string& message)
+    {
+        network::send_packet(info, message.c_str());
+    }
+
     int Application::init(void* _hinstance, const std::string& _config)
     {
         hinstance = _hinstance;
+        
+        RAIN_CONTEXT->application = this;
 
         // INIT LOGGER
         RAIN_CONTEXT->logger = new core::Logger(print_to_log);
@@ -39,12 +46,13 @@ namespace rain::engine
         network::init();
         network::start_tcp_client(info, "127.0.0.1", "5001");
         //network::start_server("127.0.0.1", "9998");
-        network::start_server_thread("127.0.0.1:9998");
+        //network::start_server_thread("127.0.0.1:5001");
+        network::start_server_thread(info);
         //network::terminate();
         //core::FilePathSystem file_system;
         //file_system.init(RAIN_CONFIG->data_root);
-		UI.init();
-        
+        //UI.field.on_validate_callbacks.connect_member(this, &Application::send_to_network);
+
 	    // INIT WINDOW
         RAIN_CONTEXT->window = new Window();
 	    RAIN_CONTEXT->window->init((HINSTANCE)hinstance, RAIN_CONFIG->screen_width, RAIN_CONFIG->screen_height, 0);
@@ -89,12 +97,10 @@ namespace rain::engine
         RAIN_INPUT->update();
         RAIN_CLOCK->tick();
 
-        if (RAIN_INPUT->is_key_pressed(DIK_H))
+        if (RAIN_INPUT->is_key_released(DIK_H))
         {
-            network::send_packet(info, "pushing H");
+            //network::send_packet(info, "pushing H");
         }
-
-		UI.update();
 
         double newTime = RAIN_CLOCK->get_total_seconds();
         double frameTime = newTime - currentTime;
@@ -130,10 +136,8 @@ namespace rain::engine
 
     void Application::render(float _alpha)
     {
-        UI.draw();
         world->draw(_alpha);
         RAIN_RENDERER->draw();
-
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);
     }

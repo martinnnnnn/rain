@@ -12,6 +12,7 @@
 #include "engine/physics/spring.h"
 #include "engine/core/profiler.h"
 #include "engine/data/data_system.h"
+#include "engine/ui/text_field.h"
 
 #include "engine/network/client.h"
 
@@ -26,6 +27,15 @@ namespace rain::engine
 
         file.open(_path);
         json_reader::read_world(file.read(), *this);
+
+        auto chat_view = registry.view<ui::text_field, ui::text_list>();
+        for (auto chat : chat_view)
+        {
+            ui::text_field& field = chat_view.get<ui::text_field>(chat);
+            ui::text_list& list = chat_view.get<ui::text_list>(chat);
+            field.on_validate.connect_member(RAIN_CONTEXT->application, &Application::send_to_network);
+            break;
+        }
 
         // ---- temp
         auto entity = registry.create();
@@ -65,6 +75,12 @@ namespace rain::engine
 
     void World::update_physics(const float _deltaTime)
     {
+        auto chat_view = registry.view<ui::text_field>();
+        for (auto chat : chat_view)
+        {
+            ui::update(chat_view.get(chat));
+        }
+
         // applying springs
         auto spring2_view = registry.view<Spring>();
         for (auto entity : spring2_view)
@@ -143,7 +159,7 @@ namespace rain::engine
 
     void World::draw(const float _alpha)
     {
-        RAIN_WPROFILE("world render ", 25.0f, 25.0f, 0.2f, (math::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
+        RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (math::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
 
         auto view = registry.view<transform, Model, Material>();
 
@@ -195,7 +211,12 @@ namespace rain::engine
             RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
         }
 
-
+        auto chat_view = registry.view<ui::text_field, ui::text_list>();
+        for (auto chat : chat_view)
+        {
+            ui::draw(chat_view.get<ui::text_field>(chat));
+            ui::draw(chat_view.get<ui::text_list>(chat));
+        }
         //auto plane_view = registry.view<Plane>();
         //for (auto ent_plane : plane_view)
         //{

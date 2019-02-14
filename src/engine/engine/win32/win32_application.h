@@ -23,13 +23,14 @@ namespace rain::engine
         void shutdown();
         void update();
         void render(float _alpha);
+        void send_to_network(const std::string& message);
+
 
     private:
         World* world;
         void* hinstance;
-		ui::ui UI;
+        network::connexion_info info;
 
         // temp
-        network::connexion_info info;
     };
 }

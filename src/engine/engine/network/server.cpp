@@ -1,7 +1,11 @@
 #include "server.h"
-#include "network.h"
 
+#include <string>
+
+#include "network.h"
 #include "engine/core/context.h"
+#include "engine/win32/win32_application.h"
+#include "engine/ui/text_field.h"
 
 #define DEFAULT_BUFLEN 512
 
@@ -71,6 +75,74 @@ namespace rain::engine
             //CloseHandle(hThreadArray);
             return 0;
         }
+
+        i32 start_server_thread(const connexion_info& info)
+        {
+            DWORD   thread_id;
+            HANDLE  thread_handle;
+
+            thread_handle = CreateThread(
+                NULL,                   // default security attributes
+                0,                      // use default stack size  
+                start_server_from_socket,           // thread function name
+                (void*)&info,                // argument to thread function 
+                0,                      // use default creation flags   
+                &thread_id);      // returns the thread identifier 
+
+            if (thread_handle == NULL)
+            {
+                ErrorHandler(TEXT("CreateThread"));
+                ExitProcess(3);
+            }
+
+            //WaitForMultipleObjects(1, &hThreadArray, TRUE, INFINITE);
+            //// Close all thread handles and free memory allocations.
+
+            //CloseHandle(hThreadArray);
+            return 0;
+        }
+
+        DWORD _stdcall start_server_from_socket(LPVOID lpParam)
+        {
+            int iResult;
+
+            connexion_info*info = (connexion_info*)lpParam;
+            //SOCKET ListenSocket = info->socket;
+            SOCKET ClientSocket = INVALID_SOCKET;
+
+            int iSendResult;
+            char recvbuf[DEFAULT_BUFLEN];
+
+            //iResult = listen(info->socket, SOMAXCONN);
+            //if (iResult == SOCKET_ERROR) {
+            //    RAIN_LOG_NETWORK("listen failed with error: %d\n", WSAGetLastError());
+            //    closesocket(info->socket);
+            //    return 1;
+            //}
+
+            // Receive until the peer shuts down the connection
+            do {
+
+                iResult = recv(info->socket, recvbuf, DEFAULT_BUFLEN, 0);
+                if (iResult > 0) {
+                    //RAIN_LOG_NETWORK("Bytes received: %d\n", iResult);
+                    RAIN_LOG_NETWORK("marty : %s\n", recvbuf);
+                    std::string message = std::string("marty : ") + recvbuf;
+                    //RAIN_CONTEXT->application->UI.add_message(message);
+                }
+                else if (iResult == 0)
+                    RAIN_LOG_NETWORK("Connection closing...\n");
+                else {
+                    RAIN_LOG_NETWORK("recv failed with error: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    WSACleanup();
+                    return 1;
+                }
+
+            } while (iResult > 0);
+            return 0;
+        }
+
 
 
         DWORD _stdcall start_server(LPVOID lpParam)
@@ -148,6 +220,7 @@ namespace rain::engine
                 iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
                 if (iResult > 0) {
                     RAIN_LOG_NETWORK("Bytes received: %d\n", iResult);
+                    RAIN_LOG_NETWORK("Text received: %s\n", recvbuf);
 
                     // Echo the buffer back to the sender
                     iSendResult = send(ClientSocket, recvbuf, iResult, 0);

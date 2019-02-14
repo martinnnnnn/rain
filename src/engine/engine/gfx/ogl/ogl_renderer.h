@@ -127,9 +127,9 @@ namespace rain::engine
 		Shader ui_shader;
 		void init_ui();
 		void draw_ui();
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color);
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color);
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec3& a_color, const math::vec3& b_color, const math::vec3& c_color);
-        void draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const math::vec3& color);
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color);
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color, const math::vec4& b_color);
+		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color, const math::vec4& b_color, const math::vec4& c_color);
+        void draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const math::vec4& color);
     };
 }
