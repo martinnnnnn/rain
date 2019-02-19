@@ -7,6 +7,16 @@
 
 namespace rain::engine::ui
 {
+    void text_list::add_line(const network::INGAME_CHAT_INC& line)
+    {
+        messages.push_front(line.msg);
+        if (messages.size() >= max_count)
+        {
+            messages.pop_back();
+        }
+    }
+
+
 	void remove_letter(text_field& field)
 	{
 		if (field.is_focused && field.next_index > 0)
@@ -27,15 +37,6 @@ namespace rain::engine::ui
 			field.buffer[field.next_index++] = letter;
 		}
 	}
-
-    void add_message(text_list& list, const std::string& message)
-    {
-        list.messages.push_front(message);
-        if (list.messages.size() >= list.max_count)
-        {
-            list.messages.pop_back();
-        }
-    }
 
     void draw(const text_field& field)
     {
@@ -87,6 +88,7 @@ namespace rain::engine::ui
             }
             if (RAIN_INPUT->is_key_released(DIK_RETURN))
             {
+                RAIN_LOG("entered !");
                 field.on_validate.emit(std::string(field.buffer, field.next_index));
                 clear(field);
             }

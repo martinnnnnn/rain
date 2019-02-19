@@ -18,7 +18,7 @@ namespace rain::engine
 
     struct id_container
     {
-        std::vector<u32> id;
+        virtual ~id_container() {}
     };
 
     template<typename T>
@@ -71,7 +71,7 @@ namespace rain::engine
         template<typename T>
         void add_data(handle<T> new_data_handle)
         {
-            u32 t_id = core::type_id<T>::get<T>();
+            u32 t_id = core::type_id<struct DATA_SYSTEM> ::get<T>();
             if (t_id >= containers.size())
             {
                 containers.resize(t_id + 1);
@@ -84,14 +84,14 @@ namespace rain::engine
         template<typename T>
         handle<T> const * find_data(const core::uuid& id)
         {
-            u32 t_id = core::type_id<T>::get<T>();
+            u32 t_id = core::type_id<struct DATA_SYSTEM>::get<T>();
             return static_cast<handle_pool<T>*>(containers[t_id])->find_data(id);
         }
 
         template<typename T>
         handle<T> const * find_data(const file_path& path)
         {
-            u32 t_id = core::type_id<T>::get<T>();
+            u32 t_id = core::type_id<struct DATA_SYSTEM>::get<T>();
             return static_cast<handle_pool<T>*>(containers[t_id])->find_data(path);
         }
 

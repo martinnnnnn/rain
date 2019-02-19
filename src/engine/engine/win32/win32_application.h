@@ -1,9 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
-#include <vector>
-#include <functional>
 
 #include "core/core.h"
 
@@ -15,7 +12,7 @@ namespace rain::engine
 {
     struct World;
 
-    class Application
+    class application
     {
     public:
 
@@ -24,7 +21,6 @@ namespace rain::engine
         void update();
         void render(float _alpha);
         void send_to_network(const std::string& message);
-
 
     private:
         World* world;

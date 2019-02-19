@@ -30,6 +30,11 @@ namespace rain::engine
             SOCKET socket;
         };
 
+        struct INGAME_CHAT_INC
+        {
+            std::string msg;
+        };
+
 
         i32 init();
         void terminate();

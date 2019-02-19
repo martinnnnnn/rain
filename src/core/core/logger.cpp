@@ -11,13 +11,13 @@
 
 namespace rain::core
 {
-    Logger::Logger(void(*_printOutput)(const char*))
+    logger::logger(void(*_printOutput)(const char*))
     {
         printOutput = _printOutput;
         clean_buffers();
     }
 
-    void Logger::log_level(const char* _level, const char* _format, ...)
+    void logger::log_level(const char* _level, const char* _format, ...)
     {
         string::print_to_buffer(header_buffer, sizeof(header_buffer), "%s ", _level);
         va_list args;
@@ -27,7 +27,7 @@ namespace rain::core
         print_log();
     }
 
-    void Logger::log_max(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...)
+    void logger::log_max(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...)
     {
         string::print_to_buffer(header_buffer, sizeof(header_buffer), "%s Error at %s on line %u :\n", _level, _filePath, _fileLine);
         va_list args;
@@ -37,14 +37,14 @@ namespace rain::core
         print_log();
     }
 
-    void Logger::print_log()
+    void logger::print_log()
     {
         printOutput(header_buffer);
         printOutput(message_buffer);
         printOutput("\n");
     }
 
-    void Logger::log_raw(const char* _format, ...)
+    void logger::log_raw(const char* _format, ...)
     {
         va_list args;
         va_start(args, _format);
@@ -53,7 +53,7 @@ namespace rain::core
         print_log_raw();
     }
 
-    void Logger::print_log_raw()
+    void logger::print_log_raw()
     {
         printOutput(message_buffer);
     }

@@ -129,6 +129,7 @@ namespace rain::engine
                     RAIN_LOG_NETWORK("marty : %s\n", recvbuf);
                     std::string message = std::string("marty : ") + recvbuf;
                     //RAIN_CONTEXT->application->UI.add_message(message);
+                    RAIN_MESSAGING->emit(INGAME_CHAT_INC{ message });
                 }
                 else if (iResult == 0)
                     RAIN_LOG_NETWORK("Connection closing...\n");

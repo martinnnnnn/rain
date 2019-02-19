@@ -11,7 +11,7 @@ namespace rain::engine
     struct Client;
 
     class data_system;
-    class Application;
+    class application;
     class Window;
     class Renderer;
     class Input;
@@ -19,13 +19,13 @@ namespace rain::engine
     struct Context : public core::Singleton<Context>
     {
         Context();
-
-        Application* application;
+        core::messager* msger;
+        application* app;
         Config* config;
         Window* window;
         Renderer* renderer;
         Input* input;
-        core::Logger* logger;
+        core::logger* logger;
         data_system* data_sys;
         HighResolutionClock* clock;
     };
@@ -39,6 +39,7 @@ namespace rain::engine
 #define RAIN_WINDOW                     RAIN_CONTEXT->window
 #define RAIN_INPUT                      RAIN_CONTEXT->input
 #define RAIN_DATA                       RAIN_CONTEXT->data_sys
+#define RAIN_MESSAGING                  RAIN_CONTEXT->msger
 
 #define RAIN_FIND_DATA_FROM_PATH(type, path)  RAIN_CONTEXT->data_sys->find_data<type>(path) 
 #define RAIN_FIND_DATA_FROM_ID(type, id)      RAIN_CONTEXT->data_sys->find_data<type>(id)

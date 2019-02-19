@@ -15,6 +15,7 @@
 // TEMP
 #include "engine/network/server.h"
 #include <filesystem>
+#include <functional>
 
 namespace rain::engine
 {
@@ -24,24 +25,29 @@ namespace rain::engine
         OutputDebugStringA(_msg);
     }
 
-    void Application::send_to_network(const std::string& message)
+    void application::send_to_network(const std::string& message)
     {
         network::send_packet(info, message.c_str());
     }
 
-    int Application::init(void* _hinstance, const std::string& _config)
+    int application::init(void* _hinstance, const std::string& _config)
     {
+        using namespace std::placeholders;
+
         hinstance = _hinstance;
         
-        RAIN_CONTEXT->application = this;
+        RAIN_CONTEXT->app = this;
 
         // INIT LOGGER
-        RAIN_CONTEXT->logger = new core::Logger(print_to_log);
+        RAIN_CONTEXT->logger = new core::logger(print_to_log);
 
         // INIT CONFIG
         RAIN_CONFIG = new Config();
         RAIN_CONFIG->init(Win32::get_exe_path() + RAIN_CONFIG_FILE_NAME);
         
+        // INIT MESSAGING
+        RAIN_MESSAGING = new core::messager();
+
         // TEMP
         network::init();
         network::start_tcp_client(info, "127.0.0.1", "5001");
@@ -85,7 +91,7 @@ namespace rain::engine
     }
 
 
-    void Application::update()
+    void application::update()
     {
         RAIN_RENDERER->clear();
 
@@ -128,13 +134,13 @@ namespace rain::engine
 
     }
 
-    void Application::shutdown()
+    void application::shutdown()
     {
         RAIN_INPUT->shutdown();
     }
 
 
-    void Application::render(float _alpha)
+    void application::render(float _alpha)
     {
         world->draw(_alpha);
         RAIN_RENDERER->draw();
@@ -146,7 +152,7 @@ namespace rain::engine
 
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline, int nshowcmd)
 {
-    rain::engine::Application application;
+    rain::engine::application application;
     
     if (application.init(hinstance, "") != 0)
     {

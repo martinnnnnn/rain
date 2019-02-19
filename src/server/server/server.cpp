@@ -8,41 +8,23 @@
 
 
 #define DEFAULT_BUFLEN 512
-
+#define DEFAULT_ADDRESS "127.0.0.1:5001"
 
 namespace rain::server
 {
-
-    void ErrorHandler(LPTSTR lpszFunction)
+    
+    void print_error(i32 code, const char* fn)
     {
         LPVOID lpMsgBuf;
-        LPVOID lpDisplayBuf;
-        DWORD dw = GetLastError();
 
         FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL,
-            dw,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            code,
+            MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
             (LPTSTR)&lpMsgBuf,
             0, NULL);
-
-        // Display the error message.
-
-        lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-            (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR));
-        StringCchPrintf((LPTSTR)lpDisplayBuf,
-            LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-            TEXT("%s failed with error %d: %s"),
-            lpszFunction, dw, lpMsgBuf);
-        MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
-
-        // Free error-handling buffer allocations.
-
-        LocalFree(lpMsgBuf);
-        LocalFree(lpDisplayBuf);
+        RAIN_LOG_SERVER("/!\\ %s failed with error %d: %s", fn, code, lpMsgBuf);
     }
 
     i32 init_winsock()
@@ -51,7 +33,7 @@ namespace rain::server
         i32 i_result = WSAStartup(MAKEWORD(2, 2), &wsa_data);
         if (i_result != 0)
         {
-            printf("WSAStartup failed with error: %d\n", i_result);
+            print_error(i_result, "WSAStartup");
             return 1;
         }
         return 0;
@@ -63,8 +45,17 @@ namespace rain::server
         return 0;
     }
 
+    void print_fn(const char* str)
+    {
+        printf(str);
+    }
+
     i32 server::init(const char* ip, const char* port)
     {
+        RAIN_SERVER_CONTEXT->logger = new core::logger(print_fn);
+
+        RAIN_LOG_SERVER("\n\n-----------------------------------------------\n\n");
+        RAIN_LOG_SERVER("Initializing server @ %s:%s...", ip, port);
         int i_result;
 
         listen_socket = INVALID_SOCKET;
@@ -78,35 +69,38 @@ namespace rain::server
         hints.ai_protocol = IPPROTO_TCP;
         hints.ai_flags = AI_PASSIVE;
 
-        //std::string ip;
-        //std::string port;
-        //core::string::pair_split(ip_address_and_port->address, ":", ip, port);
-
-        // Resolve the server address and port
-        i_result = getaddrinfo(ip, port, &hints, &result);
-        if (i_result != 0) {
-            printf("getaddrinfo failed with error: %d\n", i_result);
+        RAIN_LOG_SERVER("   -> Resolving address and port...");
+        i_result = ::getaddrinfo(ip, port, &hints, &result);
+        if (i_result != 0)
+        {
+            print_error(i_result, "getaddrinfo");
             return 1;
         }
+        RAIN_LOG_SERVER("   -> Done");
 
-        // Create a SOCKET for connecting to server
-        listen_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-        if (listen_socket == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
+        RAIN_LOG_SERVER("   -> Creating socket...");
+        listen_socket = ::socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        if (listen_socket == INVALID_SOCKET)
+        {
+            print_error(WSAGetLastError(), "socket constructor");
             freeaddrinfo(result);
             return 1;
         }
+        RAIN_LOG_SERVER("   -> Done");
 
-        // Setup the TCP listening socket
-        i_result = bind(listen_socket, result->ai_addr, (int)result->ai_addrlen);
-        if (i_result == SOCKET_ERROR) {
-            printf("bind failed with error: %d\n", WSAGetLastError());
-            freeaddrinfo(result);
-            closesocket(listen_socket);
+        RAIN_LOG_SERVER("   -> Binding the socket to the address...");
+        i_result = ::bind(listen_socket, result->ai_addr, (int)result->ai_addrlen);
+        if (i_result == SOCKET_ERROR)
+        {
+
+            print_error(WSAGetLastError(), "bind");
+            ::freeaddrinfo(result);
+            ::closesocket(listen_socket);
             return 1;
         }
-
-        freeaddrinfo(result);
+        RAIN_LOG_SERVER("   -> Done");
+        RAIN_LOG_SERVER("Initialization done, freeing ressources...");
+        ::freeaddrinfo(result);
 
         return 0;
     }
@@ -119,45 +113,46 @@ namespace rain::server
 
     i32 server::start_listening()
     {
+        RAIN_LOG_SERVER("Starting to listen for clients...");
+
         i32 i_result;
         while (1)
         {
+            RAIN_LOG_SERVER("   -> Listening...");
             i_result = listen(listen_socket, SOMAXCONN);
-            if (i_result == SOCKET_ERROR) {
-                printf("listen failed with error: %d\n", WSAGetLastError());
-                closesocket(listen_socket);
-                return 1;
-            }
-
-            SOCKET ClientSocket = INVALID_SOCKET;
-            ClientSocket = accept(listen_socket, NULL, NULL);
-            if (ClientSocket == INVALID_SOCKET)
+            if (i_result == SOCKET_ERROR)
             {
-                printf("accept failed with error: %d\n", WSAGetLastError());
+                print_error(WSAGetLastError(), "listen");
                 closesocket(listen_socket);
                 return 1;
-
             }
-            printf("new client connected !\n");
-            client_sockets.push_back(ClientSocket);
+            SOCKET client_socket = INVALID_SOCKET;
+            RAIN_LOG_SERVER("   -> Waiting for a connexion request...");
+            client_socket = accept(listen_socket, NULL, NULL);
+            if (client_socket == INVALID_SOCKET)
+            {
+                print_error(WSAGetLastError(), "accept");
+                continue;
+            }
+            RAIN_LOG_SERVER("   -> New client connexion successful !\n");
+            RAIN_LOG_SERVER("   -> Launching new thread to handle it\n");
+            client_sockets.push_back(client_socket);
             DWORD   thread_id;
             HANDLE  thread_handle;
-
-            thread_handle = CreateThread(
-                NULL,                               // default security attributes
-                0,                                  // use default stack size  
-                launch_client_socket_static,        // thread function name
-                (void*)this,                        // argument to thread function 
-                0,                                  // use default creation flags   
-                &thread_id);                        // returns the thread identifier 
+            thread_handle = CreateThread(NULL, 0, launch_client_socket_static, (void*)this, 0, &thread_id);
 
             if (thread_handle == NULL)
             {
-                ErrorHandler(TEXT("CreateThread"));
+                print_error(GetLastError(), "CreateThread");
                 ExitProcess(3);
             }
         }
-        // No longer need server socket
+    }
+
+    DWORD WINAPI server::launch_listening_static(void* Param)
+    {
+        server* This = (server*)Param;
+        return This->start_listening();
     }
 
     DWORD WINAPI server::launch_client_socket_static(void* Param)
@@ -172,7 +167,6 @@ namespace rain::server
         i32 i_result = 0;
         char recvbuf[DEFAULT_BUFLEN];
 
-        // Receive until the peer shuts down the connection
         do {
             i_result = recv(client_socket, recvbuf, DEFAULT_BUFLEN, 0);
             if (i_result > 0)
@@ -226,20 +220,150 @@ namespace rain::server
         closesocket(client_socket);
         return 0;
     }
+    enum class console_command
+    {
+        INIT_SERVER,
+        SHUTDOWN_SERVER,
+        START_LISTEN,
+        GLOBAL_MESSAGE,
+        LIST_CLIENT,
+        KICK_CLIENT,
+        HELP,
+        QUIT,
+        UNKNOWN
+    };
+
+    console_command parse_command(const char* str)
+    {
+        if (strcmp(str, "quit") == 0)
+        {
+            return console_command::QUIT;
+        }
+        if (strcmp(str, "help") == 0)
+        {
+            return console_command::HELP;
+        }
+        if (strcmp(str, "init") == 0)
+        {
+            return console_command::INIT_SERVER;
+        }
+        if (strcmp(str, "listen") == 0)
+        {
+            return console_command::START_LISTEN;
+        }
+        if (strcmp(str, "tell") == 0)
+        {
+            return console_command::GLOBAL_MESSAGE;
+        }
+        if (strcmp(str, "list") == 0)
+        {
+            return console_command::LIST_CLIENT;
+        }
+        if (strcmp(str, "kick") == 0)
+        {
+            return console_command::KICK_CLIENT;
+        }
+        if (strcmp(str, "shutdown") == 0)
+        {
+            return console_command::SHUTDOWN_SERVER;
+        }
+        return console_command::UNKNOWN;
+    }
 }
 
 int main(int argc, char* argv[])
 {
-    using namespace rain::server;
+    using console_command = rain::server::console_command;
+    
+    rain::server::server* rain_server = new rain::server::server();
+    rain::server::init_winsock();
 
-    printf("hello\n");
+    console_command command = console_command::UNKNOWN;
+    std::vector<std::string> cmd_list;
 
-    init_winsock();
-    //ip_ptr address = new ip();
-    //address->address = "127.0.0.1:9998";
+    char buf[64];
+    while (command != console_command::QUIT)
+    {
+        printf("cmd :>");
+        fgets(buf, sizeof(buf), stdin);
+        cmd_list = rain::core::string::split(rain::core::string::trim(buf), " ");
 
-    server* rain_server = new server();
-    rain_server->init("127.0.0.1", "5001");
-    rain_server->start_listening();
-    shutdown_winsock();
+        if (cmd_list.size() == 0)
+        {
+            continue;
+        }
+        command = rain::server::parse_command(cmd_list[0].c_str());
+
+        switch (command)
+        {
+        case console_command::HELP:
+        {
+            printf("quit                   -> shutdown server and quit application\n");
+            printf("init <ip>:<port>       -> initialize server with the ip and port specified\n");
+            printf("listen                 -> start listening - server needs to be initialized\n");
+            printf("shutdown               -> shut the server down\n");
+            printf("tell <msg>             -> send a message to all clients\n");
+            printf("list                   -> get the list of all clients\n");
+            printf("kick <client_name>     -> kick a client using his name\n");
+            printf("\n");
+            break;
+        }
+        case console_command::INIT_SERVER:
+        {
+            std::string ip;
+            std::string port;
+            if (cmd_list.size() == 2)
+            {
+                rain::core::string::pair_split(cmd_list[1], ":", ip, port);
+            }
+            else
+            {
+                printf("> No ip address and port specified, defaulting to 127.0.0.1:5001\n");
+                rain::core::string::pair_split(DEFAULT_ADDRESS, ":", ip, port);
+            }
+            if (rain_server->init(ip.c_str(), port.c_str()) != 0)
+            {
+                printf("> Server coun't initialize... where did you fuck up ?\n");
+            }
+            break;
+        }
+        case console_command::START_LISTEN:
+            DWORD   thread_id;
+            HANDLE  thread_handle;
+            thread_handle = CreateThread(NULL, 0, rain::server::server::launch_listening_static, (void*)rain_server, 0, &thread_id);
+
+            if (thread_handle == NULL)
+            {
+                rain::server::print_error(GetLastError(), "CreateThread");
+                ExitProcess(3);
+            }
+            break;
+        case console_command::SHUTDOWN_SERVER:
+            printf("not implemented yet\n");
+            break;
+        case console_command::GLOBAL_MESSAGE:
+            printf("not implemented yet\n");
+            break;
+        case console_command::LIST_CLIENT:
+            printf("not implemented yet\n");
+            break;
+        case console_command::KICK_CLIENT:
+            printf("not implemented yet\n");
+            break;
+        case console_command::UNKNOWN:
+            printf("Unknown command : type /help for informations on the various commands\n");
+            break;
+        }
+
+    }
+    
+    // close connexions
+    // shutdown server
+    
+    rain::server::shutdown_winsock();
+
+
+
+
+    return 0;
 }

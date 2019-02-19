@@ -9,10 +9,10 @@
 
 namespace rain::core
 {
-    class Logger
+    class logger
     {
     public:
-        Logger(void(*_printOutput)(const char*));
+        logger(void(*_printOutput)(const char*));
 
         inline void clean_buffers()
         {

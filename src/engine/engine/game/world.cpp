@@ -1,6 +1,7 @@
 #include "world.h"
 
 #include <cassert>
+#include <algorithm>
 
 #include "engine/core/context.h"
 #include "engine/win32/win32_application.h"
@@ -13,6 +14,7 @@
 #include "engine/core/profiler.h"
 #include "engine/data/data_system.h"
 #include "engine/ui/text_field.h"
+#include "engine/ui/text_list.h"
 
 #include "engine/network/client.h"
 
@@ -33,7 +35,8 @@ namespace rain::engine
         {
             ui::text_field& field = chat_view.get<ui::text_field>(chat);
             ui::text_list& list = chat_view.get<ui::text_list>(chat);
-            field.on_validate.connect_member(RAIN_CONTEXT->application, &Application::send_to_network);
+            field.on_validate.connect_member(RAIN_CONTEXT->app, &application::send_to_network);
+            RAIN_MESSAGING->subscribe<network::INGAME_CHAT_INC>(std::bind(&ui::text_list::add_line, &list, std::placeholders::_1));
             break;
         }
 

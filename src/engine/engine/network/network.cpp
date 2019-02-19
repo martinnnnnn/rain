@@ -114,7 +114,7 @@ namespace rain::engine::network
     {
         RAIN_LOG_NETWORK("you : %s", buffer);
         std::string message = std::string("you : ") + buffer;
-        //RAIN_CONTEXT->application->UI.add_message(message);
+        RAIN_MESSAGING->emit(INGAME_CHAT_INC{ message });
         i32 i_result = send(info.socket, buffer, (i32)strlen(buffer) + 1, 0);
         if (i_result == SOCKET_ERROR)
         {

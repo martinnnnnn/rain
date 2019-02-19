@@ -2,6 +2,7 @@
 
 #include "core/core.h"
 
+#include <atomic>
 
 namespace rain::core
 {
