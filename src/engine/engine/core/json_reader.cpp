@@ -420,7 +420,8 @@ namespace rain::engine::json_reader
     //    }
     //}
 
-    void read_transform(const std::string & json_str, math::transform& t)
+    
+    void read_transform(const std::string& json_str, math::transform& t)
     {
         nlohmann::json j = nlohmann::json::parse(json_str);
 

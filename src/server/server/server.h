@@ -21,8 +21,6 @@ namespace rain::server
 {
 
 
-
-
     typedef struct
     {
         std::string address;

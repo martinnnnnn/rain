@@ -7,14 +7,7 @@
 
 namespace rain::engine::ui
 {
-    void text_list::add_line(const network::INGAME_CHAT_INC& line)
-    {
-        messages.push_front(line.msg);
-        if (messages.size() >= max_count)
-        {
-            messages.pop_back();
-        }
-    }
+
 
 
 	void remove_letter(text_field& field)
@@ -44,14 +37,6 @@ namespace rain::engine::ui
 
         assert(field.next_index < NELEMS(field.buffer));
         RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), field.x + 2, field.y + 2, 0.25f, field.color_txt);
-    }
-
-    void draw(const text_list& list)
-    {
-        for (u32 i = 0; i < list.messages.size(); ++i)
-        {
-            RAIN_RENDERER->draw_text_2d(list.messages[i], list.x, list.y + i * 10, 0.25f, list.color);
-        }
     }
 
 	void update(text_field& field)

@@ -15,8 +15,10 @@ add_subdirectory(server)
 message(STATUS "Rain Engine executable generation")
 add_subdirectory(engine)
 
+#### NETWORK DEPENDENCIES ####
+add_dependencies(${RAIN_NETORK} ${RAIN_CORE} ${RAIN_MATH})
 #### SERVER DEPENDENCIES ####
-add_dependencies(${RAIN_SERVER} ${RAIN_CORE})
+add_dependencies(${RAIN_SERVER} ${RAIN_CORE} ${RAIN_MATH})
 #### ENGINE DEPENDENCIES ####
-add_dependencies(${RAIN_ENGINE} ${RAIN_CORE})
+add_dependencies(${RAIN_ENGINE} ${RAIN_CORE} ${RAIN_MATH})
 
