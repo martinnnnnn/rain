@@ -153,9 +153,9 @@ namespace rain::engine
         if (RAIN_RENDERER) RAIN_RENDERER->resize(m_width, m_height);
     }
 
-    math::vec2 Window::size() const
+    glm::vec2 Window::size() const
     {
-        return math::vec2{ f32(m_width), f32(m_height) };
+        return glm::vec2{ f32(m_width), f32(m_height) };
     }
 
     void Window::toggle_fullscreen()
@@ -228,10 +228,10 @@ namespace rain::engine
         return m_rect;
     }
 
-    math::vec2 Window::get_center_pos_absolute()
+    glm::vec2 Window::get_center_pos_absolute()
     {
 		get_rect();
-        return math::vec2{ f32(m_rect.left + center_pos_x), f32(m_rect.top + center_pos_y) };
+        return glm::vec2{ f32(m_rect.left + center_pos_x), f32(m_rect.top + center_pos_y) };
     }
 
 

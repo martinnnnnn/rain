@@ -4,7 +4,6 @@
 #include <entt.hpp>
 
 #include "core/core.h"
-#include "math/math.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
 

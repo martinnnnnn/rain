@@ -14,8 +14,6 @@
 
 namespace rain::engine::json_reader
 {
-    using namespace rain::math;
-
     std::string get_string(const rapidjson::Value& _json_value)
     {
         rapidjson::StringBuffer buffer;
@@ -60,7 +58,7 @@ namespace rain::engine::json_reader
 
             if (world_object.HasMember("Transform"))
             {
-                transform& t = registry.assign<transform>(entity);
+                core::transform& t = registry.assign<core::transform>(entity);
                 read_transform(world_object["Transform"], t);
                 RAIN_LOG_RAW("%s\n", json_writer::serialize(t).c_str());
             }
@@ -71,7 +69,7 @@ namespace rain::engine::json_reader
             }
             if (world_object.HasMember("Sphere"))
             {
-                sphere& s = registry.assign<sphere>(entity);
+                core::sphere& s = registry.assign<core::sphere>(entity);
                 read_sphere(world_object["Sphere"], s);
             }
             if (world_object.HasMember("Spring"))
@@ -81,7 +79,7 @@ namespace rain::engine::json_reader
             }
             if (world_object.HasMember("Plane"))
             {
-                plane& p = registry.assign<plane>(entity);
+                core::plane& p = registry.assign<core::plane>(entity);
                 read_plane(world_object["Plane"], p);
             }
             if (world_object.HasMember("Model"))
@@ -126,7 +124,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_vec3(const rapidjson::Value& _json, math::vec3& vec)
+    void read_vec3(const rapidjson::Value& _json, glm::vec3& vec)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -134,7 +132,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_vec4(const rapidjson::Value& _json, math::vec4& vec)
+    void read_vec4(const rapidjson::Value& _json, glm::vec4& vec)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -142,7 +140,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_quat(const rapidjson::Value& _json, math::quat& q)
+    void read_quat(const rapidjson::Value& _json, glm::quat& q)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -150,7 +148,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_transform(const rapidjson::Value& _json, transform& _transform)
+    void read_transform(const rapidjson::Value& _json, core::transform& _transform)
     {
         read_transform(get_string(_json), _transform);
 
@@ -221,7 +219,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_sphere(const rapidjson::Value& _json, math::sphere& sphere)
+    void read_sphere(const rapidjson::Value& _json, core::sphere& sphere)
     {
         if (_json.HasMember("offset"))
         {
@@ -266,27 +264,27 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_plane(const rapidjson::Value& _json, math::plane& p)
+    void read_plane(const rapidjson::Value& _json, core::plane& p)
     {
-        vec3 position {};
-        vec3 normal {};
-        
-        vec3 point1 {};
-        vec3 point2 {};
-        vec3 point3 {};
+        glm::vec3 position {};
+        glm::vec3 normal {};
+
+        glm::vec3 point1 {};
+        glm::vec3 point2 {};
+        glm::vec3 point3 {};
 
         if (_json.HasMember("position") && _json.HasMember("normal"))
         {
             read_vec3(_json["position"], position);
             read_vec3(_json["normal"], normal);
-            p = plane(position, normal);
+            p = core::plane(position, normal);
         }
         else if (_json.HasMember("point1") && _json.HasMember("point2") && _json.HasMember("point3"))
         {
             read_vec3(_json["point1"], point1);
             read_vec3(_json["point2"], point2);
             read_vec3(_json["point3"], point3);
-            p = plane(point1, point2, point3);
+            p = core::plane(point1, point2, point3);
         }
     }
 
@@ -421,7 +419,7 @@ namespace rain::engine::json_reader
     //}
 
     
-    void read_transform(const std::string& json_str, math::transform& t)
+    void read_transform(const std::string& json_str, core::transform& t)
     {
         nlohmann::json j = nlohmann::json::parse(json_str);
 
@@ -443,7 +441,7 @@ namespace rain::engine::json_reader
 
 namespace rain::engine::json_writer
 {
-    std::string serialize(const math::transform& t)
+    std::string serialize(const core::transform& t)
     {
         rapidjson::Document d;
         rapidjson::Value json_transform(rapidjson::kObjectType);

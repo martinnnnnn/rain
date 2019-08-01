@@ -1,12 +1,12 @@
 #pragma once
 
-#include "core/core.h"
-#include "math/math.h"
-
-#include "engine/network/server.h"
-
 #include <vector>
 #include <deque>
+#include "glm.hpp"
+
+#include "core/core.h"
+#include "engine/network/server.h"
+
 
 namespace rain::engine::ui
 {
@@ -20,8 +20,8 @@ namespace rain::engine::ui
         char buffer[127];
         u32 next_index;
         bool is_focused;
-        math::vec4 color_bg;
-        math::vec4 color_txt;
+        glm::vec4 color_bg;
+        glm::vec4 color_txt;
         std::string default_text;
         core::signal<std::string const &> on_validate;
     };

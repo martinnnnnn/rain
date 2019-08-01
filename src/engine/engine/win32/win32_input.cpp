@@ -189,7 +189,7 @@ void Input::update()
 
     char buffer[512];
     core::string::print_to_buffer(buffer, 512, "(%d, %d)", x_from_topleft, y_from_topleft);
-    RAIN_RENDERER->draw_text_2d(buffer, 500, 50, 0.5f, math::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+    RAIN_RENDERER->draw_text_2d(buffer, 500, 50, 0.5f, glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 }
 
 void Input::update_mouse_click(const bool input_state, mouse_state& state,  f64& time)

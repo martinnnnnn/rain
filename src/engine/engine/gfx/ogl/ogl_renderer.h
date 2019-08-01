@@ -7,7 +7,7 @@
 #include "gl/GLU.h"
 
 #include "core/core.h"
-#include "math/math.h"
+#include "glm.hpp"
 #include "ogl_shader.h"
 #include "engine/core/config.h"
 #include "engine/data/geometry/mesh.h"
@@ -46,39 +46,39 @@ namespace rain::engine
         void draw();
 
         void draw_debug();
-        void draw_debug_line(const math::vec3& _point1, const math::vec3& _point2, const math::vec3& _color);
-        void draw_debug_line(const math::vec3& _point1, const math::vec3& _point2, const math::vec3& _color1, const math::vec3& _color2);
-        void draw_debug_cube(const math::vec3& _center, const f32 _width, const f32 _height, const math::vec3& _color);
-        void draw_debug_sphere(const math::vec3& _position, const f32 _scale = 1.0f, const math::quat& orientation = math::quat(math::from_euler()));
-        void draw_coord_view(const math::vec3& _position);
+        void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color);
+        void draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2);
+        void draw_debug_cube(const glm::vec3& _center, const f32 _width, const f32 _height, const glm::vec3& _color);
+        void draw_debug_sphere(const glm::vec3& _position, const f32 _scale = 1.0f, const glm::quat& orientation = glm::quat());
+        void draw_coord_view(const glm::vec3& _position);
 
         void draw_billboard();
         void draw_line();
-        void draw_quad(const math::plane& _p, const math::vec3 _position, const math::vec3& _color);
-        void draw_cube(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
-        void draw_sphere(const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
+        void draw_quad(const core::plane& _p, const glm::vec3 _position, const glm::vec3& _color);
+        void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
+        void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_mesh();
 
         void resize(u32 _width, u32 _height);
-        void set_perspective_projection_matrix(const math::mat4& _projection);
-        void set_orthogonal_projection_matrix(const math::mat4& _projection);
-        void set_view_matrix(const math::vec3& _eye, float _pitch, float _yaw);
-        void set_view_matrix(const math::vec3& _eye, const math::vec3& _center, const math::vec3& _up);
-        void set_view_matrix(const math::mat4& _matrix);
+        void set_perspective_projection_matrix(const glm::mat4& _projection);
+        void set_orthogonal_projection_matrix(const glm::mat4& _projection);
+        void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
+        void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
+        void set_view_matrix(const glm::mat4& _matrix);
 
-        u32 load_primitive(math::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, math::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
-        void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const math::vec3& position, const math::quat& _orientation, const math::vec3& scale);
+        u32 load_primitive(glm::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, glm::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
+        void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const glm::vec3& position, const glm::quat& _orientation, const glm::vec3& scale);
 
         void load_mesh(Mesh* mesh);
-        void draw_mesh(Mesh* mesh, const Material& material, const math::vec3& position, const math::quat& orientation, const math::vec3& scale);
+        void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void release_mesh(Mesh* mesh);
 
         static constexpr u32 debug_vertices_max_count = 8192;
 
         u32      m_debug_vertex_count;
         Shader debug_shader;
-        math::vec3 m_debug_vertices[debug_vertices_max_count];
-        math::vec3 m_debug_colors[debug_vertices_max_count];
+        glm::vec3 m_debug_vertices[debug_vertices_max_count];
+        glm::vec3 m_debug_colors[debug_vertices_max_count];
         u32      m_debug_vao;
         u32      m_debug_vbo;
         u32      m_debug_cbo;
@@ -92,9 +92,9 @@ namespace rain::engine
 	    GLuint sphereVAO;
 	    u32 sphere_index_count;
 
-        math::mat4 proj_mat_perspective;
-        math::mat4 proj_mat_orthogonal;
-        math::mat4 view_mat;
+        glm::mat4 proj_mat_perspective;
+        glm::mat4 proj_mat_orthogonal;
+        glm::mat4 view_mat;
 
         handle<Shader> const * debug_shader_handle;
         Shader phong_shader;
@@ -106,7 +106,7 @@ namespace rain::engine
             f32 x;
             f32 y;
             f32 scale;
-            math::vec4 color;
+            glm::vec4 color;
         };
         std::vector<text> texts;
         Shader text_shader;
@@ -115,21 +115,21 @@ namespace rain::engine
         GLuint text_vbo;
         void init_text_2d();
         void draw_text_2d();
-        void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const math::vec4& _color);
+        void draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec4& _color);
 
 		static constexpr u32 ui_max_vertex_count = 8192;
 		u32 ui_vertex_count;
 		u32 ui_vao;
 		u32 ui_vbo;
 		u32 ui_cbo;
-		math::vec3 ui_vertices[ui_max_vertex_count];
-		math::vec3 ui_colors[ui_max_vertex_count];
+		glm::vec3 ui_vertices[ui_max_vertex_count];
+		glm::vec3 ui_colors[ui_max_vertex_count];
 		Shader ui_shader;
 		void init_ui();
 		void draw_ui();
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color);
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color, const math::vec4& b_color);
-		void draw_ui_triangle(const math::vec3& a, const math::vec3& b, const math::vec3& c, const math::vec4& a_color, const math::vec4& b_color, const math::vec4& c_color);
-        void draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const math::vec4& color);
+		void draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color);
+		void draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color, const glm::vec4& b_color);
+		void draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color, const glm::vec4& b_color, const glm::vec4& c_color);
+        void draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const glm::vec4& color);
     };
 }

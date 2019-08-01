@@ -16,6 +16,7 @@
 #include "core/signal.h"
 #include "core/messaging.h"
 #include "core/serialize/serialize.h"
+#include "math/math.h"
 //#include "core/profiler.h"
 
 

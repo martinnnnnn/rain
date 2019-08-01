@@ -1,6 +1,5 @@
 #include "win32_application.h"
 
-#include "math/math.h"
 #include "win32_window.h"
 #include "engine/win32/win32_input.h"
 #include "engine/win32/win32_window.h"

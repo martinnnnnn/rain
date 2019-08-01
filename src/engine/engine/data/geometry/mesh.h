@@ -4,7 +4,7 @@
 #include <fbxsdk.h>
 
 #include "core/core.h"
-#include "math/math.h"
+#include "glm.hpp"
 #include "engine/data/data_handle.h"
 
 namespace rain::engine
@@ -12,12 +12,12 @@ namespace rain::engine
 
     struct Vertex
     {
-        math::vec3 position;
-        math::vec3 normal;
-        math::vec3 binormal;
-        math::vec3 tangent;
-        math::vec3 bitangent;
-        math::vec2 texCoords[4];
+        glm::vec3 position;
+        glm::vec3 normal;
+        glm::vec3 binormal;
+        glm::vec3 tangent;
+        glm::vec3 bitangent;
+        glm::vec2 texCoords[4];
     };
 
     bool operator==(const Vertex& _a, const Vertex& _b);

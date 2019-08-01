@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "core/core.h"
-#include "math/math.h"
+#include "glm.hpp"
 #include "engine/physics/rigid_body.h"
 
 namespace rain::engine
@@ -12,29 +12,29 @@ namespace rain::engine
     
     struct MeshBound
     {
-        std::vector<math::vec3> points;
+        std::vector<glm::vec3> points;
     };
 
     struct HitInfo
     {
         bool hit;
         f32 normalizedTime;
-        math::vec3 contactPoint;
-        math::vec3 contactNormal;
+        glm::vec3 contactPoint;
+        glm::vec3 contactNormal;
     };
 
 
 
-    HitInfo detect_collision_sphere(const math::sphere& _sphereA, const math::transform& _transformA, const math::sphere& _sphereB, const math::transform& _transformB);
-    HitInfo detect_collision_sphere_plane(math::sphere& _sphere, math::transform& _transform, math::plane& _plane);
+    HitInfo detect_collision_sphere(const core::sphere& _sphereA, const core::transform& _transformA, const core::sphere& _sphereB, const core::transform& _transformB);
+    HitInfo detect_collision_sphere_plane(core::sphere& _sphere, core::transform& _transform, core::plane& _plane);
 
-    math::vec2 detect_collision_ray_sphere(const math::ray& _ray, const math::sphere& _sphere);
+    glm::vec2 detect_collision_ray_sphere(const core::ray& _ray, const core::sphere& _sphere);
 
-    void collision_response(RigidBody& _bodyA, math::transform& _transformA, math::vec3& _position);
-    void collision_response(RigidBody& _bodyA, math::transform& _transformA, RigidBody& _bodyB, math::transform& _transformB);
+    void collision_response(RigidBody& _bodyA, core::transform& _transformA, glm::vec3& _position);
+    void collision_response(RigidBody& _bodyA, core::transform& _transformA, RigidBody& _bodyB, core::transform& _transformB);
 
 
-    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const math::transform& _transformA, const MeshBound& _verticesB, const math::transform& _transformB);
+    HitInfo detect_collision_gjk(const MeshBound& _verticesA, const core::transform& _transformA, const MeshBound& _verticesB, const core::transform& _transformB);
 
 
     //namespace convex_hull

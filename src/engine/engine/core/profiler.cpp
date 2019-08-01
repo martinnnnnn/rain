@@ -30,7 +30,7 @@ namespace rain::engine
         return elapsed_seconds.count();
     }
 
-    window_profiler::window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const math::vec4& _color)
+    window_profiler::window_profiler(const std::string& _message, const f32 _x, const f32 _y, const f32 _scale, const glm::vec4& _color)
         : message(_message)
         , x(_x)
         , y(_y)

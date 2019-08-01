@@ -35,9 +35,9 @@ namespace rain::engine
         void fullscreen(bool _fullscreen);
 		void recover_display_mode();
         rect get_rect();
-		math::vec2 get_center_pos_absolute();
+		glm::vec2 get_center_pos_absolute();
 
-        math::vec2 size() const;
+        glm::vec2 size() const;
 
 		bool initialized;
 		HWND hwnd;

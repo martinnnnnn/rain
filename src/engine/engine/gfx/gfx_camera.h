@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/core.h"
-#include "math/math.h"
+#include "glm.hpp"
 
 namespace rain::engine
 {
@@ -13,13 +13,13 @@ namespace rain::engine
 		float movement_speed;
 		float yaw;
 		float pitch;
-		math::vec3 front;
-		math::vec3 right;
-		math::vec3 up;
-		math::vec3 worldUp;
+		glm::vec3 front;
+		glm::vec3 right;
+		glm::vec3 up;
+		glm::vec3 worldUp;
 	};
 
 
-    void update(Camera& _camera, math::transform& _transform);
+    void update(Camera& _camera, core::transform& _transform);
 	
 }
