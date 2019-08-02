@@ -6,6 +6,7 @@
 #include "plane.h"
 #include "ray.h"
 #include "quick_hull.h"
+#include "simplex_noise.h"
 
 namespace rain::core
 {

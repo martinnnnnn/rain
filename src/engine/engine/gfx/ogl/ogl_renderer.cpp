@@ -233,7 +233,8 @@ namespace rain::engine
 
     void Renderer::init_cube()
     {
-        const float vertices[288] = {
+        const float vertices[288] =
+        {
             // position           // normals          // texture coords
             -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
@@ -382,8 +383,8 @@ namespace rain::engine
         std::vector<glm::vec3> normals;
         std::vector<unsigned int> indices;
 
-        const unsigned int X_SEGMENTS = 64;
-        const unsigned int Y_SEGMENTS = 64;
+        const unsigned int X_SEGMENTS = 4;
+        const unsigned int Y_SEGMENTS = 4;
         const float PI = 3.14159265359f;
         for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
         {

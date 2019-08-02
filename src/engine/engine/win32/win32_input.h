@@ -48,6 +48,7 @@ namespace rain::engine
         u32 alphanum_codes[37];
         void init_alphanum_codes();
         char get_char(u32 key_code);
+
     private:
         static constexpr u32 KEYS_COUNT = 256;
 

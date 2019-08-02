@@ -2,6 +2,8 @@
 
 #include <cassert>
 #include <algorithm>
+#include <thread>
+#include <new>
 
 #include "engine/core/context.h"
 #include "engine/win32/win32_application.h"
@@ -24,6 +26,13 @@ namespace rain::engine
     void World::init(const std::string& _path)
     {
         RAIN_PROFILE("world init");
+
+        {
+            RAIN_PROFILE("Chunk init");
+            vmap = new core::voxel_map();
+            core::init(vmap);
+        }
+
 
         file.open(_path);
         json_reader::read_world(file.read(), *this);
@@ -57,7 +66,11 @@ namespace rain::engine
             memcpy(&vertices[i], &(model.mesh->data->vertices[i].position), sizeof(glm::vec3));
         }
 
-        quick_hull(vertices, vertices_count, &mesh);
+        {
+            RAIN_PROFILE("quickhull");
+            RAIN_LOG("vertices count : %u", vertices_count);
+            quick_hull(vertices, vertices_count, &mesh);
+        }
         temp_vao = RAIN_RENDERER->load_primitive(mesh.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
         // ---- /temp
     }
@@ -158,9 +171,20 @@ namespace rain::engine
 
     }
 
+    void draw_naive(const core::voxel_chunk& chunk);
+
     void World::draw(const float _alpha)
     {
         RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
+
+        {
+            RAIN_WPROFILE("chunk render ", 500.0f, 55.0f, 0.2f, (glm::vec4{ 0.2, 0.9f, 0.2f, 1.0f }));
+            for (u32 i = 0; i < vmap->chunks_count; ++i)
+            {
+                draw_naive(vmap->chunks[i]);
+            }
+        }
+
 
         auto view = registry.view<core::transform, Model, Material>();
 
@@ -225,5 +249,167 @@ namespace rain::engine
         //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
     }
+
+    void draw_naive(const core::voxel_chunk& chunk)
+    {
+        using core::CHUNK_SIZE;
+        using core::CHUNK_SIZE_SQUARED;
+        using core::voxel_block;
+
+        for (u32 i = 0; i < CHUNK_SIZE; ++i)
+        {
+            for (u32 j = 0; j < CHUNK_SIZE; ++j)
+            {
+                for (u32 k = 0; k < CHUNK_SIZE; ++k)
+                {
+                    const i32 index = i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
+                    const voxel_block* block = &(chunk.data[index]);
+
+                    if (block->type == voxel_block::Type::EMPTY)
+                    {
+                        continue;
+                    }
+
+                    u32 iabsolute = i + chunk.position.x;
+                    u32 jabsolute = j + chunk.position.y;
+                    u32 kabsolute = k + chunk.position.z;
+
+                    //if (iabsolute == 0 || jabsolute == 0 || kabsolute == 0 || iabsolute == CHUNK_SIZE - 1 || jabsolute == CHUNK_SIZE - 1 || kabsolute == CHUNK_SIZE - 1)
+                    //{
+                    //    RAIN_RENDERER->draw_sphere(glm::vec3{ iabsolute + 15, jabsolute, kabsolute }, glm::quat(), glm::vec3{ 0.3f, 0.3f, 0.3f });
+                    //    continue;
+                    //}
+
+                    if (!is_block_border(&chunk, core::uvec3{ i, j, k }))
+                    {
+                        continue;
+                    }
+
+                    RAIN_RENDERER->draw_sphere(glm::vec3{ iabsolute + 15, jabsolute, kabsolute }, glm::quat(), glm::vec3{ 0.3f, 0.3f, 0.3f });
+                }
+            }
+        }
+    }
+
+    //void generate_mesh(Chunk& chunk)
+    //{
+    //    chunk.cXN = chunk.position.x > 0 ? &chunk.map->chunks[chunk.position.x - 1, chunk.position.y, chunk.position.z] : nullptr;
+    //    chunk.cYN = chunk.position.y > 0 ? &chunk.map->chunks[chunk.position.x, chunk.position.y - 1, chunk.position.z] : nullptr;
+    //    chunk.cZN = chunk.position.z > 0 ? &chunk.map->chunks[chunk.position.x, chunk.position.y, chunk.position.z - 1] : nullptr;
+
+    //    chunk.cXP = chunk.position.x < CHUNK_MAX_POS_X - 1 ? &chunk.map->chunks[chunk.position.x + 1, chunk.position.y, chunk.position.z] : nullptr;
+    //    chunk.cYP = chunk.position.y < CHUNK_MAX_POS_Y - 1 ? &chunk.map->chunks[chunk.position.x, chunk.position.y + 1, chunk.position.z] : nullptr;
+    //    chunk.cZP = chunk.position.z < CHUNK_MAX_POS_Z - 1 ? &chunk.map->chunks[chunk.position.x, chunk.position.y, chunk.position.z + 1] : nullptr;
+
+
+    //    u32 access = 0;
+
+    //    // Y axis - start from the bottom and search up
+    //    for (u32 j = 0; j < CHUNK_SIZE; ++j)
+    //    {
+    //        // Z axis
+    //        for (u32 k = 0; k < CHUNK_SIZE; ++k)
+    //        {
+    //            // X axis
+    //            for (u32 i = 0; i < CHUNK_SIZE; ++i)
+    //            {
+    //                access = i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
+    //                Block* b = &(chunk.data[access]);
+
+    //                if (b->type == BlockType::EMPTY)
+    //                {
+    //                    continue;
+    //                }
+
+    //                create_run(chunk, b, i, j, k, access);
+    //            }
+
+    //            //if (vertexBuffer.used > vertexBuffer.data.Length - 2048)
+    //            //    vertexBuffer.Extend(2048);
+    //        }
+    //    }
+    //}
+
+    //void create_run(Chunk& chunk, Block* b, u32 i, u32 j, u32 k, u32 access)
+    //{
+    //    static bool visited[CHUNK_SIZE_CUBED * CHUNK_NEIGHBOUR_COUNT];
+    //    memset(&visited, 0, sizeof(bool) * CHUNK_SIZE_CUBED * CHUNK_NEIGHBOUR_COUNT);
+
+    //    int i1 = i + 1;
+    //    int j1 = j + 1;
+    //    int k1 = k + 1;
+
+    //    int length = 0;
+    //    int chunkAccess = 0;
+
+    //    //if (!visited[CHUNK_CXN * CHUNK_SIZE_CUBED + access] && visible_face_XN(i - 1, j, k))
+    //    //{
+    //    //    // Search upwards to determine run length
+    //    //    for (int q = j; q < CHUNK_SIZE; q++)
+    //    //    {
+    //    //        // Pre-calculate the array lookup as it is used twice
+    //    //        chunkAccess = i + q * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
+
+    //    //        // If we reach a different block or an empty block, end the run
+    //    //        if (DifferentBlock(chunkAccess, b))
+    //    //            break;
+
+    //    //        // Store that we have visited this block
+    //    //        chunkHelper.visitedXN[chunkAccess] = true;
+
+    //    //        length++;
+    //    //    }
+
+
+    //    //    if (length > 0)
+    //    //    {
+    //    //        // Create a quad and write it directly to the buffer
+    //    //        BlockVertex.AppendQuad(buffer, new Int3(i, length + j, k1),
+    //    //            new Int3(i, length + j, k),
+    //    //            new Int3(i, j, k1),
+    //    //            new Int3(i, j, k),
+    //    //            (byte)FaceType.xn, b.kind, health16);
+
+    //    //        buffer.used += 6;
+    //    //    }
+    //    //}
+
+    //    //// Same algorithm for right (X+)
+    //    //if (!chunkHelper.visitedXP[access] && VisibleFaceXP(i1, j, k))
+    //    //{
+    //    //    ...
+    //    //}
+    //}
+
+    //bool visible_face_XN(Chunk& chunk, u32 i, u32 j, u32 k)
+    //{
+    //    // Access directly from a neighbouring chunk
+    //    if (i < 0)
+    //    {
+    //        Chunk* cXN = chunk.cXN;
+    //        if (cXN == nullptr)
+    //        {
+    //            return true;
+    //        }
+
+    //        return chunk.cXN->data[31 + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
+    //    }
+
+    //    return chunk.data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
+    //}
+
+    //bool visible_face_XP(Chunk& chunk, u32 i, u32 j, u32 k)
+    //{
+    //    if (i >= CHUNK_SIZE)
+    //    {
+    //        Chunk* cXP = chunk.cXP;
+    //        if (cXP == nullptr)
+    //            return true;
+
+    //        return cXP->data[0 + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
+    //    }
+
+    //    return chunk.data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
+    //}
 
 }
