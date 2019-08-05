@@ -2,7 +2,7 @@
 
 #include "core/types.h"
 
-namespace rain::core
+namespace rain::engine
 {
 
 

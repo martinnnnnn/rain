@@ -56,12 +56,15 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
         std::string hello = RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs";
         debug_shader_handle = RAIN_FIND_DATA_FROM_PATH(Shader, hello);
+
+        phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
         phong_shader.use();
         phong_shader.set("lightDiff", 0.3f, 0.3f, 0.3f);
         phong_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
+
+        instancing_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs", RAIN_CONFIG->data_root + "/shaders/glsl/instancing.fs");
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -456,6 +459,127 @@ namespace rain::engine
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
+
+    void Renderer::init_instancing(const std::vector<glm::mat4>& instances, u32& vao)
+    {
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec3> normals;
+        std::vector<unsigned int> indices;
+
+        const unsigned int X_SEGMENTS = 4;
+        const unsigned int Y_SEGMENTS = 4;
+        const float PI = 3.14159265359f;
+        for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+        {
+            for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+            {
+                float xSegment = (float)x / (float)X_SEGMENTS;
+                float ySegment = (float)y / (float)Y_SEGMENTS;
+                float xPos = glm::cos(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
+                float yPos = glm::cos(ySegment * PI);
+                float zPos = glm::sin(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
+
+                positions.push_back(glm::vec3{ xPos, yPos, zPos });
+                uv.push_back(glm::vec2{ xSegment, ySegment });
+                normals.push_back(glm::vec3{ xPos, yPos, zPos });
+            }
+        }
+
+        bool oddRow = false;
+        for (int y = 0; y < Y_SEGMENTS; ++y)
+        {
+            if (!oddRow) // even rows: y == 0, y == 2; and so on
+            {
+                for (int x = 0; x <= X_SEGMENTS; ++x)
+                {
+                    indices.push_back(y       * (X_SEGMENTS + 1) + x);
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                }
+            }
+            else
+            {
+                for (int x = X_SEGMENTS; x >= 0; --x)
+                {
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                    indices.push_back(y       * (X_SEGMENTS + 1) + x);
+                }
+            }
+            oddRow = !oddRow;
+        }
+        sphere_index_count = indices.size();
+
+        std::vector<float> data;
+        for (u32 i = 0; i < positions.size(); ++i)
+        {
+            data.push_back(positions[i].x);
+            data.push_back(positions[i].y);
+            data.push_back(positions[i].z);
+            if (uv.size() > 0)
+            {
+                data.push_back(uv[i].x);
+                data.push_back(uv[i].y);
+            }
+            if (normals.size() > 0)
+            {
+                data.push_back(normals[i].x);
+                data.push_back(normals[i].y);
+                data.push_back(normals[i].z);
+            }
+        }
+        glGenVertexArrays(1, &vao);
+
+        u32 sphere_vbo, sphere_ebo, instance_vbo;
+        glGenBuffers(1, &sphere_vbo);
+        glGenBuffers(1, &sphere_ebo);
+        glGenBuffers(1, &instance_vbo);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::vec3), &instances[0], GL_STATIC_DRAW);
+
+        i32 stride = (3 + 2 + 3) * sizeof(float) + sizeof(glm::mat4);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);                   
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);                   
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        // instance matrix
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, stride, (void*)((5 * sizeof(float)) + sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, stride, (void*)((5 * sizeof(float)) + 2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, stride, (void*)((5 * sizeof(float)) + 3 * sizeof(glm::vec4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+
+    void Renderer::draw_instancing(const u32 vao, const u32 amount)
+    {
+        instancing_shader.use();
+        instancing_shader.set("projection", proj_mat_perspective);
+        instancing_shader.set("view", view_mat);
+        glBindVertexArray(vao);
+        glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
+        glBindVertexArray(0);
+    }
+
 
 
     void Renderer::init_debug()

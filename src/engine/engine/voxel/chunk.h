@@ -3,7 +3,7 @@
 #include "core/types.h"
 #include "block.h"
 
-namespace rain::core
+namespace rain::engine
 {
     struct uvec3
     {

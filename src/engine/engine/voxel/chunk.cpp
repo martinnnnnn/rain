@@ -1,11 +1,12 @@
 #include "chunk.h"
 
 #include "core/math/simplex_noise.h"
-#include "core/voxel/map.h"
+#include "engine/voxel/map.h"
 #include <Windows.h>
 #include "core/logger.h"
+#include "gtx/transform.hpp"
 
-namespace rain::core
+namespace rain::engine
 {
     //voxel_chunk::voxel_chunk(voxel_map* map, const uvec3& position)
     //    : map(map)
@@ -49,9 +50,10 @@ namespace rain::core
                     voxel_block* block = &chunk->data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED];
 
                     float noise = (core::simplex_noise::noise(float(i + chunk->position.x) / CHUNK_SIZE, float(j + chunk->position.y) / CHUNK_SIZE, float(k + chunk->position.z) / CHUNK_SIZE) + 1.0f) / 2.0f;
-                    if (noise > 0.9f)
+                    if (noise < 0.2f)
                     {
                         block->type = voxel_block::Type::DIRT;
+                        map->model_matrices.emplace_back(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }));
                     }
                     else
                     {
@@ -64,11 +66,7 @@ namespace rain::core
 
     void set_neightbours(voxel_chunk* chunk)
     {
-        char msgbuf[128];
-
         const uvec3 map_index{ chunk->position.x / CHUNK_SIZE, chunk->position.y / CHUNK_SIZE, chunk->position.z / CHUNK_SIZE };
-        sprintf(msgbuf, "mapindex : [%u, %u, %u]\n\n\n", chunk->position.x / CHUNK_SIZE, chunk->position.y / CHUNK_SIZE, chunk->position.z / CHUNK_SIZE);
-        OutputDebugString(msgbuf);
 
         chunk->cXN = map_index.x > 0 ? &chunk->map->chunks[(map_index.x - 1) + (map_index.y * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
         chunk->cYN = map_index.y > 0 ? &chunk->map->chunks[(map_index.x) + ((map_index.y - 1) * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
@@ -77,26 +75,6 @@ namespace rain::core
         chunk->cXP = map_index.x < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x + 1) + ((map_index.y) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED)] : nullptr;
         chunk->cYP = map_index.y < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x) + ((map_index.y + 1) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED)] : nullptr;
         chunk->cZP = map_index.z < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z + 1) * MAP_SIZE_SQUARED)] : nullptr;
-
-        //chunk->cXN = map_index.x > 0 ? &chunk->map->chunks[(map_index.x - 1) + (map_index.y * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cXN : [%u, %u, %u] -> %d --> %s\n ", map_index.x - 1, map_index.y, map_index.z, (map_index.x - 1) + ((map_index.y) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED), chunk->cXN ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
-        //chunk->cYN = map_index.y > 0 ? &chunk->map->chunks[(map_index.x) + ((map_index.y - 1) * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cYN : [%u, %u, %u] -> %d --> %s\n", map_index.x , map_index.y - 1, map_index.z, (map_index.x) + ((map_index.y - 1) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED), chunk->cYN ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
-        //chunk->cZN = map_index.z > 0 ? &chunk->map->chunks[(map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z - 1) * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cZN : [%u, %u, %u] -> %d --> %s\n\n", map_index.x, map_index.y, map_index.z - 1, (map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z - 1) * MAP_SIZE_SQUARED), chunk->cZN ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
-
-        //chunk->cXP = map_index.x < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x + 1) + ((map_index.y) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cXP : [%u, %u, %u] -> %d --> %s\n", map_index.x + 1, map_index.y, map_index.z, (map_index.x + 1) + ((map_index.y) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED), chunk->cXP ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
-        //chunk->cYP = map_index.y < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x) + ((map_index.y + 1) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cYP : [%u, %u, %u] -> %d --> %s\n", map_index.x, map_index.y + 1, map_index.z, (map_index.x) + ((map_index.y + 1) * MAP_SIZE) + ((map_index.z) * MAP_SIZE_SQUARED), chunk->cYP ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
-        //chunk->cZP = map_index.z < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z + 1) * MAP_SIZE_SQUARED)] : nullptr;
-        //sprintf(msgbuf, "cZP : [%u, %u, %u] -> %d --> %s\n\n\n", map_index.x, map_index.y, map_index.z + 1, (map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z + 1) * MAP_SIZE_SQUARED), chunk->cZP ? "ptr" : "nullptr");
-        //OutputDebugString(msgbuf);
     }
 
     voxel_block* get_block(voxel_chunk const * const chunk, const uvec3& position)

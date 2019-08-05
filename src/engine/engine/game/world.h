@@ -7,7 +7,7 @@
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
 
-
+#include "engine/voxel/voxel.h"
 
 namespace rain::engine
 {
@@ -32,7 +32,7 @@ namespace rain::engine
 
         // TEMP
         u32 temp_vao;
-        core::voxel_map* vmap;
+        voxel_map* vmap;
     };
 }
 

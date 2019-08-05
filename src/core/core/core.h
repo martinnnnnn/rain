@@ -17,7 +17,6 @@
 #include "core/messaging.h"
 #include "core/serialize/serialize.h"
 #include "core/math/math.h"
-#include "core/voxel/voxel.h"
 
 //#include "core/profiler.h"
 

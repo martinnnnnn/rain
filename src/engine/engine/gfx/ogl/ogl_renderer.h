@@ -41,6 +41,7 @@ namespace rain::engine
         void init_shapes();
 	    void init_cube();
         void init_sphere();
+        void init_instancing(const std::vector<glm::mat4>& instances, u32& vao);
         void init_data();
 
         void draw();
@@ -57,6 +58,7 @@ namespace rain::engine
         void draw_quad(const core::plane& _p, const glm::vec3 _position, const glm::vec3& _color);
         void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
+        void draw_instancing(const u32 vao, const u32 amount);
         void draw_mesh();
 
         void resize(u32 _width, u32 _height);
@@ -98,6 +100,7 @@ namespace rain::engine
 
         handle<Shader> const * debug_shader_handle;
         Shader phong_shader;
+        Shader instancing_shader;
         Shader pbr_shader;
 
         struct text

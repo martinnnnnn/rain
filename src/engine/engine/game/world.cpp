@@ -29,8 +29,8 @@ namespace rain::engine
 
         {
             RAIN_PROFILE("Chunk init");
-            vmap = new core::voxel_map();
-            core::init(vmap);
+            vmap = new voxel_map();
+            engine::init(vmap);
         }
 
 
@@ -171,17 +171,25 @@ namespace rain::engine
 
     }
 
-    void draw_naive(const core::voxel_chunk& chunk);
+    void draw_naive(const voxel_chunk& chunk);
 
     void World::draw(const float _alpha)
     {
         RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
 
+        //{
+        //    RAIN_PROFILE("voxel map render naive");
+        //    for (u32 i = 0; i < vmap->chunks_count; ++i)
+        //    {
+        //        draw_naive(vmap->chunks[i]);
+        //    }
+        //}
+
         {
-            RAIN_WPROFILE("chunk render ", 500.0f, 55.0f, 0.2f, (glm::vec4{ 0.2, 0.9f, 0.2f, 1.0f }));
+            RAIN_PROFILE("voxel map render");
             for (u32 i = 0; i < vmap->chunks_count; ++i)
             {
-                draw_naive(vmap->chunks[i]);
+                engine::draw(vmap);
             }
         }
 
@@ -250,12 +258,8 @@ namespace rain::engine
         //}
     }
 
-    void draw_naive(const core::voxel_chunk& chunk)
+    void draw_naive(const voxel_chunk& chunk)
     {
-        using core::CHUNK_SIZE;
-        using core::CHUNK_SIZE_SQUARED;
-        using core::voxel_block;
-
         for (u32 i = 0; i < CHUNK_SIZE; ++i)
         {
             for (u32 j = 0; j < CHUNK_SIZE; ++j)
@@ -265,7 +269,7 @@ namespace rain::engine
                     const i32 index = i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
                     const voxel_block* block = &(chunk.data[index]);
 
-                    if (block->type == voxel_block::Type::EMPTY)
+                    if (block->type == voxel_block::Type::EMPTY || !is_block_border(&chunk, uvec3{ i, j, k }))
                     {
                         continue;
                     }
@@ -273,17 +277,6 @@ namespace rain::engine
                     u32 iabsolute = i + chunk.position.x;
                     u32 jabsolute = j + chunk.position.y;
                     u32 kabsolute = k + chunk.position.z;
-
-                    //if (iabsolute == 0 || jabsolute == 0 || kabsolute == 0 || iabsolute == CHUNK_SIZE - 1 || jabsolute == CHUNK_SIZE - 1 || kabsolute == CHUNK_SIZE - 1)
-                    //{
-                    //    RAIN_RENDERER->draw_sphere(glm::vec3{ iabsolute + 15, jabsolute, kabsolute }, glm::quat(), glm::vec3{ 0.3f, 0.3f, 0.3f });
-                    //    continue;
-                    //}
-
-                    if (!is_block_border(&chunk, core::uvec3{ i, j, k }))
-                    {
-                        continue;
-                    }
 
                     RAIN_RENDERER->draw_sphere(glm::vec3{ iabsolute + 15, jabsolute, kabsolute }, glm::quat(), glm::vec3{ 0.3f, 0.3f, 0.3f });
                 }

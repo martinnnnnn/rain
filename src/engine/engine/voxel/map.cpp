@@ -1,8 +1,10 @@
-#include "core/voxel/map.h"
+#include "engine/voxel/map.h"
 
-#include "core/logger.h"
+#include "engine/core/context.h"
+#include "engine/gfx/ogl/ogl_renderer.h"
 
-namespace rain::core
+
+namespace rain::engine
 {
     void init(voxel_map* vmap)
     {
@@ -19,6 +21,10 @@ namespace rain::core
                 }
             }
         }
+
+        RAIN_LOG("%d cubes to drawn", vmap->model_matrices.size());
+        RAIN_RENDERER->init_instancing(vmap->model_matrices, vmap->vao);
+
         for (u32 i = 0; i < MAP_SIZE; ++i)
         {
             for (u32 j = 0; j < MAP_SIZE; ++j)
@@ -29,6 +35,12 @@ namespace rain::core
                 }
             }
         }
-        
+    }
+
+    void draw(voxel_map* vmap)
+    {
+        RAIN_RENDERER->draw_instancing(vmap->vao, vmap->model_matrices.size());
     }
 }
+
+
