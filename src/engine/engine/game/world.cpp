@@ -177,13 +177,13 @@ namespace rain::engine
     {
         RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
 
-        //{
-        //    RAIN_PROFILE("voxel map render naive");
-        //    for (u32 i = 0; i < vmap->chunks_count; ++i)
-        //    {
-        //        draw_naive(vmap->chunks[i]);
-        //    }
-        //}
+        {
+            RAIN_PROFILE("voxel map render naive");
+            for (u32 i = 0; i < vmap->chunks_count; ++i)
+            {
+                draw_naive(vmap->chunks[i]);
+            }
+        }
 
         {
             RAIN_PROFILE("voxel map render");

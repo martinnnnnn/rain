@@ -53,7 +53,7 @@ namespace rain::engine
                     if (noise < 0.2f)
                     {
                         block->type = voxel_block::Type::DIRT;
-                        map->model_matrices.emplace_back(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }));
+                        map->model_matrices.push_back(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }));
                     }
                     else
                     {
