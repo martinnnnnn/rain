@@ -1,18 +1,3 @@
-// #version 330 core
-// layout (location = 0) in vec3 aPos;
-// layout (location = 1) in mat4 aInstanceMatrix;
-
-// uniform mat4 projection;
-// uniform mat4 view;
-
-// out vec3 position;
-
-// void main()
-// {
-//     position = aPos;
-//     gl_Position = projection * view * aInstanceMatrix * vec4(aPos, 1.0f); 
-// }
-
 #version 420 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
@@ -36,4 +21,3 @@ void main()
     vs_out.Normal = mat3(transpose(inverse(aInstanceMatrix))) * aNorm;
     gl_Position = proj * view * aInstanceMatrix * vec4(aPos, 1.0);
 }
-

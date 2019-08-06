@@ -13,6 +13,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 //#include "math/geometry/algorithms/quick_hull.h"
 
@@ -59,8 +61,11 @@ namespace rain::engine
         //std::string hello = ;
         instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs");
         instancing_handle->data->use();
-        instancing_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
-        instancing_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
+        instancing_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        instancing_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("dirLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("material.shininess", 32.0f);
 
         phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs");
         phong_handle->data->use();
@@ -222,6 +227,43 @@ namespace rain::engine
         glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
+    }
+
+    u32 Renderer::load_texture(const char* path, bool gamma)
+    {
+        u32 textureID;
+        glGenTextures(1, &textureID);
+
+        int width, height, nrComponents;
+        unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+        if (data)
+        {
+            GLenum format;
+            if (nrComponents == 1)
+                format = GL_RED;
+            else if (nrComponents == 3)
+                format = GL_RGB;
+            else if (nrComponents == 4)
+                format = GL_RGBA;
+
+            glBindTexture(GL_TEXTURE_2D, textureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            stbi_image_free(data);
+        }
+        else
+        {
+            RAIN_LOG_ERROR("Texture failed to load from path: %s", path);
+            stbi_image_free(data);
+        }
+
+        return textureID;
     }
 
     void Renderer::clear()
@@ -580,11 +622,15 @@ namespace rain::engine
     }
 
 
-    void Renderer::draw_instancing(const u32 vao, const u32 amount)
+    void Renderer::draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
     {
         instancing_handle->data->use();
         instancing_handle->data->set("proj", proj_mat_perspective);
         instancing_handle->data->set("view", view_mat);
+        instancing_handle->data->set("viewPos", view_position);
+
+        bind_texture(texture, 1);
+
         glBindVertexArray(vao);
         glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
         glBindVertexArray(0);

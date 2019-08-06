@@ -2,7 +2,8 @@
 
 #include "engine/core/context.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
-
+#include "engine/data/data_system.h"
+#include "engine/game/world.h"
 
 namespace rain::engine
 {
@@ -25,21 +26,12 @@ namespace rain::engine
         RAIN_LOG("%d cubes to drawn", vmap->model_matrices.size());
         RAIN_RENDERER->init_instancing(vmap->model_matrices, vmap->vao);
 
-        for (u32 i = 0; i < MAP_SIZE; ++i)
-        {
-            for (u32 j = 0; j < MAP_SIZE; ++j)
-            {
-                for (u32 k = 0; k < MAP_SIZE; ++k)
-                {
-                    set_neightbours(&vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED]);
-                }
-            }
-        }
+        vmap->texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/wall.jpg");
     }
 
     void draw(voxel_map* vmap)
     {
-        RAIN_RENDERER->draw_instancing(vmap->vao, vmap->model_matrices.size());
+        RAIN_RENDERER->draw_instancing(vmap->vao, vmap->model_matrices.size(), vmap->texture_handle->data, RAIN_WORLD->main_camera.transform->position);
     }
 }
 

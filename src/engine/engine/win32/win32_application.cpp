@@ -83,8 +83,9 @@ namespace rain::engine
         RAIN_CONTEXT->clock = new HighResolutionClock();
         RAIN_CONTEXT->clock->reset();
 
-        world = new World();
-        world->init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
+
+        RAIN_WORLD = new World();
+        RAIN_WORLD->init(RAIN_CONFIG->data_root + RAIN_CONFIG->starting_world);
 
         return 0;
     }
@@ -118,8 +119,8 @@ namespace rain::engine
 
         while (accumulator >= dt)
         {
-            world->update_physics((float)dt);
-            world->update_camera((float)dt);
+            RAIN_WORLD->update_physics((float)dt);
+            RAIN_WORLD->update_camera((float)dt);
             accumulator -= dt;
         }
 
@@ -141,7 +142,7 @@ namespace rain::engine
 
     void application::render(float _alpha)
     {
-        world->draw(_alpha);
+        RAIN_WORLD->draw(_alpha);
         RAIN_RENDERER->draw();
         //renderer.set_view_matrix(camera.position, glm::radians(camera.pitch), glm::radians(camera.yaw));
         //renderer->set_view_matrix(camera->position, camera->position + camera->front, camera->up);

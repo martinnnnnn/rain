@@ -10,8 +10,6 @@
 
 namespace rain::engine
 {
-    struct World;
-
     class application
     {
     public:
@@ -23,7 +21,6 @@ namespace rain::engine
         void send_to_network(const std::string& message);
 
     private:
-        World* world;
         void* hinstance;
         network::connexion_info info;
 

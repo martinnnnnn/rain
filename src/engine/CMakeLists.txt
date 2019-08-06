@@ -43,6 +43,7 @@ target_include_directories(${RAIN_ENGINE} PUBLIC
     ${CMAKE_SOURCE_DIR}/external/entt/
     ${CMAKE_SOURCE_DIR}/external/freetype/
     ${CMAKE_SOURCE_DIR}/external/glm/glm/
+    ${CMAKE_SOURCE_DIR}/external/stb/
     ${GLEW_INCLUDE_DIRS}
     )
 

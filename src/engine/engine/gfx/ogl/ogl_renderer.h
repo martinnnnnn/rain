@@ -9,6 +9,7 @@
 #include "core/core.h"
 #include "glm.hpp"
 #include "ogl_shader.h"
+#include "ogl_texture.h"
 #include "engine/core/config.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/data/material/material.h"
@@ -58,7 +59,7 @@ namespace rain::engine
         void draw_quad(const core::plane& _p, const glm::vec3 _position, const glm::vec3& _color);
         void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
-        void draw_instancing(const u32 vao, const u32 amount);
+        void draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
         void draw_mesh();
 
         void resize(u32 _width, u32 _height);
@@ -74,6 +75,8 @@ namespace rain::engine
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void release_mesh(Mesh* mesh);
+
+        u32 load_texture(const char* path, bool gamma);
 
         static constexpr u32 debug_vertices_max_count = 8192;
 

@@ -62,10 +62,7 @@ namespace rain::engine
                 }
             }
         }
-    }
 
-    void set_neightbours(voxel_chunk* chunk)
-    {
         const uvec3 map_index{ chunk->position.x / CHUNK_SIZE, chunk->position.y / CHUNK_SIZE, chunk->position.z / CHUNK_SIZE };
 
         chunk->cXN = map_index.x > 0 ? &chunk->map->chunks[(map_index.x - 1) + (map_index.y * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;

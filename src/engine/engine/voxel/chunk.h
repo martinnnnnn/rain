@@ -61,11 +61,9 @@ namespace rain::engine
         voxel_chunk *cXN, *cXP, *cYN, *cYP, *cZN, *cZP;
 
         voxel_chunk() {}
-        //voxel_chunk(voxel_map* map, const uvec3& position);
     };
 
     void init(voxel_chunk* chunk, voxel_map* map, const uvec3& position);
-    void set_neightbours(voxel_chunk* chunk);
     bool is_block_border(voxel_chunk const * const chunk, const uvec3& position);
 
 }

@@ -47,6 +47,16 @@ namespace rain::engine
             break;
         }
 
+        auto camera_view = registry.view<core::transform, Camera>();
+        for (auto entity : camera_view)
+        {
+            core::transform& t = camera_view.get<core::transform>(entity);
+            Camera& camera = camera_view.get<Camera>(entity);
+            main_camera.camera = &camera;
+            main_camera.transform = &t;
+            break;
+        }
+
         // ---- temp
         auto entity = registry.create();
         core::transform& t = registry.assign<core::transform>(entity);
@@ -176,11 +186,7 @@ namespace rain::engine
         //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         RAIN_PROFILE("world render ");
         
-        {
-            RAIN_PROFILE("voxel map render");
-            //for (u32 i = 0; i < vmap->chunks_count; ++i)
-            engine::draw(vmap);
-        }
+        engine::draw(vmap);
 
         auto view = registry.view<core::transform, Model, Material>();
 
@@ -245,126 +251,4 @@ namespace rain::engine
         //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
     }
-
-    //void generate_mesh(Chunk& chunk)
-    //{
-    //    chunk.cXN = chunk.position.x > 0 ? &chunk.map->chunks[chunk.position.x - 1, chunk.position.y, chunk.position.z] : nullptr;
-    //    chunk.cYN = chunk.position.y > 0 ? &chunk.map->chunks[chunk.position.x, chunk.position.y - 1, chunk.position.z] : nullptr;
-    //    chunk.cZN = chunk.position.z > 0 ? &chunk.map->chunks[chunk.position.x, chunk.position.y, chunk.position.z - 1] : nullptr;
-
-    //    chunk.cXP = chunk.position.x < CHUNK_MAX_POS_X - 1 ? &chunk.map->chunks[chunk.position.x + 1, chunk.position.y, chunk.position.z] : nullptr;
-    //    chunk.cYP = chunk.position.y < CHUNK_MAX_POS_Y - 1 ? &chunk.map->chunks[chunk.position.x, chunk.position.y + 1, chunk.position.z] : nullptr;
-    //    chunk.cZP = chunk.position.z < CHUNK_MAX_POS_Z - 1 ? &chunk.map->chunks[chunk.position.x, chunk.position.y, chunk.position.z + 1] : nullptr;
-
-
-    //    u32 access = 0;
-
-    //    // Y axis - start from the bottom and search up
-    //    for (u32 j = 0; j < CHUNK_SIZE; ++j)
-    //    {
-    //        // Z axis
-    //        for (u32 k = 0; k < CHUNK_SIZE; ++k)
-    //        {
-    //            // X axis
-    //            for (u32 i = 0; i < CHUNK_SIZE; ++i)
-    //            {
-    //                access = i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
-    //                Block* b = &(chunk.data[access]);
-
-    //                if (b->type == BlockType::EMPTY)
-    //                {
-    //                    continue;
-    //                }
-
-    //                create_run(chunk, b, i, j, k, access);
-    //            }
-
-    //            //if (vertexBuffer.used > vertexBuffer.data.Length - 2048)
-    //            //    vertexBuffer.Extend(2048);
-    //        }
-    //    }
-    //}
-
-    //void create_run(Chunk& chunk, Block* b, u32 i, u32 j, u32 k, u32 access)
-    //{
-    //    static bool visited[CHUNK_SIZE_CUBED * CHUNK_NEIGHBOUR_COUNT];
-    //    memset(&visited, 0, sizeof(bool) * CHUNK_SIZE_CUBED * CHUNK_NEIGHBOUR_COUNT);
-
-    //    int i1 = i + 1;
-    //    int j1 = j + 1;
-    //    int k1 = k + 1;
-
-    //    int length = 0;
-    //    int chunkAccess = 0;
-
-    //    //if (!visited[CHUNK_CXN * CHUNK_SIZE_CUBED + access] && visible_face_XN(i - 1, j, k))
-    //    //{
-    //    //    // Search upwards to determine run length
-    //    //    for (int q = j; q < CHUNK_SIZE; q++)
-    //    //    {
-    //    //        // Pre-calculate the array lookup as it is used twice
-    //    //        chunkAccess = i + q * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
-
-    //    //        // If we reach a different block or an empty block, end the run
-    //    //        if (DifferentBlock(chunkAccess, b))
-    //    //            break;
-
-    //    //        // Store that we have visited this block
-    //    //        chunkHelper.visitedXN[chunkAccess] = true;
-
-    //    //        length++;
-    //    //    }
-
-
-    //    //    if (length > 0)
-    //    //    {
-    //    //        // Create a quad and write it directly to the buffer
-    //    //        BlockVertex.AppendQuad(buffer, new Int3(i, length + j, k1),
-    //    //            new Int3(i, length + j, k),
-    //    //            new Int3(i, j, k1),
-    //    //            new Int3(i, j, k),
-    //    //            (byte)FaceType.xn, b.kind, health16);
-
-    //    //        buffer.used += 6;
-    //    //    }
-    //    //}
-
-    //    //// Same algorithm for right (X+)
-    //    //if (!chunkHelper.visitedXP[access] && VisibleFaceXP(i1, j, k))
-    //    //{
-    //    //    ...
-    //    //}
-    //}
-
-    //bool visible_face_XN(Chunk& chunk, u32 i, u32 j, u32 k)
-    //{
-    //    // Access directly from a neighbouring chunk
-    //    if (i < 0)
-    //    {
-    //        Chunk* cXN = chunk.cXN;
-    //        if (cXN == nullptr)
-    //        {
-    //            return true;
-    //        }
-
-    //        return chunk.cXN->data[31 + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
-    //    }
-
-    //    return chunk.data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
-    //}
-
-    //bool visible_face_XP(Chunk& chunk, u32 i, u32 j, u32 k)
-    //{
-    //    if (i >= CHUNK_SIZE)
-    //    {
-    //        Chunk* cXP = chunk.cXP;
-    //        if (cXP == nullptr)
-    //            return true;
-
-    //        return cXP->data[0 + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
-    //    }
-
-    //    return chunk.data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED].type == BlockType::EMPTY;
-    //}
-
 }
