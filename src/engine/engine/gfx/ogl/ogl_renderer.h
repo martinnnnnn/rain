@@ -98,9 +98,10 @@ namespace rain::engine
         glm::mat4 proj_mat_orthogonal;
         glm::mat4 view_mat;
 
-        handle<Shader> const * debug_shader_handle;
+        handle<Shader> const * phong_handle;
+        handle<Shader> const * instancing_handle;
         Shader phong_shader;
-        Shader instancing_shader;
+        //Shader instancing_shader;
         Shader pbr_shader;
 
         struct text

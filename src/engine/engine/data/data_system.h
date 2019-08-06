@@ -45,7 +45,7 @@ namespace rain::engine
         {
             for (u32 i = 0; i < handles.size(); ++i)
             {
-                if (handles[i].path.get_path_absolute().compare(path.get_path_absolute()))
+                if (handles[i].path.get_path_absolute().compare(path.get_path_absolute()) == 0)
                 {
                     return &(handles[i]);
                 }
@@ -58,6 +58,8 @@ namespace rain::engine
 
     class data_system
     {
+        using data_system_type_id = core::type_id<struct DATA_SYSTEM_TYPE_ID>;
+
     public:
         template<typename T, typename... Args>
         static handle<T> load_data(const file_path& path, const core::uuid& id, Args &&... args)
@@ -71,7 +73,7 @@ namespace rain::engine
         template<typename T>
         void add_data(handle<T> new_data_handle)
         {
-            u32 t_id = core::type_id<struct DATA_SYSTEM> ::get<T>();
+            u32 t_id = data_system_type_id::template get<T>();
             if (t_id >= containers.size())
             {
                 containers.resize(t_id + 1);
@@ -84,14 +86,14 @@ namespace rain::engine
         template<typename T>
         handle<T> const * find_data(const core::uuid& id)
         {
-            u32 t_id = core::type_id<struct DATA_SYSTEM>::get<T>();
+            u32 t_id = data_system_type_id::template get<T>();
             return static_cast<handle_pool<T>*>(containers[t_id])->find_data(id);
         }
 
         template<typename T>
         handle<T> const * find_data(const file_path& path)
         {
-            u32 t_id = core::type_id<struct DATA_SYSTEM>::get<T>();
+            u32 t_id = data_system_type_id::template get<T>();
             return static_cast<handle_pool<T>*>(containers[t_id])->find_data(path);
         }
 

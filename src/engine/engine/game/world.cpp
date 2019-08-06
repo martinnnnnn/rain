@@ -171,28 +171,16 @@ namespace rain::engine
 
     }
 
-    void draw_naive(const voxel_chunk& chunk);
-
     void World::draw(const float _alpha)
     {
-        RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
-
-        {
-            RAIN_PROFILE("voxel map render naive");
-            for (u32 i = 0; i < vmap->chunks_count; ++i)
-            {
-                draw_naive(vmap->chunks[i]);
-            }
-        }
-
+        //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
+        RAIN_PROFILE("world render ");
+        
         {
             RAIN_PROFILE("voxel map render");
-            for (u32 i = 0; i < vmap->chunks_count; ++i)
-            {
-                engine::draw(vmap);
-            }
+            //for (u32 i = 0; i < vmap->chunks_count; ++i)
+            engine::draw(vmap);
         }
-
 
         auto view = registry.view<core::transform, Model, Material>();
 
@@ -256,32 +244,6 @@ namespace rain::engine
         //    Plane& plane = plane_view.get(ent_plane);
         //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
-    }
-
-    void draw_naive(const voxel_chunk& chunk)
-    {
-        for (u32 i = 0; i < CHUNK_SIZE; ++i)
-        {
-            for (u32 j = 0; j < CHUNK_SIZE; ++j)
-            {
-                for (u32 k = 0; k < CHUNK_SIZE; ++k)
-                {
-                    const i32 index = i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED;
-                    const voxel_block* block = &(chunk.data[index]);
-
-                    if (block->type == voxel_block::Type::EMPTY || !is_block_border(&chunk, uvec3{ i, j, k }))
-                    {
-                        continue;
-                    }
-
-                    u32 iabsolute = i + chunk.position.x;
-                    u32 jabsolute = j + chunk.position.y;
-                    u32 kabsolute = k + chunk.position.z;
-
-                    RAIN_RENDERER->draw_sphere(glm::vec3{ iabsolute + 15, jabsolute, kabsolute }, glm::quat(), glm::vec3{ 0.3f, 0.3f, 0.3f });
-                }
-            }
-        }
     }
 
     //void generate_mesh(Chunk& chunk)

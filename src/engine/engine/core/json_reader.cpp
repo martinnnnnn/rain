@@ -60,7 +60,7 @@ namespace rain::engine::json_reader
             {
                 core::transform& t = registry.assign<core::transform>(entity);
                 read_transform(world_object["Transform"], t);
-                RAIN_LOG_RAW("%s\n", json_writer::serialize(t).c_str());
+                //RAIN_LOG_RAW("%s\n", json_writer::serialize(t).c_str());
             }
             if (world_object.HasMember("RigidBody"))
             {

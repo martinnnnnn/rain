@@ -28,7 +28,7 @@ namespace rain::engine
     constexpr u32 CHUNK_SIZE_SQUARED = CHUNK_SIZE * CHUNK_SIZE;
     constexpr u32 CHUNK_SIZE_CUBED = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
     
-    constexpr u32 MAP_SIZE = 2;
+    constexpr u32 MAP_SIZE = 5;
     constexpr u32 MAP_SIZE_SQUARED = MAP_SIZE * MAP_SIZE;
     constexpr u32 MAP_SIZE_CUBED = MAP_SIZE * MAP_SIZE * MAP_SIZE;
 

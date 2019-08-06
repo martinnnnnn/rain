@@ -56,15 +56,25 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        std::string hello = RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs";
-        debug_shader_handle = RAIN_FIND_DATA_FROM_PATH(Shader, hello);
+        //std::string hello = ;
+        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs");
+        instancing_handle->data->use();
+        instancing_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
+        instancing_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
+
+        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs");
+        phong_handle->data->use();
+        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
+        phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
 
         phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
         phong_shader.use();
         phong_shader.set("lightDiff", 0.3f, 0.3f, 0.3f);
         phong_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
 
-        instancing_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs", RAIN_CONFIG->data_root + "/shaders/glsl/instancing.fs");
+        //instancing_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs", RAIN_CONFIG->data_root + "/shaders/glsl/instancing.fs");
+        //instancing_shader.set("lightDiff", 0.7f, 0.7f, 0.7f);
+        //instancing_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -515,18 +525,19 @@ namespace rain::engine
             data.push_back(positions[i].x);
             data.push_back(positions[i].y);
             data.push_back(positions[i].z);
-            //if (uv.size() > 0)
-            //{
-            //    data.push_back(uv[i].x);
-            //    data.push_back(uv[i].y);
-            //}
-            //if (normals.size() > 0)
-            //{
-            //    data.push_back(normals[i].x);
-            //    data.push_back(normals[i].y);
-            //    data.push_back(normals[i].z);
-            //}
+            if (uv.size() > 0)
+            {
+                data.push_back(uv[i].x);
+                data.push_back(uv[i].y);
+            }
+            if (normals.size() > 0)
+            {
+                data.push_back(normals[i].x);
+                data.push_back(normals[i].y);
+                data.push_back(normals[i].z);
+            }
         }
+
         glGenVertexArrays(1, &vao);
 
         u32 sphere_vbo, sphere_ebo, instance_vbo;
@@ -539,32 +550,31 @@ namespace rain::engine
         glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
-        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::vec3), instances.data(), GL_STATIC_DRAW);
-
         i32 stride = (3 + 2 + 3) * sizeof(float);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3, (void*)0);
-        //glEnableVertexAttribArray(1);                   
-        //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-        //glEnableVertexAttribArray(2);
-        //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
 
         // instance matrix
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
         glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
         glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
-        glVertexAttribDivisor(1, 1);
-        glVertexAttribDivisor(2, 1);
         glVertexAttribDivisor(3, 1);
         glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
 
         glBindVertexArray(0);
     }
@@ -572,9 +582,9 @@ namespace rain::engine
 
     void Renderer::draw_instancing(const u32 vao, const u32 amount)
     {
-        instancing_shader.use();
-        instancing_shader.set("projection", proj_mat_perspective);
-        instancing_shader.set("view", view_mat);
+        instancing_handle->data->use();
+        instancing_handle->data->set("proj", proj_mat_perspective);
+        instancing_handle->data->set("view", view_mat);
         glBindVertexArray(vao);
         glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
         glBindVertexArray(0);
