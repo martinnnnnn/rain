@@ -356,5 +356,4 @@ namespace rain::engine
     {
         return !(_a == _b);
     }
-
 }

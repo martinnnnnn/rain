@@ -58,7 +58,6 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        //std::string hello = ;
         instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs");
         instancing_handle->data->use();
         instancing_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
@@ -71,15 +70,6 @@ namespace rain::engine
         phong_handle->data->use();
         phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
         phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
-
-        phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
-        phong_shader.use();
-        phong_shader.set("lightDiff", 0.3f, 0.3f, 0.3f);
-        phong_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
-
-        //instancing_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs", RAIN_CONFIG->data_root + "/shaders/glsl/instancing.fs");
-        //instancing_shader.set("lightDiff", 0.7f, 0.7f, 0.7f);
-        //instancing_shader.set("lightDirection", -0.2f, -1.0f, -0.3f);
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -121,6 +111,32 @@ namespace rain::engine
     void Renderer::set_view_matrix(const glm::mat4& _matrix)
     {
         view_mat = _matrix;
+    }
+
+    u32 Renderer::load_scalar_field(core::scalar_field_mesh* mesh)
+    {
+        u32 vao, vbo_vertices, ebo_vertices_indices;
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glGenBuffers(1, &vbo_vertices);
+
+        i32 stride = (3 + 2 + 3) * sizeof(float);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(glm::vec3), mesh->vertices.data(), GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        return vao;
     }
 
 
@@ -1004,10 +1020,10 @@ namespace rain::engine
 
     void Renderer::draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
-        phong_shader.use();
-        phong_shader.set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
-        phong_shader.set("proj", proj_mat_perspective);
-        phong_shader.set("view", view_mat);
+        phong_handle->data->use();
+        phong_handle->data->set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
+        phong_handle->data->set("proj", proj_mat_perspective);
+        phong_handle->data->set("view", view_mat);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -1016,10 +1032,10 @@ namespace rain::engine
 
     void Renderer::draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
-        phong_shader.use();
-        phong_shader.set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
-        phong_shader.set("proj", proj_mat_perspective);
-        phong_shader.set("view", view_mat);
+        phong_handle->data->use();
+        phong_handle->data->set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
+        phong_handle->data->set("proj", proj_mat_perspective);
+        phong_handle->data->set("view", view_mat);
 
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);

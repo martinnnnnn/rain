@@ -74,6 +74,8 @@ namespace rain::engine
         u32 load_primitive(glm::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, glm::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
         void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const glm::vec3& position, const glm::quat& _orientation, const glm::vec3& scale);
 
+        u32 Renderer::load_scalar_field(core::scalar_field_mesh* mesh);
+
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void release_mesh(Mesh* mesh);
@@ -105,8 +107,7 @@ namespace rain::engine
 
         handle<Shader> const * phong_handle;
         handle<Shader> const * instancing_handle;
-        Shader phong_shader;
-        //Shader instancing_shader;
+
         Shader pbr_shader;
 
         struct text

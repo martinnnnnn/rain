@@ -39,8 +39,10 @@ namespace rain::engine
 #define RAIN_RENDERER                   RAIN_CONTEXT->renderer
 #define RAIN_WINDOW                     RAIN_CONTEXT->window
 #define RAIN_INPUT                      RAIN_CONTEXT->input
-#define RAIN_DATA                       RAIN_CONTEXT->data_sys
+#define RAIN_DATA_SYSTEM                RAIN_CONTEXT->data_sys
 #define RAIN_MESSAGING                  RAIN_CONTEXT->msger
+#define RAIN_WORLD                      RAIN_CONTEXT->world
+
 #define RAIN_WORLD                      RAIN_CONTEXT->world
 
 #define RAIN_FIND_DATA_FROM_PATH(type, path)  RAIN_CONTEXT->data_sys->find_data<type>(path) 

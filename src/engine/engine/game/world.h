@@ -39,6 +39,7 @@ namespace rain::engine
 
         // TEMP
         u32 temp_vao;
+        u32 temp_vao2;
         voxel_map* vmap;
     };
 }

@@ -80,6 +80,11 @@ namespace rain::engine
             quick_hull(vertices, vertices_count, &mesh);
         }
         temp_vao = RAIN_RENDERER->load_primitive(mesh.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
+
+
+        core::scalar_field_mesh* sf = new core::scalar_field_mesh();
+        from_scalar_field(core::simplex_noise::noise, 1.0f, 10, sf);
+        temp_vao2 = RAIN_RENDERER->load_primitive(sf.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
         // ---- /temp
     }
 
@@ -184,7 +189,7 @@ namespace rain::engine
         //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         RAIN_PROFILE("world render ");
         
-        engine::draw(vmap);
+        //engine::draw(vmap);
 
         auto view = registry.view<core::transform, Model, Material>();
 
