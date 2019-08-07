@@ -43,6 +43,7 @@ namespace rain::engine
 	    void init_cube();
         void init_sphere();
         void init_instancing(const std::vector<glm::mat4>& instances, u32& vao);
+        void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao);
         void init_data();
 
         void draw();
@@ -60,6 +61,7 @@ namespace rain::engine
         void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
+        void draw_instancing_cube(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
         void draw_mesh();
 
         void resize(u32 _width, u32 _height);

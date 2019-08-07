@@ -47,13 +47,11 @@ namespace rain::engine
             break;
         }
 
+        //retrieving main camera
         auto camera_view = registry.view<core::transform, Camera>();
         for (auto entity : camera_view)
         {
-            core::transform& t = camera_view.get<core::transform>(entity);
-            Camera& camera = camera_view.get<Camera>(entity);
-            main_camera.camera = &camera;
-            main_camera.transform = &t;
+            main_camera_id = entity;
             break;
         }
 
@@ -251,4 +249,15 @@ namespace rain::engine
         //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
     }
+
+    Camera& World::main_camera()
+    {
+        return registry.get<Camera>(main_camera_id);
+    }
+
+    core::transform& World::main_camera_transform()
+    {
+        return registry.get<core::transform>(main_camera_id);
+    }
+
 }

@@ -25,13 +25,17 @@ namespace rain::engine
         entt::DefaultRegistry registry;
         core::File file;
 
-        MainCamera main_camera;
+        //MainCamera main_camera;
+        u32 main_camera_id;
 
         void init(const std::string& _path);
 
         void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
         void draw(const float _alpha);
+
+        Camera& main_camera();
+        core::transform& main_camera_transform();
 
         // TEMP
         u32 temp_vao;

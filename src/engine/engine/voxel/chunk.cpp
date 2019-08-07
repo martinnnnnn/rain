@@ -8,32 +8,6 @@
 
 namespace rain::engine
 {
-    //voxel_chunk::voxel_chunk(voxel_map* map, const uvec3& position)
-    //    : map(map)
-    //    , position(position * CHUNK_SIZE)
-    //    , cXN(nullptr), cXP(nullptr), cYN(nullptr), cYP(nullptr), cZN(nullptr), cZP(nullptr)
-    //{
-    //    for (u32 i = 0; i < CHUNK_SIZE; ++i)
-    //    {
-    //        for (u32 j = 0; j < CHUNK_SIZE; ++j)
-    //        {
-    //            for (u32 k = 0; k < CHUNK_SIZE; ++k)
-    //            {
-    //                voxel_block* block = &data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED];
-
-    //                float noise = (core::simplex_noise::noise(float(i) / CHUNK_SIZE, float(j) / CHUNK_SIZE, float(k) / CHUNK_SIZE) + 1.0f) / 2.0f;
-    //                if (noise > 0.8f)
-    //                {
-    //                    block->type = voxel_block::Type::DIRT;
-    //                }
-    //                else
-    //                {
-    //                    block->type = voxel_block::Type::EMPTY;
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 
     void init(voxel_chunk* chunk, voxel_map* map, const uvec3& position)
     {
@@ -53,7 +27,8 @@ namespace rain::engine
                     if (noise > 0.7f)
                     {
                         block->type = voxel_block::Type::DIRT;
-                        map->model_matrices.push_back(glm::scale(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }), glm::vec3{ 0.3f, 0.3f, 0.3f }));
+                        map->model_matrices.emplace_back(glm::scale(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }), glm::vec3{ 1.0f, 1.0f, 1.0f }));
+                        //map->model_matrices.push_back(glm::scale(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }), glm::vec3{ 0.3f, 0.3f, 0.3f }));
                     }
                     else
                     {

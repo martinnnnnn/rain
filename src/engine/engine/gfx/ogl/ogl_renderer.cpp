@@ -69,7 +69,7 @@ namespace rain::engine
 
         phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs");
         phong_handle->data->use();
-        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
+        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
         phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
 
         phong_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
@@ -90,7 +90,7 @@ namespace rain::engine
     void Renderer::set_orthogonal_projection_matrix(const glm::mat4& mat)
     {
         proj_mat_orthogonal = mat;
-        //proj_mat_orthogonal = math::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
+        //proj_mat_orthogonal = glm::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
     void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
@@ -512,8 +512,217 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
+
+    void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao)
+    {
+        std::vector<glm::vec3> Positions = std::vector<glm::vec3>
+        {
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+        };
+        std::vector<glm::vec2> UV = std::vector<glm::vec2>{
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 0.0f),
+
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+        };
+        std::vector<glm::vec3> Normals = std::vector<glm::vec3>{
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+        };
+
+
+        std::vector<float> data;
+        for (u32 i = 0; i < Positions.size(); ++i)
+        {
+            data.push_back(Positions[i].x);
+            data.push_back(Positions[i].y);
+            data.push_back(Positions[i].z);
+            if (UV.size() > 0)
+            {
+                data.push_back(UV[i].x);
+                data.push_back(UV[i].y);
+            }
+            if (Normals.size() > 0)
+            {
+                data.push_back(Normals[i].x);
+                data.push_back(Normals[i].y);
+                data.push_back(Normals[i].z);
+            }
+        }
+
+        glGenVertexArrays(1, &vao);
+
+        u32 cube_vbo, instance_vbo;
+        glGenBuffers(1, &cube_vbo);
+        glGenBuffers(1, &instance_vbo);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+
+        i32 stride = (3 + 2 + 3) * sizeof(float);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
+
+        // instance matrix
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
+    {
+        instancing_handle->data->use();
+        instancing_handle->data->set("proj", proj_mat_perspective);
+        instancing_handle->data->set("view", view_mat);
+        instancing_handle->data->set("viewPos", view_position);
+        instancing_handle->data->set("text1", 0);
+
+        bind_texture(texture, 0);
+
+        glBindVertexArray(vao);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount);
+        glBindVertexArray(0);
+    }
+
     void Renderer::init_instancing(const std::vector<glm::mat4>& instances, u32& vao)
     {
+
         std::vector<glm::vec3> positions;
         std::vector<glm::vec2> uv;
         std::vector<glm::vec3> normals;
@@ -628,9 +837,9 @@ namespace rain::engine
         instancing_handle->data->set("proj", proj_mat_perspective);
         instancing_handle->data->set("view", view_mat);
         instancing_handle->data->set("viewPos", view_position);
+        instancing_handle->data->set("text1", 0);
 
-        bind_texture(texture, 1);
-
+        bind_texture(texture, 0);
         glBindVertexArray(vao);
         glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
         glBindVertexArray(0);
@@ -772,7 +981,7 @@ namespace rain::engine
         assert(false);
     }
 
-    //void Renderer::draw_quad(const core::math::Plane& _p, const vec3 _position, const vec3& _color)
+    //void Renderer::draw_quad(const core::glm::Plane& _p, const vec3 _position, const vec3& _color)
     //{
     //    vec3 z(0.0f, 0.0f, 1.0f);
     //    vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane

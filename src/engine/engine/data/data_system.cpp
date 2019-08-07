@@ -33,13 +33,12 @@ namespace rain::engine
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
                 }
-                if (ext.compare("jpg") == 0)
+                if (ext.compare("jpg") == 0 || ext.compare("png") == 0)
                 {
                     RAIN_LOG("Loading texture %s", path.c_str());
                     handle<Texture> new_texture_handle = load_data<Texture>(filepath, core::uuid::random(), filepath.get_path_absolute().c_str(), GL_TEXTURE_2D);
                     add_data<Texture>(new_texture_handle);
                 }
-                
             }
         }
     }
