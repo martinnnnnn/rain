@@ -23,6 +23,7 @@ namespace rain::core
         void log_raw(const char* _format, ...);
         void log_level(const char* _level, const char* _format, ...);
         void log_max(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...);
+        void log_crash(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...);
         void print_log();
 
         void print_log_raw();

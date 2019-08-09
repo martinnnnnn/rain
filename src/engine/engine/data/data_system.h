@@ -16,13 +16,13 @@ namespace rain::engine
 {
     using core::file_path;
 
-    struct id_container
+    struct handle_pool_base
     {
-        virtual ~id_container() {}
+        virtual ~handle_pool_base() {}
     };
 
     template<typename T>
-    struct handle_pool : public id_container
+    struct handle_pool : public handle_pool_base
     {
         void add_data(handle<T> new_data_handle)
         {
@@ -100,6 +100,6 @@ namespace rain::engine
         // temp function until a tool parses the data directory, records [files path, uuid] and assigns these uuids to world entities that need them
         void load_all_recursive(const std::string& root);
         
-        std::vector<id_container*> containers;
+        std::vector<handle_pool_base*> containers;
     };
 }

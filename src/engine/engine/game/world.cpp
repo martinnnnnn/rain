@@ -19,7 +19,7 @@
 #include "engine/ui/text_list.h"
 #include "glm.hpp"
 #include "engine/network/client.h"
-
+#include "engine/voxel/voxel.h"
 
 namespace rain::engine
 {
@@ -33,35 +33,37 @@ namespace rain::engine
             engine::init(vmap);
         }
 
+        std::vector<actor*> view;
 
         file.open(_path);
         json_reader::read_world(file.read(), *this);
 
-        auto chat_view = registry.view<ui::text_field, ui::text_list>();
-        for (auto chat : chat_view)
+        sg.get_view<ui::text_field, ui::text_list>(view, true);
+        for (auto chat : view)
         {
-            ui::text_field& field = chat_view.get<ui::text_field>(chat);
-            ui::text_list& list = chat_view.get<ui::text_list>(chat);
-            field.on_validate.connect_member(RAIN_CONTEXT->app, &application::send_to_network);
-            RAIN_MESSAGING->subscribe<network::INGAME_CHAT_INC>(std::bind(&ui::text_list::add_line, &list, std::placeholders::_1));
+            ui::text_field* field = chat->components.get<ui::text_field>();
+            ui::text_list* list = chat->components.get<ui::text_list>();
+            field->on_validate.connect_member(RAIN_CONTEXT->app, &application::send_to_network);
+            RAIN_MESSAGING->subscribe<network::INGAME_CHAT_INC>(std::bind(&ui::text_list::add_line, list, std::placeholders::_1));
             break;
         }
 
         //retrieving main camera
-        auto camera_view = registry.view<core::transform, Camera>();
-        for (auto entity : camera_view)
+        sg.get_view<core::transform, Camera>(view, true);
+        for (auto act : view)
         {
-            main_camera_id = entity;
+            main_camera.camera = act->components.get<Camera>();
+            main_camera.transform = act->components.get<core::transform>();
             break;
         }
 
         // ---- temp
-        auto entity = registry.create();
-        core::transform& t = registry.assign<core::transform>(entity);
-        t.scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
-        Material& material = registry.assign<Material>(entity);
-        material.shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
-        core::mesh& mesh = registry.assign<core::mesh>(entity);
+        actor* new_actor = sg.create();
+        core::transform* t = new_actor->components.create<core::transform>();
+        t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
+        Material* material = new_actor->components.create<Material>();
+        material->shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
+        core::mesh* mesh = new_actor->components.create<core::mesh>();
 
         Model model;
         model.path = file_path(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
@@ -77,106 +79,66 @@ namespace rain::engine
         {
             RAIN_PROFILE("quickhull");
             RAIN_LOG("vertices count : %u", vertices_count);
-            quick_hull(vertices, vertices_count, &mesh);
+            quick_hull(vertices, vertices_count, mesh);
         }
-        temp_vao = RAIN_RENDERER->load_primitive(mesh.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
+        temp_vao = RAIN_RENDERER->load_primitive(mesh->vertices, mesh->vertices_count, mesh->vertices_indices, mesh->vertices_indices_count, mesh->normals, mesh->normals_count, mesh->normals_indices, mesh->normal_indices_count);
 
-
-        core::scalar_field_mesh* sf = new core::scalar_field_mesh();
-        from_scalar_field(core::simplex_noise::noise, 1.0f, 10, sf);
-        temp_vao2 = RAIN_RENDERER->load_primitive(sf.vertices, mesh.vertices_count, mesh.vertices_indices, mesh.vertices_indices_count, mesh.normals, mesh.normals_count, mesh.normals_indices, mesh.normal_indices_count);
         // ---- /temp
     }
 
     void World::update_camera(const float _deltaTime)
     {
-        auto camera_view = registry.view<core::transform, Camera>();
-        for (auto entity : camera_view)
-        {
-            core::transform& t = camera_view.get<core::transform>(entity);
-            Camera& camera = camera_view.get<Camera>(entity);
-            update(camera, t);
-            RAIN_RENDERER->set_view_matrix(t.position, t.position + camera.front, camera.up);
-        }
+        update(*(main_camera.camera), *(main_camera.transform));
+        RAIN_RENDERER->set_view_matrix(main_camera.transform->position, main_camera.transform->position + main_camera.camera->front, main_camera.camera->up);
     }
 
     void World::update_physics(const float _deltaTime)
     {
-        auto chat_view = registry.view<ui::text_field>();
-        for (auto chat : chat_view)
+        std::vector<actor*> view;
+
+        //auto chat_view = registry.view<ui::text_field>();
+        sg.get_view<ui::text_field>(view);
+        for (auto chat : view)
         {
-            ui::update(chat_view.get(chat));
+            ui::update(*(chat->components.get<ui::text_field>()));
         }
 
         // applying springs
-        auto spring2_view = registry.view<Spring>();
-        for (auto entity : spring2_view)
-        {
-            Spring& spring2 = spring2_view.get(entity);
-            RigidBody& bodyA = registry.get<RigidBody>(spring2.entityA);
-            core::transform& transformA = registry.get<core::transform>(spring2.entityA);
-            RigidBody& bodyB = registry.get<RigidBody>(spring2.entityB);
-            core::transform& transformB = registry.get<core::transform>(spring2.entityB);
-            Physics::apply_spring(spring2, transformA, bodyA, transformB, bodyB);
-        }
+        //auto spring2_view = registry.view<Spring>();
+        //for (auto entity : spring2_view)
+        //{
+        //    Spring& spring2 = spring2_view.get(entity);
+        //    RigidBody& bodyA = registry.get<RigidBody>(spring2.entityA);
+        //    core::transform& transformA = registry.get<core::transform>(spring2.entityA);
+        //    RigidBody& bodyB = registry.get<RigidBody>(spring2.entityB);
+        //    core::transform& transformB = registry.get<core::transform>(spring2.entityB);
+        //    Physics::apply_spring(spring2, transformA, bodyA, transformB, bodyB);
+        //}
 
         // updating physics
-        auto physics_view = registry.view<RigidBody, core::transform>();
-        for (auto entity : physics_view)
+        sg.get_view<RigidBody, core::transform>(view, true);
+        for (auto act : view)
         {
-            RigidBody& body = physics_view.get<RigidBody>(entity);
-            Physics::apply_gravity(body);
-            Physics::update(body, physics_view.get<core::transform>(entity), _deltaTime);
+            RigidBody* body = act->components.get<RigidBody>();
+            Physics::apply_gravity(*body);
+            Physics::update(*body, *(act->components.get<core::transform>()), _deltaTime);
         }
 
-        //auto transform_view = registry.view<Transform>();
-        //for (auto entity1 : transform_view)
-        //{
-        //    Transform& transform1 = transform_view.get(entity1);
-        //    for (auto entity2 : transform_view)
-        //    {
-        //        if (entity1 == entity2)
-        //            continue;
-
-        //        Transform& transform2 = transform_view.get(entity2);
-        //        
-        //        detect_collision_gjk(positions, transform1, positions, transform2);
-        //    }
-        //}
-        // updating collision
-        auto sphere_view = registry.view<RigidBody, core::sphere, core::transform>();
-        for (auto entity1 : sphere_view)
+        sg.get_view<RigidBody, core::sphere, core::transform>(view, true);
+        for (auto act : view)
         {
-            RigidBody& body1 = sphere_view.get<RigidBody>(entity1);
-            core::sphere& bound1 = sphere_view.get<core::sphere>(entity1);
-            core::transform& transform1 = sphere_view.get<core::transform>(entity1);
-            //for (auto entity2 : sphere_view)
-            //{
-            //    if (entity1 == entity2)
-            //    {
-            //        break;
-            //    }
+            RigidBody* body1 = act->components.get<RigidBody>();
+            core::sphere* bound1 = act->components.get<core::sphere>();
+            core::transform* transform1 = act->components.get<core::transform>();
 
-            //    RigidBody& body2 = sphere_view.get<RigidBody>(entity2);
-            //    Sphere& bound2 = sphere_view.get<Sphere>(entity2);
-            //    Transform& transform2 = sphere_view.get<Transform>(entity2);
-
-            //    HitInfo info = detect_collision_sphere(bound1, transform1, bound2, transform2);
-            //    if (info.hit)
-            //    {
-            //        collision_response(body1, transform1, body2, transform2);
-            //    }
-            //}
-
-            auto plane_view = registry.view<core::plane>();
-            for (auto ent_plane : plane_view)
+            sg.get_view<core::plane>(view, true);
+            for (auto ent_plane : view)
             {
-                core::plane& plane = plane_view.get(ent_plane);
-
-                HitInfo info = detect_collision_sphere_plane(bound1, transform1, plane);
+                core::plane* plane = ent_plane->components.get<core::plane>();
+                HitInfo info = detect_collision_sphere_plane(*bound1, *transform1, *plane);
                 if (info.hit)
                 {
-                    collision_response(body1, transform1, project_on_plane(transform1.position, plane));
+                    collision_response(*body1, *transform1, project_on_plane(transform1->position, *plane));
                 }
             }
 
@@ -189,15 +151,17 @@ namespace rain::engine
         //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         RAIN_PROFILE("world render ");
         
-        //engine::draw(vmap);
+        engine::draw(vmap);
 
-        auto view = registry.view<core::transform, Model, Material>();
+        std::vector<actor*> view;
+
+        sg.get_view<core::transform, Model, Material>(view);
 
         for (auto entity : view)
         {
-            core::transform& t = view.get<core::transform>(entity);
-            Model& model = view.get<Model>(entity);
-            Material& material = view.get<Material>(entity);
+            core::transform& t = *(entity->components.get<core::transform>());
+            Model& model = *(entity->components.get<Model>());
+            Material& material = *(entity->components.get<Material>());
 
             //Packet p {};
             //p.senderId = 47;
@@ -216,12 +180,12 @@ namespace rain::engine
             RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, t.scale);
         }
 
-        auto test_view = registry.view<core::transform, core::mesh, Material>();
-        for (auto entity : test_view)
+        sg.get_view<core::transform, core::mesh, Material>(view, true);
+        for (auto entity : view)
         {
-            core::transform& t = test_view.get<core::transform>(entity);
-            core::mesh& mesh = test_view.get<core::mesh>(entity);
-            Material& material = test_view.get<Material>(entity);
+            core::transform& t = *(entity->components.get<core::transform>());
+            core::mesh& mesh = *(entity->components.get<core::mesh>());
+            Material& material = *(entity->components.get<Material>());
 
             glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
             glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
@@ -229,11 +193,10 @@ namespace rain::engine
             RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
         }
 
-        auto view2 = registry.view<core::transform, core::sphere>();
-
-        for (auto entity : view2)
+        sg.get_view<core::transform, core::sphere>(view, true);
+        for (auto entity : view)
         {
-            core::transform& t = view2.get<core::transform>(entity);
+            core::transform& t = *(entity->components.get<core::transform>());
             
             glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
             glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
@@ -241,11 +204,11 @@ namespace rain::engine
             RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
         }
 
-        auto chat_view = registry.view<ui::text_field, ui::text_list>();
-        for (auto chat : chat_view)
+        sg.get_view<ui::text_field, ui::text_list>(view, true);
+        for (auto chat : view)
         {
-            ui::draw(chat_view.get<ui::text_field>(chat));
-            ui::draw(chat_view.get<ui::text_list>(chat));
+            ui::draw(*(chat->components.get<ui::text_field>()));
+            ui::draw(*(chat->components.get<ui::text_list>()));
         }
         //auto plane_view = registry.view<Plane>();
         //for (auto ent_plane : plane_view)
@@ -254,15 +217,4 @@ namespace rain::engine
         //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
         //}
     }
-
-    Camera& World::main_camera()
-    {
-        return registry.get<Camera>(main_camera_id);
-    }
-
-    core::transform& World::main_camera_transform()
-    {
-        return registry.get<core::transform>(main_camera_id);
-    }
-
 }

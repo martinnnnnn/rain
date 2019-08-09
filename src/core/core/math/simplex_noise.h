@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>  // size_t
+#include "glm.hpp"
 
 namespace rain::core
 {
@@ -14,6 +15,8 @@ namespace rain::core
         static float noise(float x, float y);
         // 3D Perlin simplex noise
         static float noise(float x, float y, float z);
+
+        inline static float noise(glm::vec3 v) { return noise(v.x, v.y, v.z); }
 
         // Fractal/Fractional Brownian Motion (fBm) noise summation
         float fractal(size_t octaves, float x) const;

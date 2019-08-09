@@ -136,6 +136,7 @@ namespace rain::engine
             return true;
         }
 
+        //------------------------
         // cZP
         next = nullptr;
         if (position.z < CHUNK_SIZE - 1)

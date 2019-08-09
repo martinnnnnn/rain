@@ -66,6 +66,14 @@ namespace rain::engine
         instancing_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         instancing_handle->data->set("material.shininess", 32.0f);
 
+        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.vs");
+        sf_handle->data->use();
+        sf_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        sf_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("dirLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("material.shininess", 32.0f);
+
         phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs");
         phong_handle->data->use();
         phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
@@ -115,6 +123,25 @@ namespace rain::engine
 
     u32 Renderer::load_scalar_field(core::scalar_field_mesh* mesh)
     {
+        std::vector<float> data;
+        for (u32 i = 0; i < mesh->vertices.size(); ++i)
+        {
+            data.push_back(mesh->vertices[i].x);
+            data.push_back(mesh->vertices[i].y);
+            data.push_back(mesh->vertices[i].z);
+            if (mesh->uv.size() > 0)
+            {
+                data.push_back(mesh->uv[i].x);
+                data.push_back(mesh->uv[i].y);
+            }                  
+            if (mesh->normals.size() > 0)
+            {
+                data.push_back(mesh->normals[i].x);
+                data.push_back(mesh->normals[i].y);
+                data.push_back(mesh->normals[i].z);
+            }
+        }
+
         u32 vao, vbo_vertices, ebo_vertices_indices;
 
         glGenVertexArrays(1, &vao);
@@ -124,7 +151,7 @@ namespace rain::engine
         i32 stride = (3 + 2 + 3) * sizeof(float);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(glm::vec3), mesh->vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
@@ -137,6 +164,22 @@ namespace rain::engine
         glBindVertexArray(0);
 
         return vao;
+    }
+
+    void Renderer::draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count)
+    {
+        sf_handle->data->use();
+        sf_handle->data->set("proj", proj_mat_perspective);
+        sf_handle->data->set("view", view_mat);
+        sf_handle->data->set("model", transform);
+        sf_handle->data->set("viewPos", view_position);
+        sf_handle->data->set("text1", 0);
+
+        bind_texture(texture, 0);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, triangle_count);
+        glBindVertexArray(0);
     }
 
 

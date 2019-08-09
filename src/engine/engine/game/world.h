@@ -1,17 +1,16 @@
 #pragma once
 
 #include <string>
-#include <entt.hpp>
 
 #include "core/core.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
-
-#include "engine/voxel/voxel.h"
+#include "scene_graph.h"
 
 namespace rain::engine
 {
     struct Camera;
+    struct voxel_map;
 
     struct MainCamera
     {
@@ -22,11 +21,9 @@ namespace rain::engine
     struct World
     {
         std::string name;
-        entt::DefaultRegistry registry;
         core::File file;
 
-        //MainCamera main_camera;
-        u32 main_camera_id;
+        MainCamera main_camera;
 
         void init(const std::string& _path);
 
@@ -34,12 +31,9 @@ namespace rain::engine
         void update_physics(const float _deltaTime);
         void draw(const float _alpha);
 
-        Camera& main_camera();
-        core::transform& main_camera_transform();
-
         // TEMP
+        scene_graph sg;
         u32 temp_vao;
-        u32 temp_vao2;
         voxel_map* vmap;
     };
 }

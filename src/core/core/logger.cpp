@@ -37,6 +37,17 @@ namespace rain::core
         print_log();
     }
 
+    void logger::log_crash(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...)
+    {
+        string::print_to_buffer(header_buffer, sizeof(header_buffer), "%s Error at %s on line %u :\n", _level, _filePath, _fileLine);
+        va_list args;
+        va_start(args, _format);
+        string::print_to_buffer_va(message_buffer, sizeof(message_buffer), _format, args);
+        va_end(args);
+        print_log();
+        exit(1);
+    }
+
     void logger::print_log()
     {
         printOutput(header_buffer);

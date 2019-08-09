@@ -43,75 +43,92 @@ namespace rain::engine::json_reader
         world_document.Parse(_json.c_str());
 
         _world.name = world_document["name"].GetString();
-        RAIN_LOG("parsing world : %s\n", _world.name.c_str());
+        RAIN_LOG("Parsing world : %s\n", _world.name.c_str());
 
         const rapidjson::Value& world_objects = world_document["objects"];
-        entt::DefaultRegistry& registry = _world.registry;
+
+        //entt::DefaultRegistry& registry = _world.registry;
+
         for (u32 i = 0; i < world_objects.Size(); i++)
         {
             const rapidjson::Value& world_object = world_objects[i];
 
-            auto entity = registry.create();
+            actor* new_actor = _world.sg.create();
+            //auto entity = registry.create();
 
-            u32& id = registry.assign<u32>(entity);
-            id = world_object["id"].GetUint();
+            actor_id* id = new_actor->components.create<actor_id>();
+
+            //u32& id = registry.assign<u32>(entity);
+            *id = world_object["id"].GetUint();
 
             if (world_object.HasMember("Transform"))
             {
-                core::transform& t = registry.assign<core::transform>(entity);
-                read_transform(world_object["Transform"], t);
+                auto t = new_actor->components.create<core::transform>();
+
+                //core::transform& t = registry.assign<core::transform>(entity);
+                read_transform(world_object["Transform"], *t);
                 //RAIN_LOG_RAW("%s\n", json_writer::serialize(t).c_str());
             }
             if (world_object.HasMember("RigidBody"))
             {
-                RigidBody& rigid_body = registry.assign<RigidBody>(entity);
-                read_rigid_body(world_object["RigidBody"], rigid_body);
+                auto rigid_body = new_actor->components.create<RigidBody>();
+                //RigidBody& rigid_body = registry.assign<RigidBody>(entity);
+                read_rigid_body(world_object["RigidBody"], *rigid_body);
             }
             if (world_object.HasMember("Sphere"))
             {
-                core::sphere& s = registry.assign<core::sphere>(entity);
-                read_sphere(world_object["Sphere"], s);
+                auto s = new_actor->components.create<core::sphere>();
+                //core::sphere& s = registry.assign<core::sphere>(entity);
+                read_sphere(world_object["Sphere"], *s);
             }
             if (world_object.HasMember("Spring"))
             {
-                Spring& spring = registry.assign<Spring>(entity);
-                read_spring(world_object["Spring"], spring);
+                auto spring = new_actor->components.create<Spring>();
+                //Spring& spring = registry.assign<Spring>(entity);
+                read_spring(world_object["Spring"], *spring);
             }
             if (world_object.HasMember("Plane"))
             {
-                core::plane& p = registry.assign<core::plane>(entity);
-                read_plane(world_object["Plane"], p);
+                auto p = new_actor->components.create<core::plane>();
+                //core::plane& p = registry.assign<core::plane>(entity);
+                read_plane(world_object["Plane"], *p);
             }
             if (world_object.HasMember("Model"))
             {
-                Model& model = registry.assign<Model>(entity);
-                read_model(world_object["Model"], model);
+                auto model = new_actor->components.create<Model>();
+                //Model& model = registry.assign<Model>(entity);
+                read_model(world_object["Model"], *model);
 
                 if (world_object.HasMember("MeshBound"))
                 {
-                    MeshBound& meshBound = registry.assign<MeshBound>(entity);
-                    read_mesh_bound(world_object["MeshBound"], model, meshBound);
+                    auto meshBound = new_actor->components.create<MeshBound>();
+                    //MeshBound& meshBound = registry.assign<MeshBound>(entity);
+                    read_mesh_bound(world_object["MeshBound"], *model, *meshBound);
                 }
             }
             if (world_object.HasMember("Material"))
             {
-                Material& material = registry.assign<Material>(entity);
-                read_material(world_object["Material"], material);
+                auto material = new_actor->components.create<Material>();
+                //Material& material = registry.assign<Material>(entity);
+                read_material(world_object["Material"], *material);
             }
             if (world_object.HasMember("Camera"))
             {
-                Camera& camera = registry.assign<Camera>(entity);
-                read_camera(world_object["Camera"], camera);
+                auto camera = new_actor->components.create<Camera>();
+                //Camera& camera = registry.assign<Camera>(entity);
+                read_camera(world_object["Camera"], *camera);
             }
             if (world_object.HasMember("text_field"))
             {
-                ui::text_field& field = registry.assign<ui::text_field>(entity);
-                read_text_field(world_object["text_field"], field);
+                auto field = new_actor->components.create<ui::text_field>();
+                //ui::text_field& field = registry.assign<ui::text_field>(entity);
+                read_text_field(world_object["text_field"], *field);
             }
             if (world_object.HasMember("text_list"))
             {
-                ui::text_list& list = registry.assign<ui::text_list>(entity);
-                read_text_list(world_object["text_list"], list);
+                auto list = new_actor->components.create<ui::text_list>();
+                //ui::text_list& list = registry.assign<ui::text_list>(entity);
+                read_text_list(world_object["text_list"], *list);
             }
         }
     }

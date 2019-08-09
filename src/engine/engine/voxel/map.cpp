@@ -31,7 +31,7 @@ namespace rain::engine
 
     void draw(voxel_map* vmap)
     {
-        RAIN_RENDERER->draw_instancing_cube(vmap->vao, vmap->model_matrices.size(), vmap->texture_handle->data, RAIN_WORLD->main_camera_transform().position);
+        RAIN_RENDERER->draw_instancing_cube(vmap->vao, vmap->model_matrices.size(), vmap->texture_handle->data, RAIN_WORLD->main_camera.transform->position);
     }
 }
 

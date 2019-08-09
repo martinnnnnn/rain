@@ -55,6 +55,7 @@ namespace rain::engine
 #define RAIN_LOG_PROFILE(...)   do { RAIN_CONTEXT->logger->log_level("[PROFILE]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_WARNING(...)   do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, "[WARNING]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, "[ERROR]", __VA_ARGS__); } while(false)
+#define RAIN_LOG_CRASH(...)     do { RAIN_CONTEXT->logger->log_crash(__FILE__, __LINE__, "[CRASH]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_RAW(...)       do { RAIN_CONTEXT->logger->log_raw(__VA_ARGS__); } while(false)
 #else
 #define RAIN_LOG(...)

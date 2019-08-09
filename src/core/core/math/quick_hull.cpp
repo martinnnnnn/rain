@@ -29,7 +29,7 @@ namespace rain::core
         output->normal_indices_count = lib_mesh.nnormals;
     }
 
-    void from_scalar_field(std::function<float(glm::vec3)>& noise, const float maxDistance, const uint16_t gridResolution, scalar_field_mesh* output)
+    void from_scalar_field(const float maxDistance, const uint16_t gridResolution, scalar_field_mesh* output)
     {
         static int edgeTable[256] =
         {
@@ -386,9 +386,12 @@ namespace rain::core
         const float    cubeScale = (1.0f / static_cast<float>(gridSize)) * 2.0f * scale; // range => [-scale, scale] => 2*scale
 
                                                                                          // traverse the voxel grid
-        for (uint16_t z = 0; z < gridSize; ++z) {
-            for (uint16_t y = 0; y < gridSize; ++y) {
-                for (uint16_t x = 0; x < gridSize; ++x) {
+        for (uint16_t z = 0; z < gridSize; ++z)
+        {
+            for (uint16_t y = 0; y < gridSize; ++y) 
+            {
+                for (uint16_t x = 0; x < gridSize; ++x) 
+                {
                     // calculate voxel's 3D positions and evaluate SDF at each of its corners
                     float halfCube = cubeScale * 0.5f;
                     glm::vec3 center({
@@ -402,35 +405,35 @@ namespace rain::core
                     // left-bottom-back
                     offset = glm::vec3(-halfCube, -halfCube, -halfCube);
                     voxel.LBB = glm::vec4(center + offset, 0.0f);
-                    voxel.LBB.w = noise(glm::vec3(voxel.LBB));
+                    voxel.LBB.w = simplex_noise::noise(glm::vec3(voxel.LBB));
                     // right-bottom-back
                     offset = glm::vec3(halfCube, -halfCube, -halfCube);
                     voxel.RBB = glm::vec4(center + offset, 0.0f);
-                    voxel.RBB.w = noise(glm::vec3(voxel.RBB));
+                    voxel.RBB.w = simplex_noise::noise(glm::vec3(voxel.RBB));
                     // right-bottom-front
                     offset = glm::vec3(halfCube, -halfCube, halfCube);
                     voxel.RBF = glm::vec4(center + offset, 0.0f);
-                    voxel.RBF.w = noise(glm::vec3(voxel.RBF));
+                    voxel.RBF.w = simplex_noise::noise(glm::vec3(voxel.RBF));
                     // left-bottom-front
                     offset = glm::vec3(-halfCube, -halfCube, halfCube);
                     voxel.LBF = glm::vec4(center + offset, 0.0f);
-                    voxel.LBF.w = noise(glm::vec3(voxel.LBF));
+                    voxel.LBF.w = simplex_noise::noise(glm::vec3(voxel.LBF));
                     // left-top-back
                     offset = glm::vec3(-halfCube, halfCube, -halfCube);
                     voxel.LTB = glm::vec4(center + offset, 0.0f);
-                    voxel.LTB.w = noise(glm::vec3(voxel.LTB));
+                    voxel.LTB.w = simplex_noise::noise(glm::vec3(voxel.LTB));
                     // right-top-back
                     offset = glm::vec3(halfCube, halfCube, -halfCube);
                     voxel.RTB = glm::vec4(center + offset, 0.0f);
-                    voxel.RTB.w = noise(glm::vec3(voxel.RTB));
+                    voxel.RTB.w = simplex_noise::noise(glm::vec3(voxel.RTB));
                     // right-top-front
                     offset = glm::vec3(halfCube, halfCube, halfCube);
                     voxel.RTF = glm::vec4(center + offset, 0.0f);
-                    voxel.RTF.w = noise(glm::vec3(voxel.RTF));
+                    voxel.RTF.w = simplex_noise::noise(glm::vec3(voxel.RTF));
                     // left-top-front
                     offset = glm::vec3(-halfCube, halfCube, halfCube);
                     voxel.LTF = glm::vec4(center + offset, 0.0f);
-                    voxel.LTF.w = noise(glm::vec3(voxel.LTF));
+                    voxel.LTF.w = simplex_noise::noise(glm::vec3(voxel.LTF));
 
                     // given all calculated data, generate this voxel's vertices
                     std::vector<glm::vec3> vertList(12);

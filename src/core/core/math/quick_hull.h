@@ -27,5 +27,5 @@ namespace rain::core
     };
 
     void quick_hull(glm::vec3 const *  vertices, const u32 indices, mesh* output);
-    void from_scalar_field(std::function<float(glm::vec3)>& noise, const float maxDistance, const uint16_t gridResolution, scalar_field_mesh* output);
+    void from_scalar_field(const float maxDistance, const uint16_t gridResolution, scalar_field_mesh* output);
 }
