@@ -4,9 +4,7 @@
 
 namespace rain::engine
 {
-
-
-    struct voxel_block
+    struct voxel_cell
     {
         enum class Type
         {
@@ -17,6 +15,6 @@ namespace rain::engine
         };
 
         Type type;
-        u8 health;
+        f32 distance;
     };
 }

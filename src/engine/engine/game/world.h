@@ -6,6 +6,7 @@
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
 #include "scene_graph.h"
+#include "engine/voxel/voxel.h"
 
 namespace rain::engine
 {
@@ -33,8 +34,13 @@ namespace rain::engine
 
         // TEMP
         scene_graph sg;
-        u32 temp_vao;
+
+        u32 vao_quickhull;
+
         voxel_map* vmap;
+
+        isosurface::voxel_mesh vmesh;
+        u32 vao_transvoxel;
     };
 }
 

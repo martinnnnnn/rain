@@ -1,27 +1,16 @@
 #pragma once
 
-#include "core/types.h"
-#include "block.h"
+#include "core/core.h"
+#include "voxel_cell.h"
+
+#include "glm.hpp"
 
 namespace rain::engine
 {
-    struct uvec3
-    {
-        union
-        {
-            struct
-            {
-                u32 x;
-                u32 y;
-                u32 z;
-            };
-            u32 data[3];
-        };
-    };
 
-    inline uvec3 operator*(const uvec3& v, const u32 c)
+    inline glm::u32vec3 operator*(const glm::u32vec3& v, const u32 c)
     {
-        return uvec3{ v.x * c, v.y * c, v.z * c };
+        return glm::u32vec3{ v.x * c, v.y * c, v.z * c };
     }
 
     constexpr u32 CHUNK_SIZE = 32;
@@ -52,18 +41,18 @@ namespace rain::engine
 
     struct voxel_chunk
     {
-        voxel_block* data;
+        voxel_cell* data;
         u32 data_size;
 
         voxel_map* map;
-        uvec3 position;
+        glm::u32vec3 position;
 
         voxel_chunk *cXN, *cXP, *cYN, *cYP, *cZN, *cZP;
 
         voxel_chunk() {}
     };
 
-    void init(voxel_chunk* chunk, voxel_map* map, const uvec3& position);
-    bool is_block_border(voxel_chunk const * const chunk, const uvec3& position);
-
+    void init(voxel_chunk* chunk, voxel_map* map, const glm::u32vec3& position);
+    bool is_cell_border(voxel_chunk const * const chunk, const glm::u32vec3& position);
+    voxel_cell* get_cell(voxel_chunk const * const chunk, const glm::u32vec3& position);
 }

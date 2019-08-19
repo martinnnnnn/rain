@@ -1,7 +1,7 @@
-#include "chunk.h"
+#include "voxel_chunk.h"
 
 #include "core/math/simplex_noise.h"
-#include "engine/voxel/map.h"
+#include "engine/voxel/voxel_map.h"
 #include <Windows.h>
 #include "core/logger.h"
 #include "gtx/transform.hpp"
@@ -9,11 +9,11 @@
 namespace rain::engine
 {
 
-    void init(voxel_chunk* chunk, voxel_map* map, const uvec3& position)
+    void init(voxel_chunk* chunk, voxel_map* map, const glm::u32vec3& position)
     {
         chunk->map = map;
         chunk->position = position * CHUNK_SIZE;
-        chunk->data = (voxel_block*)calloc(CHUNK_SIZE_CUBED, sizeof(voxel_block));
+        chunk->data = (voxel_cell*)calloc(CHUNK_SIZE_CUBED, sizeof(voxel_cell));
 
         for (u32 i = 0; i < CHUNK_SIZE; ++i)
         {
@@ -21,24 +21,23 @@ namespace rain::engine
             {
                 for (u32 k = 0; k < CHUNK_SIZE; ++k)
                 {
-                    voxel_block* block = &chunk->data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED];
+                    voxel_cell* cell = &chunk->data[i + j * CHUNK_SIZE + k * CHUNK_SIZE_SQUARED];
 
-                    float noise = (core::simplex_noise::noise(float(i + chunk->position.x) / CHUNK_SIZE, float(j + chunk->position.y) / CHUNK_SIZE, float(k + chunk->position.z) / CHUNK_SIZE) + 1.0f) / 2.0f;
-                    if (noise > 0.7f)
+                    cell->distance = (core::simplex_noise::noise(float(i + chunk->position.x) / CHUNK_SIZE, float(j + chunk->position.y) / CHUNK_SIZE, float(k + chunk->position.z) / CHUNK_SIZE) + 1.0f) / 2.0f;
+                    if (cell->distance > 0.7f)
                     {
-                        block->type = voxel_block::Type::DIRT;
+                        cell->type = voxel_cell::Type::DIRT;
                         map->model_matrices.emplace_back(glm::scale(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }), glm::vec3{ 1.0f, 1.0f, 1.0f }));
-                        //map->model_matrices.push_back(glm::scale(glm::translate(glm::mat4(1), glm::vec3{ i + chunk->position.x , j + chunk->position.y , k + chunk->position.z }), glm::vec3{ 0.3f, 0.3f, 0.3f }));
                     }
                     else
                     {
-                        block->type = voxel_block::Type::EMPTY;
+                        cell->type = voxel_cell::Type::EMPTY;
                     }
                 }
             }
         }
 
-        const uvec3 map_index{ chunk->position.x / CHUNK_SIZE, chunk->position.y / CHUNK_SIZE, chunk->position.z / CHUNK_SIZE };
+        const glm::u32vec3 map_index{ chunk->position.x / CHUNK_SIZE, chunk->position.y / CHUNK_SIZE, chunk->position.z / CHUNK_SIZE };
 
         chunk->cXN = map_index.x > 0 ? &chunk->map->chunks[(map_index.x - 1) + (map_index.y * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
         chunk->cYN = map_index.y > 0 ? &chunk->map->chunks[(map_index.x) + ((map_index.y - 1) * MAP_SIZE) + (map_index.z * MAP_SIZE_SQUARED)] : nullptr;
@@ -49,28 +48,27 @@ namespace rain::engine
         chunk->cZP = map_index.z < MAP_SIZE - 1 ? &chunk->map->chunks[(map_index.x) + ((map_index.y) * MAP_SIZE) + ((map_index.z + 1) * MAP_SIZE_SQUARED)] : nullptr;
     }
 
-    voxel_block* get_block(voxel_chunk const * const chunk, const uvec3& position)
+    voxel_cell* get_cell(voxel_chunk const * const chunk, const glm::u32vec3& position)
     {
-        voxel_block* block = &chunk->data[position.x + position.y * CHUNK_SIZE + position.z * CHUNK_SIZE_SQUARED];
-        return block;
+        voxel_cell* cell = &chunk->data[position.x + position.y * CHUNK_SIZE + position.z * CHUNK_SIZE_SQUARED];
+        return cell;
     }
 
-    bool is_block_border(voxel_chunk const * const chunk, const uvec3& position)
+    bool is_cell_border(voxel_chunk const * const chunk, const glm::u32vec3& position)
     {
-        voxel_block* block = get_block(chunk, position);
-        voxel_block* next = nullptr;
+        voxel_cell* next = nullptr;
 
         // cXN
         next = nullptr;
         if (position.x > 0)
         {
-            next = get_block(chunk, uvec3{ position.x - 1, position.y, position.z });
+            next = get_cell(chunk, glm::u32vec3{ position.x - 1, position.y, position.z });
         }
         else if (chunk->cXN != nullptr)
         {
-            next = get_block(chunk->cXN, uvec3{ CHUNK_SIZE - 1, position.y, position.z });
+            next = get_cell(chunk->cXN, glm::u32vec3{ CHUNK_SIZE - 1, position.y, position.z });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
@@ -79,13 +77,13 @@ namespace rain::engine
         next = nullptr;
         if (position.x < CHUNK_SIZE - 1)
         {
-            next = get_block(chunk, uvec3{ position.x + 1, position.y, position.z });
+            next = get_cell(chunk, glm::u32vec3{ position.x + 1, position.y, position.z });
         }
         else if (chunk->cXP != nullptr)
         {
-            next = get_block(chunk->cXP, uvec3{ 0, position.y, position.z });
+            next = get_cell(chunk->cXP, glm::u32vec3{ 0, position.y, position.z });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
@@ -95,13 +93,13 @@ namespace rain::engine
         next = nullptr;
         if (position.y > 0)
         {
-            next = get_block(chunk, uvec3{ position.x, position.y - 1, position.z });
+            next = get_cell(chunk, glm::u32vec3{ position.x, position.y - 1, position.z });
         }
         else if (chunk->cYN != nullptr)
         {
-            next = get_block(chunk->cYN, uvec3{ position.x, CHUNK_SIZE - 1, position.z });
+            next = get_cell(chunk->cYN, glm::u32vec3{ position.x, CHUNK_SIZE - 1, position.z });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
@@ -110,13 +108,13 @@ namespace rain::engine
         next = nullptr;
         if (position.y < CHUNK_SIZE - 1)
         {
-            next = get_block(chunk, uvec3{ position.x, position.y + 1, position.z });
+            next = get_cell(chunk, glm::u32vec3{ position.x, position.y + 1, position.z });
         }
         else if (chunk->cYP != nullptr)
         {
-            next = get_block(chunk->cYP, uvec3{ position.x, 0, position.z });
+            next = get_cell(chunk->cYP, glm::u32vec3{ position.x, 0, position.z });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
@@ -125,13 +123,13 @@ namespace rain::engine
         next = nullptr;
         if (position.z > 0)
         {
-            next = get_block(chunk, uvec3{ position.x, position.y, position.z - 1 });
+            next = get_cell(chunk, glm::u32vec3{ position.x, position.y, position.z - 1 });
         }
         else if (chunk->cZN != nullptr)
         {
-            next = get_block(chunk->cZN, uvec3{ position.x, position.y, CHUNK_SIZE - 1 });
+            next = get_cell(chunk->cZN, glm::u32vec3{ position.x, position.y, CHUNK_SIZE - 1 });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
@@ -141,23 +139,18 @@ namespace rain::engine
         next = nullptr;
         if (position.z < CHUNK_SIZE - 1)
         {
-            next = get_block(chunk, uvec3{ position.x, position.y, position.z + 1 });
+            next = get_cell(chunk, glm::u32vec3{ position.x, position.y, position.z + 1 });
         }
         else if (chunk->cZP != nullptr)
         {
-            next = get_block(chunk->cZP, uvec3{ position.x, position.y, 0 });
+            next = get_cell(chunk->cZP, glm::u32vec3{ position.x, position.y, 0 });
         }
-        if (next == nullptr || next->type == voxel_block::Type::EMPTY)
+        if (next == nullptr || next->type == voxel_cell::Type::EMPTY)
         {
             return true;
         }
 
         return false;
-    }
-
-    void generate_mesh()
-    {
-
     }
 }
 

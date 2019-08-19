@@ -78,6 +78,12 @@ namespace rain::engine
         phong_handle->data->use();
         phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
         phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
+
+        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.vs");
+        transvoxel_handle->data->use();
+        transvoxel_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
+        transvoxel_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
+        
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -571,6 +577,38 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
+    void Renderer::init_transvoxel(isosurface::voxel_mesh* mesh, u32& vao)
+    {
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        u32 vbo, ebo;
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(float), &mesh->vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+        i32 stride = (3 + 3) * sizeof(float);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    }
+
+    void Renderer::draw_transvoxel(const u32& vao, const u32 index_count)
+    {
+        transvoxel_handle->data->use();
+        transvoxel_handle->data->set("model", glm::mat4(1));
+        transvoxel_handle->data->set("proj", proj_mat_perspective);
+        transvoxel_handle->data->set("view", view_mat);
+
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
 
     void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao)
     {
@@ -618,7 +656,8 @@ namespace rain::engine
              glm::vec3(-0.5f,  0.5f, -0.5f),
              glm::vec3(-0.5f,  0.5f,  0.5f),
         };
-        std::vector<glm::vec2> UV = std::vector<glm::vec2>{
+        std::vector<glm::vec2> UV = std::vector<glm::vec2>
+        {
             glm::vec2(0.0f, 0.0f),
             glm::vec2(1.0f, 1.0f),
             glm::vec2(1.0f, 0.0f),
@@ -661,7 +700,8 @@ namespace rain::engine
             glm::vec2(0.0f, 1.0f),
             glm::vec2(0.0f, 0.0f),
         };
-        std::vector<glm::vec3> Normals = std::vector<glm::vec3>{
+        std::vector<glm::vec3> Normals = std::vector<glm::vec3>
+        {
             glm::vec3(0.0f,  0.0f, -1.0f),
             glm::vec3(0.0f,  0.0f, -1.0f),
             glm::vec3(0.0f,  0.0f, -1.0f),

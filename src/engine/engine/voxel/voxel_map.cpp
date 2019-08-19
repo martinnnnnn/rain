@@ -1,4 +1,4 @@
-#include "engine/voxel/map.h"
+#include "engine/voxel/voxel_map.h"
 
 #include "engine/core/context.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
@@ -11,14 +11,15 @@ namespace rain::engine
     {
         vmap->chunks_count = MAP_SIZE_CUBED;
         vmap->chunks = (voxel_chunk*)calloc(vmap->chunks_count, sizeof(voxel_chunk));
-        vmap->model_matrices.reserve(2000000);
+        vmap->model_matrices.reserve(2'000'000);
+
         for (u32 i = 0; i < MAP_SIZE; ++i)
         {
             for (u32 j = 0; j < MAP_SIZE; ++j)
             {
                 for (u32 k = 0; k < MAP_SIZE; ++k)
                 {
-                    init(&vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED], vmap, uvec3{ i, j , k });
+                    init(&vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED], vmap, glm::u32vec3{ i, j , k });
                 }
             }
         }

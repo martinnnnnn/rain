@@ -14,6 +14,7 @@
 #include "engine/data/geometry/mesh.h"
 #include "engine/data/material/material.h"
 #include "engine/data/data_handle.h"
+#include "engine/voxel/voxel.h"
 
 namespace rain::engine
 {
@@ -77,6 +78,9 @@ namespace rain::engine
         u32 load_scalar_field(core::scalar_field_mesh* mesh);
         void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count);
 
+        void init_transvoxel(isosurface::voxel_mesh* mesh, u32& vao);
+        void draw_transvoxel(const u32& vao, const u32 index_count);
+
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void release_mesh(Mesh* mesh);
@@ -109,6 +113,7 @@ namespace rain::engine
         handle<Shader> const * phong_handle;
         handle<Shader> const * instancing_handle;
         handle<Shader> const * sf_handle;
+        handle<Shader> const * transvoxel_handle;
 
         Shader pbr_shader;
 

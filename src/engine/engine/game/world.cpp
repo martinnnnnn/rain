@@ -33,6 +33,9 @@ namespace rain::engine
             engine::init(vmap);
         }
 
+        isosurface::transvoxel(&(vmap->chunks[0]), 1, &vmesh);
+        RAIN_RENDERER->init_transvoxel(&vmesh, vao_transvoxel);
+
         std::vector<actor*> view;
 
         file.open(_path);
@@ -81,7 +84,7 @@ namespace rain::engine
             RAIN_LOG("vertices count : %u", vertices_count);
             quick_hull(vertices, vertices_count, mesh);
         }
-        temp_vao = RAIN_RENDERER->load_primitive(mesh->vertices, mesh->vertices_count, mesh->vertices_indices, mesh->vertices_indices_count, mesh->normals, mesh->normals_count, mesh->normals_indices, mesh->normal_indices_count);
+        vao_quickhull = RAIN_RENDERER->load_primitive(mesh->vertices, mesh->vertices_count, mesh->vertices_indices, mesh->vertices_indices_count, mesh->normals, mesh->normals_count, mesh->normals_indices, mesh->normal_indices_count);
 
         // ---- /temp
     }
@@ -96,7 +99,6 @@ namespace rain::engine
     {
         std::vector<actor*> view;
 
-        //auto chat_view = registry.view<ui::text_field>();
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)
         {
@@ -151,7 +153,8 @@ namespace rain::engine
         //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         RAIN_PROFILE("world render ");
         
-        engine::draw(vmap);
+        //engine::draw(vmap);
+        RAIN_RENDERER->draw_transvoxel(vao_transvoxel, vmesh.indices.size());
 
         std::vector<actor*> view;
 
@@ -190,7 +193,7 @@ namespace rain::engine
             glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
             glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
 
-            RAIN_RENDERER->draw_primitive(temp_vao, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
+            RAIN_RENDERER->draw_primitive(vao_quickhull, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
         }
 
         sg.get_view<core::transform, core::sphere>(view, true);

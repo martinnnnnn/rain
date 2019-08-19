@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chunk.h"
+#include "voxel_chunk.h"
 #include "stdlib.h"
 
 #include <vector>
