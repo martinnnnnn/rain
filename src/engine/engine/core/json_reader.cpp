@@ -11,6 +11,7 @@
 #include "engine/data/data_system.h"
 #include "engine/data/data_handle.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
+#include "engine/core/profiler.h"
 
 namespace rain::engine::json_reader
 {
@@ -39,12 +40,13 @@ namespace rain::engine::json_reader
 
     void read_world(const std::string& _json, World& _world)
     {
+        RAIN_PROFILE("World Parsing");
+
         rapidjson::Document world_document;
         world_document.Parse(_json.c_str());
 
         _world.name = world_document["name"].GetString();
-        RAIN_LOG("Parsing world : %s\n", _world.name.c_str());
-
+        RAIN_LOG("Parsing world : %s", _world.name.c_str());
         const rapidjson::Value& world_objects = world_document["objects"];
 
         //entt::DefaultRegistry& registry = _world.registry;

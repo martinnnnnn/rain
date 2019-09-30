@@ -11,7 +11,7 @@ namespace rain::engine
     {
         vmap->chunks_count = MAP_SIZE_CUBED;
         vmap->chunks = (voxel_chunk*)calloc(vmap->chunks_count, sizeof(voxel_chunk));
-        vmap->model_matrices.reserve(2'000'000);
+        vmap->model_matrices.reserve(10'000'000);
 
         for (u32 i = 0; i < MAP_SIZE; ++i)
         {
@@ -28,6 +28,21 @@ namespace rain::engine
         RAIN_RENDERER->init_instancing_cube(vmap->model_matrices, vmap->vao);
 
         vmap->texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
+    }
+
+    void delete_vmap(voxel_map* vmap)
+    {
+        for (u32 i = 0; i < MAP_SIZE; ++i)
+        {
+            for (u32 j = 0; j < MAP_SIZE; ++j)
+            {
+                for (u32 k = 0; k < MAP_SIZE; ++k)
+                {
+                    free(vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED].data);
+                }
+            }
+        }
+        free(vmap->chunks);
     }
 
     void draw(voxel_map* vmap)

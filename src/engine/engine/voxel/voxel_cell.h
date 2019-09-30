@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/types.h"
+#include <glm.hpp>
 
 namespace rain::engine
 {
@@ -15,6 +16,7 @@ namespace rain::engine
         };
 
         Type type;
-        f32 distance;
+        i8 distance;
+        glm::vec3 position;
     };
 }

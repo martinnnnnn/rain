@@ -21,5 +21,6 @@ namespace rain::engine
     };
 
     void init(voxel_map* vmap);
+    void delete_vmap(voxel_map* vmap);
     void draw(voxel_map* vmap);
 }

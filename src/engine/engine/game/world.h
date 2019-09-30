@@ -39,8 +39,12 @@ namespace rain::engine
 
         voxel_map* vmap;
 
-        isosurface::voxel_mesh vmesh;
-        u32 vao_transvoxel;
+        //u32 vao_transvoxel;
+
+        //std::vector<glm::vec3> transVertices;
+        //std::vector<glm::vec3> transNormals;
+
+        isosurface::tvox_map tmap;
     };
 }
 

@@ -16,8 +16,16 @@
 #include "engine/data/data_handle.h"
 #include "engine/voxel/voxel.h"
 
+//#define SPIRV
+
+
 namespace rain::engine
 {
+
+#ifdef SPIRV
+    static PFNGLSPECIALIZESHADERPROC gl_specialize_shader;
+#endif
+
     struct StaticMesh
     {
         GLuint vao;
@@ -35,7 +43,7 @@ namespace rain::engine
     {
     public:
         void init();
-
+        void update();
         void clear();
 
         void init_default_shaders();
@@ -78,8 +86,8 @@ namespace rain::engine
         u32 load_scalar_field(core::scalar_field_mesh* mesh);
         void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count);
 
-        void init_transvoxel(isosurface::voxel_mesh* mesh, u32& vao);
-        void draw_transvoxel(const u32& vao, const u32 index_count);
+        void init_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, u32& vao);
+        void draw_transvoxel(const u32& vao, const u32 index_count, const glm::vec3& view_position);
 
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);

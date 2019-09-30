@@ -45,7 +45,7 @@ namespace rain::engine
         end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end - start;
         char buffer[512];
-        core::string::print_to_buffer(buffer, 512, (message + " %f ms").c_str(), elapsed_seconds.count() * 1000.0);
+        core::string::print_to_buffer(buffer, 512, (message + " %.2f ms").c_str(), elapsed_seconds.count() * 1000.0);
         RAIN_RENDERER->draw_text_2d(buffer, x, y, scale, color);
     }
 }

@@ -10,6 +10,8 @@
 #include "engine/core/context.h"
 #include "engine/win32/win32_helpers.h"
 
+#include "ogl_renderer.h"
+
 namespace rain::engine
 {
 	
@@ -54,26 +56,42 @@ namespace rain::engine
 		return success;
 	}
 
+    void Shader::gpu_load(GLuint obj, const char* code)
+    {
+#ifndef SPIRV
+        glShaderSource(obj, 1, &code, NULL);
+        glCompileShader(obj);
+        check_compile_errors(obj, "VERTEX");
+#else
+        glShaderBinary(1, &obj, GL_SHADER_BINARY_FORMAT_SPIR_V_ARB, code, strlen(code));
+        gl_specialize_shader(obj, "main", 0, 0, 0);
+#endif
+
+    }
+
 	void Shader::load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code)
 	{
 		id = glCreateProgram();
+
 		vertex_object = glCreateShader(GL_VERTEX_SHADER);
+        gpu_load(vertex_object, _vertex_code);
+		//glShaderSource(vertex_object, 1, &_vertex_code, NULL);
+		//glCompileShader(vertex_object);
+		//check_compile_errors(vertex_object, "VERTEX");
+
 		fragment_object = glCreateShader(GL_FRAGMENT_SHADER);
-
-		glShaderSource(vertex_object, 1, &_vertex_code, NULL);
-		glCompileShader(vertex_object);
-		check_compile_errors(vertex_object, "VERTEX");
-
-		glShaderSource(fragment_object, 1, &_fragment_code, NULL);
-		glCompileShader(fragment_object);	
-		check_compile_errors(fragment_object, "FRAGMENT");
+        gpu_load(fragment_object, _fragment_code);
+  //      glShaderSource(fragment_object, 1, &_fragment_code, NULL);
+		//glCompileShader(fragment_object);	
+		//check_compile_errors(fragment_object, "FRAGMENT");
 
 		if (_geometry_code != nullptr)
 		{
 			geometry_object = glCreateShader(GL_GEOMETRY_SHADER);
-			glShaderSource(geometry_object, 1, &_geometry_code, NULL);
-			glCompileShader(geometry_object);
-			check_compile_errors(geometry_object, "GEOMETRY");
+            gpu_load(geometry_object, _geometry_code);
+   //         glShaderSource(geometry_object, 1, &_geometry_code, NULL);
+			//glCompileShader(geometry_object);
+			//check_compile_errors(geometry_object, "GEOMETRY");
 		}
 
 		glAttachShader(id, vertex_object);

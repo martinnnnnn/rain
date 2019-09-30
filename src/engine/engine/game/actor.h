@@ -12,8 +12,7 @@ namespace rain::engine
     {
         actor* parent;
         std::vector<actor*> children;
-        core::heterogenous_vector<struct COMPONENT_TYPE_ID> components;
-
+        core::heterogenous_vector<struct COMPONENT_TYPE_ID> components; 
     };
 }
 

@@ -20,12 +20,13 @@
 #include "glm.hpp"
 #include "engine/network/client.h"
 #include "engine/voxel/voxel.h"
+#include "engine/win32/win32_input.h"
 
 namespace rain::engine
 {
     void World::init(const std::string& _path)
     {
-        RAIN_PROFILE("world init");
+        RAIN_PROFILE("World Initialization");
 
         {
             RAIN_PROFILE("Chunk init");
@@ -33,8 +34,33 @@ namespace rain::engine
             engine::init(vmap);
         }
 
-        isosurface::transvoxel(&(vmap->chunks[0]), 1, &vmesh);
-        RAIN_RENDERER->init_transvoxel(&vmesh, vao_transvoxel);
+
+        {
+            RAIN_PROFILE("Transvoxel");
+            //for (u32 i = 0; i < MAP_SIZE; ++i)
+            //{
+            //    for (u32 j = 0; j < MAP_SIZE; ++j)
+            //    {
+            //        for (u32 k = 0; k < MAP_SIZE; ++k)
+            //        {
+            //            isosurface::transvoxel(&(vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED]), transVertices, transNormals);
+            //        }
+            //    }
+            //}
+            //delete_vmap(vmap);
+            //delete vmap;
+            //vmap = nullptr;
+            //RAIN_RENDERER->init_transvoxel2(transVertices, transNormals, vao_transvoxel);
+
+            isosurface::init_tmap(&tmap);
+            isosurface::transvoxel(&tmap);
+            RAIN_RENDERER->init_transvoxel(tmap.vertices, tmap.normals, tmap.vao);
+        }
+
+
+
+        
+        //RAIN_RENDERER->init_transvoxel2(transVertices, transNormals, vao_transvoxel);
 
         std::vector<actor*> view;
 
@@ -65,7 +91,7 @@ namespace rain::engine
         core::transform* t = new_actor->components.create<core::transform>();
         t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
         Material* material = new_actor->components.create<Material>();
-        material->shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vs"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.fs"));
+        material->shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vert"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.frag"));
         core::mesh* mesh = new_actor->components.create<core::mesh>();
 
         Model model;
@@ -150,74 +176,90 @@ namespace rain::engine
 
     void World::draw(const float _alpha)
     {
-        //RAIN_WPROFILE("world render ", 500.0f, 50.0f, 0.2f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
-        RAIN_PROFILE("world render ");
+        RAIN_WPROFILE("FPS : ", 1000.0f, 10.0f, 0.5f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         
-        //engine::draw(vmap);
-        RAIN_RENDERER->draw_transvoxel(vao_transvoxel, vmesh.indices.size());
+        RAIN_RENDERER->update();
 
-        std::vector<actor*> view;
-
-        sg.get_view<core::transform, Model, Material>(view);
-
-        for (auto entity : view)
+        static bool draw_vmap = true;
+        if (RAIN_INPUT->is_key_released(DIK_F) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
         {
-            core::transform& t = *(entity->components.get<core::transform>());
-            Model& model = *(entity->components.get<Model>());
-            Material& material = *(entity->components.get<Material>());
-
-            //Packet p {};
-            //p.senderId = 47;
-            //p.sequenceNumber= 12;
-            //const char* hello = "qslmdfqkldfh";
-            //memcpy(p.data, hello, strlen(hello));
-            //
-            //SerializedPacket* serialized = (SerializedPacket*)p.Serialize();
-
-            //send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
-            //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
-            
-            glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
-
-            RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, t.scale);
+            draw_vmap = !draw_vmap;
+            RAIN_LOG("%s", draw_vmap ? "1" : "2");
         }
 
-        sg.get_view<core::transform, core::mesh, Material>(view, true);
-        for (auto entity : view)
+        if (draw_vmap)
         {
-            core::transform& t = *(entity->components.get<core::transform>());
-            core::mesh& mesh = *(entity->components.get<core::mesh>());
-            Material& material = *(entity->components.get<Material>());
-
-            glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
-
-            RAIN_RENDERER->draw_primitive(vao_quickhull, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
+            engine::draw(vmap);
+            //RAIN_RENDERER->draw_transvoxel(vao_transvoxel, transVertices.size(), main_camera.transform->position);
         }
-
-        sg.get_view<core::transform, core::sphere>(view, true);
-        for (auto entity : view)
+        else
         {
-            core::transform& t = *(entity->components.get<core::transform>());
-            
-            glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
-            glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
-
-            RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
+            RAIN_RENDERER->draw_transvoxel(tmap.vao, tmap.vertices.size(), main_camera.transform->position);
         }
+        
 
-        sg.get_view<ui::text_field, ui::text_list>(view, true);
-        for (auto chat : view)
-        {
-            ui::draw(*(chat->components.get<ui::text_field>()));
-            ui::draw(*(chat->components.get<ui::text_list>()));
-        }
-        //auto plane_view = registry.view<Plane>();
-        //for (auto ent_plane : plane_view)
+        //std::vector<actor*> view;
+
+        //sg.get_view<core::transform, Model, Material>(view);
+
+        //for (auto entity : view)
         //{
-        //    Plane& plane = plane_view.get(ent_plane);
-        //    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
+        //    core::transform& t = *(entity->components.get<core::transform>());
+        //    Model& model = *(entity->components.get<Model>());
+        //    Material& material = *(entity->components.get<Material>());
+
+        //    //Packet p {};
+        //    //p.senderId = 47;
+        //    //p.sequenceNumber= 12;
+        //    //const char* hello = "qslmdfqkldfh";
+        //    //memcpy(p.data, hello, strlen(hello));
+        //    //
+        //    //SerializedPacket* serialized = (SerializedPacket*)p.Serialize();
+
+        //    //send_data(RAIN_APPLICATION.client, (char*)serialized, sizeof(SerializedPacket));
+        //    //check_receive_data(RAIN_APPLICATION.client, buffer, sizeof(buffer));
+        //    
+        //    glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+        //    glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
+
+        //    RAIN_RENDERER->draw_mesh(model.mesh->data, material, position, orientation, t.scale);
         //}
+
+        //sg.get_view<core::transform, core::mesh, Material>(view, true);
+        //for (auto entity : view)
+        //{
+        //    core::transform& t = *(entity->components.get<core::transform>());
+        //    core::mesh& mesh = *(entity->components.get<core::mesh>());
+        //    Material& material = *(entity->components.get<Material>());
+
+        //    glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+        //    glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
+
+        //    RAIN_RENDERER->draw_primitive(vao_quickhull, mesh.vertices_indices_count, material, t.position, t.orientation, t.scale);
+        //}
+
+        //sg.get_view<core::transform, core::sphere>(view, true);
+        //for (auto entity : view)
+        //{
+        //    core::transform& t = *(entity->components.get<core::transform>());
+        //    
+        //    glm::vec3 position = t.position * _alpha + t.lastPosition * (1.0f - _alpha);
+        //    glm::quat orientation = t.orientation * _alpha + t.lastOrientation * (1.0f - _alpha);
+
+        //    RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
+        //}
+
+        //sg.get_view<ui::text_field, ui::text_list>(view, true);
+        //for (auto chat : view)
+        //{
+        //    ui::draw(*(chat->components.get<ui::text_field>()));
+        //    ui::draw(*(chat->components.get<ui::text_list>()));
+        //}
+        ////auto plane_view = registry.view<Plane>();
+        ////for (auto ent_plane : plane_view)
+        ////{
+        ////    Plane& plane = plane_view.get(ent_plane);
+        ////    RAIN_RENDERER->draw_quad(plane, project_on_plane(vec3{0, 15, 0}, plane), vec30.7f, 0.7f, 0));
+        ////}
     }
 }

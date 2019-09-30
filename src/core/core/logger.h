@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
+#include <mutex>
 
 #include "core/types.h"
 
@@ -32,6 +33,8 @@ namespace rain::core
     private:
         char message_buffer[1024 * 4];
         char header_buffer[1024];
+        std::mutex mut;
+
         void (*printOutput) (const char*);
     };
 }

@@ -18,6 +18,7 @@
 #include "core/serialize/serialize.h"
 #include "core/math/math.h"
 #include "core/heterogenous_vector.h"
+#include "core/thread/thread_pool.h"
 
 //#include "core/profiler.h"
 

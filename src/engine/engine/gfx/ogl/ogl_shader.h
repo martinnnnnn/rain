@@ -13,9 +13,9 @@
 #include "glm.hpp"
 
 
+
 namespace rain::engine
 {
-
 	class Shader
 	{
 	public:
@@ -53,6 +53,7 @@ namespace rain::engine
 		
 		void load(const char* _vertex_code, const char* _fragment_code, const char* _geometry_code = nullptr);
 		void check_compile_errors(unsigned int _shader, const std::string& _type);
+        void gpu_load(GLuint obj, const char* code);
 
 		core::File vertex_file;
 		core::File fragment_file;

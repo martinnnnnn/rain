@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <mutex>
+#include <thread>
 
 #include "core/core.h"
 #include "data_handle.h"
@@ -27,6 +29,15 @@ namespace rain::engine
         void add_data(handle<T> new_data_handle)
         {
             handles.push_back(new_data_handle);
+        }
+
+        void clear()
+        {
+            for_each(handles.begin(), handles.end(), [](handle<T> handle)
+            {
+                delete handle.data;
+            });
+            handles.clear();
         }
 
         handle<T> const * find_data(const core::uuid& id)
@@ -71,6 +82,21 @@ namespace rain::engine
         }
 
         template<typename T>
+        void add_data_tf(handle<T> new_data_handle)
+        {
+            mut.lock();
+            u32 t_id = data_system_type_id::template get<T>();
+            if (t_id >= containers.size())
+            {
+                containers.resize(t_id + 1);
+                containers[t_id] = new handle_pool<T>();
+            }
+
+            static_cast<handle_pool<T>*>(containers[t_id])->add_data(new_data_handle);
+            mut.unlock();
+        }
+
+        template<typename T>
         void add_data(handle<T> new_data_handle)
         {
             u32 t_id = data_system_type_id::template get<T>();
@@ -99,7 +125,10 @@ namespace rain::engine
 
         // temp function until a tool parses the data directory, records [files path, uuid] and assigns these uuids to world entities that need them
         void load_all_recursive(const std::string& root);
-        
+        void reload_shaders();
+
         std::vector<handle_pool_base*> containers;
+        std::mutex mut;
+        std::string root;
     };
 }

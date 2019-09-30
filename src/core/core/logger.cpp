@@ -50,9 +50,11 @@ namespace rain::core
 
     void logger::print_log()
     {
+        mut.lock();
         printOutput(header_buffer);
         printOutput(message_buffer);
         printOutput("\n");
+        mut.unlock();
     }
 
     void logger::log_raw(const char* _format, ...)

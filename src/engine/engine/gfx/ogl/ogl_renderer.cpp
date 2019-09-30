@@ -7,8 +7,10 @@
 #include "core/core.h"
 #include "ogl_shader.h"
 #include "engine/core/context.h"
+#include "engine/core/profiler.h"
 #include "engine/win32/win32_window.h"
 #include "engine/data/data_system.h"
+#include "engine/win32/win32_input.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -34,18 +36,37 @@ namespace rain::engine
         glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
         glClearDepth(1.0f);
         glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         resize(u32(RAIN_WINDOW->size().x), u32(RAIN_WINDOW->size().y));
+
+#ifdef SPIRV
+        gl_specialize_shader = (PFNGLSPECIALIZESHADERPROC)glGetProcAddressREGAL("glSpecializeShaderARB");
+        if (!gl_specialize_shader) 
+        {
+            fprintf(stderr, "failed to load glSpecializeShaderARB entry point\n");
+        }
+#endif
     }
 
     void Renderer::init_data()
     {
+        RAIN_PROFILE("Renderer data initialization");
         init_default_shaders();
         init_debug();
         init_ui();
         init_shapes();
         init_text_2d();
+    }
+
+    void Renderer::update()
+    {
+        if (RAIN_INPUT->is_key_released(DIK_R) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
+        {
+            RAIN_DATA_SYSTEM->reload_shaders();
+            init_default_shaders();
+        }
     }
 
     void Renderer::resize(u32 _width, u32 _height)
@@ -58,7 +79,7 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vs");
+        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vert");
         instancing_handle->data->use();
         instancing_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
         instancing_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -66,7 +87,7 @@ namespace rain::engine
         instancing_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         instancing_handle->data->set("material.shininess", 32.0f);
 
-        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.vs");
+        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.vert");
         sf_handle->data->use();
         sf_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
         sf_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -74,16 +95,17 @@ namespace rain::engine
         sf_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         sf_handle->data->set("material.shininess", 32.0f);
 
-        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs");
+        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vert");
         phong_handle->data->use();
         phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
         phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
 
-        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.vs");
+        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.vert");
         transvoxel_handle->data->use();
-        transvoxel_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
-        transvoxel_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
-        
+        transvoxel_handle->data->set("lightPos", 0.3f, 0.3f, 0.3f);
+        transvoxel_handle->data->set("viewPos", 0.3f, 0.3f, 0.3f);
+        transvoxel_handle->data->set("lightColor", 1.0f, 1.0f, 1.0f);
+        transvoxel_handle->data->set("objectColor", 1.0f, 0.5f, 0.31f);
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -341,7 +363,7 @@ namespace rain::engine
     {
         draw_debug_line(glm::vec3{ 200.0f, 0.0f, 0.0f }, glm::vec3{ -200.0f, 0.0f, 0.0f }, glm::vec3{ 1.0f, 0.5f, 0.0f }, glm::vec3{ 0.5f, 1.0f, 0.0f });
         draw_debug_line(glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 0.0f, -200.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.5f }, glm::vec3{ 0.0f, 0.5f, 1.0f });
-        draw_debug_line(glm::vec3{ 0.0f, 0.0f, 200.0f }, glm::vec3{ 0.0f, 0.0f, -200.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f }, glm::vec3{ 1.0f, 0.0f, 0.5f });
+        draw_debug_line(glm::vec3{ 0.0f, 0.0f, 200.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f }, glm::vec3{ 1.0f, 0.0f, 0.5f });
     }
 
 
@@ -577,35 +599,69 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
-    void Renderer::init_transvoxel(isosurface::voxel_mesh* mesh, u32& vao)
+    void Renderer::init_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, u32& vao)
     {
+        std::vector<float> data;
+        data.reserve(50'000'000);
+        for (u32 i = 0; i < vertices.size(); ++i)
+        {
+            data.push_back(vertices[i].x);
+            data.push_back(vertices[i].y);
+            data.push_back(vertices[i].z);
+
+            data.push_back(normals[i].x);
+            data.push_back(normals[i].y);
+            data.push_back(normals[i].z);
+        }
+
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
+        u32 vbo;
 
-        u32 vbo, ebo;
         glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
-
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(float), &mesh->vertices[0], GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+
         i32 stride = (3 + 3) * sizeof(float);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+
+
+        //glGenVertexArrays(1, &vao);
+
+        //u32 cube_vbo, instance_vbo;
+        //glGenBuffers(1, &cube_vbo);
+        //glGenBuffers(1, &instance_vbo);
+
+        //glBindVertexArray(vao);
+        //glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
+        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+
+        //i32 stride = (3 + 2 + 3) * sizeof(float);
+        //glEnableVertexAttribArray(0);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        //glEnableVertexAttribArray(1);
+        //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        //glEnableVertexAttribArray(2);
+        //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        //glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        //glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
     }
 
-    void Renderer::draw_transvoxel(const u32& vao, const u32 index_count)
+
+    void Renderer::draw_transvoxel(const u32& vao, const u32 triangle_count, const glm::vec3& view_position)
     {
         transvoxel_handle->data->use();
         transvoxel_handle->data->set("model", glm::mat4(1));
-        transvoxel_handle->data->set("proj", proj_mat_perspective);
+        transvoxel_handle->data->set("projection", proj_mat_perspective);
         transvoxel_handle->data->set("view", view_mat);
+        transvoxel_handle->data->set("viewPos", view_position);
 
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, triangle_count);
         glBindVertexArray(0);
     }
 
@@ -964,7 +1020,7 @@ namespace rain::engine
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);
 
-        debug_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/debug.vs", RAIN_CONFIG->data_root + "/shaders/glsl/debug.fs");
+        debug_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/debug.vert", RAIN_CONFIG->data_root + "/shaders/glsl/debug.frag");
     }
 
     void Renderer::draw()
@@ -1137,7 +1193,7 @@ namespace rain::engine
     void Renderer::init_text_2d()
     {
         texts.reserve(128);
-        text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
+        text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vert", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.frag");
 
         FT_Library ft;
 
@@ -1287,7 +1343,7 @@ namespace rain::engine
 		glEnableVertexAttribArray(0);
 		glBindVertexArray(0);
 
-		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/ui.vs", RAIN_CONFIG->data_root + "/shaders/glsl/ui.fs");
+		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/ui.vert", RAIN_CONFIG->data_root + "/shaders/glsl/ui.frag");
 	}
 
 	void Renderer::draw_ui()

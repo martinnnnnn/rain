@@ -2,69 +2,68 @@
 
 #include "glm.hpp"
 #include <vector>
+#include "core/core.h"
 #include "voxel_cell.h"
 #include "voxel_chunk.h"
+#include "transvoxel_tables.h"
 
 namespace rain::engine::isosurface
 {
-    struct ReuseCell
-    {
-        std::vector<i32> Verts;
+    constexpr u32 BLOCK_SIZE = 16;
+    constexpr u32 BLOCK_SIZE_SQUARED = BLOCK_SIZE * BLOCK_SIZE;
+    constexpr u32 BLOCK_SIZE_CUBED = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
 
-        ReuseCell(int size)
-        {
-            Verts.resize(size, -1);
-        }
+    constexpr u32 TMAP_SIZE = 4;
+    constexpr u32 TMAP_SIZE_SQUARED = TMAP_SIZE * TMAP_SIZE;
+    constexpr u32 TMAP_SIZE_CUBED = TMAP_SIZE * TMAP_SIZE * TMAP_SIZE;
+
+    struct tvox_point
+    {
+        i8 distance;
+
+        u8 local_x;
+        u8 local_y;
+        u8 local_z;
+
+        u16 world_x;
+        u16 world_y;
+        u16 world_z;
     };
 
-    struct RegularCellCache
+    struct tvox_block;
+
+    struct tvox_cell
     {
-        std::vector<std::vector<ReuseCell*>> cache;
-        int chunkSize;
-
-        RegularCellCache(i32 size)
-        {
-            chunkSize = size;
-            cache.resize(2);
-
-            cache[0].resize(chunkSize * chunkSize);
-            cache[1].resize(chunkSize * chunkSize);
-
-            for (int i = 0; i < chunkSize * chunkSize; i++)
-            {
-                cache[0][i] = new ReuseCell(4);
-                cache[1][i] = new ReuseCell(4);
-            }
-        }
-
-        ReuseCell* GetReusedIndex(const glm::i32vec3& pos, i8 rDir)
-        {
-            int rx = rDir & 0x01;
-            int rz = (rDir >> 1) & 0x01;
-            int ry = (rDir >> 2) & 0x01;
-
-            int dx = pos.x - rx;
-            int dy = pos.y - ry;
-            int dz = pos.z - rz;
-
-            assert(dx >= 0 && dy >= 0 && dz >= 0);
-            return cache[dx & 1][dy * chunkSize + dz];
-        }
-
-
-        void SetReusableIndex(const glm::i32vec3& pos, i8 reuseIndex, u16 p)
-        {
-            cache[pos.x & 1][pos.y * chunkSize + pos.z]->Verts[reuseIndex] = p;
-        }
+        tvox_point* corners[8];
     };
 
+    struct tvox_map;
 
-    struct voxel_mesh
+    struct tvox_block
     {
+        tvox_point points[BLOCK_SIZE_CUBED];
+        u32 x;
+        u32 y;
+        u32 z;
+    };
+
+    struct tvox_map
+    {
+        std::vector<tvox_block*> blocks;
+
+        // temp ?
+        u32 vao;
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec3> normals;
-        std::vector<u16> indices;
     };
 
-    void transvoxel(voxel_chunk const * const chunk, const i16 LOD, voxel_mesh* mesh);
+    void init_tmap(tvox_map* map);
+    bool is_inside_boundary(i32 max, i32 x, i32 y, i32 z);
+    tvox_block* get_tblock(tvox_map* map, i32 x, i32 y, i32 z);
+    tvox_cell create_tcell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z);
+    tvox_point* get_tpoint(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z);
+    void transvoxel(tvox_map* map);
+    void transvoxel(tvox_map* map, tvox_block* block);
+
+    //void transvoxel(voxel_chunk* chunk, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals);
 }

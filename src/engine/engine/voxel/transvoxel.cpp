@@ -2,167 +2,296 @@
 
 #include "transvoxel_tables.h"
 
+#include "core/core.h"
+#include "engine/core/context.h"
 
 namespace rain::engine::isosurface
 {
-    glm::i32vec3 corner_index[] =
+    void init_tblock(tvox_block* block, u32 x, u32 y, u32 z)
     {
-        glm::i32vec3{ 0, 0, 0 },
-        glm::i32vec3{ 1, 0, 0 },
-        glm::i32vec3{ 0, 0, 1 },
-        glm::i32vec3{ 1, 0, 1 },
-        glm::i32vec3{ 0, 1, 0 },
-        glm::i32vec3{ 1, 1, 0 },
-        glm::i32vec3{ 0, 1, 1 },
-        glm::i32vec3{ 1, 1, 1 }
-    };
+        block->x = x;
+        block->y = y;
+        block->z = z;
 
-
-    u8 getCaseCode(i8 density[8])
-    {
-        u8 code = 0;
-        u8 konj = 0x01;
-        for (u32 i = 0; i < 8; i++)
+        for (u32 i = 0; i < BLOCK_SIZE; ++i)
         {
-            code |= (u8)((density[i] >> (8 - 1 - i)) & konj);
-            konj <<= 1;
-        }
-
-        return code;
-    }
-
-
-    glm::vec3 interpolate_voxel_vector(long t, const glm::vec3& P0, const glm::vec3& P1)
-    {
-        long u = 0x0100 - t; //256 - t
-        float s = 1.0f / 256.0f;
-        glm::vec3 Q = P0 * t + P1 * u; //Density Interpolation
-        Q *= s; // shift to shader ! 
-        return Q;
-    }
-
-
-    void generate_vertex(glm::i32vec3& offsetPos, voxel_mesh* mesh, int LOD, long t, u8& v0, u8& v1, i8& d0, i8& d1, const glm::vec3& normal)
-    {
-        glm::i32vec3 iP0 = (offsetPos + corner_index[v0] * LOD);
-        glm::vec3 P0{ iP0.x, iP0.y, iP0.z };
-
-        glm::i32vec3 iP1 = (offsetPos + corner_index[v1] * LOD);
-        glm::vec3 P1{ iP1.x, iP1.y, iP1.z };
-
-        glm::vec3 Q = interpolate_voxel_vector(t, P0, P1);
-
-        mesh->vertices.push_back(Q);
-        mesh->normals.push_back(normal);
-    }
-
-    void polygonize_cell(voxel_chunk const * const chunk, glm::i32vec3& offset, const glm::i32vec3& position, const i16 LOD, RegularCellCache* cache, voxel_mesh* mesh)
-    {
-        offset += position * LOD;
-
-        u8 direction_mask = (u8)((position.x > 0 ? 1 : 0) | ((position.z > 0 ? 1 : 0) << 1) | ((position.y > 0 ? 1 : 0) << 2));
-
-        i8 density[8];
-
-        for (int i = 0; i < 8; i++)
-        {
-            glm::i32vec3 index{ offset + corner_index[i] * i32(LOD) };
-            f32 dist = chunk->data[index.x + index.y * CHUNK_SIZE + index.z * CHUNK_SIZE_SQUARED].distance;
-            density[i] = (dist > 0) ? 1 : ((dist < 0) ? -1 : 0);
-        }
-
-        u8 caseCode = getCaseCode(density);
-
-        if ((caseCode ^ ((density[7] >> 7) & 0xFF)) == 0)
-        {
-            return;
-        }
-
-        glm::vec3 corner_normals[8];
-        for (int i = 0; i < 8; i++)
-        {
-            auto p = offset + corner_index[i] * i32(LOD);
-            float nx = (get_cell(chunk, p + glm::i32vec3{ 1, 0, 0 }) - get_cell(chunk, p - glm::i32vec3{ 1, 0, 0 })) * 0.5f;
-            float ny = (get_cell(chunk, p + glm::i32vec3{ 0, 1, 0 }) - get_cell(chunk, p - glm::i32vec3{ 0, 1, 0 })) * 0.5f;
-            float nz = (get_cell(chunk, p + glm::i32vec3{ 0, 0, 1 }) - get_cell(chunk, p - glm::i32vec3{ 0, 0, 1 })) * 0.5f;
-
-            corner_normals[i] = glm::normalize(glm::vec3{ nx, ny, nz });
-        }
-
-        const u8 regularCellClass = lengyel::regularCellClass[caseCode];
-        u16 vertexLocations[12];
-        memcpy(&vertexLocations[0], &lengyel::regularVertexData[caseCode][0], sizeof(u16) * 12);
-
-
-        lengyel::RegularCellData c = lengyel::regularCellData[regularCellClass];
-        long vertexCount = c.GetVertexCount();
-        long triangleCount = c.GetTriangleCount();
-        std::vector<u16> mappedIndizes;
-        mappedIndizes.resize(vertexCount);
-
-        for (int i = 0; i < vertexCount; i++)
-        {
-            u8 edge = (u8)(vertexLocations[i] >> 8);
-            u8 reuseIndex = (u8)(edge & 0xF); //Vertex id which should be created or reused 1,2 or 3
-            u8 rDir = (u8)(edge >> 4); //the direction to go to reach a previous cell for reusing 
-
-            u8 v1 = (u8)((vertexLocations[i]) & 0x0F); //Second Corner Index
-            u8 v0 = (u8)((vertexLocations[i] >> 4) & 0x0F); //First Corner Index
-
-            i8 d0 = density[v0];
-            i8 d1 = density[v1];
-
-            assert(v1 > v0 && "this is wrong !");
-
-            i32 t = (d1 << 8) / (d1 - d0);
-            i32 u = 0x0100 - t;
-            f32 t0 = t / 256.0f;
-            f32 t1 = u / 256.0f;
-
-            i32 index = -1;
-
-            if (v1 != 7 && (rDir & direction_mask) == rDir)
+            for (u32 j = 0; j < BLOCK_SIZE; ++j)
             {
-                ReuseCell* cell = cache->GetReusedIndex(position, rDir);
-                index = cell->Verts[reuseIndex];
-            }
-
-            if (index == -1)
-            {
-                glm::vec3 normal = corner_normals[v0] * t0 + corner_normals[v1] * t1;
-                generate_vertex(offset, mesh, LOD, t, v0, v1, d0, d1, normal);
-                index = mesh->vertices.size() - 1;
-            }
-
-            if ((rDir & 8) != 0)
-            {
-                cache->SetReusableIndex(position, reuseIndex, mesh->vertices.size()-1);
-            }
-
-            mappedIndizes[i] = (u16)index;
-        }
-
-        for (int t = 0; t < triangleCount; t++)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                mesh->indices.push_back(mappedIndizes[c.vertexIndex[t * 3 + i]]);
-            }
-        }
-    }
-
-    void transvoxel(voxel_chunk const * const chunk, const i16 LOD, voxel_mesh* mesh)
-    {
-        RegularCellCache cache(CHUNK_SIZE * 10);
-        for (int x = 0; x < CHUNK_SIZE; x++)
-        {
-            for (int y = 0; y < CHUNK_SIZE; y++)
-            {
-                for (int z = 0; z < CHUNK_SIZE; z++)
+                for (u32 k = 0; k < BLOCK_SIZE; ++k)
                 {
-                    polygonize_cell(chunk, glm::i32vec3{ x, y, z }, glm::i32vec3(x, y, z), LOD, &cache, mesh);
+                    tvox_point* point = &(block->points[i + j * BLOCK_SIZE + k * BLOCK_SIZE_SQUARED]);
+                    
+                    point->local_x = i;
+                    point->local_y = j;
+                    point->local_z = k;
+
+                    point->world_x = i + x * BLOCK_SIZE;
+                    point->world_y = j + y * BLOCK_SIZE;
+                    point->world_z = k + z * BLOCK_SIZE;
+
+                    const f32 pointx = f32(point->world_x) / f32(BLOCK_SIZE);
+                    const f32 pointy = f32(point->world_y) / f32(BLOCK_SIZE);
+                    const f32 pointz = f32(point->world_z) / f32(BLOCK_SIZE);
+
+                    point->distance = i8(core::simplex_noise::noise(pointx, pointy, pointz) * 127.0f);
                 }
             }
         }
     }
+
+    void init_tmap(tvox_map* map)
+    {
+        map->blocks.resize(TMAP_SIZE_CUBED);
+
+        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        {
+            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            {
+                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                {
+                    u32 currentIndex = i + j * TMAP_SIZE + k * TMAP_SIZE_SQUARED;
+                    map->blocks[currentIndex] = new tvox_block();
+                    init_tblock(map->blocks[currentIndex], i, j, k);
+                }
+            }
+        }
+    }
+
+    bool is_inside_boundary(i32 max, i32 x, i32 y, i32 z)
+    {
+        return (x < max && y < max && z < max && x >= 0 && y >= 0 && z >= 0);
+    }
+
+    tvox_block* get_tblock(tvox_map* map, i32 x, i32 y, i32 z)
+    {
+        if (is_inside_boundary(TMAP_SIZE, x, y, z))
+        {
+            return map->blocks[x + y * TMAP_SIZE + z * TMAP_SIZE_SQUARED];
+        }
+
+        return nullptr;
+    }
+
+
+    tvox_cell create_tcell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    {
+        tvox_cell cell{};
+
+        cell.corners[0] = get_tpoint(map, block, x - 1, y - 1, z + 1);
+        cell.corners[1] = get_tpoint(map, block, x    , y - 1, z + 1);
+        cell.corners[2] = get_tpoint(map, block, x - 1, y - 1, z);
+        cell.corners[3] = get_tpoint(map, block, x    , y - 1, z);
+        cell.corners[4] = get_tpoint(map, block, x - 1, y    , z + 1);
+        cell.corners[5] = get_tpoint(map, block, x    , y    , z + 1);
+        cell.corners[6] = get_tpoint(map, block, x - 1, y    , z);
+        cell.corners[7] = get_tpoint(map, block, x    , y    , z);
+
+        for (u32 i = 0; i < 8; ++i)
+        {
+            if (!cell.corners[i])
+            {
+                cell.corners[i] = cell.corners[7];
+            }
+        }
+
+
+        return cell;
+    }
+
+    tvox_point* get_tpoint(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    {
+        if (is_inside_boundary(BLOCK_SIZE, x, y, z))
+        {
+            return &(block->points[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
+        }
+
+        const i32 new_block_x = (x == -1) ? block->x - 1 : (x == BLOCK_SIZE) ? block->x + 1 : block->x;
+        const i32 new_block_y = (y == -1) ? block->y - 1 : (y == BLOCK_SIZE) ? block->y + 1 : block->y;
+        const i32 new_block_z = (z == -1) ? block->z - 1 : (z == BLOCK_SIZE) ? block->z + 1 : block->z;
+
+        tvox_block* new_block = get_tblock(map, new_block_x, new_block_y, new_block_z);
+        if (new_block)
+        {
+            const i32 new_cell_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
+            const i32 new_cell_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
+            const i32 new_cell_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
+
+            return get_tpoint(map, new_block, new_cell_x, new_cell_y, new_cell_z);
+        }
+
+        return nullptr;
+    }
+
+    void transvoxel(tvox_map* map)
+    {
+        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        {
+            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            {
+                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                {
+                    transvoxel(map, map->blocks[i + j * TMAP_SIZE + k * TMAP_SIZE_SQUARED]);
+                }
+            }
+        }
+    }
+
+    void transvoxel(tvox_map* map, tvox_block* block)
+    {
+        for (i32 z = 0; z < BLOCK_SIZE; ++z)
+        {
+            for (i32 y = 0; y < BLOCK_SIZE; ++y)
+            {
+                for (i32 x = 0; x < BLOCK_SIZE; ++x)
+                {
+                    tvox_cell cell = create_tcell(map, block, x, y, z);
+
+                    unsigned long caseCode =
+                        ((cell.corners[0]->distance >> 7) & 0x01)
+                        | ((cell.corners[1]->distance >> 6) & 0x02)
+                        | ((cell.corners[2]->distance >> 5) & 0x04)
+                        | ((cell.corners[3]->distance >> 4) & 0x08)
+                        | ((cell.corners[4]->distance >> 3) & 0x10)
+                        | ((cell.corners[5]->distance >> 2) & 0x20)
+                        | ((cell.corners[6]->distance >> 1) & 0x40)
+                        | (cell.corners[7]->distance & 0x80);
+
+                    if ((caseCode ^ ((cell.corners[7]->distance >> 7) & 0xFF)) != 0)
+                    {
+                        u8 regCellClass = lengyel::regularCellClass[caseCode];
+                        lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
+                        const u16* regVertexData = lengyel::regularVertexData[caseCode];
+
+                        std::vector<glm::vec3> vertexPositions;
+                        vertexPositions.resize(cellData.GetVertexCount());
+
+                        for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
+                        {
+                            const u16 vertexData = *(regVertexData + i);
+                            const u8 lowByte = vertexData & 0xFF;
+                            const u8 lowNumberedCorner = lowByte >> 4;
+                            const u8 highNumberedCorner = lowByte & 0x0F;
+
+                            const f32 t = f32(cell.corners[highNumberedCorner]->distance) / (f32(cell.corners[highNumberedCorner]->distance) - f32(cell.corners[lowNumberedCorner]->distance));
+
+                            const f32 lnc_x = f32(cell.corners[lowNumberedCorner]->world_x);
+                            const f32 lnc_y = f32(cell.corners[lowNumberedCorner]->world_y);
+                            const f32 lnc_z = f32(cell.corners[lowNumberedCorner]->world_z);
+
+                            const f32 hnc_x = f32(cell.corners[highNumberedCorner]->world_x);
+                            const f32 hnc_y = f32(cell.corners[highNumberedCorner]->world_y);
+                            const f32 hnc_z = f32(cell.corners[highNumberedCorner]->world_z);
+
+                            //const f32 lnc_x = f32(cell.corners[lowNumberedCorner]->x + block->x * BLOCK_SIZE);
+                            //const f32 lnc_y = f32(cell.corners[lowNumberedCorner]->y + block->y * BLOCK_SIZE);
+                            //const f32 lnc_z = f32(cell.corners[lowNumberedCorner]->z + block->z * BLOCK_SIZE);
+
+                            //const f32 hnc_x = f32(cell.corners[highNumberedCorner]->x + block->x * BLOCK_SIZE);
+                            //const f32 hnc_y = f32(cell.corners[highNumberedCorner]->y + block->y * BLOCK_SIZE);
+                            //const f32 hnc_z = f32(cell.corners[highNumberedCorner]->z + block->z * BLOCK_SIZE);
+
+                            vertexPositions[i] = glm::vec3
+                            {
+                                t * lnc_x + (1 - t) * hnc_x,
+                                t * lnc_y + (1 - t) * hnc_y,
+                                t * lnc_z + (1 - t) * hnc_z
+                            };
+                        }
+
+                        u32 j = 0;
+                        for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
+                        {
+                            map->vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
+                            if (j % 3 == 0)
+                            {
+                                const glm::vec3& A = vertexPositions[cellData.vertexIndex[i]];
+                                const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
+                                const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
+                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //void transvoxel(voxel_chunk* chunk, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals)
+    //{
+    //    for (i32 z = 0; z < CHUNK_SIZE; ++z)
+    //    {
+    //        for (i32 y = 0; y < CHUNK_SIZE; ++y)
+    //        {
+    //            for (i32 x = 0; x < CHUNK_SIZE; ++x)
+    //            {
+    //                voxel_cell* cells[8];
+    //                cells[0] = get_cell(chunk, x - 1, y - 1, z + 1);
+    //                cells[1] = get_cell(chunk, x    , y - 1, z + 1);
+    //                cells[2] = get_cell(chunk, x - 1, y - 1, z    );
+    //                cells[3] = get_cell(chunk, x    , y - 1, z    );
+    //                cells[4] = get_cell(chunk, x - 1, y    , z + 1);
+    //                cells[5] = get_cell(chunk, x    , y    , z + 1);
+    //                cells[6] = get_cell(chunk, x - 1, y    , z    );
+    //                cells[7] = get_cell(chunk, x    , y    , z    );
+
+    //                for (u32 i = 0; i < 8; ++i)
+    //                {
+    //                    if (!cells[i])
+    //                    {
+    //                        cells[i] = cells[7];
+    //                    }
+    //                }
+
+    //                unsigned long caseCode = 
+    //                      ((cells[0]->distance >> 7) & 0x01) 
+    //                    | ((cells[1]->distance >> 6) & 0x02) 
+    //                    | ((cells[2]->distance >> 5) & 0x04) 
+    //                    | ((cells[3]->distance >> 4) & 0x08) 
+    //                    | ((cells[4]->distance >> 3) & 0x10)
+    //                    | ((cells[5]->distance >> 2) & 0x20) 
+    //                    | ((cells[6]->distance >> 1) & 0x40) 
+    //                    | (cells[7]->distance & 0x80);
+    //                
+    //                if ((caseCode ^ ((cells[7]->distance >> 7) & 0xFF)) != 0)
+    //                {
+    //                    u8 regCellClass = lengyel::regularCellClass[caseCode];
+    //                    lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
+    //                    const u16* regVertexData = lengyel::regularVertexData[caseCode];
+
+    //                    std::vector<glm::vec3> vertexPositions;
+    //                    vertexPositions.resize(cellData.GetVertexCount());
+
+    //                    for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
+    //                    {
+    //                        const u16 vertexData = *(regVertexData + i);
+    //                        const u8 lowByte = vertexData & 0xFF;
+    //                        const u8 lowNumberedCorner = lowByte >> 4;
+    //                        const u8 highNumberedCorner = lowByte & 0x0F;
+
+    //                        const f32 t = f32(cells[highNumberedCorner]->distance) / (f32(cells[highNumberedCorner]->distance) - f32(cells[lowNumberedCorner]->distance));
+    //                        vertexPositions[i] = t * cells[lowNumberedCorner]->position + (1 - t) * cells[highNumberedCorner]->position;
+    //                    }
+
+    //                    u32 j = 0;
+    //                    for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
+    //                    {
+    //                        vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
+    //                        if (j % 3 == 0)
+    //                        {
+    //                            const glm::vec3& A = vertexPositions[cellData.vertexIndex[i    ]];
+    //                            const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
+    //                            const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
+    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+ 
 }
