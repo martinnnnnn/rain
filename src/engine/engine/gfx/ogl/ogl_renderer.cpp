@@ -525,8 +525,8 @@ namespace rain::engine
         std::vector<glm::vec3> normals;
         std::vector<unsigned int> indices;
 
-        const unsigned int X_SEGMENTS = 4;
-        const unsigned int Y_SEGMENTS = 4;
+        const unsigned int X_SEGMENTS = 32;
+        const unsigned int Y_SEGMENTS = 32;
         const float PI = 3.14159265359f;
         for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
         {
@@ -599,10 +599,10 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
-    void Renderer::init_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, u32& vao)
+    void Renderer::init_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, u32& vao, u32& vbo)
     {
         std::vector<float> data;
-        data.reserve(50'000'000);
+        data.reserve(2'000'000);
         for (u32 i = 0; i < vertices.size(); ++i)
         {
             data.push_back(vertices[i].x);
@@ -616,7 +616,6 @@ namespace rain::engine
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
-        u32 vbo;
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -629,26 +628,75 @@ namespace rain::engine
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 
 
-        //glGenVertexArrays(1, &vao);
 
-        //u32 cube_vbo, instance_vbo;
-        //glGenBuffers(1, &cube_vbo);
-        //glGenBuffers(1, &instance_vbo);
+
+        //glGenVertexArrays(1, &vao);
+        //glBindVertexArray(vao);
+
+        //glGenBuffers(1, &vbo);
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        //glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3) /** 2*/, NULL, GL_DYNAMIC_DRAW);
+        //glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(glm::vec3), &vertices[0]);
+        ////glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(f32) * 3, normals.size() * sizeof(f32) * 3, &normals[0]);
+
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+        ////glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 3, (void*)(vertices.size() * sizeof(f32) * 3));
+
+
+        //std::vector<float> positions;
+        //positions.reserve(500'000);
+        //for (u32 i = 0; i < vertices.size(); ++i)
+        //{
+        //    positions.push_back(vertices[i].x);
+        //    positions.push_back(vertices[i].y);
+        //    positions.push_back(vertices[i].z);
+        //}
+
+        //glGenVertexArrays(1, &vao);
+        //glBindVertexArray(vao);
+
+        //glGenBuffers(1, &vbo);
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+        ////glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(f32), NULL, GL_DYNAMIC_DRAW);
+        //glBufferSubData(GL_ARRAY_BUFFER, 0, positions.size() * sizeof(f32), &positions[0]);
+
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    }
+
+    void Renderer::update_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const u32& vao, const u32& vbo)
+    {
+        std::vector<float> data;
+        data.reserve(2'000'000);
+        for (u32 i = 0; i < vertices.size(); ++i)
+        {
+            data.push_back(vertices[i].x);
+            data.push_back(vertices[i].y);
+            data.push_back(vertices[i].z);
+
+            data.push_back(normals[i].x);
+            data.push_back(normals[i].y);
+            data.push_back(normals[i].z);
+        }
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+
+        i32 stride = (3 + 3) * sizeof(float);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+
+
 
         //glBindVertexArray(vao);
-        //glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
-        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        //glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(glm::vec3), &vertices[0]);
+        //glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), normals.size() * sizeof(glm::vec3), &normals[0]);
 
-        //i32 stride = (3 + 2 + 3) * sizeof(float);
-        //glEnableVertexAttribArray(0);
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-        //glEnableVertexAttribArray(1);
-        //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-        //glEnableVertexAttribArray(2);
-        //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
-
-        //glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
-        //glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)(vertices.size() * sizeof(glm::vec3)));
     }
 
 
@@ -1318,6 +1366,7 @@ namespace rain::engine
         texts.clear();
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_CULL_FACE);
     }
 
     void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec4& _color)

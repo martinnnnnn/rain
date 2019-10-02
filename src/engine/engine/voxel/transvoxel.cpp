@@ -1,14 +1,18 @@
 #include "transvoxel.h"
 
 #include "transvoxel_tables.h"
-
 #include "core/core.h"
 #include "engine/core/context.h"
+#include "engine/core/profiler.h"
+#include "engine/gfx/ogl/ogl_renderer.h"
 
-namespace rain::engine::isosurface
+#include "assert.h"
+
+namespace rain::engine::transvoxel
 {
     void init_tblock(tvox_block* block, u32 x, u32 y, u32 z)
     {
+        block->need_update = true;
         block->x = x;
         block->y = y;
         block->z = z;
@@ -33,13 +37,15 @@ namespace rain::engine::isosurface
                     const f32 pointy = f32(point->world_y) / f32(BLOCK_SIZE);
                     const f32 pointz = f32(point->world_z) / f32(BLOCK_SIZE);
 
-                    point->distance = i8(core::simplex_noise::noise(pointx, pointy, pointz) * 127.0f);
+                    point->dist = i8(core::simplex_noise::noise(pointx, pointy, pointz) * 127.0f);
+
+                    point->owner = block;
                 }
             }
         }
     }
 
-    void init_tmap(tvox_map* map)
+    void init_map(tvox_map* map)
     {
         map->blocks.resize(TMAP_SIZE_CUBED);
 
@@ -62,7 +68,7 @@ namespace rain::engine::isosurface
         return (x < max && y < max && z < max && x >= 0 && y >= 0 && z >= 0);
     }
 
-    tvox_block* get_tblock(tvox_map* map, i32 x, i32 y, i32 z)
+    tvox_block* get_block(tvox_map* map, i32 x, i32 y, i32 z)
     {
         if (is_inside_boundary(TMAP_SIZE, x, y, z))
         {
@@ -72,33 +78,7 @@ namespace rain::engine::isosurface
         return nullptr;
     }
 
-
-    tvox_cell create_tcell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
-    {
-        tvox_cell cell{};
-
-        cell.corners[0] = get_tpoint(map, block, x - 1, y - 1, z + 1);
-        cell.corners[1] = get_tpoint(map, block, x    , y - 1, z + 1);
-        cell.corners[2] = get_tpoint(map, block, x - 1, y - 1, z);
-        cell.corners[3] = get_tpoint(map, block, x    , y - 1, z);
-        cell.corners[4] = get_tpoint(map, block, x - 1, y    , z + 1);
-        cell.corners[5] = get_tpoint(map, block, x    , y    , z + 1);
-        cell.corners[6] = get_tpoint(map, block, x - 1, y    , z);
-        cell.corners[7] = get_tpoint(map, block, x    , y    , z);
-
-        for (u32 i = 0; i < 8; ++i)
-        {
-            if (!cell.corners[i])
-            {
-                cell.corners[i] = cell.corners[7];
-            }
-        }
-
-
-        return cell;
-    }
-
-    tvox_point* get_tpoint(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    tvox_point* get_point(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
     {
         if (is_inside_boundary(BLOCK_SIZE, x, y, z))
         {
@@ -109,20 +89,259 @@ namespace rain::engine::isosurface
         const i32 new_block_y = (y == -1) ? block->y - 1 : (y == BLOCK_SIZE) ? block->y + 1 : block->y;
         const i32 new_block_z = (z == -1) ? block->z - 1 : (z == BLOCK_SIZE) ? block->z + 1 : block->z;
 
-        tvox_block* new_block = get_tblock(map, new_block_x, new_block_y, new_block_z);
+        tvox_block* new_block = get_block(map, new_block_x, new_block_y, new_block_z);
         if (new_block)
         {
             const i32 new_cell_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
             const i32 new_cell_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
             const i32 new_cell_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
 
-            return get_tpoint(map, new_block, new_cell_x, new_cell_y, new_cell_z);
+            return get_point(map, new_block, new_cell_x, new_cell_y, new_cell_z);
         }
 
         return nullptr;
     }
 
+    tvox_cell create_cell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    {
+        tvox_cell cell{};
+
+        cell.corners[0] = get_point(map, block, x    , y    , z    );
+        cell.corners[1] = get_point(map, block, x + 1, y    , z    );
+        cell.corners[2] = get_point(map, block, x    , y + 1, z    );
+        cell.corners[3] = get_point(map, block, x + 1, y + 1, z    );
+        cell.corners[4] = get_point(map, block, x    , y    , z + 1);
+        cell.corners[5] = get_point(map, block, x + 1, y    , z + 1);
+        cell.corners[6] = get_point(map, block, x    , y + 1, z + 1);
+        cell.corners[7] = get_point(map, block, x + 1, y + 1, z + 1);
+
+        return cell;
+    }
+
+    void set_case_code(tvox_cell* cell)
+    {
+        assert(cell->corners[0] && "A cell corner can never be null.");
+        assert(cell->corners[1] && "A cell corner can never be null.");
+        assert(cell->corners[2] && "A cell corner can never be null.");
+        assert(cell->corners[3] && "A cell corner can never be null.");
+        assert(cell->corners[4] && "A cell corner can never be null.");
+        assert(cell->corners[5] && "A cell corner can never be null.");
+        assert(cell->corners[6] && "A cell corner can never be null.");
+        assert(cell->corners[7] && "A cell corner can never be null.");
+
+        cell->case_code =
+            ((cell->corners[0]->dist >> 7) & 0x01)
+            | ((cell->corners[1]->dist >> 6) & 0x02)
+            | ((cell->corners[2]->dist >> 5) & 0x04)
+            | ((cell->corners[3]->dist >> 4) & 0x08)
+            | ((cell->corners[4]->dist >> 3) & 0x10)
+            | ((cell->corners[5]->dist >> 2) & 0x20)
+            | ((cell->corners[6]->dist >> 1) & 0x40)
+            | (cell->corners[7]->dist & 0x80);
+    }
+
+    void update_validity_mask(u8& validity_mask, i32 point_x, i32 point_y, i32 point_z, i32 block_x, i32 block_y, i32 block_z)
+    {
+        u8 x_value = (point_x == 0 && block_x == 0) ? 0 : 1UL;
+        u8 y_value = (point_y == 0 && block_y == 0) ? 0 : 1UL;
+        u8 z_value = (point_z == 0 && block_z == 0) ? 0 : 1UL;
+
+        if (point_x == 0 && block_x == 0)
+        {
+            unset_bit<u8>(validity_mask, 0);
+        }
+        else
+        {
+            set_bit<u8>(validity_mask, 0);
+        }
+
+        if (point_y == 0 && block_y == 0)
+        {
+            unset_bit<u8>(validity_mask, 1);
+        }
+        else
+        {
+            set_bit<u8>(validity_mask, 1);
+        }
+
+        if (point_z == 0 && block_z == 0)
+        {
+            unset_bit<u8>(validity_mask, 2);
+        }
+        else
+        {
+            set_bit<u8>(validity_mask, 2);
+        }
+
+
+        //set_bit<u8>(validity_mask, 0, x_value);
+        //set_bit<u8>(validity_mask, 1, y_value);
+        //set_bit<u8>(validity_mask, 2, z_value);
+
+        //set_bit<u8>(validity_mask, 1, x > 0 ? 1UL : 0UL);
+        //set_bit<u8>(validity_mask, 2, y > 0 ? 1UL : 0UL);
+        //set_bit<u8>(validity_mask, 3, z > 0 ? 1UL : 0UL);
+    }
+
+    void transvoxel(tvox_map* map, tvox_block* block, tvox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
+    {
+        block->vertices.clear();
+        block->normals.clear();
+
+        u8 validity_mask = 0;
+
+        i32 xmax = (block->x == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 ymax = (block->y == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 zmax = (block->z == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+
+        for (i32 z = 0; z < zmax; ++z)
+        {
+            const u8 previous_deck = (current_deck + 1) & 1;
+            for (i32 y = 0; y < ymax; ++y)
+            {
+                for (i32 x = 0; x < xmax; ++x)
+                {
+                    decks[current_deck][x + y * BLOCK_SIZE] = create_cell(map, block, x, y, z);
+                    tvox_cell* cell = &decks[current_deck][x + y * BLOCK_SIZE];
+                    set_case_code(cell);
+
+                    if ((cell->case_code ^ ((cell->corners[7]->dist >> 7) & 0xFF)) != 0)
+                    {
+                        update_validity_mask(validity_mask, x, y, z, block->x, block->y, block->z);
+
+                        u8 regCellClass = lengyel::regularCellClass[cell->case_code];
+                        lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
+                        const u16* regVertexData = lengyel::regularVertexData[cell->case_code];
+
+                        std::vector<glm::vec3> vertexPositions;
+
+                        u32 vcount = cellData.GetVertexCount();
+                        for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
+                        {
+                            const u16 vertexData = *(regVertexData + i);
+
+                            const u8 highByte = vertexData >> 8;    // high byte contains :
+                            const u8 mapping = highByte >> 4;       // mapping to the preceeding cell
+                            const u8 vertexIndex = highByte & 0x0F; // index of the vertex that needs to be reused / created
+
+                            const u8 lowByte = vertexData & 0xFF; // low byte contains the corners between which a vertex needs to be created
+                            const u8 lowNumberedCorner = lowByte >> 4;
+                            const u8 highNumberedCorner = lowByte & 0x0F;
+
+                            glm::vec3 current_tmp = VEC3_INVALID;
+
+                            i8 new_x = x - (mapping & 0x01);
+                            i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
+                            i8 new_z = (current_deck + ((mapping & 0x04) >> 2)) & 1;
+
+                            if (new_x == -1)
+                            {
+                                new_x = BLOCK_SIZE - 1;
+                                new_z = previous_deck;
+                            }
+                            if (new_y == -1) 
+                            {
+                                new_y = BLOCK_SIZE - 1;
+                                new_z = previous_deck;
+                            }
+                            // /!\ the problem :
+                            //      we autorize x to go negative even though x & dock x are equal to 0.
+                            //      this is due to y = 0 && docky > 0.
+                            //      these are two different cases that need to be handled differently.
+                            //      god my code is ugly.
+                            const tvox_cell& neighbour_cell = decks[new_z][new_x + CHUNK_SIZE * new_y];
+                            if (mapping & validity_mask == mapping)
+                            {
+                                current_tmp = neighbour_cell.vertices[vertexIndex];
+                            }
+                            else
+                            {
+                                const f32 t = f32(cell->corners[highNumberedCorner]->dist) / (f32(cell->corners[highNumberedCorner]->dist) - f32(cell->corners[lowNumberedCorner]->dist));
+
+                                const f32 lnc_x = f32(cell->corners[lowNumberedCorner]->world_x);
+                                const f32 lnc_y = f32(cell->corners[lowNumberedCorner]->world_y);
+                                const f32 lnc_z = f32(cell->corners[lowNumberedCorner]->world_z);
+
+                                const f32 hnc_x = f32(cell->corners[highNumberedCorner]->world_x);
+                                const f32 hnc_y = f32(cell->corners[highNumberedCorner]->world_y);
+                                const f32 hnc_z = f32(cell->corners[highNumberedCorner]->world_z);
+
+                                cell->vertices[vertexIndex] = glm::vec3
+                                {
+                                    t * lnc_x + (1 - t) * hnc_x,
+                                    t * lnc_y + (1 - t) * hnc_y,
+                                    t * lnc_z + (1 - t) * hnc_z
+                                };
+                                current_tmp = cell->vertices[vertexIndex];
+                            }
+
+                            if (current_tmp == VEC3_INVALID)
+                            {
+                                RAIN_LOG("hello");
+                            }
+                            //assert(current_tmp != VEC3_INVALID && "The vectex should never be invalid at this point.");
+
+                            vertexPositions.push_back(current_tmp);
+                        }
+
+                        u32 j = 0;
+                        for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
+                        {
+                            block->vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
+                            if (j % 3 == 0)
+                            {
+                                const glm::vec3& A = vertexPositions[cellData.vertexIndex[i]];
+                                const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
+                                const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
+                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                            }
+                        }
+                    }
+                }
+            }
+            current_deck = previous_deck;
+        }
+
+        if (block->vao == 0)
+        {
+            RAIN_RENDERER->init_transvoxel(block->vertices, block->normals, block->vao, block->vbo);
+        }
+        else
+        {
+            RAIN_RENDERER->update_transvoxel(block->vertices, block->normals, block->vao, block->vbo);
+        }
+
+        block->need_update = false;
+    }
+
+
     void transvoxel(tvox_map* map)
+    {
+        tvox_cell decks[2][BLOCK_SIZE_SQUARED];
+        memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
+
+        u8 current_deck = 0;
+
+        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        {
+            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            {
+                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                {
+                    tvox_block* block = get_block(map, k, j, i);
+
+                    if (!block->need_update)
+                        continue;
+                    RAIN_PROFILE("Block transvoxel");
+                    transvoxel(map, block, decks, current_deck);
+                }
+            }
+        }
+    }
+
+    void draw_map(tvox_map* map, const glm::vec3& camera_position)
     {
         for (u32 i = 0; i < TMAP_SIZE; ++i)
         {
@@ -130,168 +349,47 @@ namespace rain::engine::isosurface
             {
                 for (u32 k = 0; k < TMAP_SIZE; ++k)
                 {
-                    transvoxel(map, map->blocks[i + j * TMAP_SIZE + k * TMAP_SIZE_SQUARED]);
+                    tvox_block* block = get_block(map, i, j, k);
+
+                    RAIN_RENDERER->draw_transvoxel(block->vao, block->vertices.size(), camera_position);
                 }
             }
         }
     }
 
-    void transvoxel(tvox_map* map, tvox_block* block)
+    std::vector<tvox_point*> get_points_in_sphere(tvox_map* tmap, const core::sphere& sphere)
     {
-        for (i32 z = 0; z < BLOCK_SIZE; ++z)
+        std::vector<tvox_point*> points;
+
+        for (u32 i = 0; i < TMAP_SIZE; ++i)
         {
-            for (i32 y = 0; y < BLOCK_SIZE; ++y)
+            for (u32 j = 0; j < TMAP_SIZE; ++j)
             {
-                for (i32 x = 0; x < BLOCK_SIZE; ++x)
+                for (u32 k = 0; k < TMAP_SIZE; ++k)
                 {
-                    tvox_cell cell = create_tcell(map, block, x, y, z);
+                    tvox_block* block = get_block(tmap, i, j, k);
 
-                    unsigned long caseCode =
-                        ((cell.corners[0]->distance >> 7) & 0x01)
-                        | ((cell.corners[1]->distance >> 6) & 0x02)
-                        | ((cell.corners[2]->distance >> 5) & 0x04)
-                        | ((cell.corners[3]->distance >> 4) & 0x08)
-                        | ((cell.corners[4]->distance >> 3) & 0x10)
-                        | ((cell.corners[5]->distance >> 2) & 0x20)
-                        | ((cell.corners[6]->distance >> 1) & 0x40)
-                        | (cell.corners[7]->distance & 0x80);
-
-                    if ((caseCode ^ ((cell.corners[7]->distance >> 7) & 0xFF)) != 0)
+                    for (u32 x = 0; x < BLOCK_SIZE; ++x)
                     {
-                        u8 regCellClass = lengyel::regularCellClass[caseCode];
-                        lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
-                        const u16* regVertexData = lengyel::regularVertexData[caseCode];
-
-                        std::vector<glm::vec3> vertexPositions;
-                        vertexPositions.resize(cellData.GetVertexCount());
-
-                        for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
+                        for (u32 y = 0; y < BLOCK_SIZE; ++y)
                         {
-                            const u16 vertexData = *(regVertexData + i);
-                            const u8 lowByte = vertexData & 0xFF;
-                            const u8 lowNumberedCorner = lowByte >> 4;
-                            const u8 highNumberedCorner = lowByte & 0x0F;
-
-                            const f32 t = f32(cell.corners[highNumberedCorner]->distance) / (f32(cell.corners[highNumberedCorner]->distance) - f32(cell.corners[lowNumberedCorner]->distance));
-
-                            const f32 lnc_x = f32(cell.corners[lowNumberedCorner]->world_x);
-                            const f32 lnc_y = f32(cell.corners[lowNumberedCorner]->world_y);
-                            const f32 lnc_z = f32(cell.corners[lowNumberedCorner]->world_z);
-
-                            const f32 hnc_x = f32(cell.corners[highNumberedCorner]->world_x);
-                            const f32 hnc_y = f32(cell.corners[highNumberedCorner]->world_y);
-                            const f32 hnc_z = f32(cell.corners[highNumberedCorner]->world_z);
-
-                            //const f32 lnc_x = f32(cell.corners[lowNumberedCorner]->x + block->x * BLOCK_SIZE);
-                            //const f32 lnc_y = f32(cell.corners[lowNumberedCorner]->y + block->y * BLOCK_SIZE);
-                            //const f32 lnc_z = f32(cell.corners[lowNumberedCorner]->z + block->z * BLOCK_SIZE);
-
-                            //const f32 hnc_x = f32(cell.corners[highNumberedCorner]->x + block->x * BLOCK_SIZE);
-                            //const f32 hnc_y = f32(cell.corners[highNumberedCorner]->y + block->y * BLOCK_SIZE);
-                            //const f32 hnc_z = f32(cell.corners[highNumberedCorner]->z + block->z * BLOCK_SIZE);
-
-                            vertexPositions[i] = glm::vec3
+                            for (u32 z = 0; z < BLOCK_SIZE; ++z)
                             {
-                                t * lnc_x + (1 - t) * hnc_x,
-                                t * lnc_y + (1 - t) * hnc_y,
-                                t * lnc_z + (1 - t) * hnc_z
-                            };
-                        }
+                                tvox_point* point = get_point(tmap, block, x, y, z);
+                                const glm::vec3 position = glm::vec3(point->world_x, point->world_x, point->world_z) + tmap->position;
+                                const f32 dist = glm::distance(position, sphere.offset);
 
-                        u32 j = 0;
-                        for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
-                        {
-                            map->vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
-                            if (j % 3 == 0)
-                            {
-                                const glm::vec3& A = vertexPositions[cellData.vertexIndex[i]];
-                                const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
-                                const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
-                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-                                map->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
+                                if (dist < sphere.radius)
+                                {
+                                    points.push_back(point);
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        return points;
     }
-
-    //void transvoxel(voxel_chunk* chunk, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals)
-    //{
-    //    for (i32 z = 0; z < CHUNK_SIZE; ++z)
-    //    {
-    //        for (i32 y = 0; y < CHUNK_SIZE; ++y)
-    //        {
-    //            for (i32 x = 0; x < CHUNK_SIZE; ++x)
-    //            {
-    //                voxel_cell* cells[8];
-    //                cells[0] = get_cell(chunk, x - 1, y - 1, z + 1);
-    //                cells[1] = get_cell(chunk, x    , y - 1, z + 1);
-    //                cells[2] = get_cell(chunk, x - 1, y - 1, z    );
-    //                cells[3] = get_cell(chunk, x    , y - 1, z    );
-    //                cells[4] = get_cell(chunk, x - 1, y    , z + 1);
-    //                cells[5] = get_cell(chunk, x    , y    , z + 1);
-    //                cells[6] = get_cell(chunk, x - 1, y    , z    );
-    //                cells[7] = get_cell(chunk, x    , y    , z    );
-
-    //                for (u32 i = 0; i < 8; ++i)
-    //                {
-    //                    if (!cells[i])
-    //                    {
-    //                        cells[i] = cells[7];
-    //                    }
-    //                }
-
-    //                unsigned long caseCode = 
-    //                      ((cells[0]->distance >> 7) & 0x01) 
-    //                    | ((cells[1]->distance >> 6) & 0x02) 
-    //                    | ((cells[2]->distance >> 5) & 0x04) 
-    //                    | ((cells[3]->distance >> 4) & 0x08) 
-    //                    | ((cells[4]->distance >> 3) & 0x10)
-    //                    | ((cells[5]->distance >> 2) & 0x20) 
-    //                    | ((cells[6]->distance >> 1) & 0x40) 
-    //                    | (cells[7]->distance & 0x80);
-    //                
-    //                if ((caseCode ^ ((cells[7]->distance >> 7) & 0xFF)) != 0)
-    //                {
-    //                    u8 regCellClass = lengyel::regularCellClass[caseCode];
-    //                    lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
-    //                    const u16* regVertexData = lengyel::regularVertexData[caseCode];
-
-    //                    std::vector<glm::vec3> vertexPositions;
-    //                    vertexPositions.resize(cellData.GetVertexCount());
-
-    //                    for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
-    //                    {
-    //                        const u16 vertexData = *(regVertexData + i);
-    //                        const u8 lowByte = vertexData & 0xFF;
-    //                        const u8 lowNumberedCorner = lowByte >> 4;
-    //                        const u8 highNumberedCorner = lowByte & 0x0F;
-
-    //                        const f32 t = f32(cells[highNumberedCorner]->distance) / (f32(cells[highNumberedCorner]->distance) - f32(cells[lowNumberedCorner]->distance));
-    //                        vertexPositions[i] = t * cells[lowNumberedCorner]->position + (1 - t) * cells[highNumberedCorner]->position;
-    //                    }
-
-    //                    u32 j = 0;
-    //                    for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
-    //                    {
-    //                        vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
-    //                        if (j % 3 == 0)
-    //                        {
-    //                            const glm::vec3& A = vertexPositions[cellData.vertexIndex[i    ]];
-    //                            const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
-    //                            const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
-    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-    //                            normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
- 
 }

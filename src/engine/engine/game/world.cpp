@@ -30,8 +30,8 @@ namespace rain::engine
 
         {
             RAIN_PROFILE("Chunk init");
-            vmap = new voxel_map();
-            engine::init(vmap);
+            //vmap = new voxel_map();
+            //engine::init(vmap);
         }
 
 
@@ -52,9 +52,10 @@ namespace rain::engine
             //vmap = nullptr;
             //RAIN_RENDERER->init_transvoxel2(transVertices, transNormals, vao_transvoxel);
 
-            isosurface::init_tmap(&tmap);
-            isosurface::transvoxel(&tmap);
-            RAIN_RENDERER->init_transvoxel(tmap.vertices, tmap.normals, tmap.vao);
+            transvoxel::init_map(&tmap);
+            transvoxel::transvoxel(&tmap);
+            //RAIN_RENDERER->init_transvoxel(tmap.vertices, tmap.normals, tmap.vao);
+
         }
 
 
@@ -125,6 +126,31 @@ namespace rain::engine
     {
         std::vector<actor*> view;
 
+        bool need_update = false;
+
+        static f32 lasttime = 0;
+
+        if (RAIN_INPUT->mouseclick_left == Input::mouse_state::pressed)
+        {
+            core::sphere sphere = core::sphere(10, main_camera.transform->position + main_camera.camera->front * 40.0f);
+            RAIN_RENDERER->draw_sphere(sphere.offset, glm::quat(glm::vec3()), glm::vec3(sphere.radius, sphere.radius, sphere.radius));
+
+            if (lasttime + 1 < RAIN_CONTEXT->clock->get_total_seconds())
+            {
+                std::vector<transvoxel::tvox_point*> inside = transvoxel::get_points_in_sphere(&tmap, sphere);
+                for (u32 i = 0; i < inside.size(); ++i)
+                {
+                    if (inside[i]->dist > 0)
+                        inside[i]->dist -= 2;
+                    inside[i]->owner->need_update = true;
+                    need_update = true;
+                }
+            }
+        }
+
+        if (need_update) transvoxel::transvoxel(&tmap);
+
+
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)
         {
@@ -176,25 +202,27 @@ namespace rain::engine
 
     void World::draw(const float _alpha)
     {
-        RAIN_WPROFILE("FPS : ", 1000.0f, 10.0f, 0.5f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
+        //RAIN_WPROFILE("GPU : ", 1000.0f, 10.0f, 0.5f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
         
         RAIN_RENDERER->update();
 
         static bool draw_vmap = true;
         if (RAIN_INPUT->is_key_released(DIK_F) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
         {
+            transvoxel::transvoxel(&tmap);
             draw_vmap = !draw_vmap;
-            RAIN_LOG("%s", draw_vmap ? "1" : "2");
         }
 
         if (draw_vmap)
         {
-            engine::draw(vmap);
+            //engine::draw(vmap);
             //RAIN_RENDERER->draw_transvoxel(vao_transvoxel, transVertices.size(), main_camera.transform->position);
+            transvoxel::draw_map(&tmap, main_camera.transform->position);
         }
         else
         {
-            RAIN_RENDERER->draw_transvoxel(tmap.vao, tmap.vertices.size(), main_camera.transform->position);
+            //RAIN_RENDERER->draw_transvoxel(tmap.vao, tmap.vertices.size(), main_camera.transform->position);
+            transvoxel::draw_map(&tmap, main_camera.transform->position);
         }
         
 

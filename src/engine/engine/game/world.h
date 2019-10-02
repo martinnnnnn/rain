@@ -44,7 +44,7 @@ namespace rain::engine
         //std::vector<glm::vec3> transVertices;
         //std::vector<glm::vec3> transNormals;
 
-        isosurface::tvox_map tmap;
+        transvoxel::tvox_map tmap;
     };
 }
 

@@ -2,7 +2,7 @@
 
 {
     "engine_name": "Rain Engine",
-    "data_root": "D:/_MARTIN/programming/_projects/rain_voxel/data",
+    "data_root": "D:/_MARTIN/programming/_projects/rain/data",
     "starting_world": "/world/world_3.wo.rain",
     "screen_width": 1200,
     "screen_height": 800,
