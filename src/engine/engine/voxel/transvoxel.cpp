@@ -142,11 +142,7 @@ namespace rain::engine::transvoxel
 
     void update_validity_mask(u8& validity_mask, i32 point_x, i32 point_y, i32 point_z, i32 block_x, i32 block_y, i32 block_z)
     {
-        u8 x_value = (point_x == 0 && block_x == 0) ? 0 : 1UL;
-        u8 y_value = (point_y == 0 && block_y == 0) ? 0 : 1UL;
-        u8 z_value = (point_z == 0 && block_z == 0) ? 0 : 1UL;
-
-        if (point_x == 0 && block_x == 0)
+        if (point_x == 0 /*&& block_x == 0*/)
         {
             unset_bit<u8>(validity_mask, 0);
         }
@@ -155,7 +151,7 @@ namespace rain::engine::transvoxel
             set_bit<u8>(validity_mask, 0);
         }
 
-        if (point_y == 0 && block_y == 0)
+        if (point_y == 0 /*&& block_y == 0*/)
         {
             unset_bit<u8>(validity_mask, 1);
         }
@@ -164,7 +160,7 @@ namespace rain::engine::transvoxel
             set_bit<u8>(validity_mask, 1);
         }
 
-        if (point_z == 0 && block_z == 0)
+        if (point_z == 0 /*&& block_z == 0*/)
         {
             unset_bit<u8>(validity_mask, 2);
         }
@@ -172,15 +168,6 @@ namespace rain::engine::transvoxel
         {
             set_bit<u8>(validity_mask, 2);
         }
-
-
-        //set_bit<u8>(validity_mask, 0, x_value);
-        //set_bit<u8>(validity_mask, 1, y_value);
-        //set_bit<u8>(validity_mask, 2, z_value);
-
-        //set_bit<u8>(validity_mask, 1, x > 0 ? 1UL : 0UL);
-        //set_bit<u8>(validity_mask, 2, y > 0 ? 1UL : 0UL);
-        //set_bit<u8>(validity_mask, 3, z > 0 ? 1UL : 0UL);
     }
 
     void transvoxel(tvox_map* map, tvox_block* block, tvox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
@@ -234,21 +221,6 @@ namespace rain::engine::transvoxel
                             i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
                             i8 new_z = (current_deck + ((mapping & 0x04) >> 2)) & 1;
 
-                            if (new_x == -1)
-                            {
-                                new_x = BLOCK_SIZE - 1;
-                                new_z = previous_deck;
-                            }
-                            if (new_y == -1) 
-                            {
-                                new_y = BLOCK_SIZE - 1;
-                                new_z = previous_deck;
-                            }
-                            // /!\ the problem :
-                            //      we autorize x to go negative even though x & dock x are equal to 0.
-                            //      this is due to y = 0 && docky > 0.
-                            //      these are two different cases that need to be handled differently.
-                            //      god my code is ugly.
                             const tvox_cell& neighbour_cell = decks[new_z][new_x + CHUNK_SIZE * new_y];
                             if (mapping & validity_mask == mapping)
                             {
@@ -275,13 +247,11 @@ namespace rain::engine::transvoxel
                                 current_tmp = cell->vertices[vertexIndex];
                             }
 
-                            if (current_tmp == VEC3_INVALID)
-                            {
-                                RAIN_LOG("hello");
-                            }
-                            //assert(current_tmp != VEC3_INVALID && "The vectex should never be invalid at this point.");
+                            assert(current_tmp != VEC3_INVALID && "The vectex should never be invalid at this point.");
 
                             vertexPositions.push_back(current_tmp);
+
+                            
                         }
 
                         u32 j = 0;
