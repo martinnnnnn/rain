@@ -39,6 +39,11 @@ namespace rain::engine::transvoxel
         tvox_block* owner;
     };
 
+    struct vertex_index
+    {
+        u32 cell_index;
+        u32 block_index;
+    };
 
     struct tvox_cell
     {
@@ -46,15 +51,26 @@ namespace rain::engine::transvoxel
             : case_code(-1)
         {
             std::fill_n(corners, 8, nullptr);
-            std::fill_n(vertices, 4, VEC3_INVALID);
+            //std::fill_n(cell_index, 4, -1);
+            //std::fill_n(block_index, 4, -1);
         }
 
         u8 case_code;
         tvox_point* corners[8];
-        glm::vec3 vertices[4];
+
+        std::vector<vertex_index> indexes;
+
+        //i32 cell_index[4];
+        //i32 block_index[4];
     };
 
     struct tvox_map;
+
+    struct tvox_vertex
+    {
+        glm::vec3 position;
+        glm::vec3 normal;
+    };
 
     struct tvox_block
     {
@@ -66,8 +82,8 @@ namespace rain::engine::transvoxel
 
         u32 vao;
         u32 vbo;
-        std::vector<glm::vec3> vertices;
-        std::vector<glm::vec3> normals;
+        std::vector<tvox_vertex> vertices;
+        std::vector<u32> indices;
 
         bool need_update;
     };

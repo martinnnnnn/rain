@@ -173,7 +173,6 @@ namespace rain::engine::transvoxel
     void transvoxel(tvox_map* map, tvox_block* block, tvox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
     {
         block->vertices.clear();
-        block->normals.clear();
 
         u8 validity_mask = 0;
 
@@ -200,9 +199,6 @@ namespace rain::engine::transvoxel
                         lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
                         const u16* regVertexData = lengyel::regularVertexData[cell->case_code];
 
-                        std::vector<glm::vec3> vertexPositions;
-
-                        u32 vcount = cellData.GetVertexCount();
                         for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
                         {
                             const u16 vertexData = *(regVertexData + i);
@@ -215,16 +211,22 @@ namespace rain::engine::transvoxel
                             const u8 lowNumberedCorner = lowByte >> 4;
                             const u8 highNumberedCorner = lowByte & 0x0F;
 
-                            glm::vec3 current_tmp = VEC3_INVALID;
 
-                            i8 new_x = x - (mapping & 0x01);
-                            i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
-                            i8 new_z = (current_deck + ((mapping & 0x04) >> 2)) & 1;
-
-                            const tvox_cell& neighbour_cell = decks[new_z][new_x + CHUNK_SIZE * new_y];
                             if (mapping & validity_mask == mapping)
                             {
-                                current_tmp = neighbour_cell.vertices[vertexIndex];
+                                i8 new_x = x - (mapping & 0x01);
+                                i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
+                                i8 new_z = (current_deck + ((mapping & 0x04) >> 2)) & 1;
+                                const tvox_cell& neighbour_cell = decks[new_z][new_x + CHUNK_SIZE * new_y];
+
+                                for (u32 j = 0; j < neighbour_cell.indexes.size(); ++j)
+                                {
+                                    if (neighbour_cell.indexes[j].cell_index == vertexIndex)
+                                    {
+                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell.indexes[j].block_index });
+                                        break;
+                                    }
+                                }
                             }
                             else
                             {
@@ -238,35 +240,56 @@ namespace rain::engine::transvoxel
                                 const f32 hnc_y = f32(cell->corners[highNumberedCorner]->world_y);
                                 const f32 hnc_z = f32(cell->corners[highNumberedCorner]->world_z);
 
-                                cell->vertices[vertexIndex] = glm::vec3
+                                if (mapping == 8)
                                 {
-                                    t * lnc_x + (1 - t) * hnc_x,
-                                    t * lnc_y + (1 - t) * hnc_y,
-                                    t * lnc_z + (1 - t) * hnc_z
-                                };
-                                current_tmp = cell->vertices[vertexIndex];
+                                    cell->indexes.emplace_back(vertex_index{ vertexIndex, block->vertices.size() });
+                                }
+                                else // neighbour cell not available : create & own new vertex
+                                {
+                                    cell->indexes.emplace_back(vertex_index{ 255, block->vertices.size() });
+                                }
+                                block->vertices.emplace_back(tvox_vertex
+                                {
+                                    glm::vec3
+                                    {
+                                        t * lnc_x + (1 - t) * hnc_x,
+                                        t * lnc_y + (1 - t) * hnc_y,
+                                        t * lnc_z + (1 - t) * hnc_z
+                                    },
+                                    glm::vec3 {0.0f, 0.0f, 0.0f}
+                                });
                             }
+                        }
 
-                            assert(current_tmp != VEC3_INVALID && "The vectex should never be invalid at this point.");
+                        u32 triangle_count = cellData.GetTriangleCount() * 3;
+                        for (i32 i = 0; i < triangle_count; ++i)
+                        {
+                            u8 index = cellData.vertexIndex[i];
+                            block->indices.emplace_back(cell->indexes[index].block_index);
 
-                            vertexPositions.push_back(current_tmp);
-
-                            
+                            //for (u8 j = 0; j < 4; ++j)
+                            //{
+                            //    if (cell->cell_index[j] == vertex_i)
+                            //    {
+                            //        block->indices.emplace_back(cell->block_index[j]);
+                            //    }
+                            //}
                         }
 
                         u32 j = 0;
                         for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
                         {
-                            block->vertices.push_back(vertexPositions[cellData.vertexIndex[i]]);
-                            if (j % 3 == 0)
-                            {
-                                const glm::vec3& A = vertexPositions[cellData.vertexIndex[i]];
-                                const glm::vec3& B = vertexPositions[cellData.vertexIndex[i - 1]];
-                                const glm::vec3& C = vertexPositions[cellData.vertexIndex[i - 2]];
-                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-                                block->normals.push_back(glm::normalize(glm::cross(B - A, C - A)));
-                            }
+                            block->indices.emplace_back(cell->indexes[cellData.vertexIndex[i]].block_index);
+                            //if (j % 3 == 0)
+                            //{
+                            //    tvox_vertex* A = &(block->vertices[block->indices[i]]);
+                            //    tvox_vertex* B = &(block->vertices[block->indices[i - 1]]);
+                            //    tvox_vertex* C = &(block->vertices[block->indices[i - 2]]);
+                            //    glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
+                            //    A->normal = normal;
+                            //    B->normal = normal;
+                            //    C->normal = normal;
+                            //}
                         }
                     }
                 }
@@ -274,13 +297,18 @@ namespace rain::engine::transvoxel
             current_deck = previous_deck;
         }
 
+        //for (u32 i = 0; i < block->vertices.size(); ++i)
+        //{
+        //    block->vertices[i].normal = glm::normalize(block->vertices[i].normal);
+        //}
+
         if (block->vao == 0)
         {
-            RAIN_RENDERER->init_transvoxel(block->vertices, block->normals, block->vao, block->vbo);
+            RAIN_RENDERER->init_transvoxel(block->vertices, block->indices, block->vao);
         }
         else
         {
-            RAIN_RENDERER->update_transvoxel(block->vertices, block->normals, block->vao, block->vbo);
+            //RAIN_RENDERER->update_transvoxel(block->vertices, block->indices, block->vao);
         }
 
         block->need_update = false;
@@ -321,7 +349,7 @@ namespace rain::engine::transvoxel
                 {
                     tvox_block* block = get_block(map, i, j, k);
 
-                    RAIN_RENDERER->draw_transvoxel(block->vao, block->vertices.size(), camera_position);
+                    RAIN_RENDERER->draw_transvoxel(block->vao, block->indices.size(), camera_position);
                 }
             }
         }

@@ -599,57 +599,47 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
-    void Renderer::init_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, u32& vao, u32& vbo)
+    void Renderer::init_transvoxel(const std::vector<transvoxel::tvox_vertex>& vertices, const std::vector<u32>& indices, u32& vao)
     {
-        std::vector<float> data;
-        data.reserve(2'000'000);
-        for (u32 i = 0; i < vertices.size(); ++i)
-        {
-            data.push_back(vertices[i].x);
-            data.push_back(vertices[i].y);
-            data.push_back(vertices[i].z);
-
-            data.push_back(normals[i].x);
-            data.push_back(normals[i].y);
-            data.push_back(normals[i].z);
-        }
-
+        u32 vbo = 0;
+        u32 ebo = 0;
         glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
+
         glBindVertexArray(vao);
 
-        glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(transvoxel::tvox_vertex), vertices.data(), GL_STATIC_DRAW);
 
-        i32 stride = (3 + 3) * sizeof(float);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u32), indices.data(), GL_STATIC_DRAW);
+
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
+
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
+
+        //glEnableVertexAttribArray(2);
+        //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+        glBindVertexArray(0);
 
 
 
 
-        //glGenVertexArrays(1, &vao);
-        //glBindVertexArray(vao);
-
-        //glGenBuffers(1, &vbo);
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3) /** 2*/, NULL, GL_DYNAMIC_DRAW);
-        //glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(glm::vec3), &vertices[0]);
-        ////glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(f32) * 3, normals.size() * sizeof(f32) * 3, &normals[0]);
-
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-        ////glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(f32) * 3, (void*)(vertices.size() * sizeof(f32) * 3));
-
-
-        //std::vector<float> positions;
-        //positions.reserve(500'000);
+        //std::vector<float> data;
+        //data.reserve(2'000'000);
         //for (u32 i = 0; i < vertices.size(); ++i)
         //{
-        //    positions.push_back(vertices[i].x);
-        //    positions.push_back(vertices[i].y);
-        //    positions.push_back(vertices[i].z);
+        //    data.push_back(vertices[i].x);
+        //    data.push_back(vertices[i].y);
+        //    data.push_back(vertices[i].z);
+
+        //    data.push_back(normals[i].x);
+        //    data.push_back(normals[i].y);
+        //    data.push_back(normals[i].z);
         //}
 
         //glGenVertexArrays(1, &vao);
@@ -657,36 +647,38 @@ namespace rain::engine
 
         //glGenBuffers(1, &vbo);
         //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
 
-        ////glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(f32), NULL, GL_DYNAMIC_DRAW);
-        //glBufferSubData(GL_ARRAY_BUFFER, 0, positions.size() * sizeof(f32), &positions[0]);
-
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        //i32 stride = (3 + 3) * sizeof(float);
+        //glEnableVertexAttribArray(0);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        //glEnableVertexAttribArray(1);
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
     }
 
-    void Renderer::update_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const u32& vao, const u32& vbo)
+    void Renderer::update_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<u32>& indices, const u32& vao, const u32& vbo)
     {
-        std::vector<float> data;
-        data.reserve(2'000'000);
-        for (u32 i = 0; i < vertices.size(); ++i)
-        {
-            data.push_back(vertices[i].x);
-            data.push_back(vertices[i].y);
-            data.push_back(vertices[i].z);
+        //std::vector<float> data;
+        //data.reserve(2'000'000);
+        //for (u32 i = 0; i < vertices.size(); ++i)
+        //{
+        //    data.push_back(vertices[i].x);
+        //    data.push_back(vertices[i].y);
+        //    data.push_back(vertices[i].z);
 
-            data.push_back(normals[i].x);
-            data.push_back(normals[i].y);
-            data.push_back(normals[i].z);
-        }
+        //    data.push_back(normals[i].x);
+        //    data.push_back(normals[i].y);
+        //    data.push_back(normals[i].z);
+        //}
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
 
-        i32 stride = (3 + 3) * sizeof(float);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        //i32 stride = (3 + 3) * sizeof(float);
+        //glEnableVertexAttribArray(0);
+        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        //glEnableVertexAttribArray(1);
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
 
 
 
@@ -700,7 +692,7 @@ namespace rain::engine
     }
 
 
-    void Renderer::draw_transvoxel(const u32& vao, const u32 triangle_count, const glm::vec3& view_position)
+    void Renderer::draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position)
     {
         transvoxel_handle->data->use();
         transvoxel_handle->data->set("model", glm::mat4(1));
@@ -709,8 +701,12 @@ namespace rain::engine
         transvoxel_handle->data->set("viewPos", view_position);
 
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, triangle_count);
+        glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        //glBindVertexArray(vao);
+        //glDrawArrays(GL_TRIANGLES, 0, triangle_count);
+        //glBindVertexArray(0);
     }
 
 
