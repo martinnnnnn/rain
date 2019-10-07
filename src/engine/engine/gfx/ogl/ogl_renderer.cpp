@@ -1362,7 +1362,7 @@ namespace rain::engine
         texts.clear();
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        glDisable(GL_CULL_FACE);
+        //glDisable(GL_CULL_FACE);
     }
 
     void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec4& _color)

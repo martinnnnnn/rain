@@ -7,6 +7,8 @@
 #include "engine/gfx/ogl/ogl_renderer.h"
 
 #include "assert.h"
+#include <algorithm>
+
 
 namespace rain::engine::transvoxel
 {
@@ -216,8 +218,9 @@ namespace rain::engine::transvoxel
                             {
                                 i8 new_x = x - (mapping & 0x01);
                                 i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
-                                i8 new_z = (current_deck + ((mapping & 0x04) >> 2)) & 1;
-                                const tvox_cell& neighbour_cell = decks[new_z][new_x + CHUNK_SIZE * new_y];
+                                i8 new_deck = (current_deck + ((mapping & 0x04) >> 2)) & 1;
+
+                                const tvox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
 
                                 for (u32 j = 0; j < neighbour_cell.indexes.size(); ++j)
                                 {
@@ -243,64 +246,86 @@ namespace rain::engine::transvoxel
                                 if (mapping == 8)
                                 {
                                     cell->indexes.emplace_back(vertex_index{ vertexIndex, block->vertices.size() });
+                                    block->vertices.emplace_back(tvox_vertex
+                                    {
+                                        glm::vec3
+                                        {
+                                            t * lnc_x + (1 - t) * hnc_x,
+                                            t * lnc_y + (1 - t) * hnc_y,
+                                            t * lnc_z + (1 - t) * hnc_z
+                                        },
+                                        glm::vec3 {0.0f, 0.0f, 0.0f}
+                                    });
                                 }
                                 else // neighbour cell not available : create & own new vertex
                                 {
                                     cell->indexes.emplace_back(vertex_index{ 255, block->vertices.size() });
-                                }
-                                block->vertices.emplace_back(tvox_vertex
-                                {
-                                    glm::vec3
+                                    block->vertices.emplace_back(tvox_vertex
                                     {
-                                        t * lnc_x + (1 - t) * hnc_x,
-                                        t * lnc_y + (1 - t) * hnc_y,
-                                        t * lnc_z + (1 - t) * hnc_z
-                                    },
-                                    glm::vec3 {0.0f, 0.0f, 0.0f}
-                                });
+                                        glm::vec3
+                                        {
+                                            t * lnc_x + (1 - t) * hnc_x,
+                                            t * lnc_y + (1 - t) * hnc_y,
+                                            t * lnc_z + (1 - t) * hnc_z
+                                        },
+                                        glm::vec3 {0.0f, 0.0f, 0.0f}
+                                    });
+                                }
                             }
                         }
 
-                        u32 triangle_count = cellData.GetTriangleCount() * 3;
-                        for (i32 i = 0; i < triangle_count; ++i)
-                        {
-                            u8 index = cellData.vertexIndex[i];
-                            block->indices.emplace_back(cell->indexes[index].block_index);
+                        u32 block_index_0 = -1;
+                        u32 block_index_1 = -1;
+                        u32 block_index_2 = -1;
 
-                            //for (u8 j = 0; j < 4; ++j)
-                            //{
-                            //    if (cell->cell_index[j] == vertex_i)
-                            //    {
-                            //        block->indices.emplace_back(cell->block_index[j]);
-                            //    }
-                            //}
+                        std::reverse(cellData.vertexIndex, cellData.vertexIndex + (cellData.GetTriangleCount() * 3));
+                        for (i32 i = 0; i < cellData.GetTriangleCount() * 3; ++i)
+                        {
+                            const u32 block_index = cell->indexes[cellData.vertexIndex[i]].block_index;
+                            block->indices.emplace_back(block_index);
+                            block_index_2 = block_index_1;
+                            block_index_1 = block_index_0;
+                            block_index_0 = block_index;
+
+                            if (i % 3 == 2)
+                            {
+                                tvox_vertex* A = &(block->vertices[block_index_0]);
+                                tvox_vertex* B = &(block->vertices[block_index_1]);
+                                tvox_vertex* C = &(block->vertices[block_index_2]);
+                                glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
+                                A->normal = normal;
+                                B->normal = normal;
+                                C->normal = normal;
+                            }
                         }
 
-                        u32 j = 0;
-                        for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
-                        {
-                            block->indices.emplace_back(cell->indexes[cellData.vertexIndex[i]].block_index);
-                            //if (j % 3 == 0)
-                            //{
-                            //    tvox_vertex* A = &(block->vertices[block->indices[i]]);
-                            //    tvox_vertex* B = &(block->vertices[block->indices[i - 1]]);
-                            //    tvox_vertex* C = &(block->vertices[block->indices[i - 2]]);
-                            //    glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
-                            //    A->normal = normal;
-                            //    B->normal = normal;
-                            //    C->normal = normal;
-                            //}
-                        }
+                        //u32 j = 0;
+                        //for (i32 i = cellData.GetTriangleCount() * 3 - 1; i >= 0; --i, ++j)
+                        //{
+                        //    const u32 block_index = cell->indexes[cellData.vertexIndex[i]].block_index;
+                        //    block->indices.emplace_back(block_index);
+
+                        //    if (j % 3 == 2)
+                        //    {
+                        //        tvox_vertex* A = &(block->vertices[block->indices[j]]);
+                        //        tvox_vertex* B = &(block->vertices[block->indices[j - 1]]);
+                        //        tvox_vertex* C = &(block->vertices[block->indices[j - 2]]);
+                        //        glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
+                        //        A->normal += normal;
+                        //        B->normal += normal;
+                        //        C->normal += normal;
+                        //    }
+                        //}
                     }
                 }
             }
             current_deck = previous_deck;
         }
 
-        //for (u32 i = 0; i < block->vertices.size(); ++i)
-        //{
-        //    block->vertices[i].normal = glm::normalize(block->vertices[i].normal);
-        //}
+        for (u32 i = 0; i < block->vertices.size(); ++i)
+        {
+            block->vertices[i].normal = glm::normalize(block->vertices[i].normal);
+        }
 
         if (block->vao == 0)
         {
