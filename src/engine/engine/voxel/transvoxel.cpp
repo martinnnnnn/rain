@@ -25,23 +25,23 @@ namespace rain::engine::transvoxel
             {
                 for (u32 k = 0; k < BLOCK_SIZE; ++k)
                 {
-                    tvox_point* point = &(block->points[i + j * BLOCK_SIZE + k * BLOCK_SIZE_SQUARED]);
+                    tvox_sample* sample = &(block->samples[i + j * BLOCK_SIZE + k * BLOCK_SIZE_SQUARED]);
                     
-                    point->local_x = i;
-                    point->local_y = j;
-                    point->local_z = k;
+                    sample->local_x = i;
+                    sample->local_y = j;
+                    sample->local_z = k;
 
-                    point->world_x = i + x * BLOCK_SIZE;
-                    point->world_y = j + y * BLOCK_SIZE;
-                    point->world_z = k + z * BLOCK_SIZE;
+                    sample->world_x = i + x * BLOCK_SIZE;
+                    sample->world_y = j + y * BLOCK_SIZE;
+                    sample->world_z = k + z * BLOCK_SIZE;
 
-                    const f32 pointx = f32(point->world_x) / f32(BLOCK_SIZE);
-                    const f32 pointy = f32(point->world_y) / f32(BLOCK_SIZE);
-                    const f32 pointz = f32(point->world_z) / f32(BLOCK_SIZE);
+                    const f32 samplex = f32(sample->world_x) / f32(BLOCK_SIZE);
+                    const f32 sampley = f32(sample->world_y) / f32(BLOCK_SIZE);
+                    const f32 samplez = f32(sample->world_z) / f32(BLOCK_SIZE);
 
-                    point->dist = i8(core::simplex_noise::noise(pointx, pointy, pointz) * 127.0f);
+                    sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
 
-                    point->owner = block;
+                    sample->owner = block;
                 }
             }
         }
@@ -80,11 +80,11 @@ namespace rain::engine::transvoxel
         return nullptr;
     }
 
-    tvox_point* get_point(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    tvox_sample* get_sample(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
     {
         if (is_inside_boundary(BLOCK_SIZE, x, y, z))
         {
-            return &(block->points[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
+            return &(block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
         }
 
         const i32 new_block_x = (x == -1) ? block->x - 1 : (x == BLOCK_SIZE) ? block->x + 1 : block->x;
@@ -98,7 +98,7 @@ namespace rain::engine::transvoxel
             const i32 new_cell_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
             const i32 new_cell_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
 
-            return get_point(map, new_block, new_cell_x, new_cell_y, new_cell_z);
+            return get_sample(map, new_block, new_cell_x, new_cell_y, new_cell_z);
         }
 
         return nullptr;
@@ -108,14 +108,14 @@ namespace rain::engine::transvoxel
     {
         memset(cell, 0, sizeof(tvox_cell));
 
-        cell->corners[0] = get_point(map, block, x    , y    , z    );
-        cell->corners[1] = get_point(map, block, x + 1, y    , z    );
-        cell->corners[2] = get_point(map, block, x    , y + 1, z    );
-        cell->corners[3] = get_point(map, block, x + 1, y + 1, z    );
-        cell->corners[4] = get_point(map, block, x    , y    , z + 1);
-        cell->corners[5] = get_point(map, block, x + 1, y    , z + 1);
-        cell->corners[6] = get_point(map, block, x    , y + 1, z + 1);
-        cell->corners[7] = get_point(map, block, x + 1, y + 1, z + 1);
+        cell->corners[0] = get_sample(map, block, x    , y    , z    );
+        cell->corners[1] = get_sample(map, block, x + 1, y    , z    );
+        cell->corners[2] = get_sample(map, block, x    , y + 1, z    );
+        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z    );
+        cell->corners[4] = get_sample(map, block, x    , y    , z + 1);
+        cell->corners[5] = get_sample(map, block, x + 1, y    , z + 1);
+        cell->corners[6] = get_sample(map, block, x    , y + 1, z + 1);
+        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1);
     }
 
     void set_case_code(tvox_cell* cell)
@@ -140,9 +140,9 @@ namespace rain::engine::transvoxel
             | (cell->corners[7]->dist & 0x80);
     }
 
-    void update_validity_mask(u8& validity_mask, i32 point_x, i32 point_y, i32 point_z, i32 block_x, i32 block_y, i32 block_z)
+    void update_validity_mask(u8& validity_mask, i32 sample_x, i32 sample_y, i32 sample_z, i32 block_x, i32 block_y, i32 block_z)
     {
-        if (point_x == 0 /*&& block_x == 0*/)
+        if (sample_x == 0 /*&& block_x == 0*/)
         {
             unset_bit<u8>(validity_mask, 0);
         }
@@ -151,7 +151,7 @@ namespace rain::engine::transvoxel
             set_bit<u8>(validity_mask, 0);
         }
 
-        if (point_y == 0 /*&& block_y == 0*/)
+        if (sample_y == 0 /*&& block_y == 0*/)
         {
             unset_bit<u8>(validity_mask, 1);
         }
@@ -160,7 +160,7 @@ namespace rain::engine::transvoxel
             set_bit<u8>(validity_mask, 1);
         }
 
-        if (point_z == 0 /*&& block_z == 0*/)
+        if (sample_z == 0 /*&& block_z == 0*/)
         {
             unset_bit<u8>(validity_mask, 2);
         }
@@ -269,6 +269,7 @@ namespace rain::engine::transvoxel
 
                         std::reverse(cellData.vertexIndex, cellData.vertexIndex + (cellData.GetTriangleCount() * 3));
 
+                        u32 j = 0;
                         for (i32 i = 0; i < cellData.GetTriangleCount() * 3; ++i)
                         {
                             const u32 block_index = cell->indexes[cellData.vertexIndex[i]].block_index;
@@ -279,6 +280,7 @@ namespace rain::engine::transvoxel
 
                             if (i % 3 == 2)
                             {
+                                j++;
                                 tvox_vertex* A = &(block->vertices[block_index_0]);
                                 tvox_vertex* B = &(block->vertices[block_index_1]);
                                 tvox_vertex* C = &(block->vertices[block_index_2]);
@@ -347,7 +349,7 @@ namespace rain::engine::transvoxel
 
                     if (!block->need_update)
                         continue;
-                    RAIN_PROFILE("Block transvoxel");
+                    //RAIN_PROFILE("Block transvoxel");
                     transvoxel(map, block, decks, current_deck);
                 }
             }
@@ -370,9 +372,9 @@ namespace rain::engine::transvoxel
         }
     }
 
-    std::vector<tvox_point*> get_points_in_sphere(tvox_map* tmap, const core::sphere& sphere)
+    std::vector<tvox_sample*> get_samples_in_sphere(tvox_map* tmap, const core::sphere& sphere)
     {
-        std::vector<tvox_point*> points;
+        std::vector<tvox_sample*> samples;
 
         for (u32 i = 0; i < TMAP_SIZE; ++i)
         {
@@ -388,13 +390,13 @@ namespace rain::engine::transvoxel
                         {
                             for (u32 z = 0; z < BLOCK_SIZE; ++z)
                             {
-                                tvox_point* point = get_point(tmap, block, x, y, z);
-                                const glm::vec3 position = glm::vec3(point->world_x, point->world_x, point->world_z) + tmap->position;
+                                tvox_sample* sample = get_sample(tmap, block, x, y, z);
+                                const glm::vec3 position = glm::vec3(sample->world_x, sample->world_x, sample->world_z) + tmap->position;
                                 const f32 dist = glm::distance(position, sphere.offset);
 
                                 if (dist < sphere.radius)
                                 {
-                                    points.push_back(point);
+                                    samples.push_back(sample);
                                 }
                             }
                         }
@@ -403,6 +405,6 @@ namespace rain::engine::transvoxel
             }
         }
 
-        return points;
+        return samples;
     }
 }

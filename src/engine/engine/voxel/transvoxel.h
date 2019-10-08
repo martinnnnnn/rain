@@ -24,7 +24,7 @@ namespace rain::engine::transvoxel
 
     struct tvox_block;
 
-    struct tvox_point
+    struct tvox_sample
     {
         i8 dist;
 
@@ -54,7 +54,7 @@ namespace rain::engine::transvoxel
         }
 
         u8 case_code;
-        tvox_point* corners[8];
+        tvox_sample* corners[8];
 
         std::vector<vertex_index> indexes;
     };
@@ -69,7 +69,7 @@ namespace rain::engine::transvoxel
 
     struct tvox_block
     {
-        tvox_point points[BLOCK_SIZE_CUBED];
+        tvox_sample samples[BLOCK_SIZE_CUBED];
 
         u32 x;
         u32 y;
@@ -94,7 +94,7 @@ namespace rain::engine::transvoxel
     void transvoxel(tvox_map* map);
     void draw_map(tvox_map* map, const glm::vec3& camera_position);
 
-    std::vector<tvox_point*> get_points_in_sphere(tvox_map* tmap, const core::sphere& sphere);
+    std::vector<tvox_sample*> get_samples_in_sphere(tvox_map* tmap, const core::sphere& sphere);
 
     template<typename T>
     void set_bit(T& number, T bit)

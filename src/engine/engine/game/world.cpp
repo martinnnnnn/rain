@@ -116,7 +116,7 @@ namespace rain::engine
 
             if (lasttime + 1 < RAIN_CONTEXT->clock->get_total_seconds())
             {
-                std::vector<transvoxel::tvox_point*> inside = transvoxel::get_points_in_sphere(&tmap, sphere);
+                std::vector<transvoxel::tvox_sample*> inside = transvoxel::get_samples_in_sphere(&tmap, sphere);
                 for (u32 i = 0; i < inside.size(); ++i)
                 {
                     if (inside[i]->dist > 0)
