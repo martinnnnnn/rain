@@ -51,17 +51,12 @@ namespace rain::engine::transvoxel
             : case_code(-1)
         {
             std::fill_n(corners, 8, nullptr);
-            //std::fill_n(cell_index, 4, -1);
-            //std::fill_n(block_index, 4, -1);
         }
 
         u8 case_code;
         tvox_point* corners[8];
 
         std::vector<vertex_index> indexes;
-
-        //i32 cell_index[4];
-        //i32 block_index[4];
     };
 
     struct tvox_map;

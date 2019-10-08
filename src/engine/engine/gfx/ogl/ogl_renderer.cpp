@@ -625,35 +625,6 @@ namespace rain::engine
         //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
         glBindVertexArray(0);
-
-
-
-
-        //std::vector<float> data;
-        //data.reserve(2'000'000);
-        //for (u32 i = 0; i < vertices.size(); ++i)
-        //{
-        //    data.push_back(vertices[i].x);
-        //    data.push_back(vertices[i].y);
-        //    data.push_back(vertices[i].z);
-
-        //    data.push_back(normals[i].x);
-        //    data.push_back(normals[i].y);
-        //    data.push_back(normals[i].z);
-        //}
-
-        //glGenVertexArrays(1, &vao);
-        //glBindVertexArray(vao);
-
-        //glGenBuffers(1, &vbo);
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
-
-        //i32 stride = (3 + 3) * sizeof(float);
-        //glEnableVertexAttribArray(0);
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-        //glEnableVertexAttribArray(1);
-        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
     }
 
     void Renderer::update_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<u32>& indices, const u32& vao, const u32& vbo)

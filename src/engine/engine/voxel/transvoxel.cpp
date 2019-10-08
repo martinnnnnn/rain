@@ -104,20 +104,18 @@ namespace rain::engine::transvoxel
         return nullptr;
     }
 
-    tvox_cell create_cell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    void init_cell(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z, tvox_cell* cell)
     {
-        tvox_cell cell{};
+        memset(cell, 0, sizeof(tvox_cell));
 
-        cell.corners[0] = get_point(map, block, x    , y    , z    );
-        cell.corners[1] = get_point(map, block, x + 1, y    , z    );
-        cell.corners[2] = get_point(map, block, x    , y + 1, z    );
-        cell.corners[3] = get_point(map, block, x + 1, y + 1, z    );
-        cell.corners[4] = get_point(map, block, x    , y    , z + 1);
-        cell.corners[5] = get_point(map, block, x + 1, y    , z + 1);
-        cell.corners[6] = get_point(map, block, x    , y + 1, z + 1);
-        cell.corners[7] = get_point(map, block, x + 1, y + 1, z + 1);
-
-        return cell;
+        cell->corners[0] = get_point(map, block, x    , y    , z    );
+        cell->corners[1] = get_point(map, block, x + 1, y    , z    );
+        cell->corners[2] = get_point(map, block, x    , y + 1, z    );
+        cell->corners[3] = get_point(map, block, x + 1, y + 1, z    );
+        cell->corners[4] = get_point(map, block, x    , y    , z + 1);
+        cell->corners[5] = get_point(map, block, x + 1, y    , z + 1);
+        cell->corners[6] = get_point(map, block, x    , y + 1, z + 1);
+        cell->corners[7] = get_point(map, block, x + 1, y + 1, z + 1);
     }
 
     void set_case_code(tvox_cell* cell)
@@ -189,8 +187,8 @@ namespace rain::engine::transvoxel
             {
                 for (i32 x = 0; x < xmax; ++x)
                 {
-                    decks[current_deck][x + y * BLOCK_SIZE] = create_cell(map, block, x, y, z);
                     tvox_cell* cell = &decks[current_deck][x + y * BLOCK_SIZE];
+                    init_cell(map, block, x, y, z, cell);
                     set_case_code(cell);
 
                     if ((cell->case_code ^ ((cell->corners[7]->dist >> 7) & 0xFF)) != 0)
@@ -246,31 +244,22 @@ namespace rain::engine::transvoxel
                                 if (mapping == 8)
                                 {
                                     cell->indexes.emplace_back(vertex_index{ vertexIndex, block->vertices.size() });
-                                    block->vertices.emplace_back(tvox_vertex
-                                    {
-                                        glm::vec3
-                                        {
-                                            t * lnc_x + (1 - t) * hnc_x,
-                                            t * lnc_y + (1 - t) * hnc_y,
-                                            t * lnc_z + (1 - t) * hnc_z
-                                        },
-                                        glm::vec3 {0.0f, 0.0f, 0.0f}
-                                    });
                                 }
                                 else // neighbour cell not available : create & own new vertex
                                 {
                                     cell->indexes.emplace_back(vertex_index{ 255, block->vertices.size() });
-                                    block->vertices.emplace_back(tvox_vertex
-                                    {
-                                        glm::vec3
-                                        {
-                                            t * lnc_x + (1 - t) * hnc_x,
-                                            t * lnc_y + (1 - t) * hnc_y,
-                                            t * lnc_z + (1 - t) * hnc_z
-                                        },
-                                        glm::vec3 {0.0f, 0.0f, 0.0f}
-                                    });
                                 }
+
+                                block->vertices.emplace_back(tvox_vertex
+                                {
+                                    glm::vec3
+                                    {
+                                        t * lnc_x + (1 - t) * hnc_x,
+                                        t * lnc_y + (1 - t) * hnc_y,
+                                        t * lnc_z + (1 - t) * hnc_z
+                                    },
+                                    glm::vec3 {0.0f, 0.0f, 0.0f}
+                                });
                             }
                         }
 
@@ -293,9 +282,9 @@ namespace rain::engine::transvoxel
                                 tvox_vertex* B = &(block->vertices[block_index_1]);
                                 tvox_vertex* C = &(block->vertices[block_index_2]);
                                 glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
-                                A->normal = normal;
-                                B->normal = normal;
-                                C->normal = normal;
+                                A->normal += normal;
+                                B->normal += normal;
+                                C->normal += normal;
                             }
                         }
 
