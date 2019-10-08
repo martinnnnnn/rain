@@ -1,0 +1,4 @@
+{
+    "vertex": "/scalar_field.vert",
+    "fragment": "/scalar_field.frag"
+}

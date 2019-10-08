@@ -76,6 +76,7 @@ namespace rain::engine::transvoxel
         u32 z;
 
         u32 vao;
+        u32 ebo;
         u32 vbo;
         std::vector<tvox_vertex> vertices;
         std::vector<u32> indices;

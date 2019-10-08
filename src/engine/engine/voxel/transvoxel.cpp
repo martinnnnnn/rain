@@ -268,6 +268,7 @@ namespace rain::engine::transvoxel
                         u32 block_index_2 = -1;
 
                         std::reverse(cellData.vertexIndex, cellData.vertexIndex + (cellData.GetTriangleCount() * 3));
+
                         for (i32 i = 0; i < cellData.GetTriangleCount() * 3; ++i)
                         {
                             const u32 block_index = cell->indexes[cellData.vertexIndex[i]].block_index;
@@ -318,11 +319,11 @@ namespace rain::engine::transvoxel
 
         if (block->vao == 0)
         {
-            RAIN_RENDERER->init_transvoxel(block->vertices, block->indices, block->vao);
+            RAIN_RENDERER->init_transvoxel(block);
         }
         else
         {
-            //RAIN_RENDERER->update_transvoxel(block->vertices, block->indices, block->vao);
+            RAIN_RENDERER->update_transvoxel(block);
         }
 
         block->need_update = false;

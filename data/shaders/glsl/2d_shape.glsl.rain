@@ -1,0 +1,4 @@
+{
+    "vertex": "/2d_shape.vert",
+    "fragment": "/2d_shape.frag"
+}

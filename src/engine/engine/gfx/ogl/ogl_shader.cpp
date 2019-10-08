@@ -30,15 +30,29 @@ namespace rain::engine
         std::string fragment_code = "";
         std::string geometry_code = "";
 
-        if (vertex_file.open(vertex_path))
+        if (!vertex_path.empty() && !vertex_file.open(vertex_path))
+        {
+            RAIN_LOG_WARNING("[SHADER::open] Failed to open vertex shader with path : \n%s", vertex_path.c_str());
+        }
+        else
         {
             vertex_code = vertex_file.read();
         }
-        if (fragment_file.open(fragment_path))
+
+        if (!fragment_path.empty() && !fragment_file.open(fragment_path))
+        {
+            RAIN_LOG_WARNING("[SHADER::open] Failed to open fragment shader with path : \n%s", fragment_path.c_str());
+        }
+        else
         {
             fragment_code = fragment_file.read();
         }
-        if (geometry_file.open(geometry_path))
+
+        if (!geometry_path.empty() && !geometry_file.open(geometry_path))
+        {
+            RAIN_LOG_WARNING("[SHADER::open] Failed to open geometry shader with path : \n%s", geometry_path.c_str());
+        }
+        else
         {
             geometry_code = geometry_file.read();
         }

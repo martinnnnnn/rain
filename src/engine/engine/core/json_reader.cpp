@@ -412,6 +412,26 @@ namespace rain::engine::json_reader
         }
     }
 
+    void read_shader(const std::string& json, const std::string& directory, std::string& vertex_path, std::string& fragment_path, std::string& geometry_path)
+    {
+        rapidjson::Document shader_document;
+        shader_document.Parse(json.c_str());
+
+        if (shader_document.HasMember("vertex"))
+        {
+            vertex_path = directory + shader_document["vertex"].GetString();
+        }
+        if (shader_document.HasMember("fragment"))
+        {
+            fragment_path += directory + shader_document["fragment"].GetString();
+        }
+        if (shader_document.HasMember("geometry"))
+        {
+            geometry_path += directory + shader_document["geometry"].GetString();
+        }
+        
+    }
+
     //void read_shaders_info(const std::string& _json, std::vector<ShadersInfo>& _info)
     //{
     //    rapidjson::Document shaders_document;

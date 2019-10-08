@@ -1,0 +1,4 @@
+{
+    "vertex": "/text_2d.vert",
+    "fragment": "/text_2d.frag"
+}

@@ -29,11 +29,12 @@ namespace rain::core
 
     void logger::log_max(const char* _filePath, u32 _fileLine, const char* _level, const char* _format, ...)
     {
-        string::print_to_buffer(header_buffer, sizeof(header_buffer), "%s Error at %s on line %u :\n", _level, _filePath, _fileLine);
+        string::print_to_buffer(header_buffer, sizeof(header_buffer), "\n\n**************************\n\n%s Error at %s on line %u :\n", _level, _filePath, _fileLine);
         va_list args;
         va_start(args, _format);
         string::print_to_buffer_va(message_buffer, sizeof(message_buffer), _format, args);
         va_end(args);
+        string::print_to_buffer(footer_buffer, sizeof(footer_buffer), "\n\n**************************\n\n");
         print_log();
     }
 
@@ -53,6 +54,7 @@ namespace rain::core
         mut.lock();
         printOutput(header_buffer);
         printOutput(message_buffer);
+        printOutput(footer_buffer);
         printOutput("\n");
         mut.unlock();
     }

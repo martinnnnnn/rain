@@ -79,7 +79,7 @@ namespace rain::engine
 
     void Renderer::init_default_shaders()
     {
-        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.vert");
+        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.glsl.rain");
         instancing_handle->data->use();
         instancing_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
         instancing_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -87,7 +87,7 @@ namespace rain::engine
         instancing_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         instancing_handle->data->set("material.shininess", 32.0f);
 
-        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.vert");
+        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.glsl.rain");
         sf_handle->data->use();
         sf_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
         sf_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -95,12 +95,12 @@ namespace rain::engine
         sf_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
         sf_handle->data->set("material.shininess", 32.0f);
 
-        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.vert");
+        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.glsl.rain");
         phong_handle->data->use();
-        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f); 
+        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
         phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
 
-        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.vert");
+        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.glsl.rain");
         transvoxel_handle->data->use();
         transvoxel_handle->data->set("lightPos", 0.3f, 0.3f, 0.3f);
         transvoxel_handle->data->set("viewPos", 0.3f, 0.3f, 0.3f);
@@ -599,21 +599,21 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
-    void Renderer::init_transvoxel(const std::vector<transvoxel::tvox_vertex>& vertices, const std::vector<u32>& indices, u32& vao)
+    void Renderer::init_transvoxel(transvoxel::tvox_block* block) const
     {
-        u32 vbo = 0;
-        u32 ebo = 0;
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
+        block->vbo = 0;
+        block->ebo = 0;
+        glGenVertexArrays(1, &block->vao);
+        glGenBuffers(1, &block->vbo);
+        glGenBuffers(1, &block->ebo);
 
-        glBindVertexArray(vao);
+        glBindVertexArray(block->vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(transvoxel::tvox_vertex), vertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(u32), indices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
@@ -627,39 +627,21 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::update_transvoxel(const std::vector<glm::vec3>& vertices, const std::vector<u32>& indices, const u32& vao, const u32& vbo)
+    void Renderer::update_transvoxel(transvoxel::tvox_block* block) const
     {
-        //std::vector<float> data;
-        //data.reserve(2'000'000);
-        //for (u32 i = 0; i < vertices.size(); ++i)
-        //{
-        //    data.push_back(vertices[i].x);
-        //    data.push_back(vertices[i].y);
-        //    data.push_back(vertices[i].z);
+        glBindVertexArray(block->vao);
 
-        //    data.push_back(normals[i].x);
-        //    data.push_back(normals[i].y);
-        //    data.push_back(normals[i].z);
-        //}
+        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
 
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
 
-        //i32 stride = (3 + 3) * sizeof(float);
-        //glEnableVertexAttribArray(0);
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
-        //glEnableVertexAttribArray(1);
-        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
 
-
-
-        //glBindVertexArray(vao);
-        //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        //glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(glm::vec3), &vertices[0]);
-        //glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), normals.size() * sizeof(glm::vec3), &normals[0]);
-
-        //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0);
-        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)(vertices.size() * sizeof(glm::vec3)));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
     }
 
 

@@ -19,6 +19,7 @@ namespace rain::core
         {
             memset(message_buffer, 0, sizeof(message_buffer));
             memset(header_buffer, 0, sizeof(header_buffer));
+            memset(footer_buffer, 0, sizeof(footer_buffer));
         }
 
         void log_raw(const char* _format, ...);
@@ -33,6 +34,7 @@ namespace rain::core
     private:
         char message_buffer[1024 * 4];
         char header_buffer[1024];
+        char footer_buffer[1024];
         std::mutex mut;
 
         void (*printOutput) (const char*);

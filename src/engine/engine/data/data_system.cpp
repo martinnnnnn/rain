@@ -6,6 +6,7 @@
 
 #include "engine/gfx/ogl/ogl_texture.h"
 #include "engine/core/profiler.h"
+#include "engine/core/json_reader.h"
 
 namespace rain::engine
 {
@@ -24,16 +25,18 @@ namespace rain::engine
 
                 std::string ext = filepath.get_extention();
 
-                if (ext.compare("vert") == 0)
+                if (ext.compare("glsl.rain") == 0)
                 {
-                    RAIN_LOG("Loading  shader %s", path.c_str());
-                    std::string vertex = filepath.get_directory() + filepath.get_name() + ".vert";
-                    std::string fragment = filepath.get_directory() + filepath.get_name() + ".frag";
-                    std::string geometry = filepath.get_directory() + filepath.get_name() + ".geom";
+                    RAIN_LOG("Reloading  shader %s", path.c_str());
+                    core::File file;
+                    file.open(path);
+                    std::string vertex;
+                    std::string fragment;
+                    std::string geometry;
+                    json_reader::read_shader(file.read(), filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
                 }
-
             }
         }
     }
@@ -58,21 +61,24 @@ namespace rain::engine
                     handle<Mesh> new_mesh_handle = load_data<Mesh>(filepath, core::uuid::random(), filepath);
                     add_data<Mesh>(new_mesh_handle);
                 }
-                if (ext.compare("vert") == 0)
+                if (ext.compare("glsl.rain") == 0)
                 {
                     RAIN_LOG("Loading  shader %s", path.c_str());
-                    std::string vertex = filepath.get_directory() + filepath.get_name() + ".vert";
-                    std::string fragment = filepath.get_directory() + filepath.get_name() + ".frag";
-                    std::string geometry = filepath.get_directory() + filepath.get_name() + ".geom";
+                    core::File file;
+                    file.open(path);
+                    std::string vertex;
+                    std::string fragment;
+                    std::string geometry;
+                    json_reader::read_shader(file.read(), filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
                 }
-                if (ext.compare("jpg") == 0 || ext.compare("png") == 0)
-                {
-                    RAIN_LOG("Loading texture %s", path.c_str());
-                    handle<Texture> new_texture_handle = load_data<Texture>(filepath, core::uuid::random(), filepath.get_path_absolute().c_str(), GL_TEXTURE_2D);
-                    add_data<Texture>(new_texture_handle);
-                }
+                //if (ext.compare("jpg") == 0 || ext.compare("png") == 0)
+                //{
+                //    RAIN_LOG("Loading texture %s", path.c_str());
+                //    handle<Texture> new_texture_handle = load_data<Texture>(filepath, core::uuid::random(), filepath.get_path_absolute().c_str(), GL_TEXTURE_2D);
+                //    add_data<Texture>(new_texture_handle);
+                //}
             }
         }
 

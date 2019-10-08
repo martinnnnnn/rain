@@ -40,6 +40,7 @@ namespace rain::engine
         void read_config(const std::string& _path, Config& _config);
         void read_text_field(const rapidjson::Value& _json, ui::text_field& field);
         void read_text_list(const rapidjson::Value& _json, ui::text_list& list);
+        void read_shader(const std::string& json, const std::string& directory, std::string& vertex_path, std::string& fragment_path, std::string& geometry_path);
         //void read_shaders_info(const std::string& _path, std::vector<ShadersInfo>& _info);
 
         void read_transform(const std::string & json_str, core::transform& t);

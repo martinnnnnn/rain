@@ -29,7 +29,7 @@ namespace rain::engine
         RAIN_PROFILE("World Initialization");
 
         {
-            RAIN_PROFILE("Chunk init");
+            //RAIN_PROFILE("Chunk init");
             //vmap = new voxel_map();
             //engine::init(vmap);
         }
@@ -37,31 +37,10 @@ namespace rain::engine
 
         {
             RAIN_PROFILE("Transvoxel");
-            //for (u32 i = 0; i < MAP_SIZE; ++i)
-            //{
-            //    for (u32 j = 0; j < MAP_SIZE; ++j)
-            //    {
-            //        for (u32 k = 0; k < MAP_SIZE; ++k)
-            //        {
-            //            isosurface::transvoxel(&(vmap->chunks[i + j * MAP_SIZE + k * MAP_SIZE_SQUARED]), transVertices, transNormals);
-            //        }
-            //    }
-            //}
-            //delete_vmap(vmap);
-            //delete vmap;
-            //vmap = nullptr;
-            //RAIN_RENDERER->init_transvoxel2(transVertices, transNormals, vao_transvoxel);
-
             transvoxel::init_map(&tmap);
             transvoxel::transvoxel(&tmap);
-            //RAIN_RENDERER->init_transvoxel(tmap.vertices, tmap.normals, tmap.vao);
 
         }
-
-
-
-        
-        //RAIN_RENDERER->init_transvoxel2(transVertices, transNormals, vao_transvoxel);
 
         std::vector<actor*> view;
 
@@ -209,19 +188,16 @@ namespace rain::engine
         static bool draw_vmap = true;
         if (RAIN_INPUT->is_key_released(DIK_F) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
         {
-            transvoxel::transvoxel(&tmap);
             draw_vmap = !draw_vmap;
         }
 
         if (draw_vmap)
         {
             //engine::draw(vmap);
-            //RAIN_RENDERER->draw_transvoxel(vao_transvoxel, transVertices.size(), main_camera.transform->position);
             transvoxel::draw_map(&tmap, main_camera.transform->position);
         }
         else
         {
-            //RAIN_RENDERER->draw_transvoxel(tmap.vao, tmap.vertices.size(), main_camera.transform->position);
             transvoxel::draw_map(&tmap, main_camera.transform->position);
         }
         
