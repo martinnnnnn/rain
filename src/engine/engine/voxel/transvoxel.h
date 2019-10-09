@@ -16,9 +16,9 @@ namespace rain::engine::transvoxel
     constexpr u32 BLOCK_SIZE_SQUARED = BLOCK_SIZE * BLOCK_SIZE;
     constexpr u32 BLOCK_SIZE_CUBED = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
 
-    constexpr u32 TMAP_SIZE = 5;
-    constexpr u32 TMAP_SIZE_SQUARED = TMAP_SIZE * TMAP_SIZE;
-    constexpr u32 TMAP_SIZE_CUBED = TMAP_SIZE * TMAP_SIZE * TMAP_SIZE;
+    //constexpr u32 TMAP_SIZE = 4;
+    //constexpr u32 TMAP_SIZE_SQUARED = TMAP_SIZE * TMAP_SIZE;
+    //constexpr u32 TMAP_SIZE_CUBED = TMAP_SIZE * TMAP_SIZE * TMAP_SIZE;
 
     constexpr glm::vec3 VEC3_INVALID = glm::vec3{ FLT_MAX, FLT_MAX, FLT_MAX };
 
@@ -69,6 +69,7 @@ namespace rain::engine::transvoxel
 
     struct tvox_block
     {
+        tvox_map* map;
         tvox_sample samples[BLOCK_SIZE_CUBED];
 
         u32 x;
@@ -86,13 +87,23 @@ namespace rain::engine::transvoxel
 
     struct tvox_map
     {
+        u32 xmax;
+        u32 ymax;
+        u32 zmax;
+
         glm::vec3 position;
         std::vector<tvox_block*> blocks;
     };
 
-    void init_map(tvox_map* map);
+
+
+
+    void init_map(tvox_map* map, u32 xmax, u32 ymax, u32 zmax, float frequency, float amplitude, float lacunarity, float persistence);
+    //void init_map(tvox_map* map);
     void transvoxel(tvox_map* map);
     void draw_map(tvox_map* map, const glm::vec3& camera_position);
+    void encode_map(tvox_map* tmap, const std::string& file_path);
+    void decode_map(tvox_map* tmap, const std::string& file_path);
 
     std::vector<tvox_sample*> get_samples_in_sphere(tvox_map* tmap, const core::sphere& sphere);
 

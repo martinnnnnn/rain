@@ -38,6 +38,9 @@ namespace rain::engine
         u32 vao_quickhull;
 
         voxel_map* vmap;
+        u32 mapx;
+        u32 mapy;
+        u32 mapz;
 
         //u32 vao_transvoxel;
 

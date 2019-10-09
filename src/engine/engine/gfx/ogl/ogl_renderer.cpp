@@ -645,14 +645,15 @@ namespace rain::engine
     }
 
 
-    void Renderer::draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position)
+    void Renderer::draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position, f32 max_height)
     {
         transvoxel_handle->data->use();
         transvoxel_handle->data->set("model", glm::scale(glm::mat4(1), glm::vec3{1.0f,1.0f, 1.0f}));
         transvoxel_handle->data->set("projection", proj_mat_perspective);
         transvoxel_handle->data->set("view", view_mat);
         transvoxel_handle->data->set("viewPos", view_position);
-
+        transvoxel_handle->data->set("maxy", view_position);
+        transvoxel_handle->data->set("maxy", max_height);
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

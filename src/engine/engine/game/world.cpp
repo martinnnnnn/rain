@@ -28,18 +28,22 @@ namespace rain::engine
     {
         RAIN_PROFILE("World Initialization");
 
+        mapx = 5;
+        mapy = 1;
+        mapz = 5;
+
         {
             //RAIN_PROFILE("Chunk init");
-            //vmap = new voxel_map();
+            //vmap = new voxel_map();s
             //engine::init(vmap);
         }
 
-
         {
             RAIN_PROFILE("Transvoxel");
-            transvoxel::init_map(&tmap);
+            //transvoxel::init_map(&tmap, mapx, mapy, mapz, 0.4f, 1.4f, 0.8f, 1.5f);
+            //transvoxel::encode_map(&tmap, "D:/_MARTIN/programming/_projects/rain/test.rain.bin");
+            transvoxel::decode_map(&tmap, "D:/_MARTIN/programming/_projects/rain/test.rain.bin");
             transvoxel::transvoxel(&tmap);
-
         }
 
         std::vector<actor*> view;
@@ -105,30 +109,65 @@ namespace rain::engine
     {
         std::vector<actor*> view;
 
-        bool need_update = false;
-
-        static f32 lasttime = 0;
-
-        if (RAIN_INPUT->mouseclick_left == Input::mouse_state::pressed)
+        static float frequency = 1.0f;
+        static float amplitude = 1.0f;
+        static float lacunarity = 2.0f;
+        static float persistence = 0.5f;
+        bool change = false;
+        if (RAIN_INPUT->is_key_released(DIK_U))
         {
-            core::sphere sphere = core::sphere(10, main_camera.transform->position + main_camera.camera->front * 40.0f);
-            RAIN_RENDERER->draw_sphere(sphere.offset, glm::quat(glm::vec3()), glm::vec3(sphere.radius, sphere.radius, sphere.radius));
-
-            if (lasttime + 1 < RAIN_CONTEXT->clock->get_total_seconds())
-            {
-                std::vector<transvoxel::tvox_sample*> inside = transvoxel::get_samples_in_sphere(&tmap, sphere);
-                for (u32 i = 0; i < inside.size(); ++i)
-                {
-                    if (inside[i]->dist > 0)
-                        inside[i]->dist -= 2;
-                    inside[i]->owner->need_update = true;
-                    need_update = true;
-                }
-            }
+            frequency += 0.2f;
+            RAIN_LOG("frequency up : %f", frequency);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_J))
+        {
+            frequency -= 0.2f;
+            RAIN_LOG("frequency down : %f", frequency);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_I))
+        {
+            amplitude += 0.2f;
+            RAIN_LOG("amplitude up : %f", amplitude);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_K))
+        {
+            amplitude -= 0.2f;
+            RAIN_LOG("amplitude down : %f", amplitude);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_O))
+        {
+            lacunarity += 0.2f;
+            RAIN_LOG("lacunarity up : %f", lacunarity);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_L))
+        {
+            lacunarity -= 0.2f;
+            RAIN_LOG("lacunarity down : %f", lacunarity);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_P))
+        {
+            persistence += 0.2f;
+            RAIN_LOG("persistence up : %f", persistence);
+            change = true;
+        }
+        if (RAIN_INPUT->is_key_released(DIK_M))
+        {
+            persistence -= 0.2f;
+            RAIN_LOG("persistence down : %f", persistence);
+            change = true;
         }
 
-        if (need_update) transvoxel::transvoxel(&tmap);
-
+        if (change)
+        {
+            transvoxel::init_map(&tmap, mapx, mapy, mapz, frequency, amplitude, lacunarity, persistence);
+            transvoxel::transvoxel(&tmap);
+        }
 
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)

@@ -88,7 +88,7 @@ namespace rain::engine
 
         void init_transvoxel(transvoxel::tvox_block* block) const;
         void update_transvoxel(transvoxel::tvox_block* block) const;
-        void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position);
+        void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position, f32 max_height);
 
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);

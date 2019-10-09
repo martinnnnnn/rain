@@ -9,11 +9,34 @@
 #include "assert.h"
 #include <algorithm>
 
-
 namespace rain::engine::transvoxel
 {
-    void init_tblock(tvox_block* block, u32 x, u32 y, u32 z)
+    void init_samples_coord(tvox_block* block)
     {
+        for (u32 i = 0; i < BLOCK_SIZE; ++i)
+        {
+            for (u32 j = 0; j < BLOCK_SIZE; ++j)
+            {
+                for (u32 k = 0; k < BLOCK_SIZE; ++k)
+                {
+                    tvox_sample* sample = &(block->samples[i + j * BLOCK_SIZE + k * BLOCK_SIZE_SQUARED]);
+
+                    sample->local_x = i;
+                    sample->local_y = j;
+                    sample->local_z = k;
+
+                    sample->world_x = i + block->x * BLOCK_SIZE;
+                    sample->world_y = j + block->y * BLOCK_SIZE;
+                    sample->world_z = k + block->z * BLOCK_SIZE;
+                }
+            }
+        }
+    }
+
+    void init_tblock(tvox_block* block, u32 x, u32 y, u32 z, float frequency, float amplitude, float lacunarity, float persistence)
+    {
+        u32 terraceHeight = 10;
+
         block->need_update = true;
         block->x = x;
         block->y = y;
@@ -39,7 +62,20 @@ namespace rain::engine::transvoxel
                     const f32 sampley = f32(sample->world_y) / f32(BLOCK_SIZE);
                     const f32 samplez = f32(sample->world_z) / f32(BLOCK_SIZE);
 
-                    sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
+                    core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
+                    sample->dist = i8(-sample->world_y + (n.fractal(3, samplex, samplez)) * 50.0f);
+
+                    //sample->dist = i8( -sample->world_y + (core::simplex_noise::noise(samplex, samplez) - 0.5f) * 50.0f);
+
+                    if (sample->world_x == 0 
+                        || sample->world_y == 0
+                        || sample->world_z == 0
+                        || sample->world_x == block->map->xmax * BLOCK_SIZE - 1
+                        || sample->world_y == block->map->ymax * BLOCK_SIZE - 1
+                        || sample->world_z == block->map->zmax * BLOCK_SIZE - 1)
+                    {
+                        sample->dist = -10;
+                    }
 
                     sample->owner = block;
                 }
@@ -47,42 +83,295 @@ namespace rain::engine::transvoxel
         }
     }
 
-    void init_map(tvox_map* map)
+    struct encoded_sample
     {
-        map->blocks.resize(TMAP_SIZE_CUBED);
+        encoded_sample(u16 c, u8 d) : count(c), dist(d) {}
+        encoded_sample() : count(0), dist(0) {}
 
-        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        u16 count;
+        u8 dist;
+    };
+
+    struct encoded_block
+    {
+        std::vector<encoded_sample> samples;
+        u32 x;
+        u32 y;
+        u32 z;
+    };
+
+    struct encoded_map
+    {
+        std::vector<encoded_block> blocks;
+        u32 size_x;
+        u32 size_y;
+        u32 size_z;
+    };
+
+    void encode_map(tvox_map* tmap, const std::string& file_path)
+    {
+        encoded_map enc_map;
+        enc_map.size_x = tmap->xmax;
+        enc_map.size_y = tmap->ymax;
+        enc_map.size_z = tmap->zmax;
+        enc_map.blocks.resize(tmap->xmax * tmap->ymax * tmap->zmax);
+
+        for (u32 i = 0; i < enc_map.size_x; ++i)
         {
-            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            for (u32 j = 0; j < enc_map.size_y; ++j)
             {
-                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                for (u32 k = 0; k < enc_map.size_z; ++k)
                 {
-                    u32 currentIndex = i + j * TMAP_SIZE + k * TMAP_SIZE_SQUARED;
+                    u32 currentIndex = i + j * enc_map.size_x + k * enc_map.size_x * enc_map.size_y;
+
+                    tvox_block* block = tmap->blocks[currentIndex];
+                    encoded_block* enc_block = &(enc_map.blocks[currentIndex]);
+
+                    enc_block->x = i;
+                    enc_block->y = j;
+                    enc_block->z = k;
+
+                    std::vector<encoded_sample> encoded_block;
+                    for (u32 l = 0; l < BLOCK_SIZE_CUBED; ++l)
+                    {
+                        u16 count = 1;
+                        while (block->samples[l].dist == block->samples[l + 1].dist)
+                        {
+                            //assert(count < 255 && "Too many identical values !!");
+                            count++;
+                            l++;
+                        }
+                        enc_block->samples.emplace_back(encoded_sample(count, block->samples[l].dist));
+                    }
+                }
+            }
+        }
+
+        const u32 size = 524'288;
+        u32 counter = 0;
+        u8 buffer[size];
+        memset(buffer, 0, size);
+
+        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+        memcpy(buffer + counter, &(enc_map.size_x), sizeof(u32));
+        counter += sizeof(u32);
+
+        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+        memcpy(buffer + counter, &(enc_map.size_y), sizeof(u32));
+        counter += sizeof(u32);
+
+        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+        memcpy(buffer + counter, &(enc_map.size_z), sizeof(u32));
+        counter += sizeof(u32);
+
+        u32 block_size = enc_map.blocks.size();
+        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+        memcpy(buffer + counter, &(block_size), sizeof(u32));
+        counter += sizeof(u32);
+
+        for (u32 i = 0; i < block_size; ++i)
+        {
+            encoded_block* enc_block = &enc_map.blocks[i];
+            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+            memcpy(buffer + counter, &enc_block->x, sizeof(u32));
+            counter += sizeof(u32);
+
+            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+            memcpy(buffer + counter, &enc_block->y, sizeof(u32));
+            counter += sizeof(u32);
+
+            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+            memcpy(buffer + counter, &enc_block->z, sizeof(u32));
+            counter += sizeof(u32);
+
+            const u32 samples_size = enc_block->samples.size();
+            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+            memcpy(buffer + counter, &(samples_size), sizeof(u32));
+            counter += sizeof(u32);
+            RAIN_LOG("samples count %u, starting at %u", samples_size, counter);
+
+            for (u32 j = 0; j < samples_size; ++j)
+            {
+                assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
+                memcpy(buffer + counter, &(enc_block->samples[j]), sizeof(encoded_sample));
+                counter += sizeof(encoded_sample);
+            }
+        }
+
+        core::file::write(file_path, buffer, counter);
+    }
+
+    void decode_map(tvox_map* tmap, const std::string& file_path)
+    {
+        encoded_map enc_map;
+
+        const u32 size = 524'288;
+        u32 counter = 0;
+        u8 buffer[size];
+
+        u32 actual_size = core::file::read(file_path, buffer, size);
+
+        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+        enc_map.size_x = *(u32*)(buffer + counter);
+        counter += sizeof(u32);
+
+        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+        enc_map.size_y = *(u32*)(buffer + counter);
+        counter += sizeof(u32);
+
+        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+        enc_map.size_z = *(u32*)(buffer + counter);
+        counter += sizeof(u32);
+
+        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+        const u32 blocks_size = *(u32*)(buffer + counter);
+        counter += sizeof(u32);
+
+        enc_map.blocks.resize(blocks_size);
+        for (u32 i = 0; i < blocks_size; ++i)
+        {
+            encoded_block* enc_block = &(enc_map.blocks[i]);
+
+            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+            enc_block->x = *(u32*)(buffer + counter);
+            counter += sizeof(u32);
+
+            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+            enc_block->y = *(u32*)(buffer + counter);
+            counter += sizeof(u32);
+
+            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+            enc_block->z = *(u32*)(buffer + counter);
+            counter += sizeof(u32);
+
+            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
+            const u32 samples_size = *(u32*)(buffer + counter);
+            counter += sizeof(u32);
+            enc_block->samples.resize(samples_size);
+
+            RAIN_LOG("samples count %u, starting at %u", samples_size, counter);
+
+            for (u32 j = 0; j < samples_size; ++j)
+            {
+                assert(counter + sizeof(encoded_sample) <= actual_size && "Buffer is too small or too much data.");
+                enc_block->samples[j] = *(encoded_sample*)(buffer + counter);
+                counter += sizeof(encoded_sample);
+            }
+        }
+
+        tmap->xmax = enc_map.size_x;
+        tmap->ymax = enc_map.size_y;
+        tmap->zmax = enc_map.size_z;
+        tmap->blocks.resize(tmap->xmax * tmap->ymax * tmap->zmax);
+
+        for (u32 i = 0; i < tmap->xmax; ++i)
+        {
+            for (u32 j = 0; j < tmap->ymax; ++j)
+            {
+                for (u32 k = 0; k < tmap->zmax; ++k)
+                {
+                    u32 currentIndex = i + j * enc_map.size_x + k * enc_map.size_x * enc_map.size_y;
+
+                    RAIN_LOG("encode : %u", currentIndex);
+                    tmap->blocks[currentIndex] = new tvox_block();
+                    tmap->blocks[currentIndex]->map = tmap;
+                    tmap->blocks[currentIndex]->need_update = true;
+                    tvox_block* block = tmap->blocks[currentIndex];
+                    encoded_block* enc_block = &(enc_map.blocks[currentIndex]);
+
+
+                    block->x = i;
+                    block->y = j;
+                    block->z = k;
+
+                    u32 current = 0;
+
+                    for (u32 l = 0; l < enc_block->samples.size(); ++l)
+                    {
+                        for (u32 count = 0; count < enc_block->samples[l].count; ++count)
+                        {
+                            tvox_sample* sample = &(block->samples[current]);
+                            sample->dist = enc_block->samples[l].dist;
+                            sample->owner = block;
+                            current++;
+                        }
+                    }
+                    init_samples_coord(block);
+                }
+            }
+        }
+
+    }
+
+
+
+
+    void init_map(tvox_map* map, u32 xmax, u32 ymax, u32 zmax, float frequency, float amplitude, float lacunarity, float persistence)
+    {
+        for (u32 i = 0; i < map->blocks.size(); ++i)
+        {
+            delete map->blocks[i];
+        }
+
+        map->xmax = xmax;
+        map->ymax = ymax;
+        map->zmax = zmax;
+
+        map->blocks.resize(xmax * ymax * zmax);
+
+        for (u32 i = 0; i < xmax; ++i)
+        {
+            for (u32 j = 0; j < ymax; ++j)
+            {
+                for (u32 k = 0; k < zmax; ++k)
+                {
+                    u32 currentIndex = i + j * xmax + k * xmax * ymax;
+                    RAIN_LOG("init_map : %u", currentIndex);
                     map->blocks[currentIndex] = new tvox_block();
-                    init_tblock(map->blocks[currentIndex], i, j, k);
+                    map->blocks[currentIndex]->map = map;
+                    init_tblock(map->blocks[currentIndex], i, j, k, frequency, amplitude, lacunarity, persistence);
                 }
             }
         }
     }
+    
 
-    bool is_inside_boundary(i32 max, i32 x, i32 y, i32 z)
+    //void init_map(tvox_map* map)
+    //{
+    //    map->blocks.resize(TMAP_SIZE_CUBED);
+
+    //    for (u32 i = 0; i < TMAP_SIZE; ++i)
+    //    {
+    //        for (u32 j = 0; j < TMAP_SIZE; ++j)
+    //        {
+    //            for (u32 k = 0; k < TMAP_SIZE; ++k)
+    //            {
+    //                u32 currentIndex = i + j * TMAP_SIZE + k * TMAP_SIZE_SQUARED;
+    //                map->blocks[currentIndex] = new tvox_block();
+    //                init_tblock(map->blocks[currentIndex], i, j, k);
+    //            }
+    //        }
+    //    }
+    //}
+
+    bool is_inside_boundary(i32 xmax, i32 ymax, i32 zmax, i32 x, i32 y, i32 z)
     {
-        return (x < max && y < max && z < max && x >= 0 && y >= 0 && z >= 0);
+        return (x < xmax && y < ymax && z < zmax && x >= 0 && y >= 0 && z >= 0);
     }
 
     tvox_block* get_block(tvox_map* map, i32 x, i32 y, i32 z)
     {
-        if (is_inside_boundary(TMAP_SIZE, x, y, z))
+        if (is_inside_boundary(map->xmax, map->ymax, map->zmax, x, y, z))
         {
-            return map->blocks[x + y * TMAP_SIZE + z * TMAP_SIZE_SQUARED];
+            return map->blocks[x + y * map->xmax + z * map->xmax * map->ymax];
         }
 
         return nullptr;
     }
 
-    tvox_sample* get_sample(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z)
+    tvox_sample* get_sample(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z, u32 depth)
     {
-        if (is_inside_boundary(BLOCK_SIZE, x, y, z))
+        if (is_inside_boundary(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, x, y, z))
         {
             return &(block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
         }
@@ -108,14 +397,14 @@ namespace rain::engine::transvoxel
     {
         memset(cell, 0, sizeof(tvox_cell));
 
-        cell->corners[0] = get_sample(map, block, x    , y    , z    );
-        cell->corners[1] = get_sample(map, block, x + 1, y    , z    );
-        cell->corners[2] = get_sample(map, block, x    , y + 1, z    );
-        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z    );
-        cell->corners[4] = get_sample(map, block, x    , y    , z + 1);
-        cell->corners[5] = get_sample(map, block, x + 1, y    , z + 1);
-        cell->corners[6] = get_sample(map, block, x    , y + 1, z + 1);
-        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1);
+        cell->corners[0] = get_sample(map, block, x    , y    , z    , 0);
+        cell->corners[1] = get_sample(map, block, x + 1, y    , z    , 0);
+        cell->corners[2] = get_sample(map, block, x    , y + 1, z    , 0);
+        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z    , 0);
+        cell->corners[4] = get_sample(map, block, x    , y    , z + 1, 0);
+        cell->corners[5] = get_sample(map, block, x + 1, y    , z + 1, 0);
+        cell->corners[6] = get_sample(map, block, x    , y + 1, z + 1, 0);
+        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1, 0);
     }
 
     void set_case_code(tvox_cell* cell)
@@ -176,9 +465,9 @@ namespace rain::engine::transvoxel
 
         u8 validity_mask = 0;
 
-        i32 xmax = (block->x == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
-        i32 ymax = (block->y == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
-        i32 zmax = (block->z == TMAP_SIZE - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 xmax = (block->x == map->xmax - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 ymax = (block->y == map->ymax - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 zmax = (block->z == map->zmax - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
 
         for (i32 z = 0; z < zmax; ++z)
         {
@@ -339,11 +628,11 @@ namespace rain::engine::transvoxel
 
         u8 current_deck = 0;
 
-        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        for (u32 i = 0; i < map->zmax; ++i)
         {
-            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            for (u32 j = 0; j < map->ymax; ++j)
             {
-                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                for (u32 k = 0; k < map->xmax; ++k)
                 {
                     tvox_block* block = get_block(map, k, j, i);
 
@@ -358,15 +647,15 @@ namespace rain::engine::transvoxel
 
     void draw_map(tvox_map* map, const glm::vec3& camera_position)
     {
-        for (u32 i = 0; i < TMAP_SIZE; ++i)
+        for (u32 i = 0; i < map->xmax; ++i)
         {
-            for (u32 j = 0; j < TMAP_SIZE; ++j)
+            for (u32 j = 0; j < map->ymax; ++j)
             {
-                for (u32 k = 0; k < TMAP_SIZE; ++k)
+                for (u32 k = 0; k < map->zmax; ++k)
                 {
                     tvox_block* block = get_block(map, i, j, k);
 
-                    RAIN_RENDERER->draw_transvoxel(block->vao, block->indices.size(), camera_position);
+                    RAIN_RENDERER->draw_transvoxel(block->vao, block->indices.size(), camera_position, BLOCK_SIZE * map->ymax);
                 }
             }
         }
@@ -376,34 +665,34 @@ namespace rain::engine::transvoxel
     {
         std::vector<tvox_sample*> samples;
 
-        for (u32 i = 0; i < TMAP_SIZE; ++i)
-        {
-            for (u32 j = 0; j < TMAP_SIZE; ++j)
-            {
-                for (u32 k = 0; k < TMAP_SIZE; ++k)
-                {
-                    tvox_block* block = get_block(tmap, i, j, k);
+        //for (u32 i = 0; i < TMAP_SIZE; ++i)
+        //{
+        //    for (u32 j = 0; j < TMAP_SIZE; ++j)
+        //    {
+        //        for (u32 k = 0; k < TMAP_SIZE; ++k)
+        //        {
+        //            tvox_block* block = get_block(tmap, i, j, k);
 
-                    for (u32 x = 0; x < BLOCK_SIZE; ++x)
-                    {
-                        for (u32 y = 0; y < BLOCK_SIZE; ++y)
-                        {
-                            for (u32 z = 0; z < BLOCK_SIZE; ++z)
-                            {
-                                tvox_sample* sample = get_sample(tmap, block, x, y, z);
-                                const glm::vec3 position = glm::vec3(sample->world_x, sample->world_x, sample->world_z) + tmap->position;
-                                const f32 dist = glm::distance(position, sphere.offset);
+        //            for (u32 x = 0; x < BLOCK_SIZE; ++x)
+        //            {
+        //                for (u32 y = 0; y < BLOCK_SIZE; ++y)
+        //                {
+        //                    for (u32 z = 0; z < BLOCK_SIZE; ++z)
+        //                    {
+        //                        tvox_sample* sample = get_sample(tmap, block, x, y, z, 0);
+        //                        const glm::vec3 position = glm::vec3(sample->world_x, sample->world_x, sample->world_z) + tmap->position;
+        //                        const f32 dist = glm::distance(position, sphere.offset);
 
-                                if (dist < sphere.radius)
-                                {
-                                    samples.push_back(sample);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                        if (dist < sphere.radius)
+        //                        {
+        //                            samples.push_back(sample);
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         return samples;
     }

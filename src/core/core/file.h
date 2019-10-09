@@ -6,10 +6,31 @@
 
 namespace rain::core
 {
+    namespace file
+    {
+        inline void write(const std::string& path, u8* content, u32 size)
+        {
+            FILE* file;
+            fopen_s(&file, path.c_str(), "wb");
+            fwrite(content, sizeof(u8), size, file);
+            fclose(file);
+        }
+
+        inline u32 read(const std::string& path, u8* content, u32 size)
+        {
+            FILE* file;
+            fopen_s(&file, path.c_str(), "rb");
+            const u32 size_read = fread(content, sizeof(u8), size, file);
+            fclose(file);
+
+            return size_read;
+        }
+    }
+
 	class File
 	{
-
 	public:
+
 
 		enum class Mode
 		{
