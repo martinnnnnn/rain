@@ -94,11 +94,11 @@ namespace rain::engine::transvoxel
         tvox_block* new_block = get_block(map, new_block_x, new_block_y, new_block_z);
         if (new_block)
         {
-            const i32 new_cell_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
-            const i32 new_cell_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
-            const i32 new_cell_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
+            const i32 new_sample_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
+            const i32 new_sample_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
+            const i32 new_sample_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
 
-            return get_sample(map, new_block, new_cell_x, new_cell_y, new_cell_z);
+            return &(new_block->samples[new_sample_x + new_sample_y * BLOCK_SIZE + new_sample_z * BLOCK_SIZE_SQUARED]);
         }
 
         return nullptr;
