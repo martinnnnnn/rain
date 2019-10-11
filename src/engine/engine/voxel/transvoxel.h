@@ -9,6 +9,7 @@
 #include "voxel_cell.h"
 #include "voxel_chunk.h"
 #include "transvoxel_tables.h"
+#include "vox_block.h"
 
 namespace rain::engine::transvoxel
 {
@@ -96,8 +97,6 @@ namespace rain::engine::transvoxel
     };
 
 
-
-
     void init_map(tvox_map* map, u32 xmax, u32 ymax, u32 zmax, float frequency, float amplitude, float lacunarity, float persistence);
     //void init_map(tvox_map* map);
     void transvoxel(tvox_map* map);
@@ -105,17 +104,5 @@ namespace rain::engine::transvoxel
     void encode_map(tvox_map* tmap, const std::string& file_path);
     void decode_map(tvox_map* tmap, const std::string& file_path);
 
-    std::vector<tvox_sample*> get_samples_in_sphere(tvox_map* tmap, const core::sphere& sphere);
-
-    template<typename T>
-    void set_bit(T& number, T bit)
-    {
-        number |= 1UL << bit;
-    }
-
-    template<typename T>
-    void unset_bit(T& number, T bit)
-    {
-        number &= ~(1UL << bit);
-    }
+    void transvoxel(voxel::vox_block* block, voxel::vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
 }

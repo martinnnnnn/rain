@@ -48,6 +48,7 @@ namespace rain::engine
         //std::vector<glm::vec3> transNormals;
 
         transvoxel::tvox_map tmap;
+        voxel::vox_map voxmap;
     };
 }
 

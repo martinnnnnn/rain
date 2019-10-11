@@ -29,7 +29,7 @@ namespace rain::engine
         RAIN_PROFILE("World Initialization");
 
         mapx = 5;
-        mapy = 1;
+        mapy = 5;
         mapz = 5;
 
         {
@@ -42,8 +42,19 @@ namespace rain::engine
             RAIN_PROFILE("Transvoxel");
             //transvoxel::init_map(&tmap, mapx, mapy, mapz, 0.4f, 1.4f, 0.8f, 1.5f);
             //transvoxel::encode_map(&tmap, "D:/_MARTIN/programming/_projects/rain/test.rain.bin");
-            transvoxel::decode_map(&tmap, "D:/_MARTIN/programming/_projects/rain/test.rain.bin");
-            transvoxel::transvoxel(&tmap);
+            //transvoxel::decode_map(&tmap, "D:/_MARTIN/programming/_projects/rain/test.rain.bin");
+            
+            //transvoxel::transvoxel(&tmap);
+        }
+
+        {
+            voxmap.min_x = 0;
+            voxmap.min_y = 0;
+            voxmap.min_z = 0;
+            voxmap.max_x = 5;
+            voxmap.max_y = 5;
+            voxmap.max_z = 5;
+            voxel::init_map(&voxmap, glm::vec3{}, 1000, RAIN_CONFIG->data_root + "/voxel_map");
         }
 
         std::vector<actor*> view;
@@ -163,11 +174,12 @@ namespace rain::engine
             change = true;
         }
 
-        if (change)
-        {
-            transvoxel::init_map(&tmap, mapx, mapy, mapz, frequency, amplitude, lacunarity, persistence);
-            transvoxel::transvoxel(&tmap);
-        }
+        //if (change)
+        //{
+        //    transvoxel::init_map(&tmap, mapx, mapy, mapz, frequency, amplitude, lacunarity, persistence);
+        //    transvoxel::transvoxel(&tmap);
+        //}
+        voxel::update_map(&voxmap, main_camera.transform->position);
 
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)
@@ -224,22 +236,9 @@ namespace rain::engine
         
         RAIN_RENDERER->update();
 
-        static bool draw_vmap = true;
-        if (RAIN_INPUT->is_key_released(DIK_F) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
-        {
-            draw_vmap = !draw_vmap;
-        }
 
-        if (draw_vmap)
-        {
-            //engine::draw(vmap);
-            transvoxel::draw_map(&tmap, main_camera.transform->position);
-        }
-        else
-        {
-            transvoxel::draw_map(&tmap, main_camera.transform->position);
-        }
-        
+        //transvoxel::draw_map(&tmap, main_camera.transform->position);
+        voxel::draw_map(&voxmap, main_camera.transform->position);
 
         //std::vector<actor*> view;
 

@@ -87,6 +87,7 @@ namespace rain::engine
         void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count);
 
         void init_transvoxel(transvoxel::tvox_block* block) const;
+        void init_transvoxel(voxel::vox_block* block) const;
         void update_transvoxel(transvoxel::tvox_block* block) const;
         void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position, f32 max_height);
 

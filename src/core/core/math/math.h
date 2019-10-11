@@ -26,4 +26,9 @@ namespace rain::core
         }
         return false;
     }
+
+    inline bool is_inside_boundary(i32 x, i32 y, i32 z, i32 xmax, i32 ymax, i32 zmax, i32 xmin = 0, i32 ymin = 0, i32 zmin = 0)
+    {
+        return (x < xmax && y < ymax && z < zmax && x >= xmin && y >= ymin && z >= zmin);
+    }
 }

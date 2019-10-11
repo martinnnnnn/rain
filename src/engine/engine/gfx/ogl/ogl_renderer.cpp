@@ -170,7 +170,7 @@ namespace rain::engine
             }
         }
 
-        u32 vao, vbo_vertices, ebo_vertices_indices;
+        u32 vao, vbo_vertices;
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -663,6 +663,33 @@ namespace rain::engine
         //glBindVertexArray(0);
     }
 
+    void Renderer::init_transvoxel(voxel::vox_block* block) const
+    {
+        block->vbo = 0;
+        block->ebo = 0;
+        glGenVertexArrays(1, &block->vao);
+        glGenBuffers(1, &block->vbo);
+        glGenBuffers(1, &block->ebo);
+
+        glBindVertexArray(block->vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(voxel::vox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::vox_vertex), (void*)0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::vox_vertex), (void*)offsetof(voxel::vox_vertex, normal));
+
+        //glEnableVertexAttribArray(2);
+        //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+        glBindVertexArray(0);
+    }
 
     void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao)
     {
@@ -1242,7 +1269,7 @@ namespace rain::engine
             RChar character =
             {
                 texture,
-                {face->glyph->bitmap.width, face->glyph->bitmap.rows},
+                {i32(face->glyph->bitmap.width), i32(face->glyph->bitmap.rows)},
                 {face->glyph->bitmap_left, face->glyph->bitmap_top},
                 GLuint(face->glyph->advance.x)
             };

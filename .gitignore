@@ -11,3 +11,5 @@ CTestTestfile.cmake
 /build/
 /ignored/
 *.spv
+rain.sln
+/.vs/

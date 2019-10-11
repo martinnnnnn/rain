@@ -6,6 +6,11 @@
 #include "engine/core/profiler.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
 
+
+#include "vox_map.h"
+#include "vox_block.h"
+#include "vox_sample.h"
+
 #include "assert.h"
 #include <algorithm>
 
@@ -62,10 +67,10 @@ namespace rain::engine::transvoxel
                     const f32 sampley = f32(sample->world_y) / f32(BLOCK_SIZE);
                     const f32 samplez = f32(sample->world_z) / f32(BLOCK_SIZE);
 
-                    core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
-                    sample->dist = i8(-sample->world_y + (n.fractal(3, samplex, samplez)) * 50.0f);
+                    //core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
+                    //sample->dist = i8(-sample->world_y + (n.fractal(3, samplex, samplez)) * 50.0f);
 
-                    //sample->dist = i8( -sample->world_y + (core::simplex_noise::noise(samplex, samplez) - 0.5f) * 50.0f);
+                    sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
 
                     if (sample->world_x == 0 
                         || sample->world_y == 0
@@ -108,6 +113,7 @@ namespace rain::engine::transvoxel
         u32 size_z;
     };
 
+
     void encode_map(tvox_map* tmap, const std::string& file_path)
     {
         encoded_map enc_map;
@@ -131,13 +137,11 @@ namespace rain::engine::transvoxel
                     enc_block->y = j;
                     enc_block->z = k;
 
-                    std::vector<encoded_sample> encoded_block;
                     for (u32 l = 0; l < BLOCK_SIZE_CUBED; ++l)
                     {
                         u16 count = 1;
                         while (block->samples[l].dist == block->samples[l + 1].dist)
                         {
-                            //assert(count < 255 && "Too many identical values !!");
                             count++;
                             l++;
                         }
@@ -152,54 +156,29 @@ namespace rain::engine::transvoxel
         u8 buffer[size];
         memset(buffer, 0, size);
 
-        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-        memcpy(buffer + counter, &(enc_map.size_x), sizeof(u32));
-        counter += sizeof(u32);
+        core::to_buffer(buffer, size, &counter, enc_map.size_x);
+        core::to_buffer(buffer, size, &counter, enc_map.size_y);
+        core::to_buffer(buffer, size, &counter, enc_map.size_z);
+        core::to_buffer(buffer, size, &counter, enc_map.blocks.size());
 
-        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-        memcpy(buffer + counter, &(enc_map.size_y), sizeof(u32));
-        counter += sizeof(u32);
-
-        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-        memcpy(buffer + counter, &(enc_map.size_z), sizeof(u32));
-        counter += sizeof(u32);
-
-        u32 block_size = enc_map.blocks.size();
-        assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-        memcpy(buffer + counter, &(block_size), sizeof(u32));
-        counter += sizeof(u32);
-
-        for (u32 i = 0; i < block_size; ++i)
+        for (u32 i = 0; i < enc_map.blocks.size(); ++i)
         {
             encoded_block* enc_block = &enc_map.blocks[i];
-            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-            memcpy(buffer + counter, &enc_block->x, sizeof(u32));
-            counter += sizeof(u32);
 
-            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-            memcpy(buffer + counter, &enc_block->y, sizeof(u32));
-            counter += sizeof(u32);
+            core::to_buffer(buffer, size, &counter, enc_block->x);
+            core::to_buffer(buffer, size, &counter, enc_block->y);
+            core::to_buffer(buffer, size, &counter, enc_block->z);
+            core::to_buffer(buffer, size, &counter, enc_block->samples.size());
 
-            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-            memcpy(buffer + counter, &enc_block->z, sizeof(u32));
-            counter += sizeof(u32);
-
-            const u32 samples_size = enc_block->samples.size();
-            assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-            memcpy(buffer + counter, &(samples_size), sizeof(u32));
-            counter += sizeof(u32);
-            RAIN_LOG("samples count %u, starting at %u", samples_size, counter);
-
-            for (u32 j = 0; j < samples_size; ++j)
+            for (u32 j = 0; j < enc_block->samples.size(); ++j)
             {
-                assert(counter + sizeof(u32) < size && "Buffer is too small or too much data.");
-                memcpy(buffer + counter, &(enc_block->samples[j]), sizeof(encoded_sample));
-                counter += sizeof(encoded_sample);
+                core::to_buffer(buffer, size, &counter, enc_block->samples[j]);
             }
         }
 
         core::file::write(file_path, buffer, counter);
     }
+
 
     void decode_map(tvox_map* tmap, const std::string& file_path)
     {
@@ -211,51 +190,29 @@ namespace rain::engine::transvoxel
 
         u32 actual_size = core::file::read(file_path, buffer, size);
 
-        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-        enc_map.size_x = *(u32*)(buffer + counter);
-        counter += sizeof(u32);
-
-        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-        enc_map.size_y = *(u32*)(buffer + counter);
-        counter += sizeof(u32);
-
-        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-        enc_map.size_z = *(u32*)(buffer + counter);
-        counter += sizeof(u32);
-
-        assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-        const u32 blocks_size = *(u32*)(buffer + counter);
-        counter += sizeof(u32);
-
+        core::from_buffer<u32>(buffer, actual_size, &counter, &enc_map.size_x);
+        core::from_buffer<u32>(buffer, actual_size, &counter, &enc_map.size_y);
+        core::from_buffer<u32>(buffer, actual_size, &counter, &enc_map.size_z);
+        u32 blocks_size = 0;
+        core::from_buffer<u32>(buffer, actual_size, &counter, &blocks_size);
         enc_map.blocks.resize(blocks_size);
+
         for (u32 i = 0; i < blocks_size; ++i)
         {
             encoded_block* enc_block = &(enc_map.blocks[i]);
 
-            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-            enc_block->x = *(u32*)(buffer + counter);
-            counter += sizeof(u32);
+            RAIN_PROFILE("decoding block");
 
-            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-            enc_block->y = *(u32*)(buffer + counter);
-            counter += sizeof(u32);
-
-            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-            enc_block->z = *(u32*)(buffer + counter);
-            counter += sizeof(u32);
-
-            assert(counter + sizeof(u32) < actual_size && "Buffer is too small or too much data.");
-            const u32 samples_size = *(u32*)(buffer + counter);
-            counter += sizeof(u32);
+            core::from_buffer(buffer, actual_size, &counter, &enc_block->x);
+            core::from_buffer(buffer, actual_size, &counter, &enc_block->y);
+            core::from_buffer(buffer, actual_size, &counter, &enc_block->z);
+            u32 samples_size = 0;
+            core::from_buffer(buffer, actual_size, &counter, &samples_size);
             enc_block->samples.resize(samples_size);
-
-            RAIN_LOG("samples count %u, starting at %u", samples_size, counter);
 
             for (u32 j = 0; j < samples_size; ++j)
             {
-                assert(counter + sizeof(encoded_sample) <= actual_size && "Buffer is too small or too much data.");
-                enc_block->samples[j] = *(encoded_sample*)(buffer + counter);
-                counter += sizeof(encoded_sample);
+                core::from_buffer(buffer, actual_size, &counter, &(enc_block->samples[j]));
             }
         }
 
@@ -272,7 +229,6 @@ namespace rain::engine::transvoxel
                 {
                     u32 currentIndex = i + j * enc_map.size_x + k * enc_map.size_x * enc_map.size_y;
 
-                    RAIN_LOG("encode : %u", currentIndex);
                     tmap->blocks[currentIndex] = new tvox_block();
                     tmap->blocks[currentIndex]->map = tmap;
                     tmap->blocks[currentIndex]->need_update = true;
@@ -354,14 +310,9 @@ namespace rain::engine::transvoxel
     //    }
     //}
 
-    bool is_inside_boundary(i32 xmax, i32 ymax, i32 zmax, i32 x, i32 y, i32 z)
-    {
-        return (x < xmax && y < ymax && z < zmax && x >= 0 && y >= 0 && z >= 0);
-    }
-
     tvox_block* get_block(tvox_map* map, i32 x, i32 y, i32 z)
     {
-        if (is_inside_boundary(map->xmax, map->ymax, map->zmax, x, y, z))
+        if (core::is_inside_boundary(x, y, z, map->xmax, map->ymax, map->zmax))
         {
             return map->blocks[x + y * map->xmax + z * map->xmax * map->ymax];
         }
@@ -371,7 +322,7 @@ namespace rain::engine::transvoxel
 
     tvox_sample* get_sample(tvox_map* map, tvox_block* block, i32 x, i32 y, i32 z, u32 depth)
     {
-        if (is_inside_boundary(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, x, y, z))
+        if (core::is_inside_boundary(x, y, z, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
         {
             return &(block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
         }
@@ -433,29 +384,29 @@ namespace rain::engine::transvoxel
     {
         if (sample_x == 0 /*&& block_x == 0*/)
         {
-            unset_bit<u8>(validity_mask, 0);
+            core::unset_bit<u8>(validity_mask, 0);
         }
         else
         {
-            set_bit<u8>(validity_mask, 0);
+            core::set_bit<u8>(validity_mask, 0);
         }
 
         if (sample_y == 0 /*&& block_y == 0*/)
         {
-            unset_bit<u8>(validity_mask, 1);
+            core::unset_bit<u8>(validity_mask, 1);
         }
         else
         {
-            set_bit<u8>(validity_mask, 1);
+            core::set_bit<u8>(validity_mask, 1);
         }
 
         if (sample_z == 0 /*&& block_z == 0*/)
         {
-            unset_bit<u8>(validity_mask, 2);
+            core::unset_bit<u8>(validity_mask, 2);
         }
         else
         {
-            set_bit<u8>(validity_mask, 2);
+            core::set_bit<u8>(validity_mask, 2);
         }
     }
 
@@ -488,7 +439,7 @@ namespace rain::engine::transvoxel
                         lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
                         const u16* regVertexData = lengyel::regularVertexData[cell->case_code];
 
-                        for (u32 i = 0; i < cellData.GetVertexCount(); ++i)
+                        for (i32 i = 0; i < cellData.GetVertexCount(); ++i)
                         {
                             const u16 vertexData = *(regVertexData + i);
 
@@ -501,7 +452,7 @@ namespace rain::engine::transvoxel
                             const u8 highNumberedCorner = lowByte & 0x0F;
 
 
-                            if (mapping & validity_mask == mapping)
+                            if ((mapping & validity_mask) == mapping)
                             {
                                 i8 new_x = x - (mapping & 0x01);
                                 i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
@@ -655,45 +606,216 @@ namespace rain::engine::transvoxel
                 {
                     tvox_block* block = get_block(map, i, j, k);
 
-                    RAIN_RENDERER->draw_transvoxel(block->vao, block->indices.size(), camera_position, BLOCK_SIZE * map->ymax);
+                    RAIN_RENDERER->draw_transvoxel(block->vao, block->indices.size(), camera_position, f32(BLOCK_SIZE * map->ymax));
                 }
             }
         }
     }
 
-    std::vector<tvox_sample*> get_samples_in_sphere(tvox_map* tmap, const core::sphere& sphere)
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    void set_case_code(voxel::vox_cell* cell)
     {
-        std::vector<tvox_sample*> samples;
+        assert(cell->corners[0] && "A cell corner can never be null.");
+        assert(cell->corners[1] && "A cell corner can never be null.");
+        assert(cell->corners[2] && "A cell corner can never be null.");
+        assert(cell->corners[3] && "A cell corner can never be null.");
+        assert(cell->corners[4] && "A cell corner can never be null.");
+        assert(cell->corners[5] && "A cell corner can never be null.");
+        assert(cell->corners[6] && "A cell corner can never be null.");
+        assert(cell->corners[7] && "A cell corner can never be null.");
 
-        //for (u32 i = 0; i < TMAP_SIZE; ++i)
-        //{
-        //    for (u32 j = 0; j < TMAP_SIZE; ++j)
-        //    {
-        //        for (u32 k = 0; k < TMAP_SIZE; ++k)
-        //        {
-        //            tvox_block* block = get_block(tmap, i, j, k);
+        cell->case_code =
+            ((cell->corners[0]->dist >> 7) & 0x01)
+            | ((cell->corners[1]->dist >> 6) & 0x02)
+            | ((cell->corners[2]->dist >> 5) & 0x04)
+            | ((cell->corners[3]->dist >> 4) & 0x08)
+            | ((cell->corners[4]->dist >> 3) & 0x10)
+            | ((cell->corners[5]->dist >> 2) & 0x20)
+            | ((cell->corners[6]->dist >> 1) & 0x40)
+            | (cell->corners[7]->dist & 0x80);
+    }
 
-        //            for (u32 x = 0; x < BLOCK_SIZE; ++x)
-        //            {
-        //                for (u32 y = 0; y < BLOCK_SIZE; ++y)
-        //                {
-        //                    for (u32 z = 0; z < BLOCK_SIZE; ++z)
-        //                    {
-        //                        tvox_sample* sample = get_sample(tmap, block, x, y, z, 0);
-        //                        const glm::vec3 position = glm::vec3(sample->world_x, sample->world_x, sample->world_z) + tmap->position;
-        //                        const f32 dist = glm::distance(position, sphere.offset);
+    voxel::vox_sample* get_sample(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, u32 depth)
+    {
+        if (core::is_inside_boundary(x, y, z, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+        {
+            return &(block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
+        }
 
-        //                        if (dist < sphere.radius)
-        //                        {
-        //                            samples.push_back(sample);
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        const i32 new_block_x = (x == -1) ? block->position.x - 1 : (x == BLOCK_SIZE) ? block->position.x + 1 : block->position.x;
+        const i32 new_block_y = (y == -1) ? block->position.y - 1 : (y == BLOCK_SIZE) ? block->position.y + 1 : block->position.y;
+        const i32 new_block_z = (z == -1) ? block->position.z - 1 : (z == BLOCK_SIZE) ? block->position.z + 1 : block->position.z;
 
-        return samples;
+        voxel::vox_block* new_block = voxel::get_block(map, new_block_x, new_block_y, new_block_z);
+        if (new_block)
+        {
+            const i32 new_sample_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
+            const i32 new_sample_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
+            const i32 new_sample_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
+
+            return &(new_block->samples[new_sample_x + new_sample_y * BLOCK_SIZE + new_sample_z * BLOCK_SIZE_SQUARED]);
+        }
+
+        return nullptr;
+    }
+
+    void init_cell(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, voxel::vox_cell* cell)
+    {
+        memset(cell, 0, sizeof(voxel::vox_cell));
+
+        cell->corners[0] = get_sample(map, block, x, y, z, 0);
+        cell->corners[1] = get_sample(map, block, x + 1, y, z, 0);
+        cell->corners[2] = get_sample(map, block, x, y + 1, z, 0);
+        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z, 0);
+        cell->corners[4] = get_sample(map, block, x, y, z + 1, 0);
+        cell->corners[5] = get_sample(map, block, x + 1, y, z + 1, 0);
+        cell->corners[6] = get_sample(map, block, x, y + 1, z + 1, 0);
+        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1, 0);
+    }
+
+
+    void transvoxel(voxel::vox_block* block, voxel::vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
+    {
+        using namespace voxel;
+
+        block->vertices.clear();
+
+        u8 validity_mask = 0;
+
+        i32 xmax = (block->position.x == block->map->max_x - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 ymax = (block->position.y == block->map->max_y - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+        i32 zmax = (block->position.z == block->map->max_z - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+
+        for (i32 z = 0; z < zmax; ++z)
+        {
+            const u8 previous_deck = (current_deck + 1) & 1;
+            for (i32 y = 0; y < ymax; ++y)
+            {
+                for (i32 x = 0; x < xmax; ++x)
+                {
+                    vox_cell* cell = &decks[current_deck][x + y * BLOCK_SIZE];
+                    init_cell(block->map, block, x, y, z, cell);
+                    set_case_code(cell);
+
+                    if ((cell->case_code ^ ((cell->corners[7]->dist >> 7) & 0xFF)) != 0)
+                    {
+                        update_validity_mask(validity_mask, x, y, z, block->position.x, block->position.y, block->position.z);
+
+                        u8 regCellClass = lengyel::regularCellClass[cell->case_code];
+                        lengyel::RegularCellData cellData = lengyel::regularCellData[regCellClass];
+                        const u16* regVertexData = lengyel::regularVertexData[cell->case_code];
+
+                        for (i32 i = 0; i < cellData.GetVertexCount(); ++i)
+                        {
+                            const u16 vertexData = *(regVertexData + i);
+
+                            const u8 highByte = vertexData >> 8;    // high byte contains :
+                            const u8 mapping = highByte >> 4;       // mapping to the preceeding cell
+                            const u8 vertexIndex = highByte & 0x0F; // index of the vertex that needs to be reused / created
+
+                            const u8 lowByte = vertexData & 0xFF; // low byte contains the corners between which a vertex needs to be created
+                            const u8 lowNumberedCorner = lowByte >> 4;
+                            const u8 highNumberedCorner = lowByte & 0x0F;
+
+
+                            if ((mapping & validity_mask) == mapping)
+                            {
+                                i8 new_x = x - (mapping & 0x01);
+                                i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
+                                i8 new_deck = (current_deck + ((mapping & 0x04) >> 2)) & 1;
+
+                                const vox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
+
+                                for (u32 j = 0; j < neighbour_cell.indexes.size(); ++j)
+                                {
+                                    if (neighbour_cell.indexes[j].cell_index == vertexIndex)
+                                    {
+                                        cell->indexes.emplace_back(voxel::vertex_index{ 255, neighbour_cell.indexes[j].block_index });
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                const f32 t = f32(cell->corners[highNumberedCorner]->dist) / (f32(cell->corners[highNumberedCorner]->dist) - f32(cell->corners[lowNumberedCorner]->dist));
+
+                                const f32 lnc_x = f32(cell->corners[lowNumberedCorner]->x + block->position.x * BLOCK_SIZE);
+                                const f32 lnc_y = f32(cell->corners[lowNumberedCorner]->y + block->position.y * BLOCK_SIZE);
+                                const f32 lnc_z = f32(cell->corners[lowNumberedCorner]->z + block->position.z * BLOCK_SIZE);
+
+                                const f32 hnc_x = f32(cell->corners[highNumberedCorner]->x + block->position.x * BLOCK_SIZE);
+                                const f32 hnc_y = f32(cell->corners[highNumberedCorner]->y + block->position.y * BLOCK_SIZE);
+                                const f32 hnc_z = f32(cell->corners[highNumberedCorner]->z + block->position.z * BLOCK_SIZE);
+
+                                if (mapping == 8)
+                                {
+                                    cell->indexes.emplace_back(voxel::vertex_index{ vertexIndex, block->vertices.size() });
+                                }
+                                else // neighbour cell not available : create & own new vertex
+                                {
+                                    cell->indexes.emplace_back(voxel::vertex_index{ 255, block->vertices.size() });
+                                }
+
+                                block->vertices.emplace_back(voxel::vox_vertex
+                                    {
+                                        glm::vec3
+                                        {
+                                            t * lnc_x + (1 - t) * hnc_x,
+                                            t * lnc_y + (1 - t) * hnc_y,
+                                            t * lnc_z + (1 - t) * hnc_z
+                                        },
+                                        glm::vec3 {0.0f, 0.0f, 0.0f}
+                                    });
+                            }
+                        }
+
+                        u32 block_index_0 = -1;
+                        u32 block_index_1 = -1;
+                        u32 block_index_2 = -1;
+
+                        std::reverse(cellData.vertexIndex, cellData.vertexIndex + (cellData.GetTriangleCount() * 3));
+
+                        u32 j = 0;
+                        for (i32 i = 0; i < cellData.GetTriangleCount() * 3; ++i)
+                        {
+                            const u32 block_index = cell->indexes[cellData.vertexIndex[i]].block_index;
+                            block->indices.emplace_back(block_index);
+                            block_index_2 = block_index_1;
+                            block_index_1 = block_index_0;
+                            block_index_0 = block_index;
+
+                            if (i % 3 == 2)
+                            {
+                                j++;
+                                voxel::vox_vertex* A = &(block->vertices[block_index_0]);
+                                voxel::vox_vertex* B = &(block->vertices[block_index_1]);
+                                voxel::vox_vertex* C = &(block->vertices[block_index_2]);
+                                glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
+                                A->normal += normal;
+                                B->normal += normal;
+                                C->normal += normal;
+                            }
+                        }
+                    }
+                }
+            }
+            current_deck = previous_deck;
+        }
+
+        for (u32 i = 0; i < block->vertices.size(); ++i)
+        {
+            block->vertices[i].normal = glm::normalize(block->vertices[i].normal);
+        }
+
+        RAIN_RENDERER->init_transvoxel(block);
+
+        block->need_update = false;
     }
 }
