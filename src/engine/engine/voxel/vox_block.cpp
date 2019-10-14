@@ -1,6 +1,7 @@
 #include "vox_block.h"
 
 #include "vox_map.h"
+#include "engine/core/context.h"
 
 namespace rain::engine::voxel 
 {
@@ -36,26 +37,29 @@ namespace rain::engine::voxel
                     { 
                         i + block->position.x * BLOCK_SIZE,
                         j + block->position.y * BLOCK_SIZE, 
-                        k + block->position.z * BLOCK_SIZE };
+                        k + block->position.z * BLOCK_SIZE 
+                    };
 
                     const f32 samplex = f32(world_position.x) / f32(BLOCK_SIZE);
                     const f32 sampley = f32(world_position.y) / f32(BLOCK_SIZE);
                     const f32 samplez = f32(world_position.z) / f32(BLOCK_SIZE);
 
-                    core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
-                    sample->dist = i8(-world_position.y + (n.fractal(3, samplex, samplez)) * 50.0f);
+                    //core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
+                    //sample->dist = i8(-world_position.y + (n.fractal(3, samplex, samplez)) * 50.0f);
+                    sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
 
-                    //sample->dist = i8( -sample->world_y + (core::simplex_noise::noise(samplex, samplez) - 0.5f) * 50.0f);
 
-                    //if (world_position.x == 0
-                    //    || world_position.y == 0
-                    //    || world_position.z == 0
-                    //    || world_position.x == block->map->xmax * BLOCK_SIZE - 1
-                    //    || world_position.y == block->map->ymax * BLOCK_SIZE - 1
-                    //    || world_position.z == block->map->zmax * BLOCK_SIZE - 1)
-                    //{
-                    //    sample->dist = -10;
-                    //}
+                    if (world_position.x == block->map->min_x
+                        || world_position.y == block->map->min_y
+                        || world_position.z == block->map->min_z
+                        || world_position.x == block->map->max_x * BLOCK_SIZE - 1
+                        || world_position.y == block->map->max_y * BLOCK_SIZE - 1
+                        || world_position.z == block->map->max_z * BLOCK_SIZE - 1)
+                    {
+                        sample->dist = -10;
+                    }
+
+                    sample->owner = block;
                 }
             }
         }
@@ -74,6 +78,7 @@ namespace rain::engine::voxel
                     sample->x = i;
                     sample->y = j;
                     sample->z = k;
+                    sample->owner = block;
                 }
             }
         }

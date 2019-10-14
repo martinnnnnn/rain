@@ -746,13 +746,15 @@ namespace rain::engine::transvoxel
                             {
                                 const f32 t = f32(cell->corners[highNumberedCorner]->dist) / (f32(cell->corners[highNumberedCorner]->dist) - f32(cell->corners[lowNumberedCorner]->dist));
 
-                                const f32 lnc_x = f32(cell->corners[lowNumberedCorner]->x + block->position.x * BLOCK_SIZE);
-                                const f32 lnc_y = f32(cell->corners[lowNumberedCorner]->y + block->position.y * BLOCK_SIZE);
-                                const f32 lnc_z = f32(cell->corners[lowNumberedCorner]->z + block->position.z * BLOCK_SIZE);
+                                vox_sample* lnc_sample = cell->corners[lowNumberedCorner];
+                                const f32 lnc_x = f32(lnc_sample->x + lnc_sample->owner->position.x * BLOCK_SIZE);
+                                const f32 lnc_y = f32(lnc_sample->y + lnc_sample->owner->position.y * BLOCK_SIZE);
+                                const f32 lnc_z = f32(lnc_sample->z + lnc_sample->owner->position.z * BLOCK_SIZE);
 
-                                const f32 hnc_x = f32(cell->corners[highNumberedCorner]->x + block->position.x * BLOCK_SIZE);
-                                const f32 hnc_y = f32(cell->corners[highNumberedCorner]->y + block->position.y * BLOCK_SIZE);
-                                const f32 hnc_z = f32(cell->corners[highNumberedCorner]->z + block->position.z * BLOCK_SIZE);
+                                vox_sample* hnc_sample = cell->corners[highNumberedCorner];
+                                const f32 hnc_x = f32(hnc_sample->x + hnc_sample->owner->position.x * BLOCK_SIZE);
+                                const f32 hnc_y = f32(hnc_sample->y + hnc_sample->owner->position.y * BLOCK_SIZE);
+                                const f32 hnc_z = f32(hnc_sample->z + hnc_sample->owner->position.z * BLOCK_SIZE);
 
                                 if (mapping == 8)
                                 {
