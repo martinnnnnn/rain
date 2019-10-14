@@ -13,3 +13,4 @@ CTestTestfile.cmake
 *.spv
 rain.sln
 /.vs/
+/runtime_data/
