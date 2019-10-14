@@ -35,9 +35,9 @@ namespace rain::engine::voxel
 
                     const vox_position world_position = vox_position
                     { 
-                        i + block->position.x * BLOCK_SIZE,
-                        j + block->position.y * BLOCK_SIZE, 
-                        k + block->position.z * BLOCK_SIZE 
+                        block->map->min_x + (block->position.x - block->map->min_x) * BLOCK_SIZE + i32(i),
+                        block->map->min_y + (block->position.y - block->map->min_y) * BLOCK_SIZE + i32(j),
+                        block->map->min_z + (block->position.z - block->map->min_z) * BLOCK_SIZE + i32(k)
                     };
 
                     const f32 samplex = f32(world_position.x) / f32(BLOCK_SIZE);
@@ -52,9 +52,9 @@ namespace rain::engine::voxel
                     if (world_position.x == block->map->min_x
                         || world_position.y == block->map->min_y
                         || world_position.z == block->map->min_z
-                        || world_position.x == block->map->max_x * BLOCK_SIZE - 1
-                        || world_position.y == block->map->max_y * BLOCK_SIZE - 1
-                        || world_position.z == block->map->max_z * BLOCK_SIZE - 1)
+                        || world_position.x == block->map->min_x + (block->map->max_x - block->map->min_x) * BLOCK_SIZE - 1
+                        || world_position.y == block->map->min_y + (block->map->max_y - block->map->min_y) * BLOCK_SIZE - 1
+                        || world_position.z == block->map->min_z + (block->map->max_z - block->map->min_z) * BLOCK_SIZE - 1)
                     {
                         sample->dist = -10;
                     }
@@ -106,7 +106,7 @@ namespace rain::engine::voxel
             u32 actual_size = encode_block(block, buffer, buffer_size);
 
             char name_buf[16];
-            i32 n = sprintf(name_buf, ".%u-%u-%u.vox", block->position.x, block->position.y, block->position.z);
+            i32 n = sprintf(name_buf, ".%d_%d_%d.vox", block->position.x, block->position.y, block->position.z);
             core::file::write(file_name + name_buf, buffer, actual_size);
         }
 

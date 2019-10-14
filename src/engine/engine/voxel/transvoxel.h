@@ -23,5 +23,20 @@ namespace rain::engine::transvoxel
         u32 block_index;
     };
 
-    void transvoxel(voxel::vox_block* block, voxel::vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
+    struct vox_cell
+    {
+        vox_cell()
+            : case_code(-1)
+        {
+            std::fill_n(corners, 8, nullptr);
+        }
+
+        u8 case_code;
+        voxel::vox_sample* corners[8];
+
+        std::vector<vertex_index> indexes;
+    };
+
+    void transvoxel(voxel::vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
+    void transvoxel(voxel::vox_map* map);
 }

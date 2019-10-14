@@ -7,6 +7,7 @@
 #include "core/core.h"
 #include "engine/win32/win32_input.h"
 #include "engine/core/context.h"
+#include "engine/gfx/ogl/ogl_renderer.h"
 
 namespace rain::engine
 {
@@ -42,6 +43,10 @@ namespace rain::engine
                 movement += _camera.right * _camera.movement_speed;
             }
             _transform.position += movement;
+            
+            char buffer[512];
+            core::string::print_to_buffer(buffer, 512, "(%.2f, %.2f, %.2f)", _transform.position.x, _transform.position.y, _transform.position.z);
+            RAIN_RENDERER->draw_text_2d(buffer, 500.0f, 10.0f, 0.5f, (glm::vec4{ 0.5, 0.8f, 0.2f, 1.0f }));
 
             _camera.yaw += f32(RAIN_INPUT->x_frame_offset * 0.1f);
             _camera.pitch += f32(RAIN_INPUT->y_frame_offset * 0.1f);

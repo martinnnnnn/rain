@@ -46,7 +46,7 @@ namespace rain::engine::transvoxel
         }
     }
 
-    void set_case_code(voxel::vox_cell* cell)
+    void set_case_code(vox_cell* cell)
     {
         assert(cell->corners[0] && "A cell corner can never be null.");
         assert(cell->corners[1] && "A cell corner can never be null.");
@@ -92,9 +92,9 @@ namespace rain::engine::transvoxel
         return nullptr;
     }
 
-    void init_cell(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, voxel::vox_cell* cell)
+    void init_cell(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, vox_cell* cell)
     {
-        memset(cell, 0, sizeof(voxel::vox_cell));
+        memset(cell, 0, sizeof(vox_cell));
 
         cell->corners[0] = get_sample(map, block, x, y, z, 0);
         cell->corners[1] = get_sample(map, block, x + 1, y, z, 0);
@@ -107,7 +107,7 @@ namespace rain::engine::transvoxel
     }
 
 
-    void transvoxel(voxel::vox_block* block, voxel::vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
+    void transvoxel(voxel::vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
     {
         using namespace voxel;
 
@@ -163,7 +163,7 @@ namespace rain::engine::transvoxel
                                 {
                                     if (neighbour_cell.indexes[j].cell_index == vertexIndex)
                                     {
-                                        cell->indexes.emplace_back(voxel::vertex_index{ 255, neighbour_cell.indexes[j].block_index });
+                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell.indexes[j].block_index });
                                         break;
                                     }
                                 }
@@ -173,22 +173,22 @@ namespace rain::engine::transvoxel
                                 const f32 t = f32(cell->corners[highNumberedCorner]->dist) / (f32(cell->corners[highNumberedCorner]->dist) - f32(cell->corners[lowNumberedCorner]->dist));
 
                                 vox_sample* lnc_sample = cell->corners[lowNumberedCorner];
-                                const f32 lnc_x = f32(lnc_sample->x + lnc_sample->owner->position.x * BLOCK_SIZE);
-                                const f32 lnc_y = f32(lnc_sample->y + lnc_sample->owner->position.y * BLOCK_SIZE);
-                                const f32 lnc_z = f32(lnc_sample->z + lnc_sample->owner->position.z * BLOCK_SIZE);
+                                const f32 lnc_x = f32(i32(lnc_sample->x) + lnc_sample->owner->position.x * i32(BLOCK_SIZE));
+                                const f32 lnc_y = f32(i32(lnc_sample->y) + lnc_sample->owner->position.y * i32(BLOCK_SIZE));
+                                const f32 lnc_z = f32(i32(lnc_sample->z) + lnc_sample->owner->position.z * i32(BLOCK_SIZE));
 
                                 vox_sample* hnc_sample = cell->corners[highNumberedCorner];
-                                const f32 hnc_x = f32(hnc_sample->x + hnc_sample->owner->position.x * BLOCK_SIZE);
-                                const f32 hnc_y = f32(hnc_sample->y + hnc_sample->owner->position.y * BLOCK_SIZE);
-                                const f32 hnc_z = f32(hnc_sample->z + hnc_sample->owner->position.z * BLOCK_SIZE);
+                                const f32 hnc_x = f32(i32(hnc_sample->x) + hnc_sample->owner->position.x * i32(BLOCK_SIZE));
+                                const f32 hnc_y = f32(i32(hnc_sample->y) + hnc_sample->owner->position.y * i32(BLOCK_SIZE));
+                                const f32 hnc_z = f32(i32(hnc_sample->z) + hnc_sample->owner->position.z * i32(BLOCK_SIZE));
 
                                 if (mapping == 8)
                                 {
-                                    cell->indexes.emplace_back(voxel::vertex_index{ vertexIndex, block->vertices.size() });
+                                    cell->indexes.emplace_back(vertex_index{ vertexIndex, block->vertices.size() });
                                 }
                                 else // neighbour cell not available : create & own new vertex
                                 {
-                                    cell->indexes.emplace_back(voxel::vertex_index{ 255, block->vertices.size() });
+                                    cell->indexes.emplace_back(vertex_index{ 255, block->vertices.size() });
                                 }
 
                                 block->vertices.emplace_back(voxel::vox_vertex
@@ -245,5 +245,37 @@ namespace rain::engine::transvoxel
         RAIN_RENDERER->init_transvoxel(block);
 
         block->need_update = false;
+    }
+
+    void transvoxel(voxel::vox_map* map)
+    {
+        static bool need_sort = true;
+        if (need_sort)
+        {
+            need_sort = false;
+            sort(map->blocks.begin(), map->blocks.end(), [](voxel::vox_block* b1, voxel::vox_block* b2)
+            {
+                if (b1->position.z != b2->position.z)
+                    return b1->position.z < b2->position.z;
+                else if (b1->position.y != b2->position.y)
+                    return b1->position.y < b2->position.y;
+                else
+                    return b1->position.x < b2->position.x;
+            });
+        }
+
+        vox_cell decks[2][BLOCK_SIZE_SQUARED];
+        memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
+        u8 current_deck = 0;
+
+        for (u32 i = 0; i < map->blocks.size(); ++i)
+        {
+
+            if (!map->blocks[i]->need_update)
+                continue;
+
+            RAIN_LOG("(%d, %d, %d)", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z);
+            transvoxel(map->blocks[i], decks, current_deck);
+        }
     }
 }

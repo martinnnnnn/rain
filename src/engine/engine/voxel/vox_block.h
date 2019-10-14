@@ -58,28 +58,4 @@ namespace rain::engine::voxel
     void decode_block(vox_block* block, u8* buffer, u32 buffer_size);
 
     vox_position get_max_size(vox_block* block);
-    
-
-    struct vertex_index
-    {
-        u32 cell_index;
-        u32 block_index;
-    };
-
-    struct vox_cell
-    {
-        vox_cell()
-            : case_code(-1)
-        {
-            std::fill_n(corners, 8, nullptr);
-        }
-
-        u8 case_code;
-        vox_sample* corners[8];
-
-        std::vector<vertex_index> indexes;
-    };
-
-    //transvoxel(vox_block* block);
-
 }

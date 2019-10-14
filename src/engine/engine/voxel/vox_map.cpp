@@ -30,7 +30,7 @@ namespace rain::engine::voxel
 
                 if (ext.find("vox") != std::string::npos)
                 {
-                    std::vector<std::string> position_str = core::string::split(core::string::split(ext, ".")[0], "-");
+                    std::vector<std::string> position_str = core::string::split(core::string::split(ext, ".")[0], "_");
                     vox_position position{ std::stoi(position_str[0]), std::stoi(position_str[1]), std::stoi(position_str[2]) };
                     map->block_paths.emplace_back(vox_block_file{ position, path, false });
                 }
@@ -94,24 +94,48 @@ namespace rain::engine::voxel
             block_presence[linearized_pos] = true;
         }
 
-        for (u32 i = 0; i < map->max_x - map->min_x; ++i)
+        for (i32 i = map->min_x; i < map->max_x; ++i)
         {
-            for (u32 j = 0; j < map->max_y - map->min_y; ++j)
+            for (i32 j = map->min_y; j < map->max_y; ++j)
             {
-                for (u32 k = 0; k < map->max_z - map->min_z; ++k)
+                for (i32 k = map->min_z; k < map->max_z; ++k)
                 {
-                    if (!block_presence[i + j * (map->max_x - map->min_x) + k * (map->max_x - map->min_x) *  (map->max_y - map->min_y)])
+                    i32 iindex = i - map->min_x;
+                    i32 jindex = (j - map->min_y) * (map->max_x - map->min_x);
+                    i32 kindex = (k - map->min_z) * (map->max_x - map->min_x) *  (map->max_y - map->min_y);
+                    i32 tindex = iindex + jindex + kindex;
+                    i32 index = i + map->min_x + (j + map->min_y) * (map->max_x - map->min_x) + (k + map->min_z) * (map->max_x - map->min_x) *  (map->max_y - map->min_y);
+                    if (!block_presence[tindex])
                     {
                         map->blocks.emplace_back(new vox_block());
                         vox_block* block = map->blocks.back();
                         block->map = map;
-                        block->position = vox_position{i + map->min_x, j + map->min_y, k + map->min_z };
+                        block->position = vox_position{ i /*+ map->min_x*/, j /*+ map->min_y*/, k /*+ map->min_z*/ };
                         init_simplex(block, 0.4f, 1.4f, 0.8f, 1.5f);
                         save_block(block, map->directory_path + "/block");
                     }
                 }
             }
         }
+
+        //for (i32 i = 0; i < map->max_x - map->min_x; ++i)
+        //{
+        //    for (i32 j = 0; j < map->max_y - map->min_y; ++j)
+        //    {
+        //        for (i32 k = 0; k < map->max_z - map->min_z; ++k)
+        //        {
+        //            if (!block_presence[i + map->min_x + (j + map->min_y) * (map->max_x - map->min_x) + (k + map->min_z) * (map->max_x - map->min_x) *  (map->max_y - map->min_y)])
+        //            {
+        //                map->blocks.emplace_back(new vox_block());
+        //                vox_block* block = map->blocks.back();
+        //                block->map = map;
+        //                block->position = vox_position{i /*+ map->min_x*/, j /*+ map->min_y*/, k /*+ map->min_z*/ };
+        //                init_simplex(block, 0.4f, 1.4f, 0.8f, 1.5f);
+        //                save_block(block, map->directory_path + "/block");
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     void unload_block(vox_map* map, vox_block* block)
@@ -132,44 +156,29 @@ namespace rain::engine::voxel
         map->blocks.resize(map->blocks.size() - 1);
     }
 
-    void transvoxel(vox_map* map)
-    {
-        sort(map->blocks.begin(), map->blocks.end(), [](vox_block* b1, vox_block* b2)
-        {
-            if (b1->position.x != b2->position.x)
-                return b1->position.x < b2->position.x;
-            else if (b1->position.y != b2->position.y)
-                return b1->position.y < b2->position.y;
-            else
-                return b1->position.z < b2->position.z;
-
-            //if (b1->position.z != b2->position.z)
-            //    return b1->position.z < b2->position.z;
-            //else if (b1->position.y != b2->position.y)
-            //    return b1->position.y < b2->position.y;
-            //else
-            //    return b1->position.x < b2->position.x;
-        });
-
-        vox_cell decks[2][BLOCK_SIZE_SQUARED];
-        memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
-        u8 current_deck = 0;
-
-        for (u32 i = 0; i < map->blocks.size(); ++i)
-        {
-
-            if (!map->blocks[i]->need_update)
-                continue;
-
-            RAIN_LOG("(%d, %d, %d)", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z);
-            transvoxel::transvoxel(map->blocks[i], decks, current_deck);
-        }
-    }
-
     void update_map(vox_map* map, const glm::vec3& player_position)
     {
         RAIN_PROFILE("update_map");
-        // get block world position
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
             vox_block* block = map->blocks[i];
@@ -213,7 +222,7 @@ namespace rain::engine::voxel
 
         {
             RAIN_PROFILE("transvoxel");
-            transvoxel(map);
+            transvoxel::transvoxel(map);
         }
     }
 
@@ -238,7 +247,7 @@ namespace rain::engine::voxel
     {
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
-            RAIN_RENDERER->draw_transvoxel(map->blocks[i]->vao, map->blocks[i]->indices.size(), camera_position, BLOCK_SIZE * (map->max_y - map->min_y));
+            RAIN_RENDERER->draw_transvoxel(map->blocks[i]->vao, map->blocks[i]->indices.size(), camera_position, f32(BLOCK_SIZE * (map->max_y - map->min_y)));
         }
     }
 }
