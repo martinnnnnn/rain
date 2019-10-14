@@ -38,16 +38,7 @@ namespace rain::engine
         u32 vao_quickhull;
 
         voxel_map* vmap;
-        u32 mapx;
-        u32 mapy;
-        u32 mapz;
 
-        //u32 vao_transvoxel;
-
-        //std::vector<glm::vec3> transVertices;
-        //std::vector<glm::vec3> transNormals;
-
-        transvoxel::tvox_map tmap;
         voxel::vox_map voxmap;
     };
 }

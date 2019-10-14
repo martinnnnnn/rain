@@ -599,50 +599,22 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
-    void Renderer::init_transvoxel(transvoxel::tvox_block* block) const
-    {
-        block->vbo = 0;
-        block->ebo = 0;
-        glGenVertexArrays(1, &block->vao);
-        glGenBuffers(1, &block->vbo);
-        glGenBuffers(1, &block->ebo);
+    //void Renderer::update_transvoxel(transvoxel::tvox_block* block) const
+    //{
+    //    glBindVertexArray(block->vao);
 
-        glBindVertexArray(block->vao);
+    //    glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+    //    glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
-        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
+    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+    //    glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
+    //    glEnableVertexAttribArray(0);
+    //    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
 
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
-
-        //glEnableVertexAttribArray(2);
-        //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
-
-        glBindVertexArray(0);
-    }
-
-    void Renderer::update_transvoxel(transvoxel::tvox_block* block) const
-    {
-        glBindVertexArray(block->vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
-        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
-
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
-    }
+    //    glEnableVertexAttribArray(1);
+    //    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
+    //}
 
 
     void Renderer::draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& view_position, f32 max_height)
@@ -657,10 +629,6 @@ namespace rain::engine
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-
-        //glBindVertexArray(vao);
-        //glDrawArrays(GL_TRIANGLES, 0, triangle_count);
-        //glBindVertexArray(0);
     }
 
     void Renderer::init_transvoxel(voxel::vox_block* block) const
