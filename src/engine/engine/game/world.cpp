@@ -37,14 +37,13 @@ namespace rain::engine
         {
             RAIN_PROFILE("Transvoxel");
 
-            voxmap.min_x = -2;
-            voxmap.min_y = -2;
-            voxmap.min_z = -2;
-            voxmap.max_x = 5;
-            voxmap.max_y = 5;
-            voxmap.max_z = 5;
-            voxmap.position = glm::vec3{-40.f, -40.f, -40.f};
-            voxel::init_map(&voxmap, glm::vec3{}, 1000, RAIN_CONFIG->data_root + "/voxel_map");
+            //voxmap.min_x = 0;
+            voxmap.min_y = 0;
+            //voxmap.min_z = 0;
+            //voxmap.max_x = 5;
+            voxmap.max_y = 1;
+            //voxmap.max_z = 1;
+            voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 3, RAIN_CONFIG->data_root + "/voxel_map");
         }
 
         std::vector<actor*> view;

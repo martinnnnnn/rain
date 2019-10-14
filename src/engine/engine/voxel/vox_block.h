@@ -5,6 +5,7 @@
 
 #include <glm.hpp>
 #include <vector>
+#include <string>
 
 namespace rain::engine::voxel
 {
@@ -52,7 +53,7 @@ namespace rain::engine::voxel
 
     void free_block(vox_block* block);
 
-    void save_block(vox_block* block, const std::string& file_name);
+    std::string save_block(vox_block* block, const std::string& file_name);
     void load_block(vox_block* block, const std::string& file_name);
     u32 encode_block(vox_block* block, u8* buffer, u32 buffer_size);
     void decode_block(vox_block* block, u8* buffer, u32 buffer_size);

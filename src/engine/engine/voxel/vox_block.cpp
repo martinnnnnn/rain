@@ -35,26 +35,20 @@ namespace rain::engine::voxel
 
                     const vox_position world_position = vox_position
                     { 
-                        block->map->min_x + (block->position.x - block->map->min_x) * BLOCK_SIZE + i32(i),
-                        block->map->min_y + (block->position.y - block->map->min_y) * BLOCK_SIZE + i32(j),
-                        block->map->min_z + (block->position.z - block->map->min_z) * BLOCK_SIZE + i32(k)
+                        block->map->position.x + (block->position.x) * BLOCK_SIZE + i32(i),
+                        block->map->position.y + (block->position.y) * BLOCK_SIZE + i32(j),
+                        block->map->position.z + (block->position.z) * BLOCK_SIZE + i32(k)
                     };
 
                     const f32 samplex = f32(world_position.x) / f32(BLOCK_SIZE);
                     const f32 sampley = f32(world_position.y) / f32(BLOCK_SIZE);
                     const f32 samplez = f32(world_position.z) / f32(BLOCK_SIZE);
 
-                    //core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
-                    //sample->dist = i8(-world_position.y + (n.fractal(3, samplex, samplez)) * 50.0f);
-                    sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
+                    core::simplex_noise n(frequency, amplitude, lacunarity, persistence);
+                    sample->dist = i8(-world_position.y + (n.fractal(3, samplex, samplez)) * 50.0f);
+                    //sample->dist = i8(core::simplex_noise::noise(samplex, sampley, samplez) * 127.0f);
 
-
-                    if (world_position.x == block->map->min_x
-                        || world_position.y == block->map->min_y
-                        || world_position.z == block->map->min_z
-                        || world_position.x == block->map->min_x + (block->map->max_x - block->map->min_x) * BLOCK_SIZE - 1
-                        || world_position.y == block->map->min_y + (block->map->max_y - block->map->min_y) * BLOCK_SIZE - 1
-                        || world_position.z == block->map->min_z + (block->map->max_z - block->map->min_z) * BLOCK_SIZE - 1)
+                    if (world_position.y == block->map->min_y || world_position.y == block->map->position.y + block->map->max_y * BLOCK_SIZE - 1)
                     {
                         sample->dist = -10;
                     }
@@ -97,7 +91,7 @@ namespace rain::engine::voxel
         }
     }
 
-    void save_block(vox_block* block, const std::string& file_name)
+    std::string save_block(vox_block* block, const std::string& file_name)
     {
         if (block->LOD == 0)
         {
@@ -107,14 +101,16 @@ namespace rain::engine::voxel
 
             char name_buf[16];
             i32 n = sprintf(name_buf, ".%d_%d_%d.vox", block->position.x, block->position.y, block->position.z);
-            core::file::write(file_name + name_buf, buffer, actual_size);
+            std::string complete_name = file_name + name_buf;
+            core::file::write(complete_name, buffer, actual_size);
+            return complete_name;
         }
 
         for (u32 i = 0; i < vox_block::CHILD_COUNT; ++i)
         {
             if (block->children[i])
             {
-                save_block(block->children[i], file_name);
+                return save_block(block->children[i], file_name);
             }
         }
     }

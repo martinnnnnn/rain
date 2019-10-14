@@ -22,14 +22,14 @@ namespace rain::engine::voxel
         i32 max_y;
         i32 max_z;
         glm::vec3 position;
-        f32 max_distance;
+        i32 max_distance;
         std::string directory_path;
 
         std::vector<vox_block*> blocks;
         std::vector<vox_block_file> block_paths;
     };
 
-    void init_map(vox_map* map, const glm::vec3& position, const f32 max_distance, const std::string& directory_path);
+    void init_map(vox_map* map, const glm::vec3& position, const i32 max_distance, const std::string& directory_path);
     void init_block_paths(vox_map* map, const std::string& directory_path);
 
     vox_block* get_block(vox_map* map, const i32 x, const i32 y, const i32 z);

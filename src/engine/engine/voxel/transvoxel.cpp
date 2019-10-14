@@ -14,7 +14,7 @@
 #include "assert.h"
 #include <algorithm>
 
-namespace rain::engine::transvoxel
+namespace rain::engine::voxel
 {
     void update_validity_mask(u8& validity_mask, i32 sample_x, i32 sample_y, i32 sample_z, i32 block_x, i32 block_y, i32 block_z)
     {
@@ -68,7 +68,7 @@ namespace rain::engine::transvoxel
             | (cell->corners[7]->dist & 0x80);
     }
 
-    voxel::vox_sample* get_sample(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, u32 depth)
+    vox_sample* get_sample(vox_map* map, vox_block* block, i32 x, i32 y, i32 z)
     {
         if (core::is_inside_boundary(x, y, z, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
         {
@@ -79,7 +79,8 @@ namespace rain::engine::transvoxel
         const i32 new_block_y = (y == -1) ? block->position.y - 1 : (y == BLOCK_SIZE) ? block->position.y + 1 : block->position.y;
         const i32 new_block_z = (z == -1) ? block->position.z - 1 : (z == BLOCK_SIZE) ? block->position.z + 1 : block->position.z;
 
-        voxel::vox_block* new_block = voxel::get_block(map, new_block_x, new_block_y, new_block_z);
+        vox_block* new_block = get_block(map, new_block_x, new_block_y, new_block_z);
+
         if (new_block)
         {
             const i32 new_sample_x = (x == -1) ? BLOCK_SIZE - 1 : (x == BLOCK_SIZE) ? 0 : x;
@@ -92,25 +93,23 @@ namespace rain::engine::transvoxel
         return nullptr;
     }
 
-    void init_cell(voxel::vox_map* map, voxel::vox_block* block, i32 x, i32 y, i32 z, vox_cell* cell)
+    void init_cell(vox_map* map, vox_block* block, i32 x, i32 y, i32 z, vox_cell* cell)
     {
         memset(cell, 0, sizeof(vox_cell));
 
-        cell->corners[0] = get_sample(map, block, x, y, z, 0);
-        cell->corners[1] = get_sample(map, block, x + 1, y, z, 0);
-        cell->corners[2] = get_sample(map, block, x, y + 1, z, 0);
-        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z, 0);
-        cell->corners[4] = get_sample(map, block, x, y, z + 1, 0);
-        cell->corners[5] = get_sample(map, block, x + 1, y, z + 1, 0);
-        cell->corners[6] = get_sample(map, block, x, y + 1, z + 1, 0);
-        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1, 0);
+        cell->corners[0] = get_sample(map, block, x, y, z);
+        cell->corners[1] = get_sample(map, block, x + 1, y, z);
+        cell->corners[2] = get_sample(map, block, x, y + 1, z);
+        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z);
+        cell->corners[4] = get_sample(map, block, x, y, z + 1);
+        cell->corners[5] = get_sample(map, block, x + 1, y, z + 1);
+        cell->corners[6] = get_sample(map, block, x, y + 1, z + 1);
+        cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1);
     }
 
 
-    void transvoxel(voxel::vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
+    void transvoxel(vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
     {
-        using namespace voxel;
-
         block->vertices.clear();
 
         u8 validity_mask = 0;
@@ -191,7 +190,7 @@ namespace rain::engine::transvoxel
                                     cell->indexes.emplace_back(vertex_index{ 255, block->vertices.size() });
                                 }
 
-                                block->vertices.emplace_back(voxel::vox_vertex
+                                block->vertices.emplace_back(vox_vertex
                                     {
                                         glm::vec3
                                         {
@@ -222,9 +221,9 @@ namespace rain::engine::transvoxel
                             if (i % 3 == 2)
                             {
                                 j++;
-                                voxel::vox_vertex* A = &(block->vertices[block_index_0]);
-                                voxel::vox_vertex* B = &(block->vertices[block_index_1]);
-                                voxel::vox_vertex* C = &(block->vertices[block_index_2]);
+                                vox_vertex* A = &(block->vertices[block_index_0]);
+                                vox_vertex* B = &(block->vertices[block_index_1]);
+                                vox_vertex* C = &(block->vertices[block_index_2]);
                                 glm::vec3 normal = glm::cross(B->position - A->position, C->position - A->position);
                                 A->normal += normal;
                                 B->normal += normal;
@@ -247,22 +246,17 @@ namespace rain::engine::transvoxel
         block->need_update = false;
     }
 
-    void transvoxel(voxel::vox_map* map)
+    void transvoxel(vox_map* map)
     {
-        static bool need_sort = true;
-        if (need_sort)
-        {
-            need_sort = false;
-            sort(map->blocks.begin(), map->blocks.end(), [](voxel::vox_block* b1, voxel::vox_block* b2)
-            {
-                if (b1->position.z != b2->position.z)
-                    return b1->position.z < b2->position.z;
-                else if (b1->position.y != b2->position.y)
-                    return b1->position.y < b2->position.y;
-                else
-                    return b1->position.x < b2->position.x;
-            });
-        }
+        //sort(map->blocks.begin(), map->blocks.end(), [](voxel::vox_block* b1, voxel::vox_block* b2)
+        //{
+        //    if (b1->position.x != b2->position.x)
+        //        return b1->position.x < b2->position.x;
+        //    else if (b1->position.y != b2->position.y)
+        //        return b1->position.y < b2->position.y;
+        //    else
+        //        return b1->position.z < b2->position.z;
+        //});
 
         vox_cell decks[2][BLOCK_SIZE_SQUARED];
         memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
@@ -274,7 +268,6 @@ namespace rain::engine::transvoxel
             if (!map->blocks[i]->need_update)
                 continue;
 
-            RAIN_LOG("(%d, %d, %d)", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z);
             transvoxel(map->blocks[i], decks, current_deck);
         }
     }

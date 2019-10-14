@@ -11,12 +11,8 @@
 #include "transvoxel_tables.h"
 #include "vox_block.h"
 
-namespace rain::engine::transvoxel
+namespace rain::engine::voxel
 {
-    constexpr u32 BLOCK_SIZE = 16;
-    constexpr u32 BLOCK_SIZE_SQUARED = BLOCK_SIZE * BLOCK_SIZE;
-    constexpr u32 BLOCK_SIZE_CUBED = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
-
     struct vertex_index
     {
         u32 cell_index;
@@ -25,18 +21,11 @@ namespace rain::engine::transvoxel
 
     struct vox_cell
     {
-        vox_cell()
-            : case_code(-1)
-        {
-            std::fill_n(corners, 8, nullptr);
-        }
-
         u8 case_code;
-        voxel::vox_sample* corners[8];
-
+        vox_sample* corners[8];
         std::vector<vertex_index> indexes;
     };
 
-    void transvoxel(voxel::vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
-    void transvoxel(voxel::vox_map* map);
+    void transvoxel(vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
+    void transvoxel(vox_map* map);
 }
