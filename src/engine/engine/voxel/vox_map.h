@@ -26,6 +26,7 @@ namespace rain::engine::voxel
         std::string directory_path;
 
         std::vector<vox_block*> blocks;
+        std::vector<vox_block*> blocks_to_refresh;
         std::vector<vox_block_file> block_paths;
     };
 
@@ -33,7 +34,8 @@ namespace rain::engine::voxel
     void init_block_paths(vox_map* map, const std::string& directory_path);
 
     vox_block* get_block(vox_map* map, const i32 x, const i32 y, const i32 z);
-    void unload_block(vox_map* map, vox_block* block);
+    void unload_block(vox_map* map, const u32 index);
+    void unload_blocks(vox_map* map, std::vector<u32>& indexes);
     void draw_map(voxel::vox_map* map, const glm::vec3& camera_position);
     void update_map(vox_map* map, const glm::vec3& position);
 }

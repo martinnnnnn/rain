@@ -122,6 +122,7 @@ void Input::update()
         m_keysCurrent = &m_keysA;
     }
 
+    
     ZeroMemory(m_keysCurrent->data(), m_keysCurrent->size());
     HRESULT hr = m_keyboard->GetDeviceState(m_keysCurrent->size(), m_keysCurrent->data());
 

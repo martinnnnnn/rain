@@ -34,17 +34,13 @@ namespace rain::engine
             //engine::init(vmap);
         }
 
-        {
-            RAIN_PROFILE("Transvoxel");
-
-            //voxmap.min_x = 0;
-            voxmap.min_y = 0;
-            //voxmap.min_z = 0;
-            //voxmap.max_x = 5;
-            voxmap.max_y = 1;
-            //voxmap.max_z = 1;
-            voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 3, RAIN_CONFIG->data_root + "/../runtime_data");
-        }
+        //voxmap.min_x = 0;
+        voxmap.min_y = 0;
+        //voxmap.min_z = 0;
+        //voxmap.max_x = 5;
+        voxmap.max_y = 1;
+        //voxmap.max_z = 1;
+        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 5, RAIN_CONFIG->runtime_data_root);
 
         std::vector<actor*> view;
 
@@ -222,7 +218,7 @@ namespace rain::engine
 
         voxel::draw_map(&voxmap, main_camera.transform->position);
 
-        //std::vector<actor*> view;
+        std::vector<actor*> view;
 
         //sg.get_view<core::transform, Model, Material>(view);
 
@@ -273,12 +269,12 @@ namespace rain::engine
         //    RAIN_RENDERER->draw_sphere(position, orientation, t.scale);
         //}
 
-        //sg.get_view<ui::text_field, ui::text_list>(view, true);
-        //for (auto chat : view)
-        //{
-        //    ui::draw(*(chat->components.get<ui::text_field>()));
-        //    ui::draw(*(chat->components.get<ui::text_list>()));
-        //}
+        sg.get_view<ui::text_field, ui::text_list>(view, true);
+        for (auto chat : view)
+        {
+            ui::draw(*(chat->components.get<ui::text_field>()));
+            ui::draw(*(chat->components.get<ui::text_list>()));
+        }
         ////auto plane_view = registry.view<Plane>();
         ////for (auto ent_plane : plane_view)
         ////{

@@ -48,7 +48,7 @@ namespace rain::engine
 #define RAIN_FIND_DATA_FROM_PATH(type, path)  RAIN_CONTEXT->data_sys->find_data<type>(path) 
 #define RAIN_FIND_DATA_FROM_ID(type, id)      RAIN_CONTEXT->data_sys->find_data<type>(id)
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #define RAIN_LOG(...)           do { RAIN_CONTEXT->logger->log_level("[INFO]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_DEBUG(...)     do { RAIN_CONTEXT->logger->log_level("[DEBUG]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_NETWORK(...)   do { RAIN_CONTEXT->logger->log_level("[NETWORK]", __VA_ARGS__); } while(false)
@@ -57,12 +57,12 @@ namespace rain::engine
 #define RAIN_LOG_ERROR(...)     do { RAIN_CONTEXT->logger->log_max(__FILE__, __LINE__, "[ERROR]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_CRASH(...)     do { RAIN_CONTEXT->logger->log_crash(__FILE__, __LINE__, "[CRASH]", __VA_ARGS__); } while(false)
 #define RAIN_LOG_RAW(...)       do { RAIN_CONTEXT->logger->log_raw(__VA_ARGS__); } while(false)
-#else
-#define RAIN_LOG(...)
-#define RAIN_LOG_DEBUG(...)
-#define RAIN_LOG_NETWORK(...)
-#define RAIN_LOG_PROFILE(...)
-#define RAIN_LOG_WARNING(...)
-#define RAIN_LOG_ERROR(...)
-#define RAIN_LOG_RAW(...)
-#endif
+//#else
+//#define RAIN_LOG(...)
+//#define RAIN_LOG_DEBUG(...)
+//#define RAIN_LOG_NETWORK(...)
+//#define RAIN_LOG_PROFILE(...)
+//#define RAIN_LOG_WARNING(...)
+//#define RAIN_LOG_ERROR(...)
+//#define RAIN_LOG_RAW(...)
+//#endif

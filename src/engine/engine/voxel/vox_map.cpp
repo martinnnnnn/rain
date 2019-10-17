@@ -38,115 +38,39 @@ namespace rain::engine::voxel
         }
     }
 
-    //void update_size(vox_map* map)
-    //{
-    //    if (map->blocks.size() == 0)
-    //        return;
-
-    //    i32 new_min_x = map->blocks[0]->position.x;
-    //    i32 new_min_y = map->blocks[0]->position.y;
-    //    i32 new_min_z = map->blocks[0]->position.z;
-
-    //    i32 new_max_x = map->blocks[0]->position.x;
-    //    i32 new_max_y = map->blocks[0]->position.y;
-    //    i32 new_max_z = map->blocks[0]->position.z;
-
-    //    for (u32 i = 0; i < map->blocks.size(); ++i)
-    //    {
-    //        vox_block* block = map->blocks[i];
-
-    //        new_min_x = std::min(block->position.x, new_min_x);
-    //        new_min_y = std::min(block->position.x, new_min_y);
-    //        new_min_z = std::min(block->position.x, new_min_z);
-
-    //        new_max_x = std::max(block->position.x + 1, new_max_x);
-    //        new_max_y = std::max(block->position.x + 1, new_max_y);
-    //        new_max_z = std::max(block->position.x + 1, new_max_z);
-
-    //        //map->min_x = std::max(block->position.x, map->min_x);
-    //        //map->min_y = std::max(block->position.y, map->min_y);
-    //        //map->min_z = std::max(block->position.z, map->min_z);
-
-    //        //map->max_x = std::min(get_max_size(block).x, map->max_x) + 1;
-    //        //map->max_y = std::min(get_max_size(block).y, map->max_y) + 1;
-    //        //map->max_z = std::min(get_max_size(block).z, map->max_z) + 1;
-    //    }
-    //    map->min_x = new_min_x;
-    //    map->min_y = new_min_y;
-    //    map->min_z = new_min_z;
-
-    //    map->max_x = new_max_x;
-    //    map->max_y = new_max_y;
-    //    map->max_z = new_max_z;
-    //}
-
-    //void add_missing_simplex(vox_map* map)
-    //{
-    //    const u32 size = (map->max_x - map->min_x) * (map->max_y - map->min_y) * (map->max_z - map->min_z);
-    //    bool *block_presence = (bool*)calloc(size, sizeof(bool));
-
-    //    for (u32 i = 0; i < map->blocks.size(); ++i)
-    //    {
-    //        const vox_position& position = map->blocks[i]->position - vox_position{map->min_x};
-    //        const u32 linearized_pos = position.x + position.y * (map->max_x - map->min_x) + position.z  * (map->max_x - map->min_x)  * (map->max_y - map->min_y);
-    //        assert(linearized_pos >= 0 && linearized_pos < size && "Wrong position computation i...");
-    //        assert(block_presence[linearized_pos] == false && "Two block at the same place ?");
-    //        block_presence[linearized_pos] = true;
-    //    }
-
-    //    for (i32 i = map->min_x; i < map->max_x; ++i)
-    //    {
-    //        for (i32 j = map->min_y; j < map->max_y; ++j)
-    //        {
-    //            for (i32 k = map->min_z; k < map->max_z; ++k)
-    //            {
-    //                i32 iindex = i - map->min_x;
-    //                i32 jindex = (j - map->min_y) * (map->max_x - map->min_x);
-    //                i32 kindex = (k - map->min_z) * (map->max_x - map->min_x) *  (map->max_y - map->min_y);
-    //                i32 tindex = iindex + jindex + kindex;
-    //                i32 index = i + map->min_x + (j + map->min_y) * (map->max_x - map->min_x) + (k + map->min_z) * (map->max_x - map->min_x) *  (map->max_y - map->min_y);
-    //                if (!block_presence[tindex])
-    //                {
-    //                    map->blocks.emplace_back(new vox_block());
-    //                    vox_block* block = map->blocks.back();
-    //                    block->map = map;
-    //                    block->position = vox_position{ i, j, k };
-    //                    init_simplex(block, 0.4f, 1.4f, 0.8f, 1.5f);
-    //                    save_block(block, map->directory_path + "/block");
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    free(block_presence);
-    //}
-
-    void unload_block(vox_map* map, vox_block* block)
+    void unload_block(vox_map* map, const u32 index)
     {
-        for (u32 i = 0; i < map->block_paths.size(); ++i)
+        vox_position position = map->blocks[index]->position;
+
+        free_block(map->blocks[index]);
+        delete map->blocks[index];
+        map->blocks[index] = nullptr;
+        map->blocks.erase(map->blocks.begin() + index);
+    }
+
+    void unload_blocks(vox_map* map, std::vector<u32>& indexes)
+    {
+        std::sort(indexes.begin(), indexes.end());
+
+        for (auto &i = indexes.rbegin(); i != indexes.rend(); ++i)
         {
-            if (map->block_paths[i].position == block->position)
+            for (u32 j = 0; j < map->block_paths.size(); ++j)
             {
-                assert(map->block_paths[i].loaded && "This block should be loaded");
-                map->block_paths[i].loaded = false;
-                break;
+                if (map->block_paths[j].position == map->blocks[*i]->position)
+                {
+                    assert(map->block_paths[j].loaded && "This block should be loaded");
+                    map->block_paths[j].loaded = false;
+                    break;
+                }
             }
+
+            unload_block(map, *i);
+            //map->blocks.erase(map->blocks.begin() + *i);
         }
 
-        u32 free_index;
-        for (u32 i = 0; i < map->blocks.size(); ++i)
-        {
-            if (map->blocks[i] == block)
-            {
-                free_block(map->blocks[i]);
-                delete map->blocks[i];
-                free_index = i;
-                break;
-            }
-        }
-
-        std::swap(map->blocks.back(), map->blocks[free_index]);
-        map->blocks.resize(map->blocks.size() - 1);
+        //for_each(indexes.begin(), indexes.end(), [map](const u32 index)
+        //{
+        //});
     }
 
     void update_map(vox_map* map, const glm::vec3& player_position)
@@ -166,24 +90,37 @@ namespace rain::engine::voxel
         //map->max_y = player_y + map->max_distance;
         map->max_z = player_z + map->max_distance;
 
+        //RAIN_LOG("(%f, %f) -> (%d, %d)", player_position.x, player_position.z, player_x, player_z);
+
         // remove out of sight blocks && update blocks which have new neighbour when necessary
+        std::vector<u32> removed_indexes;
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
             vox_block* block = map->blocks[i];
 
+            //RAIN_LOG("blocks (%d, %d) -> (%d, %d) ||| (%d, %d)", last_max_x, last_max_z, map->max_x, map->max_z, block->position.x, block->position.z);
+
             if (!core::is_inside_boundary(block->position.x, block->position.y, block->position.z, map->max_x, map->max_y, map->max_z, map->min_x, map->min_y, map->min_z))
             {
+                //RAIN_LOG("Removing");
                 save_block(block, map->directory_path + "/block");
-                unload_block(map, block);
+                removed_indexes.emplace_back(i);
+
                 continue;
             }
 
-            if ((map->max_x > last_max_x && block->position.x == last_max_x - 1) 
+            if ((map->max_x > last_max_x && block->position.x == last_max_x - 1)
                 || (map->max_z > last_max_z && block->position.z == last_max_z - 1))
             {
+                //RAIN_LOG("Updating");
+                //RAIN_LOG("(%d, %d) -> (%d, %d)", last_max_x, last_max_z, map->max_x, map->max_z);
                 block->need_update = true;
+                //map->blocks_to_refresh.push_back(block);
             }
         }
+
+        unload_blocks(map, removed_indexes);
+        removed_indexes.clear();
 
         // add missing blocks
         for (i32 x = map->min_x; x < map->max_x; ++x)

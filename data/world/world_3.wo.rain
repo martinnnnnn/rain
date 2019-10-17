@@ -89,7 +89,7 @@
             "Transform" :
             {
                 "default": false,
-                "position" : [0.0, 7.0, 50.0],
+                "position" : [150.0, 150.0, 150.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0],
                 "scale" : [1.0,1.0,1.0]
             },

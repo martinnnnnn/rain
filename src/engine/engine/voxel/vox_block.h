@@ -2,6 +2,8 @@
 
 #include "core/core.h"
 #include "vox_sample.h"
+#include "vox_constants.h"
+#include "vox_cell.h"
 
 #include <glm.hpp>
 #include <vector>
@@ -9,18 +11,7 @@
 
 namespace rain::engine::voxel
 {
-    using vox_position = glm::i32vec3;
-
-    constexpr u32 BLOCK_SIZE = 16;
-    constexpr u32 BLOCK_SIZE_SQUARED = BLOCK_SIZE * BLOCK_SIZE;
-    constexpr u32 BLOCK_SIZE_CUBED = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
-
     struct vox_map;
-
-    constexpr u8 LOD_0 = 0;
-    constexpr u8 LOD_1 = 1;
-    constexpr u8 LOD_2 = 2;
-    constexpr u8 LOD_3 = 3;
 
     struct vox_vertex
     {
@@ -40,6 +31,8 @@ namespace rain::engine::voxel
         u8 LOD;
         vox_block* children[CHILD_COUNT];
         bool need_update;
+
+        vox_cell last_deck[BLOCK_SIZE_SQUARED];
 
         u32 vao;
         u32 ebo;

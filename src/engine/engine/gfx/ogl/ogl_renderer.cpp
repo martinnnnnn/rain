@@ -361,9 +361,9 @@ namespace rain::engine
 
     void Renderer::draw_coord_view(const glm::vec3& _position)
     {
-        draw_debug_line(glm::vec3{ 200.0f, 0.0f, 0.0f }, glm::vec3{ -200.0f, 0.0f, 0.0f }, glm::vec3{ 1.0f, 0.5f, 0.0f }, glm::vec3{ 0.5f, 1.0f, 0.0f });
-        draw_debug_line(glm::vec3{ 0.0f, 200.0f, 0.0f }, glm::vec3{ 0.0f, -200.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.5f }, glm::vec3{ 0.0f, 0.5f, 1.0f });
-        draw_debug_line(glm::vec3{ 0.0f, 0.0f, 200.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f }, glm::vec3{ 1.0f, 0.0f, 0.5f });
+        draw_debug_line(glm::vec3{ 2000.0f, 0.0f, 0.0f }, glm::vec3{ -2000.0f, 0.0f, 0.0f }, glm::vec3{ 1.0f, 0.5f, 0.0f }, glm::vec3{ 0.5f, 1.0f, 0.0f });
+        draw_debug_line(glm::vec3{ 0.0f, 2000.0f, 0.0f }, glm::vec3{ 0.0f, -2000.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.5f }, glm::vec3{ 0.0f, 0.5f, 1.0f });
+        draw_debug_line(glm::vec3{ 0.0f, 0.0f, 2000.0f }, glm::vec3{ 0.0f, 0.0f, -2000.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f }, glm::vec3{ 1.0f, 0.0f, 0.5f });
     }
 
 

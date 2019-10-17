@@ -13,6 +13,7 @@
 
 #include "assert.h"
 #include <algorithm>
+#include <random>
 
 namespace rain::engine::voxel
 {
@@ -74,13 +75,13 @@ namespace rain::engine::voxel
     {
         memset(cell, 0, sizeof(vox_cell));
 
-        cell->corners[0] = get_sample(map, block, x, y, z);
-        cell->corners[1] = get_sample(map, block, x + 1, y, z);
-        cell->corners[2] = get_sample(map, block, x, y + 1, z);
-        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z);
-        cell->corners[4] = get_sample(map, block, x, y, z + 1);
-        cell->corners[5] = get_sample(map, block, x + 1, y, z + 1);
-        cell->corners[6] = get_sample(map, block, x, y + 1, z + 1);
+        cell->corners[0] = get_sample(map, block, x    , y    , z    );
+        cell->corners[1] = get_sample(map, block, x + 1, y    , z    );
+        cell->corners[2] = get_sample(map, block, x    , y + 1, z    );
+        cell->corners[3] = get_sample(map, block, x + 1, y + 1, z    );
+        cell->corners[4] = get_sample(map, block, x    , y    , z + 1);
+        cell->corners[5] = get_sample(map, block, x + 1, y    , z + 1);
+        cell->corners[6] = get_sample(map, block, x    , y + 1, z + 1);
         cell->corners[7] = get_sample(map, block, x + 1, y + 1, z + 1);
     }
 
@@ -132,14 +133,26 @@ namespace rain::engine::voxel
                                 i8 new_x = x - (mapping & 0x01);
                                 i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
                                 i8 new_deck = (current_deck + ((mapping & 0x04) >> 2)) & 1;
-
-                                const vox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
-
-                                for (u32 j = 0; j < neighbour_cell.indexes.size(); ++j)
+                                
+                                vox_cell* neighbour_cell = nullptr;
+                                //if (z == 0)
+                                //{
+                                //    vox_cell* test = &(decks[new_deck][new_x + BLOCK_SIZE * new_y]);
+                                //    vox_block* previous_block = get_block(block->map, block->position.x, block->position.y, block->position.z - 1);
+                                //    neighbour_cell = &(previous_block->last_deck[new_x + BLOCK_SIZE * new_y]);
+                                //}
+                                //else
                                 {
-                                    if (neighbour_cell.indexes[j].cell_index == vertexIndex)
+                                    neighbour_cell = &(decks[new_deck][new_x + BLOCK_SIZE * new_y]);
+                                }
+                                assert(neighbour_cell && "This should never be null");
+                                //const vox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
+
+                                for (u32 j = 0; j < neighbour_cell->indexes.size(); ++j)
+                                {
+                                    if (neighbour_cell->indexes[j].cell_index == vertexIndex)
                                     {
-                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell.indexes[j].block_index });
+                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell->indexes[j].block_index });
                                         break;
                                     }
                                 }
@@ -210,6 +223,14 @@ namespace rain::engine::voxel
                     }
                 }
             }
+            //memcpy(block->last_deck, decks[current_deck], sizeof(vox_cell) * BLOCK_SIZE_SQUARED);
+            for (u32 i = 0; i < BLOCK_SIZE_SQUARED; ++i)
+            {
+                block->last_deck[i].case_code = decks[current_deck][i].case_code;
+                //block->last_deck[i].indexes = decks[current_deck][i].indexes;
+                memcpy(block->last_deck[i].corners, decks[current_deck][i].corners, sizeof(vox_sample*) * 8);
+                block->last_deck[i].indexes = decks[current_deck][i].indexes;
+            }
             current_deck = previous_deck;
         }
 
@@ -225,15 +246,7 @@ namespace rain::engine::voxel
 
     void transvoxel(vox_map* map)
     {
-        //sort(map->blocks.begin(), map->blocks.end(), [](voxel::vox_block* b1, voxel::vox_block* b2)
-        //{
-        //    if (b1->position.x != b2->position.x)
-        //        return b1->position.x < b2->position.x;
-        //    else if (b1->position.y != b2->position.y)
-        //        return b1->position.y < b2->position.y;
-        //    else
-        //        return b1->position.z < b2->position.z;
-        //});
+        //std::shuffle(map->blocks.begin(), map->blocks.end(), std::default_random_engine{});
 
         vox_cell decks[2][BLOCK_SIZE_SQUARED];
         memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
@@ -245,7 +258,15 @@ namespace rain::engine::voxel
             if (!map->blocks[i]->need_update)
                 continue;
 
+            RAIN_LOG("(%d, %d, %d), %u", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z, current_deck);
             transvoxel(map->blocks[i], decks, current_deck);
         }
+
+        //for (u32 i = 0; i < map->blocks_to_refresh.size(); ++i)
+        //{
+        //    transvoxel(map->blocks_to_refresh[i], decks, current_deck);
+        //}
+
+        map->blocks_to_refresh.clear();
     }
 }
