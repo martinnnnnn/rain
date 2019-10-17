@@ -40,7 +40,7 @@ namespace rain::engine
         //voxmap.max_x = 5;
         voxmap.max_y = 1;
         //voxmap.max_z = 1;
-        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 5, RAIN_CONFIG->runtime_data_root);
+        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 3, RAIN_CONFIG->runtime_data_root);
 
         std::vector<actor*> view;
 

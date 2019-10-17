@@ -257,7 +257,6 @@ namespace rain::engine::voxel
 
             if (!map->blocks[i]->need_update)
                 continue;
-
             RAIN_LOG("(%d, %d, %d), %u", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z, current_deck);
             transvoxel(map->blocks[i], decks, current_deck);
         }

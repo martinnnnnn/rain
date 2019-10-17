@@ -102,7 +102,10 @@ namespace rain::engine::voxel
             char name_buf[16];
             i32 n = sprintf(name_buf, ".%d_%d_%d.vox", block->position.x, block->position.y, block->position.z);
             std::string complete_name = file_name + name_buf;
-            core::file::write(complete_name, buffer, actual_size);
+            if (!core::file::write(complete_name, buffer, actual_size))
+            {
+                RAIN_LOG_WARNING("Could not open the file %s", file_name.c_str());
+            }
             return complete_name;
         }
 
@@ -121,8 +124,12 @@ namespace rain::engine::voxel
 
         const u32 size = 32'768;
         u8 buffer[size];
-        const u32 actual_size = core::file::read(file_name, buffer, size);
-
+        const i32 actual_size = core::file::read(file_name, buffer, size);
+        if (actual_size < 0)
+        {
+            RAIN_LOG_WARNING("Could not open the file %s", file_name.c_str());
+            return;
+        }
         decode_block(block, buffer, actual_size);
     }
 

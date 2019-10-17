@@ -83,14 +83,10 @@ namespace rain::engine::voxel
         const i32 last_max_z = map->max_z;
 
         map->min_x = player_x - map->max_distance;
-        //map->min_y = player_y - map->max_distance;
         map->min_z = player_z - map->max_distance;
 
         map->max_x = player_x + map->max_distance;
-        //map->max_y = player_y + map->max_distance;
         map->max_z = player_z + map->max_distance;
-
-        //RAIN_LOG("(%f, %f) -> (%d, %d)", player_position.x, player_position.z, player_x, player_z);
 
         // remove out of sight blocks && update blocks which have new neighbour when necessary
         std::vector<u32> removed_indexes;
@@ -98,11 +94,8 @@ namespace rain::engine::voxel
         {
             vox_block* block = map->blocks[i];
 
-            //RAIN_LOG("blocks (%d, %d) -> (%d, %d) ||| (%d, %d)", last_max_x, last_max_z, map->max_x, map->max_z, block->position.x, block->position.z);
-
             if (!core::is_inside_boundary(block->position.x, block->position.y, block->position.z, map->max_x, map->max_y, map->max_z, map->min_x, map->min_y, map->min_z))
             {
-                //RAIN_LOG("Removing");
                 save_block(block, map->directory_path + "/block");
                 removed_indexes.emplace_back(i);
 
@@ -112,8 +105,6 @@ namespace rain::engine::voxel
             if ((map->max_x > last_max_x && block->position.x == last_max_x - 1)
                 || (map->max_z > last_max_z && block->position.z == last_max_z - 1))
             {
-                //RAIN_LOG("Updating");
-                //RAIN_LOG("(%d, %d) -> (%d, %d)", last_max_x, last_max_z, map->max_x, map->max_z);
                 block->need_update = true;
                 //map->blocks_to_refresh.push_back(block);
             }
@@ -139,7 +130,6 @@ namespace rain::engine::voxel
                         {
                             assert(!map->block_paths[i].loaded && "This block should not be loaded");
 
-                            //RAIN_PROFILE("load new");
                             map->blocks.emplace_back(new vox_block());
                             vox_block* block = map->blocks.back();
                             block->map = map;
@@ -154,7 +144,6 @@ namespace rain::engine::voxel
                     // if we don't find the block, we create a new one (using simplex for now).
                     if (!found_in_files)
                     {
-                        //RAIN_PROFILE("create new");
                         map->blocks.emplace_back(new vox_block());
                         vox_block* block = map->blocks.back();
                         block->map = map;

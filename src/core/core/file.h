@@ -8,22 +8,28 @@ namespace rain::core
 {
     namespace file
     {
-        inline void write(const std::string& path, u8* content, u32 size)
+        inline bool write(const std::string& path, u8* content, u32 size)
         {
             FILE* file;
-            fopen_s(&file, path.c_str(), "wb");
-            fwrite(content, sizeof(u8), size, file);
-            fclose(file);
+            if (fopen_s(&file, path.c_str(), "wb") == 0)
+            {
+                fwrite(content, sizeof(u8), size, file);
+                fclose(file);
+                return true;
+            }
+            return false;
         }
 
-        inline u32 read(const std::string& path, u8* content, u32 size)
+        inline i32 read(const std::string& path, u8* content, u32 size)
         {
             FILE* file;
-            fopen_s(&file, path.c_str(), "rb");
-            const u32 size_read = fread(content, sizeof(u8), size, file);
-            fclose(file);
-
-            return size_read;
+            if (fopen_s(&file, path.c_str(), "rb") == 0)
+            {
+                const u32 size_read = fread(content, sizeof(u8), size, file);
+                fclose(file);
+                return size_read;
+            }
+            return -1;
         }
     }
 
