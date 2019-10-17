@@ -37,6 +37,8 @@ namespace rain::engine::json_reader
         _config.screen_width = config_document["screen_width"].GetUint();
         _config.screen_height = config_document["screen_height"].GetUint();
         _config.full_screen = config_document["full_screen"].GetBool();
+
+        std::filesystem::create_directory(_config.runtime_data_root);
     }
 
     void read_world(const std::string& _json, World& _world)

@@ -151,7 +151,7 @@ namespace rain::engine::voxel
                         }
                     }
 
-                    // if we don't find the block, we create a new one (using simple for now).
+                    // if we don't find the block, we create a new one (using simplex for now).
                     if (!found_in_files)
                     {
                         //RAIN_PROFILE("create new");
