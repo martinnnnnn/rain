@@ -18,32 +18,9 @@ namespace rain::engine::voxel
 {
     void update_validity_mask(u8& validity_mask, i32 sample_x, i32 sample_y, i32 sample_z, i32 block_x, i32 block_y, i32 block_z)
     {
-        if (sample_x == 0 /*&& block_x == 0*/)
-        {
-            core::unset_bit<u8>(validity_mask, 0);
-        }
-        else
-        {
-            core::set_bit<u8>(validity_mask, 0);
-        }
-
-        if (sample_y == 0 /*&& block_y == 0*/)
-        {
-            core::unset_bit<u8>(validity_mask, 1);
-        }
-        else
-        {
-            core::set_bit<u8>(validity_mask, 1);
-        }
-
-        if (sample_z == 0 /*&& block_z == 0*/)
-        {
-            core::unset_bit<u8>(validity_mask, 2);
-        }
-        else
-        {
-            core::set_bit<u8>(validity_mask, 2);
-        }
+        core::bit_set<u8>(validity_mask, 0, sample_x);
+        core::bit_set<u8>(validity_mask, 1, sample_y);
+        core::bit_set<u8>(validity_mask, 2, sample_z);
     }
 
     void set_case_code(vox_cell* cell)

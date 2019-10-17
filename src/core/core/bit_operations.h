@@ -5,14 +5,36 @@
 namespace rain::core
 {
     template<typename T>
-    void set_bit(T& number, T bit)
+    void bit_set(T& bitfield, T position, T value)
     {
-        number |= 1UL << bit;
+        unsigned long newbit = !!value;
+        bitfield ^= (-newbit ^ bitfield) & (1UL << position);
     }
 
     template<typename T>
-    void unset_bit(T& number, T bit)
+    void bit_set(T& bitfield, T position)
     {
-        number &= ~(1UL << bit);
+        bitfield |= 1UL << position;
     }
+
+    template<typename T>
+    void bit_unset(T& bitfield, T position)
+    {
+        bitfield &= ~(1UL << position);
+    }
+
+    template<typename T>
+    void bit_toggle(T& bitfield, T position)
+    {
+        bitfield ^= 1UL << position;
+    }
+
+    template<typename T>
+    T bit_check(T& bitfield, T position)
+    {
+        return (bitfield >> position) & 1U;
+    }
+
+
+
 }

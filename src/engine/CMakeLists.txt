@@ -76,6 +76,7 @@ target_include_directories("${RAIN_ENGINE_EXPORT}" PUBLIC
     ${FBXSDK_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/external/entt/
     ${CMAKE_SOURCE_DIR}/external/freetype/
+	${CMAKE_SOURCE_DIR}/external/stb/
     ${GLEW_INCLUDE_DIRS})
 
 set_target_properties("${RAIN_ENGINE_EXPORT}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${ENGINE_EXPORT_PATH})
