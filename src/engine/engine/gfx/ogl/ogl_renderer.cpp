@@ -633,11 +633,18 @@ namespace rain::engine
 
     void Renderer::init_transvoxel(voxel::vox_block* block) const
     {
-        block->vbo = 0;
-        block->ebo = 0;
-        glGenVertexArrays(1, &block->vao);
-        glGenBuffers(1, &block->vbo);
-        glGenBuffers(1, &block->ebo);
+        if (block->vao == 0)
+        {
+            glGenVertexArrays(1, &block->vao);
+        }
+        if (block->vbo == 0)
+        {
+            glGenBuffers(1, &block->vbo);
+        }
+        if (block->ebo == 0)
+        {
+            glGenBuffers(1, &block->ebo);
+        }
 
         glBindVertexArray(block->vao);
 

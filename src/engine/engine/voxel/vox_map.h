@@ -26,7 +26,6 @@ namespace rain::engine::voxel
         std::string directory_path;
 
         std::vector<vox_block*> blocks;
-        std::vector<vox_block*> blocks_to_refresh;
         std::vector<vox_block_file> block_paths;
     };
 

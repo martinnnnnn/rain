@@ -89,12 +89,17 @@ namespace rain::engine::voxel
     void transvoxel(vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
     {
         block->vertices.clear();
+        block->indices.clear();
 
         u8 validity_mask = 0;
 
         i32 xmax = (block->position.x == block->map->max_x - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
         i32 ymax = (block->position.y == block->map->max_y - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
         i32 zmax = (block->position.z == block->map->max_z - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
+
+        assert(block->position.x != block->map->max_x);
+        assert(block->position.y != block->map->max_y);
+        assert(block->position.z != block->map->max_z);
 
         for (i32 z = 0; z < zmax; ++z)
         {
@@ -223,14 +228,6 @@ namespace rain::engine::voxel
                     }
                 }
             }
-            //memcpy(block->last_deck, decks[current_deck], sizeof(vox_cell) * BLOCK_SIZE_SQUARED);
-            for (u32 i = 0; i < BLOCK_SIZE_SQUARED; ++i)
-            {
-                block->last_deck[i].case_code = decks[current_deck][i].case_code;
-                //block->last_deck[i].indexes = decks[current_deck][i].indexes;
-                memcpy(block->last_deck[i].corners, decks[current_deck][i].corners, sizeof(vox_sample*) * 8);
-                block->last_deck[i].indexes = decks[current_deck][i].indexes;
-            }
             current_deck = previous_deck;
         }
 
@@ -241,31 +238,22 @@ namespace rain::engine::voxel
 
         RAIN_RENDERER->init_transvoxel(block);
 
-        block->need_update = false;
+        block->needs_update = false;
     }
 
     void transvoxel(vox_map* map)
     {
-        //std::shuffle(map->blocks.begin(), map->blocks.end(), std::default_random_engine{});
-
         vox_cell decks[2][BLOCK_SIZE_SQUARED];
         memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
         u8 current_deck = 0;
 
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
-
-            if (!map->blocks[i]->need_update)
+            if (!map->blocks[i]->needs_update)
                 continue;
-            RAIN_LOG("(%d, %d, %d), %u", map->blocks[i]->position.x, map->blocks[i]->position.y, map->blocks[i]->position.z, current_deck);
+
+            RAIN_PROFILE("transvoxel");
             transvoxel(map->blocks[i], decks, current_deck);
         }
-
-        //for (u32 i = 0; i < map->blocks_to_refresh.size(); ++i)
-        //{
-        //    transvoxel(map->blocks_to_refresh[i], decks, current_deck);
-        //}
-
-        map->blocks_to_refresh.clear();
     }
 }

@@ -40,7 +40,7 @@ namespace rain::engine
         //voxmap.max_x = 5;
         voxmap.max_y = 1;
         //voxmap.max_z = 1;
-        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 3, RAIN_CONFIG->runtime_data_root);
+        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 10, RAIN_CONFIG->runtime_data_root);
 
         std::vector<actor*> view;
 
@@ -67,30 +67,30 @@ namespace rain::engine
         }
 
         // ---- temp
-        actor* new_actor = sg.create();
-        core::transform* t = new_actor->components.create<core::transform>();
-        t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
-        Material* material = new_actor->components.create<Material>();
-        material->shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vert"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.frag"));
-        core::mesh* mesh = new_actor->components.create<core::mesh>();
+        //actor* new_actor = sg.create();
+        //core::transform* t = new_actor->components.create<core::transform>();
+        //t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
+        //Material* material = new_actor->components.create<Material>();
+        //material->shader.load(std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.vert"), std::string(RAIN_CONFIG->data_root + "/shaders/glsl/model.frag"));
+        //core::mesh* mesh = new_actor->components.create<core::mesh>();
 
-        Model model;
-        model.path = file_path(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
-        model.mesh = RAIN_FIND_DATA_FROM_PATH(Mesh, model.path.get_path_absolute());
+        //Model model;
+        //model.path = file_path(RAIN_CONFIG->data_root + "/models/skelet/skeleton_animated.fbx");
+        //model.mesh = RAIN_FIND_DATA_FROM_PATH(Mesh, model.path.get_path_absolute());
 
-        u32 vertices_count = model.mesh->data->vertices.size();
-        glm::vec3* vertices = (glm::vec3*)malloc(vertices_count * sizeof(glm::vec3));
-        for (u32 i = 0; i < vertices_count; ++i)
-        {
-            memcpy(&vertices[i], &(model.mesh->data->vertices[i].position), sizeof(glm::vec3));
-        }
+        //u32 vertices_count = model.mesh->data->vertices.size();
+        //glm::vec3* vertices = (glm::vec3*)malloc(vertices_count * sizeof(glm::vec3));
+        //for (u32 i = 0; i < vertices_count; ++i)
+        //{
+        //    memcpy(&vertices[i], &(model.mesh->data->vertices[i].position), sizeof(glm::vec3));
+        //}
 
-        {
-            RAIN_PROFILE("quickhull");
-            RAIN_LOG("vertices count : %u", vertices_count);
-            quick_hull(vertices, vertices_count, mesh);
-        }
-        vao_quickhull = RAIN_RENDERER->load_primitive(mesh->vertices, mesh->vertices_count, mesh->vertices_indices, mesh->vertices_indices_count, mesh->normals, mesh->normals_count, mesh->normals_indices, mesh->normal_indices_count);
+        //{
+        //    RAIN_PROFILE("quickhull");
+        //    RAIN_LOG("vertices count : %u", vertices_count);
+        //    quick_hull(vertices, vertices_count, mesh);
+        //}
+        //vao_quickhull = RAIN_RENDERER->load_primitive(mesh->vertices, mesh->vertices_count, mesh->vertices_indices, mesh->vertices_indices_count, mesh->normals, mesh->normals_count, mesh->normals_indices, mesh->normal_indices_count);
 
         // ---- /temp
     }

@@ -30,9 +30,7 @@ namespace rain::engine::voxel
         vox_position position;
         u8 LOD;
         vox_block* children[CHILD_COUNT];
-        bool need_update;
-
-        vox_cell last_deck[BLOCK_SIZE_SQUARED];
+        bool needs_update;
 
         u32 vao;
         u32 ebo;

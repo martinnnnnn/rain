@@ -9,7 +9,7 @@ namespace rain::engine::voxel
         : map(nullptr)
         , position(0, 0, 0)
         , LOD(LOD_0)
-        , need_update(true)
+        , needs_update(true)
         , vao(0)
         , ebo(0)
         , vbo(0)
@@ -19,7 +19,7 @@ namespace rain::engine::voxel
 
     void init_simplex(vox_block* block, float frequency, float amplitude, float lacunarity, float persistence)
     {
-        block->need_update = true;
+        block->needs_update = true;
 
         for (u32 i = 0; i < BLOCK_SIZE; ++i)
         {
@@ -137,7 +137,7 @@ namespace rain::engine::voxel
     {
         u32 counter = 0;
 
-        core::to_buffer(buffer, buffer_size, &counter, block->position);
+        core::to_buffer<voxel::vox_position>(buffer, buffer_size, &counter, block->position);
         core::to_buffer(buffer, buffer_size, &counter, block->LOD);
         u32 size_counter = counter;
         core::to_buffer(buffer, buffer_size, &counter, u32(0));
@@ -164,7 +164,7 @@ namespace rain::engine::voxel
     {
         u32 counter = 0;
 
-        core::from_buffer(buffer, buffer_size, &counter, &block->position);
+        core::from_buffer<voxel::vox_position>(buffer, buffer_size, &counter, &block->position);
         core::from_buffer(buffer, buffer_size, &counter, &block->LOD);
         u32 rle_elem_count = 0;
         core::from_buffer(buffer, buffer_size, &counter, &rle_elem_count);

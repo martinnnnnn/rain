@@ -65,19 +65,14 @@ namespace rain::engine::voxel
             }
 
             unload_block(map, *i);
-            //map->blocks.erase(map->blocks.begin() + *i);
         }
-
-        //for_each(indexes.begin(), indexes.end(), [map](const u32 index)
-        //{
-        //});
     }
 
     void update_map(vox_map* map, const glm::vec3& player_position)
     {
-        const i32 player_x = core::round(player_position.x) / BLOCK_SIZE;
-        const i32 player_y = core::round(player_position.y) / BLOCK_SIZE;
-        const i32 player_z = core::round(player_position.z) / BLOCK_SIZE;
+        const i32 player_x = std::lround(player_position.x) / i32(BLOCK_SIZE);
+        const i32 player_y = std::lround(player_position.y) / i32(BLOCK_SIZE);
+        const i32 player_z = std::lround(player_position.z) / i32(BLOCK_SIZE);
 
         const i32 last_max_x = map->max_x;
         const i32 last_max_z = map->max_z;
@@ -105,8 +100,7 @@ namespace rain::engine::voxel
             if ((map->max_x > last_max_x && block->position.x == last_max_x - 1)
                 || (map->max_z > last_max_z && block->position.z == last_max_z - 1))
             {
-                block->need_update = true;
-                //map->blocks_to_refresh.push_back(block);
+                block->needs_update = true;
             }
         }
 
@@ -119,6 +113,7 @@ namespace rain::engine::voxel
             for (i32 z = map->min_z; z < map->max_z; ++z)
             {
                 vox_block* block = get_block(map, x, 0, z);
+
                 if (!block)
                 {
                     bool found_in_files = false;
@@ -131,7 +126,7 @@ namespace rain::engine::voxel
                             assert(!map->block_paths[i].loaded && "This block should not be loaded");
 
                             map->blocks.emplace_back(new vox_block());
-                            vox_block* block = map->blocks.back();
+                            block = map->blocks.back();
                             block->map = map;
                             block->position = map->block_paths[i].position;
                             load_block(block, map->block_paths[i].path);
@@ -145,7 +140,7 @@ namespace rain::engine::voxel
                     if (!found_in_files)
                     {
                         map->blocks.emplace_back(new vox_block());
-                        vox_block* block = map->blocks.back();
+                        block = map->blocks.back();
                         block->map = map;
                         block->position = vox_position{ x, 0, z };
                         init_simplex(block, 0.4f, 1.4f, 0.8f, 1.5f);

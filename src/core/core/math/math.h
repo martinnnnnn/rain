@@ -31,9 +31,4 @@ namespace rain::core
     {
         return (x < xmax && y < ymax && z < zmax && x >= xmin && y >= ymin && z >= zmin);
     }
-
-    inline i32 round(f32 value)
-    {
-        return i32(value + 0.5f);
-    }
 }
