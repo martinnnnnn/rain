@@ -15,6 +15,6 @@ namespace rain::engine::voxel
     struct vox_block;
     struct vox_map;
 
-    void transvoxel(vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck);
+    void transvoxel(vox_block* block);
     void transvoxel(vox_map* map);
 }

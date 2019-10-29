@@ -50,7 +50,7 @@ namespace rain::engine::voxel
     {
         if (core::is_inside_boundary(x, y, z, BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
         {
-            return &(block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED]);
+            return block->samples[x + y * BLOCK_SIZE + z * BLOCK_SIZE_SQUARED];
         }
 
         const i32 new_block_x = (x == -1) ? block->position.x - 1 : (x == BLOCK_SIZE) ? block->position.x + 1 : block->position.x;
@@ -65,7 +65,7 @@ namespace rain::engine::voxel
             const i32 new_sample_y = (y == -1) ? BLOCK_SIZE - 1 : (y == BLOCK_SIZE) ? 0 : y;
             const i32 new_sample_z = (z == -1) ? BLOCK_SIZE - 1 : (z == BLOCK_SIZE) ? 0 : z;
 
-            return &(new_block->samples[new_sample_x + new_sample_y * BLOCK_SIZE + new_sample_z * BLOCK_SIZE_SQUARED]);
+            return new_block->samples[new_sample_x + new_sample_y * BLOCK_SIZE + new_sample_z * BLOCK_SIZE_SQUARED];
         }
 
         return nullptr;
@@ -86,8 +86,11 @@ namespace rain::engine::voxel
     }
 
 
-    void transvoxel(vox_block* block, vox_cell decks[2][BLOCK_SIZE_SQUARED], u8& current_deck)
+    void transvoxel(vox_block* block)
     {
+        vox_cell decks[2][BLOCK_SIZE_SQUARED];
+        u8 current_deck = 0;
+
         block->vertices.clear();
         block->indices.clear();
 
@@ -96,10 +99,6 @@ namespace rain::engine::voxel
         i32 xmax = (block->position.x == block->map->max_x - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
         i32 ymax = (block->position.y == block->map->max_y - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
         i32 zmax = (block->position.z == block->map->max_z - 1) ? BLOCK_SIZE - 1 : BLOCK_SIZE;
-
-        assert(block->position.x != block->map->max_x);
-        assert(block->position.y != block->map->max_y);
-        assert(block->position.z != block->map->max_z);
 
         for (i32 z = 0; z < zmax; ++z)
         {
@@ -139,25 +138,13 @@ namespace rain::engine::voxel
                                 i8 new_y = y - (((mapping & 0x02) >> 1) & 1);
                                 i8 new_deck = (current_deck + ((mapping & 0x04) >> 2)) & 1;
                                 
-                                vox_cell* neighbour_cell = nullptr;
-                                //if (z == 0)
-                                //{
-                                //    vox_cell* test = &(decks[new_deck][new_x + BLOCK_SIZE * new_y]);
-                                //    vox_block* previous_block = get_block(block->map, block->position.x, block->position.y, block->position.z - 1);
-                                //    neighbour_cell = &(previous_block->last_deck[new_x + BLOCK_SIZE * new_y]);
-                                //}
-                                //else
-                                {
-                                    neighbour_cell = &(decks[new_deck][new_x + BLOCK_SIZE * new_y]);
-                                }
-                                assert(neighbour_cell && "This should never be null");
-                                //const vox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
+                                const vox_cell& neighbour_cell = decks[new_deck][new_x + BLOCK_SIZE * new_y];
 
-                                for (u32 j = 0; j < neighbour_cell->indexes.size(); ++j)
+                                for (u32 j = 0; j < neighbour_cell.indexes.size(); ++j)
                                 {
-                                    if (neighbour_cell->indexes[j].cell_index == vertexIndex)
+                                    if (neighbour_cell.indexes[j].cell_index == vertexIndex)
                                     {
-                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell->indexes[j].block_index });
+                                        cell->indexes.emplace_back(vertex_index{ 255, neighbour_cell.indexes[j].block_index });
                                         break;
                                     }
                                 }
@@ -243,17 +230,13 @@ namespace rain::engine::voxel
 
     void transvoxel(vox_map* map)
     {
-        vox_cell decks[2][BLOCK_SIZE_SQUARED];
-        memset(decks, 0, 2 * BLOCK_SIZE_SQUARED);
-        u8 current_deck = 0;
-
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
-            if (!map->blocks[i]->needs_update)
+            if (!map->blocks[i].data->needs_update)
                 continue;
 
-            RAIN_PROFILE("transvoxel");
-            transvoxel(map->blocks[i], decks, current_deck);
+            u8 current_deck = 0;
+            transvoxel(map->blocks[i].data);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace rain::engine::ui
         RAIN_RENDERER->draw_ui_quad(f32(field.x), f32(field.y), f32(field.width), f32(field.height), field.color_bg);
 
         assert(field.next_index < NELEMS(field.buffer));
-        RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), field.x + 2, field.y + 2, 0.25f, field.color_txt);
+        RAIN_RENDERER->draw_text_2d(std::string(field.buffer, field.next_index), f32(field.x + 2), f32(field.y + 2), 0.25f, field.color_txt);
     }
 
 	void update(text_field& field)

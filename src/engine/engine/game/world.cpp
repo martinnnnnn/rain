@@ -34,13 +34,9 @@ namespace rain::engine
             //engine::init(vmap);
         }
 
-        //voxmap.min_x = 0;
         voxmap.min_y = 0;
-        //voxmap.min_z = 0;
-        //voxmap.max_x = 5;
         voxmap.max_y = 1;
-        //voxmap.max_z = 1;
-        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 10, RAIN_CONFIG->runtime_data_root);
+        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
 
         std::vector<actor*> view;
 

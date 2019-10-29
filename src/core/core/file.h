@@ -1,6 +1,9 @@
 #pragma once
 
 #include <fstream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "core/core.h"
 
@@ -20,14 +23,21 @@ namespace rain::core
             return false;
         }
 
-        inline i32 read(const std::string& path, u8* content, u32 size)
+        inline i32 read(const std::string& path, u8** content)
         {
-            FILE* file;
-            if (fopen_s(&file, path.c_str(), "rb") == 0)
+            FILE *f;
+            if (fopen_s(&f, path.c_str(), "rb") == 0)
             {
-                const u32 size_read = fread(content, sizeof(u8), size, file);
-                fclose(file);
-                return size_read;
+                fseek(f, 0, SEEK_END);
+                u32 fsize = ftell(f);
+                fseek(f, 0, SEEK_SET);
+
+                *content = (u8*)malloc(fsize + 1);
+                fread(*content, 1, fsize, f);
+                fclose(f);
+
+                (*content)[fsize] = 0;
+                return fsize;
             }
             return -1;
         }

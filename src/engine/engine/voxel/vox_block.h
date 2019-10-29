@@ -7,6 +7,7 @@
 
 #include <glm.hpp>
 #include <vector>
+#include <array>
 #include <string>
 
 namespace rain::engine::voxel
@@ -21,15 +22,17 @@ namespace rain::engine::voxel
 
     struct vox_block
     {
-        vox_block();
+        vox_block(vox_map* m);
+        ~vox_block();
 
-        static constexpr u32 CHILD_COUNT = 8;
+        //static constexpr u32 CHILD_COUNT = 8;
 
         vox_map* map;
-        vox_sample samples[BLOCK_SIZE_CUBED];
+        std::array<vox_sample*, BLOCK_SIZE_CUBED> samples;
+        //vox_sample samples[BLOCK_SIZE_CUBED];
         vox_position position;
-        u8 LOD;
-        vox_block* children[CHILD_COUNT];
+        //u8 LOD;
+        //vox_block* children[CHILD_COUNT];
         bool needs_update;
 
         u32 vao;
@@ -37,17 +40,16 @@ namespace rain::engine::voxel
         u32 vbo;
         std::vector<vox_vertex> vertices;
         std::vector<u32> indices;
-
     };
 
     void init_simplex(vox_block* block, float frequency, float amplitude, float lacunarity, float persistence);
 
-    void free_block(vox_block* block);
+    //void free_block(vox_block* block);
 
     std::string save_block(vox_block* block, const std::string& file_name);
     void load_block(vox_block* block, const std::string& file_name);
     u32 encode_block(vox_block* block, u8* buffer, u32 buffer_size);
     void decode_block(vox_block* block, u8* buffer, u32 buffer_size);
 
-    vox_position get_max_size(vox_block* block);
+    //vox_position get_max_size(vox_block* block);
 }

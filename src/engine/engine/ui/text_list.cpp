@@ -18,7 +18,7 @@ namespace rain::engine::ui
     {
         for (u32 i = 0; i < list.messages.size(); ++i)
         {
-            RAIN_RENDERER->draw_text_2d(list.messages[i], list.x, list.y + i * 10, 0.25f, list.color);
+            RAIN_RENDERER->draw_text_2d(list.messages[i], f32(list.x), f32(list.y + i * 10), 0.25f, list.color);
         }
     }
 }
