@@ -22,25 +22,39 @@
 #include "engine/voxel/voxel.h"
 #include "engine/win32/win32_input.h"
 
+// temp
+#include "gtx/transform.hpp"
+#include "engine/voxel/oct_tree.h"
+
+
 namespace rain::engine
 {
-    void World::init(const std::string& _path)
+
+    struct Hello
+    {
+        int a;
+        char b;
+        std::string c;
+    };
+
+    void World::init(const std::string& path)
     {
         RAIN_PROFILE("World Initialization");
 
         {
             //RAIN_PROFILE("Chunk init");
-            //vmap = new voxel_map();s
+            //vmap = new voxel_map();
             //engine::init(vmap);
         }
 
         voxmap.min_y = 0;
         voxmap.max_y = 1;
         voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
+        voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
 
         std::vector<actor*> view;
 
-        file.open(_path);
+        file.open(path);
         json_reader::read_world(file.read(), *this);
 
         sg.get_view<ui::text_field, ui::text_list>(view, true);
@@ -62,7 +76,16 @@ namespace rain::engine
             break;
         }
 
-        // ---- temp
+        chara =
+        {
+            glm::vec3{},
+            5.0f,
+        };
+
+
+        //chara.position = glm::vec3{};
+        //chara.speed = 5.0f;
+
         //actor* new_actor = sg.create();
         //core::transform* t = new_actor->components.create<core::transform>();
         //t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
@@ -101,61 +124,33 @@ namespace rain::engine
     {
         std::vector<actor*> view;
 
-        static float frequency = 1.0f;
-        static float amplitude = 1.0f;
-        static float lacunarity = 2.0f;
-        static float persistence = 0.5f;
-        bool change = false;
-        if (RAIN_INPUT->is_key_released(DIK_U))
+        if (RAIN_INPUT->is_key_pressed(DIK_I))
         {
-            frequency += 0.2f;
-            RAIN_LOG("frequency up : %f", frequency);
-            change = true;
+            chara.position.x += 0.1f * chara.speed;
         }
-        if (RAIN_INPUT->is_key_released(DIK_J))
+        if (RAIN_INPUT->is_key_pressed(DIK_K))
         {
-            frequency -= 0.2f;
-            RAIN_LOG("frequency down : %f", frequency);
-            change = true;
+            chara.position.x -= 0.1f * chara.speed;
         }
-        if (RAIN_INPUT->is_key_released(DIK_I))
+        if (RAIN_INPUT->is_key_pressed(DIK_L))
         {
-            amplitude += 0.2f;
-            RAIN_LOG("amplitude up : %f", amplitude);
-            change = true;
+            chara.position.z += 0.1f * chara.speed;
         }
-        if (RAIN_INPUT->is_key_released(DIK_K))
+        if (RAIN_INPUT->is_key_pressed(DIK_J))
         {
-            amplitude -= 0.2f;
-            RAIN_LOG("amplitude down : %f", amplitude);
-            change = true;
+            chara.position.z -= 0.1f * chara.speed;
         }
-        if (RAIN_INPUT->is_key_released(DIK_O))
+        if (RAIN_INPUT->is_key_pressed(DIK_O))
         {
-            lacunarity += 0.2f;
-            RAIN_LOG("lacunarity up : %f", lacunarity);
-            change = true;
+            chara.position.y += 0.1f * chara.speed;
         }
-        if (RAIN_INPUT->is_key_released(DIK_L))
+        if (RAIN_INPUT->is_key_pressed(DIK_U))
         {
-            lacunarity -= 0.2f;
-            RAIN_LOG("lacunarity down : %f", lacunarity);
-            change = true;
-        }
-        if (RAIN_INPUT->is_key_released(DIK_P))
-        {
-            persistence += 0.2f;
-            RAIN_LOG("persistence up : %f", persistence);
-            change = true;
-        }
-        if (RAIN_INPUT->is_key_released(DIK_M))
-        {
-            persistence -= 0.2f;
-            RAIN_LOG("persistence down : %f", persistence);
-            change = true;
+            chara.position.y -= 0.1f * chara.speed;
         }
 
-        voxel::update_map(&voxmap, main_camera.transform->position);
+        //voxel::update_map(&voxmap, main_camera.transform->position);
+        voxel::update_map(&voxmap, chara.position);
 
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)
@@ -215,6 +210,9 @@ namespace rain::engine
         voxel::draw_map(&voxmap, main_camera.transform->position);
 
         std::vector<actor*> view;
+
+        RAIN_RENDERER->draw_sphere(chara.position, glm::quat(), glm::vec3(3, 3, 3));
+        voxel::draw_oct_tree(&octtree);
 
         //sg.get_view<core::transform, Model, Material>(view);
 

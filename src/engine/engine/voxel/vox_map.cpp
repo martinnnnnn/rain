@@ -208,6 +208,11 @@ namespace rain::engine::voxel
     {
         for (u32 i = 0; i < map->blocks.size(); ++i)
         {
+            for (u32 j = 0; j < map->blocks[i].data->vertices.size(); ++j)
+            {
+                RAIN_RENDERER->draw_debug_line(map->blocks[i].data->vertices[j].position, map->blocks[i].data->vertices[j].position + map->blocks[i].data->vertices[j].normal, glm::vec3(1, 0, 0));
+            }
+
             RAIN_RENDERER->draw_transvoxel(map->blocks[i].data->vao, map->blocks[i].data->indices.size(), map->position, camera_position, f32(BLOCK_SIZE * (map->max_y - map->min_y)));
         }
     }

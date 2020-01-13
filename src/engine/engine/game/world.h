@@ -7,6 +7,7 @@
 #include "engine/network/client.h"
 #include "scene_graph.h"
 #include "engine/voxel/voxel.h"
+#include "engine/voxel/oct_tree.h"
 
 namespace rain::engine
 {
@@ -19,6 +20,12 @@ namespace rain::engine
         core::transform* transform;
     };
 
+    struct character
+    {
+        glm::vec3 position;
+        f32 speed;
+    };
+
     struct World
     {
         std::string name;
@@ -26,7 +33,7 @@ namespace rain::engine
 
         MainCamera main_camera;
 
-        void init(const std::string& _path);
+        void init(const std::string& path);
 
         void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
@@ -40,6 +47,8 @@ namespace rain::engine
         voxel_map* vmap;
 
         voxel::vox_map voxmap;
+        character chara;
+        voxel::oct_tree octtree;
     };
 }
 

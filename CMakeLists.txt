@@ -31,7 +31,7 @@ set(ENGINE_EXE_PATH "${CMAKE_SOURCE_DIR}/bin/rain_engine")
 set(ENGINE_EXPORT_PATH "${CMAKE_SOURCE_DIR}/bin/rain_engine_export")
 
 
-#### GROUP CREATION ####
+### GROUP CREATION ####
 macro(GroupSources root_dir curdir)
     file(GLOB children RELATIVE ${root_dir}/${curdir}
             ${root_dir}/${curdir}/*)
@@ -46,6 +46,7 @@ macro(GroupSources root_dir curdir)
         endif()
     endforeach()
 endmacro()
+
 
 #### SETTING WINDOWS SDK PATHS ####
 file(TO_CMAKE_PATH "$ENV{PROGRAMFILES\(X86\)}" _progFilePath)

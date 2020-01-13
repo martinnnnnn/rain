@@ -69,6 +69,7 @@ namespace rain::engine::network
             }
             break;
         }
+
         freeaddrinfo(result);
 
         if (info.socket == INVALID_SOCKET)

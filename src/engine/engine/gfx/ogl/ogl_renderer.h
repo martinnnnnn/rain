@@ -95,7 +95,7 @@ namespace rain::engine
 
         u32 load_texture(const char* path, bool gamma);
 
-        static constexpr u32 debug_vertices_max_count = 8192;
+        static constexpr u32 debug_vertices_max_count = 262144;
 
         u32      m_debug_vertex_count;
         Shader debug_shader;

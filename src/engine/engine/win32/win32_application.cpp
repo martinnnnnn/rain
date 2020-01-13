@@ -159,6 +159,9 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPSTR lpcmdline
 {
     rain::engine::application application;
     
+
+
+
     if (application.init(hinstance, "") != 0)
     {
         return -1;

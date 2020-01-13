@@ -10,6 +10,12 @@
 
 namespace rain::core
 {
+    
+    inline bool almost_equal(const f32 a, const f32 b)
+    {
+        return (fabs(a - b) < std::numeric_limits<f32>::epsilon());
+    }
+
     inline bool get_quadratic_roots(const f32 a, const f32 b, const f32 c, f32& r1, f32& r2)
     {
         if ((a >= 0) && (b >= 0) && (c >= 0))

@@ -26,14 +26,8 @@ namespace rain::engine::voxel
 
     void set_case_code(vox_cell* cell)
     {
-        assert(cell->corners[0] && "A cell corner can never be null.");
-        assert(cell->corners[1] && "A cell corner can never be null.");
-        assert(cell->corners[2] && "A cell corner can never be null.");
-        assert(cell->corners[3] && "A cell corner can never be null.");
-        assert(cell->corners[4] && "A cell corner can never be null.");
-        assert(cell->corners[5] && "A cell corner can never be null.");
-        assert(cell->corners[6] && "A cell corner can never be null.");
-        assert(cell->corners[7] && "A cell corner can never be null.");
+        assert(cell->corners[0] && cell->corners[1] && cell->corners[2] && cell->corners[3]
+            && cell->corners[4] && cell->corners[5] && cell->corners[6] && cell->corners[7] && "A cell corner can never be null.");
 
         cell->case_code =
             ((cell->corners[0]->dist >> 7) & 0x01)
@@ -173,15 +167,15 @@ namespace rain::engine::voxel
                                 }
 
                                 block->vertices.emplace_back(vox_vertex
+                                {
+                                    glm::vec3
                                     {
-                                        glm::vec3
-                                        {
-                                            t * lnc_x + (1 - t) * hnc_x,
-                                            t * lnc_y + (1 - t) * hnc_y,
-                                            t * lnc_z + (1 - t) * hnc_z
-                                        },
-                                        glm::vec3 {0.0f, 0.0f, 0.0f}
-                                    });
+                                        t * lnc_x + (1 - t) * hnc_x,
+                                        t * lnc_y + (1 - t) * hnc_y,
+                                        t * lnc_z + (1 - t) * hnc_z
+                                    },
+                                    glm::vec3 {0.0f, 0.0f, 0.0f}
+                                });
                             }
                         }
 
@@ -210,6 +204,7 @@ namespace rain::engine::voxel
                                 A->normal += normal;
                                 B->normal += normal;
                                 C->normal += normal;
+                                
                             }
                         }
                     }
@@ -220,7 +215,7 @@ namespace rain::engine::voxel
 
         for (u32 i = 0; i < block->vertices.size(); ++i)
         {
-            block->vertices[i].normal = glm::normalize(block->vertices[i].normal);
+            block->vertices[i].normal = glm::normalize(-block->vertices[i].normal);
         }
 
         RAIN_RENDERER->init_transvoxel(block);
