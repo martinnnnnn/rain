@@ -10,4 +10,7 @@ target_include_directories(${RAIN_CORE} PUBLIC
     C:/boost/
     ${CMAKE_SOURCE_DIR}/external/glm/glm/)
 
+target_compile_definitions(${RAIN_CORE} PUBLIC RAIN_DATA_ROOT="${CMAKE_SOURCE_DIR}/data")
+target_compile_definitions(${RAIN_CORE} PUBLIC RAIN_RUNTIME_DATA_ROOT="${CMAKE_SOURCE_DIR}/runtime_data")
+
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR} core)

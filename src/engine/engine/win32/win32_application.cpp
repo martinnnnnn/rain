@@ -42,7 +42,7 @@ namespace rain::engine
 
         // INIT CONFIG
         RAIN_CONFIG = new Config();
-        RAIN_CONFIG->init(Win32::get_exe_path() + RAIN_CONFIG_FILE_NAME);
+        RAIN_CONFIG->init();
         
         // INIT MESSAGING
         RAIN_MESSAGING = new core::messager();

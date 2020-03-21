@@ -41,6 +41,20 @@ namespace rain::core
             }
             return -1;
         }
+
+		inline bool exists(const std::string& name)
+		{
+			FILE* file = NULL;
+			if (fopen_s(&file, name.c_str(), "r") == 0)
+			{
+				fclose(file);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
     }
 
 	class File

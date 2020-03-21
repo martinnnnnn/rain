@@ -53,7 +53,7 @@ GroupSources(${CMAKE_CURRENT_SOURCE_DIR} engine)
 
 add_custom_command(TARGET ${RAIN_ENGINE} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_SOURCE_DIR}/data/exe_root"
+        "${CMAKE_SOURCE_DIR}/exe_root"
          ${ENGINE_EXE_PATH}/$<CONFIGURATION>)
 
 

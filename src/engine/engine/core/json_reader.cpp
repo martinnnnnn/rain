@@ -30,9 +30,6 @@ namespace rain::engine::json_reader
 
         _config.engine_name = config_document["engine_name"].GetString();
         RAIN_LOG("Reading config file for engine : %s\n", _config.engine_name.c_str());
-
-        _config.data_root = config_document["data_root"].GetString();
-        _config.runtime_data_root = config_document["runtime_data_root"].GetString();
         _config.starting_world = config_document["starting_world"].GetString();
         _config.screen_width = config_document["screen_width"].GetUint();
         _config.screen_height = config_document["screen_height"].GetUint();

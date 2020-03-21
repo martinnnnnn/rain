@@ -49,7 +49,6 @@ namespace rain::core
     {
         return filepath;
     }
-
 }
 
 
