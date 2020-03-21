@@ -29,7 +29,7 @@ namespace rain::engine
     struct World
     {
         std::string name;
-        core::File file;
+		std::string file_name;
 
         MainCamera main_camera;
 

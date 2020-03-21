@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -42,6 +41,21 @@ namespace rain::core
             return -1;
         }
 
+		inline void read(const std::string& path, std::string& content)
+		{
+			FILE *f;
+			if (fopen_s(&f, path.c_str(), "rb") == 0)
+			{
+				fseek(f, 0, SEEK_END);
+				u32 fsize = ftell(f);
+				fseek(f, 0, SEEK_SET);
+
+				content.resize(fsize, '\0');
+				fread(&content[0], sizeof(char), (size_t)fsize, f);
+				fclose(f);
+			}
+		}
+
 		inline bool exists(const std::string& name)
 		{
 			FILE* file = NULL;
@@ -56,28 +70,4 @@ namespace rain::core
 			}
 		}
     }
-
-	class File
-	{
-	public:
-
-
-		enum class Mode
-		{
-			READ		= 1 << 0,				// open for reading only
-			WRITE		= 1 << 1,				// open for write only
-		};
-
-		bool open(const std::string& _path, std::ios_base::openmode _mode = std::fstream::in);
-        bool reopen();
-		bool is_open();
-		std::string read();
-		void close();
-        file_path& get_path();
-        std::fstream& get_stream();
-        file_path filepath;
-
-	private:
-		std::fstream m_stream;
-	};
 }

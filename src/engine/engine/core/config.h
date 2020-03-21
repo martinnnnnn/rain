@@ -15,7 +15,6 @@ namespace rain::engine
     {
         void init();
 
-        core::File file;
         std::string engine_name;
 		std::string data_root;
 		std::string runtime_data_root;

@@ -14,7 +14,9 @@ namespace rain::engine
 
 		assert(core::file::exists(data_root + RAIN_CONFIG_FILE_NAME) && "Data root path is wrong : you will not be able to continue further.");
 
-        file.open(data_root + RAIN_CONFIG_FILE_NAME);
-        json_reader::read_config(file.read(), *this);
+		std::string content;
+		core::file::read(data_root + RAIN_CONFIG_FILE_NAME, content);
+
+        json_reader::read_config(content, *this);
     }
 }

@@ -55,10 +55,6 @@ namespace rain::engine
 		void check_compile_errors(unsigned int _shader, const std::string& _type);
         void gpu_load(GLuint obj, const char* code);
 
-		core::File vertex_file;
-		core::File fragment_file;
-		core::File geometry_file;
-
         GLuint geometry_object;
 		GLuint vertex_object;
 		GLuint fragment_object;

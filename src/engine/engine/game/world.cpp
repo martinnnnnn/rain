@@ -54,8 +54,11 @@ namespace rain::engine
 
         std::vector<actor*> view;
 
-        file.open(path);
-        json_reader::read_world(file.read(), *this);
+		file_name = path;
+		std::string content;
+
+		core::file::read(file_name, content);
+        json_reader::read_world(content, *this);
 
         sg.get_view<ui::text_field, ui::text_list>(view, true);
         for (auto chat : view)

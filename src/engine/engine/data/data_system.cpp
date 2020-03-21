@@ -28,12 +28,12 @@ namespace rain::engine
                 if (ext.compare("glsl.rain") == 0)
                 {
                     RAIN_LOG("Reloading  shader %s", path.c_str());
-                    core::File file;
-                    file.open(path);
+					std::string content;
                     std::string vertex;
                     std::string fragment;
                     std::string geometry;
-                    json_reader::read_shader(file.read(), filepath.get_directory(), vertex, fragment, geometry);
+					core::file::read(path, content);
+					json_reader::read_shader(content, filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
                 }
@@ -64,12 +64,12 @@ namespace rain::engine
                 if (ext.compare("glsl.rain") == 0)
                 {
                     RAIN_LOG("Loading  shader %s", path.c_str());
-                    core::File file;
-                    file.open(path);
+					std::string content;
                     std::string vertex;
                     std::string fragment;
                     std::string geometry;
-                    json_reader::read_shader(file.read(), filepath.get_directory(), vertex, fragment, geometry);
+					core::file::read(path, content);
+					json_reader::read_shader(content, filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
                 }
