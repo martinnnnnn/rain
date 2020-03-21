@@ -3,7 +3,7 @@
 
 namespace rain::engine
 {
-    void apply_physics(RigidBody& _body, math::Transform& _transform, const f32 _deltaTime)
+    void apply_physics(RigidBody& _body, core::transform& _transform, const f32 _deltaTime)
     {
         if (!_body.infiniteMass)
         {
@@ -15,12 +15,12 @@ namespace rain::engine
             // update orientation
             _body.angularMomentum += _body.torque * _deltaTime;
             _body.angularVelocity = _body.angularMomentum * _body.rotationInertiaInverse;
-            _body.spin = 0.5f * math::quat{ 0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z } * _transform.orientation;
+            _body.spin = 0.5f * glm::quat{ 0, _body.angularVelocity.x, _body.angularVelocity.y, _body.angularVelocity.z } * _transform.orientation;
             _transform.orientation += _body.spin * _deltaTime;
-            _transform.orientation = math::normalized(_transform.orientation);
+            _transform.orientation = glm::normalize(_transform.orientation);
         }
 
-        _body.force = math::vec3{};
-        _body.torque = math::vec3{};
+        _body.force = glm::vec3{};
+        _body.torque = glm::vec3{};
     }
 }

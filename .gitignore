@@ -10,3 +10,7 @@ CTestTestfile.cmake
 /bin/
 /build/
 /ignored/
+*.spv
+rain.sln
+/.vs/
+/runtime_data/

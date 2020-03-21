@@ -21,6 +21,6 @@ namespace rain::core
 
     inline bool operator==(const uuid& a, const uuid& b)
     {
-        return a.data == b.data;
+        return memcmp(a.data, b.data, sizeof(uuid)) == 0;
     }
 }

@@ -2,14 +2,8 @@
 
 #include "core/core.h"
 
-#define WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <strsafe.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "engine/win32/win32_helpers.h"
+#include "network.h"
 
 namespace rain::engine
 {
@@ -20,7 +14,13 @@ namespace rain::engine
             std::string address;
         } ip, *ip_ptr;
 
+
+
+
+
         i32 start_server_thread(const char* ip_address);
+        i32 start_server_thread(const connexion_info& info);
         DWORD _stdcall start_server(LPVOID lpParam);
+        DWORD _stdcall start_server_from_socket(LPVOID lpParam);
     }
 }

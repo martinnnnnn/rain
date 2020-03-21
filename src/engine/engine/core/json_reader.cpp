@@ -9,12 +9,12 @@
 #include "engine/core/context.h"
 #include "engine/core/config.h"
 #include "engine/data/data_system.h"
+#include "engine/data/data_handle.h"
 #include "engine/gfx/ogl/ogl_renderer.h"
+#include "engine/core/profiler.h"
 
 namespace rain::engine::json_reader
 {
-    using namespace rain::math;
-
     std::string get_string(const rapidjson::Value& _json_value)
     {
         rapidjson::StringBuffer buffer;
@@ -32,77 +32,108 @@ namespace rain::engine::json_reader
         RAIN_LOG("Reading config file for engine : %s\n", _config.engine_name.c_str());
 
         _config.data_root = config_document["data_root"].GetString();
+        _config.runtime_data_root = config_document["runtime_data_root"].GetString();
         _config.starting_world = config_document["starting_world"].GetString();
         _config.screen_width = config_document["screen_width"].GetUint();
         _config.screen_height = config_document["screen_height"].GetUint();
         _config.full_screen = config_document["full_screen"].GetBool();
+
+        std::filesystem::create_directory(_config.runtime_data_root);
     }
 
     void read_world(const std::string& _json, World& _world)
     {
+        RAIN_PROFILE("World Parsing");
+
         rapidjson::Document world_document;
         world_document.Parse(_json.c_str());
 
         _world.name = world_document["name"].GetString();
-        RAIN_LOG("parsing world : %s\n", _world.name.c_str());
-
+        RAIN_LOG("Parsing world : %s", _world.name.c_str());
         const rapidjson::Value& world_objects = world_document["objects"];
-        entt::DefaultRegistry& registry = _world.registry;
+
+        //entt::DefaultRegistry& registry = _world.registry;
+
         for (u32 i = 0; i < world_objects.Size(); i++)
         {
             const rapidjson::Value& world_object = world_objects[i];
 
-            auto entity = registry.create();
+            actor* new_actor = _world.sg.create();
+            //auto entity = registry.create();
 
-            u32& id = registry.assign<u32>(entity);
-            id = world_object["id"].GetUint();
+            actor_id* id = new_actor->components.create<actor_id>();
+
+            //u32& id = registry.assign<u32>(entity);
+            *id = world_object["id"].GetUint();
 
             if (world_object.HasMember("Transform"))
             {
-                Transform& transform = registry.assign<Transform>(entity);
-                read_transform(world_object["Transform"], transform);
-                RAIN_LOG_RAW("%s\n", json_writer::serialize(transform).c_str());
+                auto t = new_actor->components.create<core::transform>();
+
+                //core::transform& t = registry.assign<core::transform>(entity);
+                read_transform(world_object["Transform"], *t);
+                //RAIN_LOG_RAW("%s\n", json_writer::serialize(t).c_str());
             }
             if (world_object.HasMember("RigidBody"))
             {
-                RigidBody& rigid_body = registry.assign<RigidBody>(entity);
-                read_rigid_body(world_object["RigidBody"], rigid_body);
+                auto rigid_body = new_actor->components.create<RigidBody>();
+                //RigidBody& rigid_body = registry.assign<RigidBody>(entity);
+                read_rigid_body(world_object["RigidBody"], *rigid_body);
             }
             if (world_object.HasMember("Sphere"))
             {
-                Sphere& sphere = registry.assign<Sphere>(entity);
-                read_sphere(world_object["Sphere"], sphere);
+                auto s = new_actor->components.create<core::sphere>();
+                //core::sphere& s = registry.assign<core::sphere>(entity);
+                read_sphere(world_object["Sphere"], *s);
             }
             if (world_object.HasMember("Spring"))
             {
-                Spring& spring = registry.assign<Spring>(entity);
-                read_spring(world_object["Spring"], spring);
+                auto spring = new_actor->components.create<Spring>();
+                //Spring& spring = registry.assign<Spring>(entity);
+                read_spring(world_object["Spring"], *spring);
             }
             if (world_object.HasMember("Plane"))
             {
-                Plane& plane = registry.assign<Plane>(entity);
-                read_plane(world_object["Plane"], plane);
+                auto p = new_actor->components.create<core::plane>();
+                //core::plane& p = registry.assign<core::plane>(entity);
+                read_plane(world_object["Plane"], *p);
             }
             if (world_object.HasMember("Model"))
             {
-                Model& model = registry.assign<Model>(entity);
-                read_model(world_object["Model"], model);
+                auto model = new_actor->components.create<Model>();
+                //Model& model = registry.assign<Model>(entity);
+                read_model(world_object["Model"], *model);
 
                 if (world_object.HasMember("MeshBound"))
                 {
-                    MeshBound& meshBound = registry.assign<MeshBound>(entity);
-                    read_mesh_bound(world_object["MeshBound"], model, meshBound);
+                    auto meshBound = new_actor->components.create<MeshBound>();
+                    //MeshBound& meshBound = registry.assign<MeshBound>(entity);
+                    read_mesh_bound(world_object["MeshBound"], *model, *meshBound);
                 }
             }
             if (world_object.HasMember("Material"))
             {
-                Material& material = registry.assign<Material>(entity);
-                read_material(world_object["Material"], material);
+                auto material = new_actor->components.create<Material>();
+                //Material& material = registry.assign<Material>(entity);
+                read_material(world_object["Material"], *material);
             }
             if (world_object.HasMember("Camera"))
             {
-                Camera& camera = registry.assign<Camera>(entity);
-                read_camera(world_object["Camera"], camera);
+                auto camera = new_actor->components.create<Camera>();
+                //Camera& camera = registry.assign<Camera>(entity);
+                read_camera(world_object["Camera"], *camera);
+            }
+            if (world_object.HasMember("text_field"))
+            {
+                auto field = new_actor->components.create<ui::text_field>();
+                //ui::text_field& field = registry.assign<ui::text_field>(entity);
+                read_text_field(world_object["text_field"], *field);
+            }
+            if (world_object.HasMember("text_list"))
+            {
+                auto list = new_actor->components.create<ui::text_list>();
+                //ui::text_list& list = registry.assign<ui::text_list>(entity);
+                read_text_list(world_object["text_list"], *list);
             }
         }
     }
@@ -115,7 +146,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_vec3(const rapidjson::Value& _json, math::vec3& vec)
+    void read_vec3(const rapidjson::Value& _json, glm::vec3& vec)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -123,7 +154,15 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_quat(const rapidjson::Value& _json, math::quat& q)
+    void read_vec4(const rapidjson::Value& _json, glm::vec4& vec)
+    {
+        for (u32 i = 0; i < _json.Size(); i++)
+        {
+            vec[i] = _json[i].GetFloat();
+        }
+    }
+
+    void read_quat(const rapidjson::Value& _json, glm::quat& q)
     {
         for (u32 i = 0; i < _json.Size(); i++)
         {
@@ -131,9 +170,13 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_transform(const rapidjson::Value& _json, Transform& _transform)
+    void read_transform(const rapidjson::Value& _json, core::transform& _transform)
     {
         read_transform(get_string(_json), _transform);
+
+        _transform.lastPosition = _transform.position;
+        _transform.lastOrientation = _transform.orientation;
+        _transform.lastScale = _transform.scale;
 
         //if (_json.HasMember("position"))
         //{
@@ -198,7 +241,7 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_sphere(const rapidjson::Value& _json, math::Sphere& sphere)
+    void read_sphere(const rapidjson::Value& _json, core::sphere& sphere)
     {
         if (_json.HasMember("offset"))
         {
@@ -243,27 +286,27 @@ namespace rain::engine::json_reader
         }
     }
 
-    void read_plane(const rapidjson::Value& _json, math::Plane& plane)
+    void read_plane(const rapidjson::Value& _json, core::plane& p)
     {
-        vec3 position {};
-        vec3 normal {};
-        
-        vec3 point1 {};
-        vec3 point2 {};
-        vec3 point3 {};
+        glm::vec3 position {};
+        glm::vec3 normal {};
+
+        glm::vec3 point1 {};
+        glm::vec3 point2 {};
+        glm::vec3 point3 {};
 
         if (_json.HasMember("position") && _json.HasMember("normal"))
         {
             read_vec3(_json["position"], position);
             read_vec3(_json["normal"], normal);
-            plane = Plane(position, normal);
+            p = core::plane(position, normal);
         }
         else if (_json.HasMember("point1") && _json.HasMember("point2") && _json.HasMember("point3"))
         {
             read_vec3(_json["point1"], point1);
             read_vec3(_json["point2"], point2);
             read_vec3(_json["point3"], point3);
-            plane = Plane(point1, point2, point3);
+            p = core::plane(point1, point2, point3);
         }
     }
 
@@ -271,20 +314,20 @@ namespace rain::engine::json_reader
     {
         if (_json.HasMember("path"))
         {
-            _model.path = FilePath(RAIN_CONFIG->data_root + std::string(_json["path"].GetString()));
-            _model.mesh = RAIN_FIND_DATA_FROM_PATH(_model.path.get_path_absolute());
-            assert(_model.mesh);
-            RAIN_RENDERER->load_mesh(_model.mesh);
+            _model.path = file_path(RAIN_CONFIG->data_root + std::string(_json["path"].GetString()));
+            _model.mesh = RAIN_FIND_DATA_FROM_PATH(Mesh, _model.path.get_path_absolute());
+            //assert(_model.mesh);
+            RAIN_RENDERER->load_mesh(_model.mesh->data);
         }
     }
 
     void read_mesh_bound(const rapidjson::Value& _json, const Model& _model, MeshBound& _meshBound)
     {
-        _meshBound.points.resize(_model.mesh->vertices.size());
+        _meshBound.points.resize(_model.mesh->data->vertices.size());
 
-        for (u32 i = 0; i < _model.mesh->vertices.size(); ++i)
+        for (u32 i = 0; i < _model.mesh->data->vertices.size(); ++i)
         {
-            _meshBound.points[i] = _model.mesh->vertices[i].position;
+            _meshBound.points[i] = _model.mesh->data->vertices[i].position;
         }
     }
 
@@ -293,21 +336,103 @@ namespace rain::engine::json_reader
         std::string vertex_path;
         std::string fragment_path;
         std::string geometry_path;
+        handle<Shader> const * handle = nullptr;
 
         if (_json.HasMember("vertex"))
         {
             vertex_path = RAIN_CONFIG->data_root + _json["vertex"].GetString();
+            handle = RAIN_FIND_DATA_FROM_PATH(Shader, vertex_path);
         }
-        if (_json.HasMember("fragment"))
-        {
-            fragment_path = RAIN_CONFIG->data_root + _json["fragment"].GetString();
-        }
-        if (_json.HasMember("geometry"))
-        {
-            geometry_path = RAIN_CONFIG->data_root + _json["geometry"].GetString();
-        }
-
+        //if (_json.HasMember("fragment"))
+        //{
+        //    fragment_path = RAIN_CONFIG->data_root + _json["fragment"].GetString();
+        //}
+        //if (_json.HasMember("geometry"))
+        //{
+        //    geometry_path = RAIN_CONFIG->data_root + _json["geometry"].GetString();
+        //}
         _material.shader.load(vertex_path, fragment_path, geometry_path);
+    }
+
+
+    void read_text_field(const rapidjson::Value& _json, ui::text_field& field)
+    {
+        memset(field.buffer, 0, sizeof(field.buffer));
+        field.next_index = 0;
+        field.is_focused = false;
+
+        if (_json.HasMember("uuid"))
+        {
+            field.id = core::uuid::from_string(_json["uuid"].GetString());
+        }
+        if (_json.HasMember("x"))
+        {
+            field.x = _json["x"].GetUint();
+        }
+        if (_json.HasMember("y"))
+        {
+            field.y = _json["y"].GetUint();
+        }
+        if (_json.HasMember("width"))
+        {
+            field.width = _json["width"].GetUint();
+        }
+        if (_json.HasMember("height"))
+        {
+            field.height = _json["height"].GetUint();
+        }
+        if (_json.HasMember("default_text"))
+        {
+            field.default_text = _json["default_text"].GetString();
+        }
+        if (_json.HasMember("color_bg"))
+        {
+            read_vec4(_json["color_bg"], field.color_bg);
+        }
+        if (_json.HasMember("color_txt"))
+        {
+            read_vec4(_json["color_txt"], field.color_txt);
+        }
+    }
+
+    void read_text_list(const rapidjson::Value& _json, ui::text_list& list)
+    {
+        if (_json.HasMember("max_count"))
+        {
+            list.max_count = _json["max_count"].GetUint();
+        }
+        if (_json.HasMember("x"))
+        {
+            list.x = _json["x"].GetUint();
+        }
+        if (_json.HasMember("y"))
+        {
+            list.y = _json["y"].GetUint();
+        }
+        if (_json.HasMember("color"))
+        {
+            read_vec4(_json["color"], list.color);
+        }
+    }
+
+    void read_shader(const std::string& json, const std::string& directory, std::string& vertex_path, std::string& fragment_path, std::string& geometry_path)
+    {
+        rapidjson::Document shader_document;
+        shader_document.Parse(json.c_str());
+
+        if (shader_document.HasMember("vertex"))
+        {
+            vertex_path = directory + shader_document["vertex"].GetString();
+        }
+        if (shader_document.HasMember("fragment"))
+        {
+            fragment_path += directory + shader_document["fragment"].GetString();
+        }
+        if (shader_document.HasMember("geometry"))
+        {
+            geometry_path += directory + shader_document["geometry"].GetString();
+        }
+        
     }
 
     //void read_shaders_info(const std::string& _json, std::vector<ShadersInfo>& _info)
@@ -335,31 +460,30 @@ namespace rain::engine::json_reader
     //    }
     //}
 
-    void read_transform(const std::string & json_str, math::Transform& t)
+    
+    void read_transform(const std::string& json_str, core::transform& t)
     {
         nlohmann::json j = nlohmann::json::parse(json_str);
-        auto pos = j["position"];
-        u32 i = 0;
-        for (nlohmann::json::iterator it = j["position"].begin(); it != j["position"].end(); ++it, ++i)
-        {
-            t.position[i] = *it;
-        }
-        i = 0;
-        for (nlohmann::json::iterator it = j["orientation"].begin(); it != j["orientation"].end(); ++it, ++i)
-        {
-            t.orientation[i] = *it;
-        }
-        i = 0;
-        for (nlohmann::json::iterator it = j["scale"].begin(); it != j["scale"].end(); ++it, ++i)
-        {
-            t.scale[i] = *it;
-        }
+
+		for (u32 i = 0; i < j["position"].size(); ++i)
+		{
+			t.position[i] = j["position"][i];
+		}
+		for (u32 i = 0; i < j["orientation"].size(); ++i)
+		{
+			t.orientation[i] = j["orientation"][i];
+		}
+		for (u32 i = 0; i < j["scale"].size(); ++i)
+		{
+			t.scale[i] = j["scale"][i];
+		}
     }
+
 }
 
 namespace rain::engine::json_writer
 {
-    std::string serialize(const math::Transform& t)
+    std::string serialize(const core::transform& t)
     {
         rapidjson::Document d;
         rapidjson::Value json_transform(rapidjson::kObjectType);

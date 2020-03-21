@@ -1,29 +1,54 @@
 #pragma once
 
 #include <string>
-#include <entt.hpp>
 
 #include "core/core.h"
-#include "math/math.h"
 #include "engine/data/geometry/mesh.h"
 #include "engine/network/client.h"
+#include "scene_graph.h"
+#include "engine/voxel/voxel.h"
+#include "engine/voxel/oct_tree.h"
 
 namespace rain::engine
 {
+    struct Camera;
+    struct voxel_map;
+
+    struct MainCamera
+    {
+        Camera* camera;
+        core::transform* transform;
+    };
+
+    struct character
+    {
+        glm::vec3 position;
+        f32 speed;
+    };
 
     struct World
     {
         std::string name;
-        entt::DefaultRegistry registry;
         core::File file;
 
-        void init(const std::string& _path);
+        MainCamera main_camera;
+
+        void init(const std::string& path);
 
         void update_camera(const float _deltaTime);
         void update_physics(const float _deltaTime);
-        void render(const float _alpha);
-        u32 temp_vao;
+        void draw(const float _alpha);
 
+        // TEMP
+        scene_graph sg;
+
+        u32 vao_quickhull;
+
+        voxel_map* vmap;
+
+        voxel::vox_map voxmap;
+        character chara;
+        voxel::oct_tree octtree;
     };
 }
 

@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "math/math.h"
+#include "glm.hpp"
 #include "core/core.h"
 
 namespace rain::engine
@@ -35,14 +35,14 @@ namespace rain::engine
         f32 mass_inverse;
         f32 size;
 
-        math::vec3 force;
-        math::vec3 momentum;
-        math::vec3 velocity;
+        glm::vec3 force;
+        glm::vec3 momentum;
+        glm::vec3 velocity;
 
-        math::vec3 torque;
-        math::vec3 angularMomentum;
-        math::vec3 angularVelocity;
-        math::quat spin;
+        glm::vec3 torque;
+        glm::vec3 angularMomentum;
+        glm::vec3 angularVelocity;
+        glm::quat spin;
         f32 rotationInertia;
         f32 rotationInertiaInverse;
 
@@ -51,6 +51,6 @@ namespace rain::engine
     };
 
 
-    void apply_physics(RigidBody& _body, math::Transform& _transform, const f32 _deltaTime);
+    void apply_physics(RigidBody& _body, core::transform& _transform, const f32 _deltaTime);
 
 }

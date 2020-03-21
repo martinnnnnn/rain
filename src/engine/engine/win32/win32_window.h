@@ -17,19 +17,30 @@ namespace rain::engine
 	{
 	public:
 
+        struct rect
+        {
+            i32 left;
+            i32 top;
+            i32 right;
+            i32 bottom;
+        };
+
 		int init(HINSTANCE _hinstance, int _width, int _height, int _depth);
 		void present();
 		void shutdown();
 		void show();
 		void hide();
 		void resize(int _width, int _height);
-		void fullscreen(bool _fullscreen);
+        void toggle_fullscreen();
+        void fullscreen(bool _fullscreen);
 		void recover_display_mode();
-		bool is_initialized() { return initialized; }
-		math::vec2 get_center_pos_absolute();
-		HWND m_hwnd;
+        rect get_rect();
+		glm::vec2 get_center_pos_absolute();
 
-        math::vec2 size() const;
+        glm::vec2 size() const;
+
+		bool initialized;
+		HWND hwnd;
 
 	private:
 
@@ -37,12 +48,11 @@ namespace rain::engine
 		i32 center_pos_y;
 		HDC m_hdc;
 		HGLRC m_hglrc;
-		RECT m_rect;
-		bool m_fullscreen;
+		rect m_rect;
+		bool full_screen;
 		i32 m_width;
 		i32 m_height;
 		i32 m_depth;
-		bool initialized;
 	};
 
 	LRESULT CALLBACK OGLWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

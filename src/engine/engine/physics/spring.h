@@ -1,7 +1,6 @@
 #pragma once
 
-
-#include "math/math.h"
+#include "glm.hpp"
 #include "core/core.h"
 
 
@@ -21,8 +20,8 @@ namespace rain::engine
 
         u32 entityA;
         u32 entityB;
-        math::vec3 anchorPointA;
-        math::vec3 anchorPointB;
+        glm::vec3 anchorPointA;
+        glm::vec3 anchorPointB;
         f32 distance;
         f32 k;
         f32 b;

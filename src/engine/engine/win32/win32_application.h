@@ -1,30 +1,29 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
-#include <vector>
-#include <functional>
 
 #include "core/core.h"
-#include "engine/win32/win32_helpers.h"
 
-extern "C" __declspec(dllexport) void launch_rain_engine(HINSTANCE hinstance);
+//temp
+#include "engine/ui/text_field.h"
+#include "engine/network/network.h"
 
 namespace rain::engine
 {
-    struct World;
-
-    class Application
+    class application
     {
     public:
 
-        int init(HINSTANCE _hinstance, const std::string& _config);
+        int init(void* _hinstance, const std::string& _config);
         void shutdown();
         void update();
         void render(float _alpha);
+        void send_to_network(const std::string& message);
 
     private:
-        World* world;
-        HINSTANCE hinstance;
+        void* hinstance;
+        network::connexion_info info;
+
+        // temp
     };
 }

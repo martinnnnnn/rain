@@ -9,7 +9,7 @@ namespace rain::core
     bool File::open(const std::string& _path, std::ios_base::openmode _mode)
     {
         
-        filepath = FilePath(_path);
+        filepath = file_path(_path);
         m_stream = std::fstream(filepath.get_path_absolute().c_str(), _mode);
         return is_open();
     }
@@ -45,7 +45,7 @@ namespace rain::core
         }
     }
 
-    FilePath& File::get_path()
+    file_path& File::get_path()
     {
         return filepath;
     }

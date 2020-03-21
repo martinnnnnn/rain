@@ -2,6 +2,7 @@
 
 #include "core/core.h"
 
+#include <atomic>
 
 namespace rain::core
 {
@@ -9,6 +10,8 @@ namespace rain::core
     class type_id
     {
     public:
+        //static const u32 MAX_VALUE = std::numeric_limits<u32>::max();
+
         template<typename... Type>
         static u32 get()
         {

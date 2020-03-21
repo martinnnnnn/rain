@@ -27,9 +27,9 @@ namespace rain::core
         double get_total_seconds() const;
 
     private:
-        // Initial time point.
+
         std::chrono::high_resolution_clock::time_point m_t0;
-        // Time since last tick.
+
         std::chrono::high_resolution_clock::duration m_deltaTime;
         std::chrono::high_resolution_clock::duration m_totalTime;
     };

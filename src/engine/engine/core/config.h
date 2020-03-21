@@ -18,6 +18,7 @@ namespace rain::engine
         core::File file;
         std::string engine_name;
         std::string data_root;
+        std::string runtime_data_root;
         std::string starting_world;
         u32 screen_width;
         u32 screen_height;

@@ -7,18 +7,21 @@
 #include "core/core.h"
 #include "ogl_shader.h"
 #include "engine/core/context.h"
+#include "engine/core/profiler.h"
 #include "engine/win32/win32_window.h"
+#include "engine/data/data_system.h"
+#include "engine/win32/win32_input.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-#include "math/geometry/algorithms/quick_hull.h"
+//#include "math/geometry/algorithms/quick_hull.h"
 
 namespace rain::engine
 {
-    using namespace rain::math;
-
     void Renderer::init()
     {
         GLenum res = glewInit();
@@ -33,80 +36,185 @@ namespace rain::engine
         glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
         glClearDepth(1.0f);
         glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
         glDepthFunc(GL_LEQUAL);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        resize(RAIN_WINDOW->size().x, RAIN_WINDOW->size().y);
+        resize(u32(RAIN_WINDOW->size().x), u32(RAIN_WINDOW->size().y));
 
+#ifdef SPIRV
+        gl_specialize_shader = (PFNGLSPECIALIZESHADERPROC)glGetProcAddressREGAL("glSpecializeShaderARB");
+        if (!gl_specialize_shader) 
+        {
+            fprintf(stderr, "failed to load glSpecializeShaderARB entry point\n");
+        }
+#endif
+    }
+
+    void Renderer::init_data()
+    {
+        RAIN_PROFILE("Renderer data initialization");
         init_default_shaders();
         init_debug();
+        init_ui();
         init_shapes();
         init_text_2d();
+    }
+
+    void Renderer::update()
+    {
+        if (RAIN_INPUT->is_key_released(DIK_R) && RAIN_INPUT->is_key_pressed(DIK_LCONTROL))
+        {
+            RAIN_DATA_SYSTEM->reload_shaders();
+            init_default_shaders();
+        }
     }
 
     void Renderer::resize(u32 _width, u32 _height)
     {
         glViewport(0, 0, _width, _height);
-        set_perspective_projection_matrix(math::perspective_rh_no(to_rad(45.0f), f32(_width) / f32(_height), 0.1f, 10000.0f));
-        set_orthogonal_projection_matrix(math::ortho(0.0f, f32(_width), 0.0f, f32(_height)));
+        set_perspective_projection_matrix(glm::perspective(glm::radians(45.0f), f32(_width) / f32(_height), 0.1f, 10000.0f));
+        set_orthogonal_projection_matrix(glm::ortho(0.0f, f32(_width), 0.0f, f32(_height)));
         
     }
 
     void Renderer::init_default_shaders()
     {
-        phong.load(RAIN_CONFIG->data_root + "/shaders/glsl/phong.vs", RAIN_CONFIG->data_root + "/shaders/glsl/phong.fs");
+        instancing_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/instancing.glsl.rain");
+        instancing_handle->data->use();
+        instancing_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        instancing_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("dirLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        instancing_handle->data->set("material.shininess", 32.0f);
 
-        phong.use();
-        phong.set("lightDiff", 0.3f, 0.3f, 0.3f);
-        phong.set("lightDirection", -0.2f, -1.0f, -0.3f);
+        sf_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/scalar_field.glsl.rain");
+        sf_handle->data->use();
+        sf_handle->data->set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        sf_handle->data->set("dirLight.ambient", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("dirLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        sf_handle->data->set("material.shininess", 32.0f);
+
+        phong_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/phong.glsl.rain");
+        phong_handle->data->use();
+        phong_handle->data->set("lightDiff", 0.3f, 0.3f, 0.3f);
+        phong_handle->data->set("lightDirection", -0.2f, -1.0f, -0.3f);
+
+        transvoxel_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel.glsl.rain");
+        transvoxel_handle->data->use();
+        transvoxel_handle->data->set("lightPos", 0.3f, 0.3f, 0.3f);
+        transvoxel_handle->data->set("viewPos", 0.3f, 0.3f, 0.3f);
+        transvoxel_handle->data->set("lightColor", 1.0f, 1.0f, 1.0f);
+        transvoxel_handle->data->set("objectColor", 1.0f, 0.5f, 0.31f);
     }
 
-    void Renderer::set_perspective_projection_matrix(const mat4& _projection)
+    void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
     {
         proj_mat_perspective = _projection;
     }
 
-    void Renderer::set_orthogonal_projection_matrix(const mat4& _projection)
+    void Renderer::set_orthogonal_projection_matrix(const glm::mat4& mat)
     {
-        proj_mat_orthogonal = _projection;
-        proj_mat_orthogonal = math::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
+        proj_mat_orthogonal = mat;
+        //proj_mat_orthogonal = glm::ortho(0.0f, static_cast<GLfloat>(800), 0.0f, static_cast<GLfloat>(600));
     }
 
-    void Renderer::set_view_matrix(const vec3& _eye, float _pitch, float _yaw)
+    void Renderer::set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw)
     {
         float cosPitch = cos(_pitch);
         float sinPitch = sin(_pitch);
         float cosYaw = cos(_yaw);
         float sinYaw = sin(_yaw);
 
-        vec3 xaxis = { cosYaw, 0, -sinYaw };
-        vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
-        vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
+        glm::vec3 xaxis = { cosYaw, 0, -sinYaw };
+        glm::vec3 yaxis = { sinYaw * sinPitch, cosPitch, cosYaw * sinPitch };
+        glm::vec3 zaxis = { sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw };
 
         view_mat =
         {
-            vec4{ xaxis.x,              yaxis.x,                zaxis.x,                0 },
-            vec4{ xaxis.y,              yaxis.y,                zaxis.y,                0 },
-            vec4{ xaxis.z,              yaxis.z,                zaxis.z,                0 },
-            vec4{ -dot(xaxis, _eye),    -dot(yaxis, _eye),      -dot(zaxis, _eye),      1 }
+            glm::vec4{ xaxis.x,              yaxis.x,                zaxis.x,                0 },
+            glm::vec4{ xaxis.y,              yaxis.y,                zaxis.y,                0 },
+            glm::vec4{ xaxis.z,              yaxis.z,                zaxis.z,                0 },
+            glm::vec4{ -dot(xaxis, _eye),    -dot(yaxis, _eye),      -dot(zaxis, _eye),      1 }
         };
     }
 
-    void Renderer::set_view_matrix(const vec3& _eye, const vec3& _center, const vec3& _up)
+    void Renderer::set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up)
     {
-        view_mat = look_at_rh(_eye, _center, _up);
+        view_mat = glm::lookAt(_eye, _center, _up);
     }
 
-    void Renderer::set_view_matrix(const mat4& _matrix)
+    void Renderer::set_view_matrix(const glm::mat4& _matrix)
     {
         view_mat = _matrix;
     }
 
-
-    u32 Renderer::load_primitive(vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count)
+    u32 Renderer::load_scalar_field(core::scalar_field_mesh* mesh)
     {
-        u32 vao,
-            vbo_vertices, ebo_vertices_indices,
-            vbo_normals, ebo_normals_indices;
+        std::vector<float> data;
+        for (u32 i = 0; i < mesh->vertices.size(); ++i)
+        {
+            data.push_back(mesh->vertices[i].x);
+            data.push_back(mesh->vertices[i].y);
+            data.push_back(mesh->vertices[i].z);
+            if (mesh->uv.size() > 0)
+            {
+                data.push_back(mesh->uv[i].x);
+                data.push_back(mesh->uv[i].y);
+            }                  
+            if (mesh->normals.size() > 0)
+            {
+                data.push_back(mesh->normals[i].x);
+                data.push_back(mesh->normals[i].y);
+                data.push_back(mesh->normals[i].z);
+            }
+        }
+
+        u32 vao, vbo_vertices;
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glGenBuffers(1, &vbo_vertices);
+
+        i32 stride = (3 + 2 + 3) * sizeof(float);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glEnableVertexAttribArray(0);
+        glBindVertexArray(0);
+
+        return vao;
+    }
+
+    void Renderer::draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count)
+    {
+        sf_handle->data->use();
+        sf_handle->data->set("proj", proj_mat_perspective);
+        sf_handle->data->set("view", view_mat);
+        sf_handle->data->set("model", transform);
+        sf_handle->data->set("viewPos", view_position);
+        sf_handle->data->set("text1", 0);
+
+        bind_texture(texture, 0);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, triangle_count);
+        glBindVertexArray(0);
+    }
+
+
+    u32 Renderer::load_primitive(glm::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, glm::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count)
+    {
+        u32 vao, vbo_vertices, ebo_vertices_indices;
+        //u32 vbo_normals, ebo_normals_indices;
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -115,7 +223,7 @@ namespace rain::engine
         glGenBuffers(1, &ebo_vertices_indices);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
-        glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(vec3), vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(glm::vec3), vertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
 
@@ -140,13 +248,13 @@ namespace rain::engine
         return vao;
     }
 
-    void Renderer::draw_primitive(const u32 vao, const u32 nindices, const Material& material, const vec3& position, const quat& orientation, const vec3& scale)
+    void Renderer::draw_primitive(const u32 vao, const u32 nindices, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
         //mat4 model = identity_mat4();
         //model = translate(model, position);
 
         material.shader.use();
-        material.shader.set("model", translate(identity_mat4(), position) * mat4_cast(orientation) * math::scale(identity_mat4(), scale));
+        material.shader.set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
         material.shader.set("proj", proj_mat_perspective);
         material.shader.set("view", view_mat);
 
@@ -158,19 +266,19 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::load_mesh(Mesh * _mesh)
+    void Renderer::load_mesh(Mesh * mesh)
     {
-        glGenVertexArrays(1, &_mesh->vao);
-        glGenBuffers(1, &_mesh->vbo);
-        glGenBuffers(1, &_mesh->ebo);
+        glGenVertexArrays(1, &mesh->vao);
+        glGenBuffers(1, &mesh->vbo);
+        glGenBuffers(1, &mesh->ebo);
 
-        glBindVertexArray(_mesh->vao);
+        glBindVertexArray(mesh->vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, _mesh->vbo);
-        glBufferData(GL_ARRAY_BUFFER, _mesh->vertices.size() * sizeof(Vertex), &_mesh->vertices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
+        glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(Vertex), &mesh->vertices[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _mesh->ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _mesh->indices.size() * sizeof(unsigned int), &_mesh->indices[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(unsigned int), &mesh->indices[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -184,28 +292,65 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::release_mesh(Mesh* _mesh)
+    void Renderer::release_mesh(Mesh* mesh)
     {
-        glDeleteBuffers(1, &_mesh->vbo);
-        glDeleteBuffers(1, &_mesh->ebo);
-        glDeleteVertexArrays(1, &_mesh->vao);
+        glDeleteBuffers(1, &mesh->vbo);
+        glDeleteBuffers(1, &mesh->ebo);
+        glDeleteVertexArrays(1, &mesh->vao);
 
-        _mesh->vbo = 0;
-        _mesh->ebo = 0;
-        _mesh->vao = 0;
+        mesh->vbo = 0;
+        mesh->ebo = 0;
+        mesh->vao = 0;
     }
 
-    void Renderer::draw_mesh(Mesh * _mesh, const Material& _material, const vec3& _position, const quat& _orientation, const vec3& _scale)
+    void Renderer::draw_mesh(Mesh * mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
-        _material.shader.use();
-        _material.shader.set("model", math::translate(identity_mat4(), _position) * math::mat4_cast(_orientation) * math::scale(identity_mat4(), _scale));
-        _material.shader.set("proj", proj_mat_perspective);
-        _material.shader.set("view", view_mat);
+        material.shader.use();
+        material.shader.set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
+        material.shader.set("proj", proj_mat_perspective);
+        material.shader.set("view", view_mat);
 
-        glBindVertexArray(_mesh->vao);
-        glDrawElements(GL_TRIANGLES, _mesh->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(mesh->vao);
+        glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
+    }
+
+    u32 Renderer::load_texture(const char* path, bool gamma)
+    {
+        u32 textureID;
+        glGenTextures(1, &textureID);
+
+        int width, height, nrComponents;
+        unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+        if (data)
+        {
+            GLenum format;
+            if (nrComponents == 1)
+                format = GL_RED;
+            else if (nrComponents == 3)
+                format = GL_RGB;
+            else if (nrComponents == 4)
+                format = GL_RGBA;
+
+            glBindTexture(GL_TEXTURE_2D, textureID);
+            glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            stbi_image_free(data);
+        }
+        else
+        {
+            RAIN_LOG_ERROR("Texture failed to load from path: %s", path);
+            stbi_image_free(data);
+        }
+
+        return textureID;
     }
 
     void Renderer::clear()
@@ -214,11 +359,11 @@ namespace rain::engine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void Renderer::draw_coord_view(const vec3& _position)
+    void Renderer::draw_coord_view(const glm::vec3& _position)
     {
-        draw_debug_line(vec3{ 200.0f, 0.0f, 0.0f }, vec3{ -200.0f, 0.0f, 0.0f }, vec3{ 1.0f, 0.5f, 0.0f }, vec3{ 0.5f, 1.0f, 0.0f });
-        draw_debug_line(vec3{ 0.0f, 200.0f, 0.0f }, vec3{ 0.0f, -200.0f, 0.0f }, vec3{ 0.0f, 1.0f, 0.5f }, vec3{ 0.0f, 0.5f, 1.0f });
-        draw_debug_line(vec3{ 0.0f, 0.0f, 200.0f }, vec3{ 0.0f, 0.0f, -200.0f }, vec3{ 0.5f, 0.0f, 1.0f }, vec3{ 1.0f, 0.0f, 0.5f });
+        draw_debug_line(glm::vec3{ 2000.0f, 0.0f, 0.0f }, glm::vec3{ -2000.0f, 0.0f, 0.0f }, glm::vec3{ 1.0f, 0.5f, 0.0f }, glm::vec3{ 0.5f, 1.0f, 0.0f });
+        draw_debug_line(glm::vec3{ 0.0f, 2000.0f, 0.0f }, glm::vec3{ 0.0f, -2000.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.5f }, glm::vec3{ 0.0f, 0.5f, 1.0f });
+        draw_debug_line(glm::vec3{ 0.0f, 0.0f, 2000.0f }, glm::vec3{ 0.0f, 0.0f, -2000.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f }, glm::vec3{ 1.0f, 0.0f, 0.5f });
     }
 
 
@@ -230,7 +375,8 @@ namespace rain::engine
 
     void Renderer::init_cube()
     {
-        const float vertices[288] = {
+        const float vertices[288] =
+        {
             // position           // normals          // texture coords
             -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
@@ -305,19 +451,19 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_quad(const Plane& _p, const vec3 _position, const vec3& _color)
+    void Renderer::draw_quad(const core::plane& _p, const glm::vec3 _position, const glm::vec3& _color)
     {   
-        vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
-        vec3 v = cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
+        glm::vec3 u = glm::cross(_p.n, _position); // cross product -> note that u lies on the plane
+        glm::vec3 v = glm::cross(_p.n, u); // v is orthogonal to both N and u (again is in the plane)  
 
-        vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
-        float  f = 20.0f;  // large enough
-        vec3 fu = u * f;
-        vec3 fv = v * f;
-        vec3 A = P0 - fu - fv;
-        vec3 B = P0 + fu - fv;
-        vec3 C = P0 + fu + fv;
-        vec3 D = P0 - fu + fv;
+        glm::vec3 P0 = -_p.n * _p.D;        // "arbitrary" point
+        float f      = 20.0f;  // large enough
+        glm::vec3 fu = u * f;
+        glm::vec3 fv = v * f;
+        glm::vec3 A  = P0 - fu - fv;
+        glm::vec3 B  = P0 + fu - fv;
+        glm::vec3 C  = P0 + fu + fv;
+        glm::vec3 D  = P0 - fu + fv;
 
         const float vertices[] =
         {
@@ -354,7 +500,7 @@ namespace rain::engine
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        mat4 mvp = proj_mat_perspective * view_mat * identity_mat4();
+        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -374,13 +520,13 @@ namespace rain::engine
         glGenBuffers(1, &vbo);
         glGenBuffers(1, &ebo);
 
-        std::vector<vec3> positions;
-        std::vector<vec2> uv;
-        std::vector<vec3> normals;
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec3> normals;
         std::vector<unsigned int> indices;
 
-        const unsigned int X_SEGMENTS = 64;
-        const unsigned int Y_SEGMENTS = 64;
+        const unsigned int X_SEGMENTS = 32;
+        const unsigned int Y_SEGMENTS = 32;
         const float PI = 3.14159265359f;
         for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
         {
@@ -388,13 +534,13 @@ namespace rain::engine
             {
                 float xSegment = (float)x / (float)X_SEGMENTS;
                 float ySegment = (float)y / (float)Y_SEGMENTS;
-                float xPos = math::cos(xSegment * 2.0f * PI) * math::sin(ySegment * PI);
-                float yPos = math::cos(ySegment * PI);
-                float zPos = math::sin(xSegment * 2.0f * PI) * math::sin(ySegment * PI);
+                float xPos = glm::cos(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
+                float yPos = glm::cos(ySegment * PI);
+                float zPos = glm::sin(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
 
-                positions.push_back(vec3{ xPos, yPos, zPos });
-                uv.push_back(vec2{ xSegment, ySegment });
-                normals.push_back(vec3{ xPos, yPos, zPos });
+                positions.push_back(glm::vec3{ xPos, yPos, zPos });
+                uv.push_back(glm::vec2{ xSegment, ySegment });
+                normals.push_back(glm::vec3{ xPos, yPos, zPos });
             }
         }
 
@@ -453,6 +599,408 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
     }
 
+    //void Renderer::update_transvoxel(transvoxel::tvox_block* block) const
+    //{
+    //    glBindVertexArray(block->vao);
+
+    //    glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+    //    glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(transvoxel::tvox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
+
+    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+    //    glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
+
+    //    glEnableVertexAttribArray(0);
+    //    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)0);
+
+    //    glEnableVertexAttribArray(1);
+    //    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(transvoxel::tvox_vertex), (void*)offsetof(transvoxel::tvox_vertex, normal));
+    //}
+
+
+    void Renderer::draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& position, const glm::vec3& view_position, f32 max_height)
+    {
+        transvoxel_handle->data->use();
+        transvoxel_handle->data->set("model", glm::translate(glm::mat4(1), position));
+        transvoxel_handle->data->set("projection", proj_mat_perspective);
+        transvoxel_handle->data->set("view", view_mat);
+        transvoxel_handle->data->set("viewPos", view_position);
+        transvoxel_handle->data->set("maxy", view_position);
+        transvoxel_handle->data->set("maxy", max_height);
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    void Renderer::init_transvoxel(voxel::vox_block* block) const
+    {
+        if (block->vao == 0)
+        {
+            glGenVertexArrays(1, &block->vao);
+        }
+        if (block->vbo == 0)
+        {
+            glGenBuffers(1, &block->vbo);
+        }
+        if (block->ebo == 0)
+        {
+            glGenBuffers(1, &block->ebo);
+        }
+
+        glBindVertexArray(block->vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, block->vbo);
+        glBufferData(GL_ARRAY_BUFFER, block->vertices.size() * sizeof(voxel::vox_vertex), block->vertices.data(), GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, block->indices.size() * sizeof(u32), block->indices.data(), GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::vox_vertex), (void*)0);
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::vox_vertex), (void*)offsetof(voxel::vox_vertex, normal));
+
+        //glEnableVertexAttribArray(2);
+        //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+        glBindVertexArray(0);
+    }
+
+    void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao)
+    {
+        std::vector<glm::vec3> Positions = std::vector<glm::vec3>
+        {
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f, -0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f,  0.5f),
+             glm::vec3(-0.5f, -0.5f, -0.5f),
+
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(0.5f,  0.5f, -0.5f),
+             glm::vec3(0.5f,  0.5f,  0.5f),
+             glm::vec3(-0.5f,  0.5f, -0.5f),
+             glm::vec3(-0.5f,  0.5f,  0.5f),
+        };
+        std::vector<glm::vec2> UV = std::vector<glm::vec2>
+        {
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 0.0f),
+
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(1.0f, 1.0f),
+            glm::vec2(1.0f, 0.0f),
+            glm::vec2(0.0f, 1.0f),
+            glm::vec2(0.0f, 0.0f),
+        };
+        std::vector<glm::vec3> Normals = std::vector<glm::vec3>
+        {
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+            glm::vec3(0.0f,  0.0f, -1.0f),
+
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+            glm::vec3(0.0f,  0.0f,  1.0f),
+
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+            glm::vec3(-1.0f,  0.0f,  0.0f),
+
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+            glm::vec3(1.0f,  0.0f,  0.0f),
+
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+            glm::vec3(0.0f, -1.0f,  0.0f),
+
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+            glm::vec3(0.0f,  1.0f,  0.0f),
+        };
+
+
+        std::vector<float> data;
+        for (u32 i = 0; i < Positions.size(); ++i)
+        {
+            data.push_back(Positions[i].x);
+            data.push_back(Positions[i].y);
+            data.push_back(Positions[i].z);
+            if (UV.size() > 0)
+            {
+                data.push_back(UV[i].x);
+                data.push_back(UV[i].y);
+            }
+            if (Normals.size() > 0)
+            {
+                data.push_back(Normals[i].x);
+                data.push_back(Normals[i].y);
+                data.push_back(Normals[i].z);
+            }
+        }
+
+        glGenVertexArrays(1, &vao);
+
+        u32 cube_vbo, instance_vbo;
+        glGenBuffers(1, &cube_vbo);
+        glGenBuffers(1, &instance_vbo);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+
+        i32 stride = (3 + 2 + 3) * sizeof(float);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
+
+        // instance matrix
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
+    {
+        instancing_handle->data->use();
+        instancing_handle->data->set("proj", proj_mat_perspective);
+        instancing_handle->data->set("view", view_mat);
+        instancing_handle->data->set("viewPos", view_position);
+        instancing_handle->data->set("text1", 0);
+
+        bind_texture(texture, 0);
+
+        glBindVertexArray(vao);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount);
+        glBindVertexArray(0);
+    }
+
+    void Renderer::init_instancing(const std::vector<glm::mat4>& instances, u32& vao)
+    {
+
+        std::vector<glm::vec3> positions;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec3> normals;
+        std::vector<unsigned int> indices;
+
+        const unsigned int X_SEGMENTS = 4;
+        const unsigned int Y_SEGMENTS = 4;
+        const float PI = 3.14159265359f;
+        for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+        {
+            for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+            {
+                float xSegment = (float)x / (float)X_SEGMENTS;
+                float ySegment = (float)y / (float)Y_SEGMENTS;
+                float xPos = glm::cos(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
+                float yPos = glm::cos(ySegment * PI);
+                float zPos = glm::sin(xSegment * 2.0f * PI) * glm::sin(ySegment * PI);
+
+                positions.push_back(glm::vec3{ xPos, yPos, zPos });
+                uv.push_back(glm::vec2{ xSegment, ySegment });
+                normals.push_back(glm::vec3{ xPos, yPos, zPos });
+            }
+        }
+
+        bool oddRow = false;
+        for (int y = 0; y < Y_SEGMENTS; ++y)
+        {
+            if (!oddRow) // even rows: y == 0, y == 2; and so on
+            {
+                for (int x = 0; x <= X_SEGMENTS; ++x)
+                {
+                    indices.push_back(y       * (X_SEGMENTS + 1) + x);
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                }
+            }
+            else
+            {
+                for (int x = X_SEGMENTS; x >= 0; --x)
+                {
+                    indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                    indices.push_back(y       * (X_SEGMENTS + 1) + x);
+                }
+            }
+            oddRow = !oddRow;
+        }
+        sphere_index_count = indices.size();
+
+        std::vector<float> data;
+        for (u32 i = 0; i < positions.size(); ++i)
+        {
+            data.push_back(positions[i].x);
+            data.push_back(positions[i].y);
+            data.push_back(positions[i].z);
+            if (uv.size() > 0)
+            {
+                data.push_back(uv[i].x);
+                data.push_back(uv[i].y);
+            }
+            if (normals.size() > 0)
+            {
+                data.push_back(normals[i].x);
+                data.push_back(normals[i].y);
+                data.push_back(normals[i].z);
+            }
+        }
+
+        glGenVertexArrays(1, &vao);
+
+        u32 sphere_vbo, sphere_ebo, instance_vbo;
+        glGenBuffers(1, &sphere_vbo);
+        glGenBuffers(1, &sphere_ebo);
+        glGenBuffers(1, &instance_vbo);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(float), &data[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+        i32 stride = (3 + 2 + 3) * sizeof(float);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
+
+        glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
+
+        // instance matrix
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+
+        glVertexAttribDivisor(3, 1);
+        glVertexAttribDivisor(4, 1);
+        glVertexAttribDivisor(5, 1);
+        glVertexAttribDivisor(6, 1);
+
+        glBindVertexArray(0);
+    }
+
+
+    void Renderer::draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
+    {
+        instancing_handle->data->use();
+        instancing_handle->data->set("proj", proj_mat_perspective);
+        instancing_handle->data->set("view", view_mat);
+        instancing_handle->data->set("viewPos", view_position);
+        instancing_handle->data->set("text1", 0);
+
+        bind_texture(texture, 0);
+        glBindVertexArray(vao);
+        glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
+        glBindVertexArray(0);
+    }
+
+
 
     void Renderer::init_debug()
     {
@@ -461,24 +1009,26 @@ namespace rain::engine
 
         glGenBuffers(1, &m_debug_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_vbo);
-        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(vec3), &m_debug_vertices[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(glm::vec3), &m_debug_vertices[0], GL_DYNAMIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
 
         glGenBuffers(1, &m_debug_cbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_cbo);
-        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(vec3), &m_debug_colors[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, debug_vertices_max_count * sizeof(glm::vec3), &m_debug_colors[0], GL_DYNAMIC_DRAW);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
 
         glEnableVertexAttribArray(0);
         glBindVertexArray(0);
 
-        debug_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/debug.vs", RAIN_CONFIG->data_root + "/shaders/glsl/debug.fs");
+        debug_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/debug.vert", RAIN_CONFIG->data_root + "/shaders/glsl/debug.frag");
     }
 
     void Renderer::draw()
     {
-        draw_coord_view(vec3 {});
-        draw_debug();
+        draw_coord_view(glm::vec3 {});
+		draw_debug();
+		draw_ui();
+        draw_text_2d();
     }
 
     void Renderer::draw_debug()
@@ -489,14 +1039,14 @@ namespace rain::engine
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_vbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(vec3), m_debug_vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(glm::vec3), m_debug_vertices);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_debug_cbo);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(vec3), m_debug_colors);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, m_debug_vertex_count * sizeof(glm::vec3), m_debug_colors);
 
         glDisable(GL_BLEND);
 
-        mat4 mvp = proj_mat_perspective * view_mat * identity_mat4();
+        glm::mat4 mvp = proj_mat_perspective * view_mat * glm::mat4(1);
         debug_shader.use();
         debug_shader.set("mvp", mvp);
 
@@ -515,7 +1065,7 @@ namespace rain::engine
         m_debug_vertex_count = 0;
     }
 
-    void Renderer::draw_debug_line(const vec3& _point1, const vec3& _point2, const vec3& _color)
+    void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color)
     {
         if (m_debug_vertex_count + 2 < debug_vertices_max_count)
         {
@@ -528,7 +1078,7 @@ namespace rain::engine
         }
     }
 
-    void Renderer::draw_debug_line(const vec3& _point1, const vec3& _point2, const vec3& _color1, const vec3& _color2)
+    void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2)
     {
         if (m_debug_vertex_count + 2 < debug_vertices_max_count)
         {
@@ -541,19 +1091,19 @@ namespace rain::engine
         }
     }
 
-    void Renderer::draw_debug_cube(const vec3& _center, const f32 _width, const f32 _height, const vec3& _color)
+    void Renderer::draw_debug_cube(const glm::vec3& _center, const f32 _width, const f32 _height, const glm::vec3& _color)
     {
         float halfWidth = _width / 2.0f;
         float halfHeight = _height / 2.0f;
 
-        vec3 A{ _center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight };
-        vec3 B{ _center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight };
-        vec3 C{ _center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight };
-        vec3 D{ _center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight };
-        vec3 E{ _center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight };
-        vec3 F{ _center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight };
-        vec3 G{ _center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight };
-        vec3 H{ _center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight };
+        glm::vec3 A{ _center.x - halfWidth, _center.y + halfWidth, _center.z - halfHeight };
+        glm::vec3 B{ _center.x + halfWidth, _center.y + halfWidth, _center.z - halfHeight };
+        glm::vec3 C{ _center.x + halfWidth, _center.y - halfWidth, _center.z - halfHeight };
+        glm::vec3 D{ _center.x - halfWidth, _center.y - halfWidth, _center.z - halfHeight };
+        glm::vec3 E{ _center.x - halfWidth, _center.y + halfWidth, _center.z + halfHeight };
+        glm::vec3 F{ _center.x + halfWidth, _center.y + halfWidth, _center.z + halfHeight };
+        glm::vec3 G{ _center.x + halfWidth, _center.y - halfWidth, _center.z + halfHeight };
+        glm::vec3 H{ _center.x - halfWidth, _center.y - halfWidth, _center.z + halfHeight };
 
         draw_debug_line(A, B, _color);
         draw_debug_line(B, C, _color);
@@ -571,7 +1121,7 @@ namespace rain::engine
         draw_debug_line(H, E, _color);
     }
 
-    void Renderer::draw_debug_sphere(const vec3& _position, const f32 _scale, const quat& orientation)
+    void Renderer::draw_debug_sphere(const glm::vec3& _position, const f32 _scale, const glm::quat& orientation)
     {
         assert(false);
     }
@@ -586,7 +1136,7 @@ namespace rain::engine
         assert(false);
     }
 
-    //void Renderer::draw_quad(const core::math::Plane& _p, const vec3 _position, const vec3& _color)
+    //void Renderer::draw_quad(const core::glm::Plane& _p, const vec3 _position, const vec3& _color)
     //{
     //    vec3 z(0.0f, 0.0f, 1.0f);
     //    vec3 u = cross(_p.n, _position); // cross product -> note that u lies on the plane
@@ -607,24 +1157,24 @@ namespace rain::engine
     //    draw_debug_line(D, A, _color);
     //}
 
-    void Renderer::draw_cube(const vec3& position, const quat& orientation, const vec3& scale)
+    void Renderer::draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
-        phong.use();
-        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
-        phong.set("proj", proj_mat_perspective);
-        phong.set("view", view_mat);
+        phong_handle->data->use();
+        phong_handle->data->set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
+        phong_handle->data->set("proj", proj_mat_perspective);
+        phong_handle->data->set("view", view_mat);
 
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_sphere(const vec3& position, const quat& orientation, const vec3& scale)
+    void Renderer::draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale)
     {
-        phong.use();
-        phong.set("model", math::translate(identity_mat4(), position) * math::mat4_cast(orientation) * math::scale(identity_mat4(), scale));
-        phong.set("proj", proj_mat_perspective);
-        phong.set("view", view_mat);
+        phong_handle->data->use();
+        phong_handle->data->set("model", glm::translate(glm::mat4(1), position) * glm::mat4_cast(orientation) * glm::scale(glm::mat4(1), scale));
+        phong_handle->data->set("proj", proj_mat_perspective);
+        phong_handle->data->set("view", view_mat);
 
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0);
@@ -642,10 +1192,8 @@ namespace rain::engine
 
     void Renderer::init_text_2d()
     {
-        text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vs", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.fs");
-
-        text_shader.use();
-        text_shader.set("projection", proj_mat_orthogonal);
+        texts.reserve(128);
+        text_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.vert", RAIN_CONFIG->data_root + "/shaders/glsl/text_2d.frag");
 
         FT_Library ft;
 
@@ -696,7 +1244,7 @@ namespace rain::engine
             RChar character =
             {
                 texture,
-                {face->glyph->bitmap.width, face->glyph->bitmap.rows},
+                {i32(face->glyph->bitmap.width), i32(face->glyph->bitmap.rows)},
                 {face->glyph->bitmap_left, face->glyph->bitmap_top},
                 GLuint(face->glyph->advance.x)
             };
@@ -718,52 +1266,150 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const vec3& _color)
+    void Renderer::draw_text_2d()
     {
         glEnable(GL_CULL_FACE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         text_shader.use();
-        text_shader.set("textColor", _color);
-
+        text_shader.set("projection", proj_mat_orthogonal);
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(text_vao);
 
-        std::string::const_iterator c;
-        GLfloat x = _x;
-        for (c = _text.begin(); c != _text.end(); c++)
+        for (u32 i = 0; i < texts.size(); ++i)
         {
-            RChar ch = text_characters[*c];
+            text_shader.set("textColor", texts[i].color);
 
-            GLfloat xpos = x + ch.bearing[0] * _scale;
-            GLfloat ypos = _y - (ch.size[1] - ch.bearing[1]) * _scale;
-
-            GLfloat w = ch.size[0] * _scale;
-            GLfloat h = ch.size[1] * _scale;
-
-            GLfloat vertices[6][4] =
+            std::string::const_iterator c;
+            GLfloat x = texts[i].x;
+            for (c = texts[i].value.begin(); c != texts[i].value.end(); c++)
             {
-                { xpos,     ypos + h,   0.0, 0.0 },
-                { xpos,     ypos,       0.0, 1.0 },
-                { xpos + w, ypos,       1.0, 1.0 },
+                RChar ch = text_characters[*c];
 
-                { xpos,     ypos + h,   0.0, 0.0 },
-                { xpos + w, ypos,       1.0, 1.0 },
-                { xpos + w, ypos + h,   1.0, 0.0 }
-            };
+                GLfloat xpos = x + ch.bearing[0] * texts[i].scale;
+                GLfloat ypos = texts[i].y - (ch.size[1] - ch.bearing[1]) * texts[i].scale;
 
-            glBindTexture(GL_TEXTURE_2D, ch.texture_id);
+                GLfloat w = ch.size[0] * texts[i].scale;
+                GLfloat h = ch.size[1] * texts[i].scale;
 
-            glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+                GLfloat vertices[6][4] =
+                {
+                    { xpos,     ypos + h,   0.0, 0.0 },
+                    { xpos,     ypos,       0.0, 1.0 },
+                    { xpos + w, ypos,       1.0, 1.0 },
 
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                    { xpos,     ypos + h,   0.0, 0.0 },
+                    { xpos + w, ypos,       1.0, 1.0 },
+                    { xpos + w, ypos + h,   1.0, 0.0 }
+                };
 
-            glDrawArrays(GL_TRIANGLES, 0, 6);
+                glBindTexture(GL_TEXTURE_2D, ch.texture_id);
 
-            x += (ch.advance >> 6) * _scale;
+                glBindBuffer(GL_ARRAY_BUFFER, text_vbo);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+
+                x += (ch.advance >> 6) * texts[i].scale;
+            }
         }
+        texts.clear();
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        //glDisable(GL_CULL_FACE);
+    }
+
+    void Renderer::draw_text_2d(const std::string& _text, const f32 _x, const f32 _y, const f32 _scale, const glm::vec4& _color)
+    {
+        texts.push_back(text{_text, _x, _y, _scale, _color});
+    }
+
+	void Renderer::init_ui()
+	{
+		glGenVertexArrays(1, &ui_vao);
+		glBindVertexArray(ui_vao);
+
+		glGenBuffers(1, &ui_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, ui_vbo);
+		glBufferData(GL_ARRAY_BUFFER, ui_max_vertex_count * sizeof(glm::vec3), &ui_vertices[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+		glGenBuffers(1, &ui_cbo);
+		glBindBuffer(GL_ARRAY_BUFFER, ui_cbo);
+		glBufferData(GL_ARRAY_BUFFER, ui_max_vertex_count * sizeof(glm::vec3), &ui_colors[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)nullptr);
+
+		glEnableVertexAttribArray(0);
+		glBindVertexArray(0);
+
+		ui_shader.load(RAIN_CONFIG->data_root + "/shaders/glsl/ui.vert", RAIN_CONFIG->data_root + "/shaders/glsl/ui.frag");
+	}
+
+	void Renderer::draw_ui()
+	{
+		if (ui_vertex_count == 0)
+		{
+			return;
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, ui_vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, ui_vertex_count * sizeof(glm::vec3), ui_vertices);
+
+		glBindBuffer(GL_ARRAY_BUFFER, ui_cbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, ui_vertex_count * sizeof(glm::vec3), ui_colors);
+
+		ui_shader.use();
+		ui_shader.set("projection", proj_mat_orthogonal);
+
+		glBindVertexArray(ui_vao);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glDrawArrays(GL_TRIANGLES, 0, ui_vertex_count);
+
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
+
+		ui_vertex_count = 0;
+	}
+
+	void Renderer::draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color)
+	{
+		draw_ui_triangle(a, b, c, a_color, a_color, a_color);
+	}
+
+	void Renderer::draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color, const glm::vec4& b_color)
+	{
+		draw_ui_triangle(a, b, c, a_color, b_color, a_color);
+	}
+
+	void Renderer::draw_ui_triangle(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec4& a_color, const glm::vec4& b_color, const glm::vec4& c_color)
+	{
+		if (m_debug_vertex_count + 3 < debug_vertices_max_count)
+		{
+			ui_vertices[ui_vertex_count + 0] = a;
+			ui_vertices[ui_vertex_count + 1] = b;
+			ui_vertices[ui_vertex_count + 2] = c;
+            
+            ui_colors[ui_vertex_count + 0] = glm::vec3{ a_color.x, a_color.y, a_color.z };
+            ui_colors[ui_vertex_count + 1] = glm::vec3{ b_color.x, b_color.y, b_color.z };
+            ui_colors[ui_vertex_count + 2] = glm::vec3{ c_color.x, c_color.y, c_color.z };
+
+			ui_vertex_count += 3;
+		}
+	}
+
+    void Renderer::draw_ui_quad(const f32 x_bottom_left, const f32 y_bottom_left, const f32& width, const f32& height, const glm::vec4& color)
+    {
+        glm::vec3 bottom_left{ x_bottom_left, y_bottom_left, 0.0f };
+        glm::vec3 bottom_right{ x_bottom_left + width, y_bottom_left, 0.0f };
+        glm::vec3 top_left{ x_bottom_left, y_bottom_left + height, 0.0f };
+        glm::vec3 top_right{ x_bottom_left + width, y_bottom_left + height, 0.0f };
+
+        draw_ui_triangle(top_left, bottom_left, top_right, color);
+        draw_ui_triangle(bottom_left, bottom_right, top_right, color);
     }
 }

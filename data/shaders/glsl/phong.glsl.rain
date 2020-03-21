@@ -1,0 +1,4 @@
+{
+    "vertex": "/phong.vert",
+    "fragment": "/phong.frag"
+}

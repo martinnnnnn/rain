@@ -16,10 +16,10 @@ namespace rain::engine
 
     int Window::init(HINSTANCE _hinstance, int _width, int _height, int _depth)
     {
-	    m_hwnd = NULL;
+	    hwnd = NULL;
 	    m_hdc = NULL;
 	    m_hglrc = NULL;
-	    m_fullscreen = false;
+	    full_screen = false;
 	    m_rect = { 0 };
         initialized = false;
 
@@ -50,7 +50,7 @@ namespace rain::engine
 	    int posx = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_width / 2);
 	    int posy = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_height / 2);
 
-	    m_hwnd = CreateWindowEx(NULL,
+	    hwnd = CreateWindowEx(NULL,
 		    RAIN_WNDCLASSNAME,
 		    RAIN_WNDNAME,
 		    WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -66,13 +66,10 @@ namespace rain::engine
         m_rect.left = posx;
         m_rect.right = posx + m_width;
 
-        center_pos_x = m_width / 2;
-        center_pos_y = m_height / 2;
 
-
-        if ((m_hdc = GetDC(m_hwnd)) == NULL)
+        if ((m_hdc = GetDC(hwnd)) == NULL)
         {
-            MessageBox(m_hwnd, "Failed to Get the Window Device Context", "Device Context Error", MB_OK);
+            MessageBox(hwnd, "Failed to Get the Window Device Context", "Device Context Error", MB_OK);
             return -1;
         }
 
@@ -97,27 +94,27 @@ namespace rain::engine
         };
 
         int indexPixelFormat = 0;
-        if (!(indexPixelFormat = ChoosePixelFormat(GetDC(m_hwnd), &pfd)))
+        if (!(indexPixelFormat = ChoosePixelFormat(GetDC(hwnd), &pfd)))
         {
-            MessageBox(m_hwnd, "Failed to find pixel format", "Pixel Format Error", MB_OK);
+            MessageBox(hwnd, "Failed to find pixel format", "Pixel Format Error", MB_OK);
             return -1;
         }
 
-        if (!SetPixelFormat(GetDC(m_hwnd), indexPixelFormat, &pfd))
+        if (!SetPixelFormat(GetDC(hwnd), indexPixelFormat, &pfd))
         {
-            MessageBox(m_hwnd, "Failed to Set Pixel Format", "Pixel Format Error", MB_OK);
+            MessageBox(hwnd, "Failed to Set Pixel Format", "Pixel Format Error", MB_OK);
             return -1;
         }
 
         if ((m_hglrc = wglCreateContext(m_hdc)) == NULL)
         {
-            MessageBox(m_hwnd, "Failed to Create the OpenGL Rendering Context", "OpenGL Rendering Context Error", MB_OK);
+            MessageBox(hwnd, "Failed to Create the OpenGL Rendering Context", "OpenGL Rendering Context Error", MB_OK);
             return -1;
         }
 
         if ((wglMakeCurrent(m_hdc, m_hglrc)) == false)
         {
-            MessageBox(m_hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
+            MessageBox(hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
             return -1;
         }
 
@@ -131,18 +128,21 @@ namespace rain::engine
 
     void Window::show()
     {
-	    ::ShowWindow(m_hwnd, SW_SHOW);
+	    ::ShowWindow(hwnd, SW_SHOW);
     }
 
     void Window::hide()
     {
-	    ::ShowWindow(m_hwnd, SW_HIDE);
+	    ::ShowWindow(hwnd, SW_HIDE);
     }
 
     void Window::resize(int _width, int _height)
     {
 	    m_width = std::max(1, _width);
 	    m_height = std::max(1, _height);
+
+		center_pos_x = m_width / 2;
+		center_pos_y = m_height / 2;
 
 	    glViewport(0, 0, m_width, m_height);
 	    glMatrixMode(GL_PROJECTION);
@@ -153,53 +153,58 @@ namespace rain::engine
         if (RAIN_RENDERER) RAIN_RENDERER->resize(m_width, m_height);
     }
 
-    math::vec2 Window::size() const
+    glm::vec2 Window::size() const
     {
-        return math::vec2{ f32(m_width), f32(m_height) };
+        return glm::vec2{ f32(m_width), f32(m_height) };
+    }
+
+    void Window::toggle_fullscreen()
+    {
+        fullscreen(!full_screen);
     }
 
     void Window::fullscreen(bool _fullscreen)
     {
-        RAIN_LOG("fullscreen ? %d\n", _fullscreen);
+        RAIN_LOG("fullscreen %s\n", _fullscreen ? "on" : "off");
 
-	    if (_fullscreen != m_fullscreen)
+	    if (_fullscreen != full_screen)
 	    {
-		    m_fullscreen = _fullscreen;
+		    full_screen = _fullscreen;
 
-		    if (m_fullscreen)
+		    if (full_screen)
 		    {
-			    ::GetWindowRect(m_hwnd, &m_rect);
+			    ::GetWindowRect(hwnd, (RECT*)&m_rect);
 
 			    UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
 
-			    ::SetWindowLongW(m_hwnd, GWL_STYLE, windowStyle);
+			    ::SetWindowLongW(hwnd, GWL_STYLE, windowStyle);
 
-			    HMONITOR hMonitor = ::MonitorFromWindow(m_hwnd, MONITOR_DEFAULTTONEAREST);
+			    HMONITOR hMonitor = ::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 			    MONITORINFOEX monitorInfo = {};
 			    monitorInfo.cbSize = sizeof(MONITORINFOEX);
 			    ::GetMonitorInfo(hMonitor, &monitorInfo);
 
-			    ::SetWindowPos(m_hwnd, HWND_TOPMOST,
+			    ::SetWindowPos(hwnd, HWND_TOPMOST,
 				    monitorInfo.rcMonitor.left,
 				    monitorInfo.rcMonitor.top,
 				    monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
 				    monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
 				    SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
-			    ::ShowWindow(m_hwnd, SW_MAXIMIZE);
+			    ::ShowWindow(hwnd, SW_MAXIMIZE);
 		    }
 		    else
 		    {
-			    ::SetWindowLong(m_hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+			    ::SetWindowLong(hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 
-			    ::SetWindowPos(m_hwnd, HWND_NOTOPMOST,
+			    ::SetWindowPos(hwnd, HWND_NOTOPMOST,
 				    m_rect.left,
 				    m_rect.top,
 				    m_rect.right - m_rect.left,
 				    m_rect.bottom - m_rect.top,
 				    SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
-			    ::ShowWindow(m_hwnd, SW_NORMAL);
+			    ::ShowWindow(hwnd, SW_NORMAL);
 		    }
 	    }
     }
@@ -217,9 +222,16 @@ namespace rain::engine
 	    ChangeDisplaySettings(NULL, 0);
     }
 
-    math::vec2 Window::get_center_pos_absolute()
+    Window::rect Window::get_rect()
     {
-        return math::vec2{ f32(m_rect.left + center_pos_x), f32(m_rect.top + center_pos_y) };
+        ::GetWindowRect(hwnd, (RECT*)&m_rect);
+        return m_rect;
+    }
+
+    glm::vec2 Window::get_center_pos_absolute()
+    {
+		get_rect();
+        return glm::vec2{ f32(m_rect.left + center_pos_x), f32(m_rect.top + center_pos_y) };
     }
 
 

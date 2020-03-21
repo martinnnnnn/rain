@@ -33,8 +33,8 @@
             },
             "Material":
             {
-                "vertex":"/shaders/glsl/model.vs",
-                "fragment": "/shaders/glsl/model.fs"
+                "vertex":"/shaders/glsl/model.vert",
+                "fragment": "/shaders/glsl/model.frag"
             }
         },
         {
@@ -64,7 +64,7 @@
             "Transform" :
             {
                 "default": false,
-                "position" : [1.0, 1.0, 0.0],
+                "position" : [14.0, 12.0, 0.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0],
                 "scale" : [1.0,1.0,1.0]
             },
@@ -82,15 +82,14 @@
                 "point2": [0.0, -0.2, 0.0],
                 "point3": [0.0, 0.0, -1.0]
             }
-        }
-        ,
+        },
         {
             "name":"fps",
             "id": 4,
             "Transform" :
             {
                 "default": false,
-                "position" : [0.0, 7.0, 50.0],
+                "position" : [150.0, 150.0, 150.0],
                 "orientation" : [0.0, 0.0, 0.0, 1.0],
                 "scale" : [1.0,1.0,1.0]
             },
@@ -98,7 +97,27 @@
             {
                 "movement_speed": 0.5
             }
+        },
+        {
+            "name":"chat",
+            "id": 5,
+            "text_field" :
+            {
+                "x": 20,
+                "y" : 20,
+                "width" : 200,
+                "height" : 15,
+                "default_text" : "Type to chat",
+                "color_bg" : [1.0, 0.0, 0.0, 1.0],
+                "color_txt" : [0.0, 0.0, 0.0, 1.0]
+            },
+            "text_list":
+            {
+                "x": 20,
+                "y": 38,
+                "max_count": 10,
+                "color":  [0.0, 1.0, 1.0, 1.0]
+            }
         }
-        
     ]
 }
