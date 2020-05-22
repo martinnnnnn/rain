@@ -12,10 +12,10 @@ namespace rain::engine
 		runtime_data_root = RAIN_RUNTIME_DATA_ROOT;
 		std::string config_path = data_root + RAIN_CONFIG_FILE_NAME;
 
-		assert(core::file::exists(data_root + RAIN_CONFIG_FILE_NAME) && "Data root path is wrong : you will not be able to continue further.");
+		assert(core::File::exists(data_root + RAIN_CONFIG_FILE_NAME) && "Data root path is wrong : you will not be able to continue further.");
 
 		std::string content;
-		core::file::read(data_root + RAIN_CONFIG_FILE_NAME, content);
+		core::File::read(data_root + RAIN_CONFIG_FILE_NAME, content);
 
         json_reader::read_config(content, *this);
     }

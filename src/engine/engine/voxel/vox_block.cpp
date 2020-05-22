@@ -93,7 +93,7 @@ namespace rain::engine::voxel
             char name_buf[16];
             i32 n = sprintf_s(name_buf, ".%d_%d_%d.vox", block->position.x, block->position.y, block->position.z);
             std::string complete_name = file_name + name_buf;
-            if (!core::file::write(complete_name, buffer, actual_size))
+            if (!core::File::write(complete_name, buffer, actual_size))
             {
                 RAIN_LOG_WARNING("Could not open the file %s", file_name.c_str());
             }
@@ -117,7 +117,7 @@ namespace rain::engine::voxel
         //assert(block->LOD == LOD_0 && "Cannot load a block of low level of detail.");
 
         u8* buffer = nullptr;
-        const i32 actual_size = core::file::read(file_name, &buffer);
+        const i32 actual_size = core::File::read(file_name, &buffer);
         if (actual_size < 0)
         {
             RAIN_LOG_WARNING("Could not open the file %s", file_name.c_str());

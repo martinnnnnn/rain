@@ -32,7 +32,7 @@ namespace rain::engine
                     std::string vertex;
                     std::string fragment;
                     std::string geometry;
-					core::file::read(path, content);
+					core::File::read(path, content);
 					json_reader::read_shader(content, filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
@@ -68,7 +68,7 @@ namespace rain::engine
                     std::string vertex;
                     std::string fragment;
                     std::string geometry;
-					core::file::read(path, content);
+					core::File::read(path, content);
 					json_reader::read_shader(content, filepath.get_directory(), vertex, fragment, geometry);
                     handle<Shader> new_shader_handle = load_data<Shader>(filepath, core::uuid::random(), vertex, fragment, geometry);
                     add_data<Shader>(new_shader_handle);
