@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <mutex>
+#include <functional>
 
 #include "core/types.h"
 
@@ -13,7 +14,7 @@ namespace rain::core
     class logger
     {
     public:
-        logger(void(*_printOutput)(const char*));
+		logger(std::function<void(const char*)> os);
 
         inline void clean_buffers()
         {
@@ -37,6 +38,6 @@ namespace rain::core
         char footer_buffer[1024];
         std::mutex mut;
 
-        void (*printOutput) (const char*);
+		std::function<void(const char*)> output_stream;
     };
 }

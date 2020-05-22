@@ -11,11 +11,11 @@
 
 namespace rain::core
 {
-    logger::logger(void(*_printOutput)(const char*))
-    {
-        printOutput = _printOutput;
-        clean_buffers();
-    }
+	logger::logger(std::function<void(const char*)> os)
+	{
+		output_stream = os;
+		clean_buffers();
+	}
 
     void logger::log_level(const char* _level, const char* _format, ...)
     {
@@ -52,10 +52,10 @@ namespace rain::core
     void logger::print_log()
     {
         mut.lock();
-        printOutput(header_buffer);
-        printOutput(message_buffer);
-        printOutput(footer_buffer);
-        printOutput("\n");
+        output_stream(header_buffer);
+        output_stream(message_buffer);
+        output_stream(footer_buffer);
+        output_stream("\n");
         mut.unlock();
     }
 
@@ -70,6 +70,6 @@ namespace rain::core
 
     void logger::print_log_raw()
     {
-        printOutput(message_buffer);
+		output_stream(message_buffer);
     }
 }
