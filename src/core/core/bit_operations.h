@@ -8,7 +8,7 @@ namespace rain::core
     void bit_set(T& bitfield, T position, T value)
     {
         unsigned long newbit = !!value;
-        bitfield ^= (-newbit ^ bitfield) & (1UL << position);
+        bitfield ^= (newbit ^ bitfield) & (1UL << position);
     }
 
     template<typename T>
