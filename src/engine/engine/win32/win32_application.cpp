@@ -40,6 +40,10 @@ namespace rain::engine
         // INIT LOGGER
         RAIN_CONTEXT->logger = new core::logger(print_to_log);
 
+		// INIT RANDOM
+		RAIN_RANDOM = new core::Random();
+		RAIN_RANDOM->initialize();
+
         // INIT CONFIG
         RAIN_CONFIG = new Config();
         RAIN_CONFIG->init();

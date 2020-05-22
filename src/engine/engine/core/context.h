@@ -29,6 +29,7 @@ namespace rain::engine
         data_system* data_sys;
         HighResolutionClock* clock;
         World* world;
+		core::Random* random;
     };
 }
 
@@ -42,8 +43,7 @@ namespace rain::engine
 #define RAIN_DATA_SYSTEM                RAIN_CONTEXT->data_sys
 #define RAIN_MESSAGING                  RAIN_CONTEXT->msger
 #define RAIN_WORLD                      RAIN_CONTEXT->world
-
-#define RAIN_WORLD                      RAIN_CONTEXT->world
+#define RAIN_RANDOM						RAIN_CONTEXT->random
 
 #define RAIN_FIND_DATA_FROM_PATH(type, path)  RAIN_CONTEXT->data_sys->find_data<type>(path) 
 #define RAIN_FIND_DATA_FROM_ID(type, id)      RAIN_CONTEXT->data_sys->find_data<type>(id)
