@@ -35,33 +35,6 @@ namespace rain::core
         std::string path;
     };
 
-
-    struct PathNode
-    {
-        enum class Type
-        {
-            DIRECTORY,
-            FILE
-        };
-
-        PathNode()
-            : type(Type::DIRECTORY)
-            , value("")
-            , parent(nullptr)
-        {}
-
-        PathNode(Type _type, const std::string& _value, PathNode* _parent)
-            : type(_type)
-            , value(_value)
-            , parent(_parent)
-        {}
-
-        Type type;
-        std::string value;
-        PathNode* parent;
-        std::vector<PathNode*> children;
-    };
-
     namespace fs = std::filesystem;
 
     struct FilePathSystem
