@@ -47,10 +47,13 @@ namespace rain::engine
             //engine::init(vmap);
         }
 
-        voxmap.min_y = 0;
-        voxmap.max_y = 1;
-        voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
+        //voxmap.min_y = 0;
+        //voxmap.max_y = 1;
+        //voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
         voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
+
+		volume_data.init_debug();
+		volume_data.load_debug();
 
         std::vector<actor*> view;
 
@@ -153,7 +156,7 @@ namespace rain::engine
         }
 
         //voxel::update_map(&voxmap, main_camera.transform->position);
-        voxel::update_map(&voxmap, chara.position);
+        //voxel::update_map(&voxmap, chara.position);
 
         sg.get_view<ui::text_field>(view);
         for (auto chat : view)
@@ -210,12 +213,13 @@ namespace rain::engine
         
         RAIN_RENDERER->update();
 
-        voxel::draw_map(&voxmap, main_camera.transform->position);
+        //voxel::draw_map(&voxmap, main_camera.transform->position);
+		volume_data.draw_debug();
 
         std::vector<actor*> view;
 
         RAIN_RENDERER->draw_sphere(chara.position, glm::quat(), glm::vec3(3, 3, 3));
-        voxel::draw_oct_tree(&octtree);
+        //voxel::draw_oct_tree(&octtree);
 
         //sg.get_view<core::transform, Model, Material>(view);
 

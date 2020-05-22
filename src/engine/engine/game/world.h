@@ -8,6 +8,7 @@
 #include "scene_graph.h"
 #include "engine/voxel/voxel.h"
 #include "engine/voxel/oct_tree.h"
+#include "engine/voxel2/volume_data.h"
 
 namespace rain::engine
 {
@@ -49,6 +50,7 @@ namespace rain::engine
         voxel::vox_map voxmap;
         character chara;
         voxel::oct_tree octtree;
+		voxel2::VolumeData volume_data;
     };
 }
 

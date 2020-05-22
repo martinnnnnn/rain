@@ -1,0 +1,157 @@
+#include  "volume_data.h"
+
+#include "engine/gfx/ogl/ogl_renderer.h"
+#include "engine/core/context.h"
+#include "engine/data/data_system.h"
+#include "gtx/transform.hpp"
+#include "engine/game/world.h"
+
+namespace rain::engine::voxel2
+{
+	void VolumeData::set(i32 x, i32 y, i32 z, Sample sample)
+	{
+		ivec3 chunk_index = get_chunk_index(x, y, z);
+
+		int offset_index =
+			(x - chunk_index.x * chunk_size.value) +
+			(y - chunk_index.y * chunk_size.value) * chunk_size.value +
+			(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
+
+		VolumeChunk* chunk = nullptr;
+
+		if (!contains(chunk_index))
+		{
+			RAIN_LOG("create chunk at (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
+			chunk = create_chunk(chunk_index);
+			add_chunk(chunk);
+		}
+		else
+		{
+			chunk = data[chunk_index];
+		}
+
+		chunk->set(sample, offset_index);
+	}
+
+	const Sample& VolumeData::get(i32 x, i32 y, i32 z)
+	{
+		ivec3 chunk_index = get_chunk_index(x, y, z);
+
+		//assert(contains(chunk_index) && "Trying to access an element not present in data");
+		if (!contains(chunk_index))
+		{
+			create_and_fill_chunk(chunk_index);
+		}
+
+		int offset_index =
+			(x - chunk_index.x * chunk_size.value) +
+			(y - chunk_index.y * chunk_size.value) * chunk_size.value +
+			(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
+
+		return data[chunk_index]->get(offset_index);
+	}
+
+
+	void VolumeData::init_debug()
+	{
+		RAIN_LOG("init debug");
+		for (i32 i = 0; i < i32(chunk_size.value); ++i)
+		{
+			for (i32 j = 0; j < i32(chunk_size.value); ++j)
+			{
+				for (i32 k = 0; k < i32(chunk_size.value); ++k)
+				{
+					set(i, j, k, Sample());
+				}
+			}
+		}
+	}
+
+	u32 vao;
+	handle<Texture> const * texture_handle;
+	std::vector<glm::mat4> model_matrices;
+
+	void VolumeData::load_debug()
+	{
+		RAIN_LOG("load debug");
+		model_matrices.reserve(10'000'000);
+
+		for (auto item : data)
+		{
+			for (i32 i = 0; i < i32(chunk_size.value); ++i)
+			{
+				for (i32 j = 0; j < i32(chunk_size.value); ++j)
+				{
+					for (i32 k = 0; k < i32(chunk_size.value); ++k)
+					{
+						glm::vec3 chunk_pos = item.second->index;
+						glm::vec3 sample_pos{ i, j, k };
+						model_matrices.emplace_back(glm::translate(glm::mat4(1), chunk_pos + sample_pos) * glm::scale(glm::mat4(1), glm::vec3(0.1f, 0.1f, 0.1f)));
+					}
+				}
+			}
+		}
+
+		RAIN_LOG("%d cubes to drawn", model_matrices.size());
+		RAIN_RENDERER->init_instancing_cube(model_matrices, vao);
+
+		texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
+	}
+
+	void VolumeData::draw_debug()
+	{
+		RAIN_RENDERER->draw_instancing_cube(vao, model_matrices.size(), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
+	}
+
+	VolumeChunk* VolumeData::create_chunk(const ivec3& chunk_index)
+	{
+		return new VolumeChunk(chunk_index, chunk_size.value);
+	}
+
+	VolumeChunk* VolumeData::create_and_fill_chunk(const ivec3& chunk_index)
+	{
+		VolumeChunk* new_chunk = create_chunk(chunk_index);
+		return new_chunk;
+	}
+
+	void VolumeData::add_chunk(VolumeChunk* chunk)
+	{
+		assert(!contains(chunk->index) && "A chunk alreay exists at this index");
+		data[chunk->index] = chunk;
+	}
+
+	ivec3 VolumeData::get_chunk_index(i32 x, i32 y, i32 z)
+	{
+		i32 xI = x / chunk_size.value;
+		if (x < 0)
+		{
+			xI--;
+		}
+
+		i32 yI = y / chunk_size.value;
+		if (y < 0)
+		{
+			yI--;
+		}
+
+		i32 zI = z / chunk_size.value;
+		if (z < 0)
+		{
+			zI--;
+		}
+
+		return ivec3(xI, yI, zI);
+	}
+
+	bool VolumeData::contains(const ivec3& chunk_index)
+	{
+		return data.find(chunk_index) != data.end();
+	}
+}
+
+
+
+
+
+
+
