@@ -823,7 +823,7 @@ namespace rain::engine
 
         glGenVertexArrays(1, &vao);
 
-        u32 cube_vbo, instance_vbo;
+        u32 cube_vbo;
         glGenBuffers(1, &cube_vbo);
         glGenBuffers(1, &instance_vbo);
 
@@ -840,17 +840,17 @@ namespace rain::engine
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)(5 * sizeof(float)));
 
         glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
-        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_DYNAMIC_DRAW);
 
         // instance matrix
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
-        glEnableVertexAttribArray(4);
-        glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
-        glEnableVertexAttribArray(5);
-        glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
-        glEnableVertexAttribArray(6);
-        glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
 
         glVertexAttribDivisor(3, 1);
         glVertexAttribDivisor(4, 1);
@@ -860,10 +860,19 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
+	void Renderer::reload_instancing_cube(const u32 vao, const u32 instance_vbo, const std::vector<glm::mat4>& instances)
+	{
+		glBindVertexArray(vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+		glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_DYNAMIC_DRAW);
+	}
+
+    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture const * const texture, const glm::vec3& view_position)
     {
         instancing_handle->data->use();
-        instancing_handle->data->set("proj", proj_mat_perspective);
+		instancing_handle->data->set("model", model);
+		instancing_handle->data->set("proj", proj_mat_perspective);
         instancing_handle->data->set("view", view_mat);
         instancing_handle->data->set("viewPos", view_position);
         instancing_handle->data->set("text1", 0);

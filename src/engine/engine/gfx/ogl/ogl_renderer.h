@@ -46,14 +46,20 @@ namespace rain::engine
         void update();
         void clear();
 
+        void resize(u32 _width, u32 _height);
+        void set_perspective_projection_matrix(const glm::mat4& _projection);
+        void set_orthogonal_projection_matrix(const glm::mat4& _projection);
+        void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
+        void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
+        void set_view_matrix(const glm::mat4& _matrix);
+
         void init_default_shaders();
         void init_debug();
         void init_shapes();
 	    void init_cube();
         void init_sphere();
         void init_instancing(const std::vector<glm::mat4>& instances, u32& vao);
-        void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao);
-        void init_data();
+		void init_data();
 
         void draw();
 
@@ -70,18 +76,15 @@ namespace rain::engine
         void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
-        void draw_instancing_cube(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
         void draw_mesh();
 
-        void resize(u32 _width, u32 _height);
-        void set_perspective_projection_matrix(const glm::mat4& _projection);
-        void set_orthogonal_projection_matrix(const glm::mat4& _projection);
-        void set_view_matrix(const glm::vec3& _eye, float _pitch, float _yaw);
-        void set_view_matrix(const glm::vec3& _eye, const glm::vec3& _center, const glm::vec3& _up);
-        void set_view_matrix(const glm::mat4& _matrix);
 
         u32 load_primitive(glm::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, glm::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
         void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const glm::vec3& position, const glm::quat& _orientation, const glm::vec3& scale);
+
+		void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao, u32& instance_vbo);
+		void reload_instancing_cube(const u32 vao, const u32 instance_vbo, const std::vector<glm::mat4>& instances);
+		void draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture const * const texture, const glm::vec3& view_position);
 
         u32 load_scalar_field(core::scalar_field_mesh* mesh);
         void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count);
