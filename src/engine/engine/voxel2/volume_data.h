@@ -11,7 +11,6 @@
 #include "assert.h"
 #include "volume_chunk.h"
 
-// implement chunk -> get pos
 // chunk streaming
 // async chunk streaming
 // debug show of chunk streaming

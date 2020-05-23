@@ -12,11 +12,6 @@ namespace rain::engine::voxel2
 	{
 		ivec3 chunk_index = get_chunk_index(x, y, z);
 
-		int offset_index =
-			(x - chunk_index.x * chunk_size.value) +
-			(y - chunk_index.y * chunk_size.value) * chunk_size.value +
-			(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
-
 		VolumeChunk* chunk = nullptr;
 
 		if (!contains(chunk_index))
@@ -30,7 +25,7 @@ namespace rain::engine::voxel2
 			chunk = data[chunk_index];
 		}
 
-		chunk->set(sample, offset_index);
+		chunk->set(sample, chunk->offset_from_absolute(x, y, z));
 	}
 
 	const Sample& VolumeData::get(i32 x, i32 y, i32 z)
@@ -43,25 +38,31 @@ namespace rain::engine::voxel2
 			create_and_fill_chunk(chunk_index);
 		}
 
+
 		int offset_index =
 			(x - chunk_index.x * chunk_size.value) +
 			(y - chunk_index.y * chunk_size.value) * chunk_size.value +
 			(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
 
-		return data[chunk_index]->get(offset_index);
+		return data[chunk_index]->get_absolute(x, y, z);
+		//return data[chunk_index]->get(offset_index);
 	}
 
 
 	void VolumeData::init_debug()
 	{
 		RAIN_LOG("init debug");
-		for (i32 i = 0; i < i32(chunk_size.value); ++i)
+
+		for (i32 i = 0; i < i32(chunk_size.value) * 5; ++i)
 		{
-			for (i32 j = 0; j < i32(chunk_size.value); ++j)
+			for (i32 j = -i32(chunk_size.value); j < i32(chunk_size.value); ++j)
 			{
 				for (i32 k = 0; k < i32(chunk_size.value); ++k)
 				{
-					set(i, j, k, Sample());
+					u32 randval = RAIN_RANDOM->range(0, 100);
+					set(i, j, k, Sample(randval));
+					const Sample& test =  get(i, j, k);
+					assert(randval == test.value && "values should be equal");
 				}
 			}
 		}
@@ -78,17 +79,12 @@ namespace rain::engine::voxel2
 
 		for (auto item : data)
 		{
-			for (i32 i = 0; i < i32(chunk_size.value); ++i)
+			const glm::vec3 chunk_pos = item.second->index;
+			RAIN_LOG("loading chunk at (%f, %f, %f)", chunk_pos.x, chunk_pos.y, chunk_pos.z);
+			for (u32 u = 0; u < chunk_size.cubed; ++u)
 			{
-				for (i32 j = 0; j < i32(chunk_size.value); ++j)
-				{
-					for (i32 k = 0; k < i32(chunk_size.value); ++k)
-					{
-						glm::vec3 chunk_pos = item.second->index;
-						glm::vec3 sample_pos{ i, j, k };
-						model_matrices.emplace_back(glm::translate(glm::mat4(1), chunk_pos + sample_pos) * glm::scale(glm::mat4(1), glm::vec3(0.1f, 0.1f, 0.1f)));
-					}
-				}
+				glm::vec3 sample_pos = chunk_size.get_position(u);
+				model_matrices.emplace_back(glm::translate(glm::mat4(1), chunk_pos * f32(chunk_size.value) + sample_pos) /** glm::scale(glm::mat4(1), glm::vec3(0.1f, 0.1f, 0.1f))*/);
 			}
 		}
 
@@ -118,23 +114,23 @@ namespace rain::engine::voxel2
 	{
 		assert(!contains(chunk->index) && "A chunk alreay exists at this index");
 		data[chunk->index] = chunk;
-	}
+	} 
 
 	ivec3 VolumeData::get_chunk_index(i32 x, i32 y, i32 z)
 	{
-		i32 xI = x / chunk_size.value;
+		i32 xI = x / i32(chunk_size.value);
 		if (x < 0)
 		{
 			xI--;
 		}
 
-		i32 yI = y / chunk_size.value;
+		i32 yI = y / i32(chunk_size.value);
 		if (y < 0)
 		{
 			yI--;
 		}
 
-		i32 zI = z / chunk_size.value;
+		i32 zI = z / i32(chunk_size.value);
 		if (z < 0)
 		{
 			zI--;

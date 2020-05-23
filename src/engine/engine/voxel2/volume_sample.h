@@ -6,7 +6,8 @@ namespace rain::engine::voxel2
 {
 	struct Sample
 	{
-		Sample() : value(0) {}
+		Sample(i8 val) : value(val) {}
+		Sample() : Sample(0) {}
 
 		i8 value;
 	};
