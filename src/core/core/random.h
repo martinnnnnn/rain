@@ -20,32 +20,32 @@ namespace rain::core
 
 	struct Random
 	{
-		inline void initialize()
+		static inline void initialize()
 		{
 			srand(u32(time(NULL)));
 		}
 
-		inline u32 range(u32 min, u32 max)
+		static inline u32 range(u32 min, u32 max)
 		{
 			return min + (rand() % (max - min));
 		}
 
-		inline u32 range_0X(u32 max)
+		static inline u32 range_0X(u32 max)
 		{
 			return range(0, max);
 		}
 
-		inline f32 range_f01()
+		static inline f32 range_f01()
 		{
 			return f32(rand() % 100) / 100.0f;
 		}
 
-		inline f32 range_f(f32 min, f32 max)
+		static inline f32 range_f(f32 min, f32 max)
 		{
 			return range_f01() * (max - min) + min;
 		}
 
-		inline f32 range_f0X(f32 max)
+		static inline f32 range_f0X(f32 max)
 		{
 			return range_f(0.0f, max);
 		}
