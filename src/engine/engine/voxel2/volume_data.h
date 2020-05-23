@@ -14,12 +14,10 @@
 // chunk streaming
 // async chunk streaming
 // debug show of chunk streaming
-// volume data reposition, scale and rotation
-// make sure up is up
 // sample value  generation
 // render sample value as color in debug
 // debug take map position into account
-
+// fix inputs
 
 namespace rain::engine::voxel2
 {
@@ -35,6 +33,7 @@ namespace rain::engine::voxel2
 
 		void init_debug();
 		void load_debug();
+		void reload_debug();
 		void draw_debug();
 
 	private:
@@ -47,7 +46,7 @@ namespace rain::engine::voxel2
 		ivec3			get_chunk_index(i32 x, i32 y, i32 z);
 		bool			contains(const ivec3& chunk_index);
 
-		glm::vec3			position;
+		core::transform		transform;
 		VolumeChunk::Size	chunk_size;
 		VolumeChunkMap		data;
 	};

@@ -25,7 +25,8 @@ namespace rain::engine
         }
 
         RAIN_LOG("%d cubes to drawn", vmap->model_matrices.size());
-        RAIN_RENDERER->init_instancing_cube(vmap->model_matrices, vmap->vao);
+		u32 vbo;
+        RAIN_RENDERER->init_instancing_cube(vmap->model_matrices, vmap->vao, vbo);
 
         vmap->texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
     }
@@ -47,7 +48,7 @@ namespace rain::engine
 
     void draw(voxel_map* vmap)
     {
-        RAIN_RENDERER->draw_instancing_cube(vmap->vao, vmap->model_matrices.size(), vmap->texture_handle->data, RAIN_WORLD->main_camera.transform->position);
+		RAIN_RENDERER->draw_instancing_cube(vmap->vao, vmap->model_matrices.size(), glm::mat4(1), vmap->texture_handle->data, RAIN_WORLD->main_camera.transform->position);
     }
 }
 

@@ -155,6 +155,17 @@ namespace rain::engine
             chara.position.y -= 0.1f * chara.speed;
         }
 
+		if (RAIN_INPUT->is_key_pressed(DIK_Q))
+		{
+			RAIN_LOG("reloading");
+			static bool done = false;
+			if (!done)
+			{
+				volume_data.reload_debug();
+				done = true;
+			}
+		}
+
         //voxel::update_map(&voxmap, main_camera.transform->position);
         //voxel::update_map(&voxmap, chara.position);
 

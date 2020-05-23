@@ -11,6 +11,7 @@ out VS_OUT
     vec2 TextCoord;
 } vs_out;
 
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
@@ -19,5 +20,5 @@ void main()
     vs_out.Position = vec3(aInstanceMatrix * vec4(aPos, 1.0));
     vs_out.TextCoord = aTextureCoord;
     vs_out.Normal = mat3(transpose(inverse(aInstanceMatrix))) * aNorm;
-    gl_Position = proj * view * aInstanceMatrix * vec4(aPos, 1.0);
+    gl_Position = proj * view * model * aInstanceMatrix * vec4(aPos, 1.0);
 }
