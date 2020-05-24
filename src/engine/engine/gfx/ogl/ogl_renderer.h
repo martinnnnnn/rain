@@ -15,21 +15,19 @@
 #include "engine/data/material/material.h"
 #include "engine/data/data_handle.h"
 #include "engine/voxel/voxel.h"
-
 //#define SPIRV
 
 
 namespace rain::engine
 {
+	namespace voxel
+	{
+		struct VoxelMesh;
+	}
 
 #ifdef SPIRV
     static PFNGLSPECIALIZESHADERPROC gl_specialize_shader;
 #endif
-
-    struct StaticMesh
-    {
-        GLuint vao;
-    };
 
     struct RChar
     {
@@ -82,7 +80,8 @@ namespace rain::engine
         u32 load_primitive(glm::vec3* vertices, u32 vertices_count, u32* vertices_indices, u32 vertices_indices_count, glm::vec3* normals, u32 normals_count, u32* normals_indices, u32 normals_indices_count);
         void draw_primitive(const u32 vao, const u32 nindices, const Material& material, const glm::vec3& position, const glm::quat& _orientation, const glm::vec3& scale);
 
-		void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao, u32& instance_vbo);
+		void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao, u32& instance_vbo, u32& cube_vbo);
+		void delete_instancing_cube(const u32 vao, const u32 instance_vbo, const u32 cube_vbo);
 		void reload_instancing_cube(const u32 vao, const u32 instance_vbo, const std::vector<glm::mat4>& instances);
 		void draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture const * const texture, const glm::vec3& view_position);
 
@@ -91,6 +90,8 @@ namespace rain::engine
 
         void init_transvoxel(voxel::vox_block* block) const;
         void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& position, const glm::vec3& view_position, f32 max_height);
+		void init_transvoxel2(voxel::VoxelMesh* chunk) const;
+		void draw_transvoxel2(const u32& vao, const u32 indices_count, const glm::vec3& position);
 
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
@@ -124,7 +125,8 @@ namespace rain::engine
         handle<Shader> const * phong_handle;
         handle<Shader> const * instancing_handle;
         handle<Shader> const * sf_handle;
-        handle<Shader> const * transvoxel_handle;
+		handle<Shader> const * transvoxel_handle;
+		handle<Shader> const * transvoxel2_handle;
 
         Shader pbr_shader;
 

@@ -5,7 +5,6 @@
 #include "engine/core/context.h"
 #include "engine/game/world.h"
 
-
 namespace rain::engine::voxel2
 {
 	OctTreeNode::OctTreeNode(VolumeData& vol_data, const ivec3& m, OCTTREE_LOD lod, i32 s, f32 max_dist)
@@ -17,7 +16,9 @@ namespace rain::engine::voxel2
 		, has_children(false)
 		, is_loaded(false)
 		, vao(0)
-		//, texture_handle(nullptr)
+		, vbo_instances(0)
+		, vbo_cube(0)
+		, texture_handle(nullptr)
 	{
 		children.fill(nullptr);
 		mats.reserve(size * size * size);
@@ -72,33 +73,32 @@ namespace rain::engine::voxel2
 	{
 		RAIN_LOG("loading");
 
-		//for (i32 i = 0; i < size; ++i)
-		//{
-		//	for (i32 j = 0; j < size; ++j)
-		//	{
-		//		for (i32 k = 0; k < size; ++k)
-		//		{
-		//			const ivec3 sample_pos = ivec3{ min.x + i * lod, min.y + j * lod, min.z + k * lod };
-		//			const Sample& sample = volume_data.get(sample_pos);
+		for (i32 i = 0; i < size; ++i)
+		{
+			for (i32 j = 0; j < size; ++j)
+			{
+				for (i32 k = 0; k < size; ++k)
+				{
+					const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
+					//const Sample& sample = volume_data.get(sample_pos);
 
-		//			mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
-		//		}
-		//	}
-		//}
+					mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
+				}
+			}
+		}
 
-		//u32 vbo;
-		//RAIN_RENDERER->init_instancing_cube(mats, vao, vbo);
-		//texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
+		RAIN_RENDERER->init_instancing_cube(mats, vao, vbo_instances, vbo_cube);
+		texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
 	}
 
 	void OctTreeNode::unload()
 	{
 		RAIN_LOG("unloading");
+		RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
 	}
 
 	void OctTreeNode::draw()
 	{
-		//RAIN_RENDERER->draw_instancing_cube(vao, mats.size(), glm::mat4(1), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
 
 		if (has_children)
 		{
@@ -109,6 +109,8 @@ namespace rain::engine::voxel2
 		}
 		else
 		{
+			RAIN_RENDERER->draw_instancing_cube(vao, mats.size(), glm::mat4(1), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
+
 			const glm::vec3 center = get_center();
 			glm::vec3 color{};
 
@@ -146,12 +148,22 @@ namespace rain::engine::voxel2
 		{
 			RAIN_LOG("create children");
 			create_children();
+			unload();
+			is_loaded = false;
 			has_children = true;
 		}
 
 		if (has_children)
 		{
 			update_children(other);
+		}
+		else
+		{
+			if (!is_loaded)
+			{
+				load();
+				is_loaded = true;
+			}
 		}
 	}
 

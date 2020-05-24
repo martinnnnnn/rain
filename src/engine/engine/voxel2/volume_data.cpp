@@ -67,7 +67,7 @@ namespace rain::engine::voxel2
 		}
 	}
 
-	u32 vao, vbo;
+	u32 vao, vbo, vbo2;
 	handle<Texture> const * texture_handle;
 	std::vector<glm::mat4> model_matrices;
 
@@ -91,7 +91,7 @@ namespace rain::engine::voxel2
 		}
 
 		RAIN_LOG("%d cubes to drawn", model_matrices.size());
-		RAIN_RENDERER->init_instancing_cube(model_matrices, vao, vbo);
+		RAIN_RENDERER->init_instancing_cube(model_matrices, vao, vbo, vbo2);
 
 		texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
 	}

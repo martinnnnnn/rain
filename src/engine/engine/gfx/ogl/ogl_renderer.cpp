@@ -11,6 +11,7 @@
 #include "engine/win32/win32_window.h"
 #include "engine/data/data_system.h"
 #include "engine/win32/win32_input.h"
+#include "engine/voxel/transvoxel2.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -106,6 +107,10 @@ namespace rain::engine
         transvoxel_handle->data->set("viewPos", 0.3f, 0.3f, 0.3f);
         transvoxel_handle->data->set("lightColor", 1.0f, 1.0f, 1.0f);
         transvoxel_handle->data->set("objectColor", 1.0f, 0.5f, 0.31f);
+
+		transvoxel2_handle = RAIN_FIND_DATA_FROM_PATH(Shader, RAIN_CONFIG->data_root + "/shaders/glsl/transvoxel2.glsl.rain");
+		transvoxel2_handle->data->use();
+		transvoxel2_handle->data->set("objectColor", 1.0f, 0.5f, 0.31f);
     }
 
     void Renderer::set_perspective_projection_matrix(const glm::mat4& _projection)
@@ -666,7 +671,50 @@ namespace rain::engine
         glBindVertexArray(0);
     }
 
-    void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao)
+	void Renderer::draw_transvoxel2(const u32& vao, const u32 indices_count, const glm::vec3& position)
+	{
+		transvoxel_handle->data->use();
+		transvoxel_handle->data->set("model", glm::translate(glm::mat4(1), position));
+		transvoxel_handle->data->set("projection", proj_mat_perspective);
+		transvoxel_handle->data->set("view", view_mat);
+		glBindVertexArray(vao);
+		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+	}
+
+	void Renderer::init_transvoxel2(voxel::VoxelMesh* chunk) const
+	{
+		if (chunk->vao == 0)
+		{
+			glGenVertexArrays(1, &chunk->vao);
+		}
+		if (chunk->vbo == 0)
+		{
+			glGenBuffers(1, &chunk->vbo);
+		}
+		if (chunk->ebo == 0)
+		{
+			glGenBuffers(1, &chunk->ebo);
+		}
+
+		glBindVertexArray(chunk->vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
+		glBufferData(GL_ARRAY_BUFFER, chunk->vertices.size() * sizeof(voxel::VoxelVertex), chunk->vertices.data(), GL_DYNAMIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk->ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, chunk->indices.size() * sizeof(u32), chunk->indices.data(), GL_DYNAMIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::VoxelVertex), (void*)0);
+
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(voxel::VoxelVertex), (void*)offsetof(voxel::VoxelVertex, normal));
+
+		glBindVertexArray(0);
+	}
+
+    void Renderer::init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao,  u32& instance_vbo, u32& cube_vbo)
     {
         std::vector<glm::vec3> Positions = std::vector<glm::vec3>
         {
@@ -801,7 +849,6 @@ namespace rain::engine
             glm::vec3(0.0f,  1.0f,  0.0f),
         };
 
-
         std::vector<float> data;
         for (u32 i = 0; i < Positions.size(); ++i)
         {
@@ -823,7 +870,6 @@ namespace rain::engine
 
         glGenVertexArrays(1, &vao);
 
-        u32 cube_vbo;
         glGenBuffers(1, &cube_vbo);
         glGenBuffers(1, &instance_vbo);
 
@@ -859,6 +905,15 @@ namespace rain::engine
 
         glBindVertexArray(0);
     }
+
+	void Renderer::delete_instancing_cube(const u32 vao, const u32 instance_vbo, const u32 cube_vbo)
+	{
+		glBindVertexArray(vao);
+		glDeleteBuffers(1, &instance_vbo);
+		glDeleteBuffers(1, &cube_vbo);
+		glDeleteVertexArrays(1, &vao);
+		glBindVertexArray(0);
+	}
 
 	void Renderer::reload_instancing_cube(const u32 vao, const u32 instance_vbo, const std::vector<glm::mat4>& instances)
 	{
@@ -1085,6 +1140,10 @@ namespace rain::engine
 
             m_debug_vertex_count += 2;
         }
+		else
+		{
+			RAIN_LOG("debug_vertices_max_count reached");
+		}
     }
 
     void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2)

@@ -9,6 +9,7 @@
 #include "engine/voxel/voxel.h"
 #include "engine/voxel/oct_tree.h"
 #include "engine/voxel2/volume_data.h"
+#include "engine/voxel2/oct_tree.h"
 
 namespace rain::engine
 {
@@ -49,8 +50,9 @@ namespace rain::engine
 
         voxel::vox_map voxmap;
         character chara;
-        voxel::oct_tree octtree;
+        //voxel::oct_tree octtree;
 		voxel2::VolumeData volume_data;
+		voxel2::OctTree    oct_tree;
     };
 }
 

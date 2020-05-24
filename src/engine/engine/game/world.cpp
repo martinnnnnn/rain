@@ -50,10 +50,12 @@ namespace rain::engine
         //voxmap.min_y = 0;
         //voxmap.max_y = 1;
         //voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
-        voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
+        //voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
 
 		volume_data.init_debug();
 		volume_data.load_debug();
+
+		oct_tree.init(&volume_data, voxel2::VolumeChunk::DEFAULT_SIZE, voxel2::OCTTREE_LOD_MAX);
 
         std::vector<actor*> view;
 
@@ -84,7 +86,7 @@ namespace rain::engine
 
         chara =
         {
-            glm::vec3{},
+            glm::vec3{-5, 0, 0},
             5.0f,
         };
 
@@ -155,7 +157,7 @@ namespace rain::engine
             chara.position.y -= 0.1f * chara.speed;
         }
 
-		if (RAIN_INPUT->is_key_pressed(DIK_Q))
+		if (RAIN_INPUT->is_key_released(DIK_Q))
 		{
 			RAIN_LOG("reloading");
 			static bool done = false;
@@ -165,6 +167,8 @@ namespace rain::engine
 				done = true;
 			}
 		}
+
+		oct_tree.update(chara.position);
 
         //voxel::update_map(&voxmap, main_camera.transform->position);
         //voxel::update_map(&voxmap, chara.position);
@@ -225,7 +229,8 @@ namespace rain::engine
         RAIN_RENDERER->update();
 
         //voxel::draw_map(&voxmap, main_camera.transform->position);
-		volume_data.draw_debug();
+		//volume_data.draw_debug();
+		oct_tree.draw();
 
         std::vector<actor*> view;
 

@@ -7,6 +7,8 @@
 
 #include "core/core.h"
 #include "volume_data.h"
+#include "engine/gfx/ogl/ogl_texture.h"
+#include "engine/data/data_system.h"
 
 // compute correct max distance
 
@@ -17,8 +19,10 @@ namespace rain::engine::voxel2
 	constexpr OCTTREE_LOD OCTTREE_LOD_1 = 1;
 	constexpr OCTTREE_LOD OCTTREE_LOD_2 = OCTTREE_LOD_1 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_3 = OCTTREE_LOD_2 * 2;
+	constexpr OCTTREE_LOD OCTTREE_LOD_4 = OCTTREE_LOD_3 * 2;
+	constexpr OCTTREE_LOD OCTTREE_LOD_5 = OCTTREE_LOD_4 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_MIN = OCTTREE_LOD_1;
-	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_3;
+	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_5;
 
 	struct OctTreeNode
 	{
@@ -62,7 +66,9 @@ namespace rain::engine::voxel2
 		// debug
 		std::vector<glm::mat4> mats;
 		u32 vao;
-		//handle<Texture> const * texture_handle;
+		u32 vbo_instances;
+		u32 vbo_cube;
+		handle<Texture> const * texture_handle;
 	};
 
 	struct OctTree
