@@ -16,7 +16,6 @@ namespace rain::engine::voxel2
 
 		if (!contains(chunk_index))
 		{
-			RAIN_LOG("create chunk at (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
 			chunk = create_chunk(chunk_index);
 			add_chunk(chunk);
 		}
@@ -105,7 +104,6 @@ namespace rain::engine::voxel2
 		for (auto item : data)
 		{
 			const glm::vec3 chunk_pos = item.second->index;
-			RAIN_LOG("loading chunk at (%f, %f, %f)", chunk_pos.x, chunk_pos.y, chunk_pos.z);
 			for (u32 u = 0; u < chunk_size.cubed; ++u)
 			{
 				glm::vec3 sample_pos = chunk_size.get_position(u);

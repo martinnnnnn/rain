@@ -29,12 +29,14 @@ namespace rain::engine::voxel2
 		}
 
 		void			set(i32 x, i32 y, i32 z, Sample sample);
-		const Sample&	get(i32 x, i32 y, i32 z);
 
-		void init_debug();
-		void load_debug();
-		void reload_debug();
-		void draw_debug();
+		const Sample&	get(i32 x, i32 y, i32 z);
+		const Sample&	get(const ivec3& index) { return get(index.x, index.y, index.z); }
+
+		void			init_debug();
+		void			load_debug();
+		void			reload_debug();
+		void			draw_debug();
 
 	private:
 
