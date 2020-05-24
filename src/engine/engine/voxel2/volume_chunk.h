@@ -9,9 +9,6 @@
 
 namespace rain::engine::voxel2
 {
-	typedef glm::ivec3 ivec3;
-	typedef glm::uvec3 uvec3;
-
 	struct ivec3_hasher
 	{
 		std::size_t operator()(const ivec3& position) const

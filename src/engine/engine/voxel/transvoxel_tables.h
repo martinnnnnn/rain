@@ -36,7 +36,7 @@
 // used for a single equivalence class in the modified Marching Cubes algorithm,
 // described in Section 3.2.
 
-namespace rain::engine::lengyel
+namespace lengyel
 {
     struct RegularCellData
     {

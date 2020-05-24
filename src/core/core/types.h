@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <glm.hpp>
 
 typedef int8_t i8;
 typedef int16_t i16;
@@ -16,4 +17,7 @@ typedef float f32;
 typedef double f64;
 
 typedef u32 uptr;
+
+typedef glm::ivec3 ivec3;
+typedef glm::uvec3 uvec3;
 
