@@ -1,0 +1,4 @@
+{
+    "vertex": "/transvoxel2.vert",
+    "fragment": "/transvoxel2.frag"
+}

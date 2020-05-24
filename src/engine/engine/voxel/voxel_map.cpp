@@ -25,8 +25,8 @@ namespace rain::engine
         }
 
         RAIN_LOG("%d cubes to drawn", vmap->model_matrices.size());
-		u32 vbo;
-        RAIN_RENDERER->init_instancing_cube(vmap->model_matrices, vmap->vao, vbo);
+		u32 instance_vbo, cube_vbo;
+        RAIN_RENDERER->init_instancing_cube(vmap->model_matrices, vmap->vao, instance_vbo, cube_vbo);
 
         vmap->texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
     }

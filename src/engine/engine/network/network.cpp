@@ -12,7 +12,7 @@ namespace rain::engine::network
     i32 init()
     {
         WSADATA wsa_data;
-        i32 i_result = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+        i32 i_result = ::WSAStartup(MAKEWORD(2, 2), &wsa_data);
         if (i_result != 0)
         {
             RAIN_LOG_NETWORK("WSAStartup failed with error: %d\n", i_result);
@@ -23,7 +23,7 @@ namespace rain::engine::network
 
     void terminate()
     {
-        WSACleanup();
+        ::WSACleanup();
     }
 
 
@@ -43,7 +43,7 @@ namespace rain::engine::network
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;
 
-        i_result = getaddrinfo(ip_address, port, &hints, &result);
+        i_result = ::getaddrinfo(ip_address, port, &hints, &result);
         if (i_result != 0)
         {
             RAIN_LOG_NETWORK("getaddrinfo failed with error: %d\n", i_result);
@@ -52,18 +52,18 @@ namespace rain::engine::network
 
         for (ptr = result; ptr != NULL; ptr = ptr->ai_next)
         {
-            info.socket = socket(ptr->ai_family, ptr->ai_socktype,
+            info.socket = ::socket(ptr->ai_family, ptr->ai_socktype,
                 ptr->ai_protocol);
             if (info.socket == INVALID_SOCKET)
             {
-                RAIN_LOG_NETWORK("socket failed with error: %ld\n", WSAGetLastError());
+                RAIN_LOG_NETWORK("socket failed with error: %ld\n", ::WSAGetLastError());
                 return 1;
             }
 
-            i_result = connect(info.socket, ptr->ai_addr, (int)ptr->ai_addrlen);
+            i_result = ::connect(info.socket, ptr->ai_addr, (int)ptr->ai_addrlen);
             if (i_result == SOCKET_ERROR)
             {
-                closesocket(info.socket);
+                ::closesocket(info.socket);
                 info.socket = INVALID_SOCKET;
                 continue;
             }
@@ -83,16 +83,16 @@ namespace rain::engine::network
 
     i32 stop_tcp_client(const connexion_info& info)
     {
-        i32 result = shutdown(info.socket, SD_SEND);
+        i32 result = ::shutdown(info.socket, SD_SEND);
         if (result == SOCKET_ERROR)
         {
-            RAIN_LOG_NETWORK("shutdown failed with error: %d\n", WSAGetLastError());
+			RAIN_LOG_NETWORK("shutdown failed with error: %d\n", ::WSAGetLastError());
             return 1;
         }
 
         char buffer[DEFAULT_BUFLEN];
         do {
-            result = recv(info.socket, buffer, DEFAULT_BUFLEN, 0);
+            result = ::recv(info.socket, buffer, DEFAULT_BUFLEN, 0);
             if (result > 0)
             {
                 RAIN_LOG_NETWORK("Bytes received: %d\n", result);
@@ -104,7 +104,7 @@ namespace rain::engine::network
             }
             else
             {
-                RAIN_LOG_NETWORK("recv failed with error: %d\n", WSAGetLastError());
+                RAIN_LOG_NETWORK("recv failed with error: %d\n", ::WSAGetLastError());
             }
 
         } while (result > 0);
@@ -116,10 +116,10 @@ namespace rain::engine::network
         RAIN_LOG_NETWORK("you : %s", buffer);
         std::string message = std::string("you : ") + buffer;
         RAIN_MESSAGING->emit(INGAME_CHAT_INC{ message });
-        i32 i_result = send(info.socket, buffer, (i32)strlen(buffer) + 1, 0);
+        i32 i_result = ::send(info.socket, buffer, (i32)strlen(buffer) + 1, 0);
         if (i_result == SOCKET_ERROR)
         {
-            RAIN_LOG_NETWORK("send failed with error: %d\n", WSAGetLastError());
+            RAIN_LOG_NETWORK("send failed with error: %d\n", ::WSAGetLastError());
             return -1;
         }
     }

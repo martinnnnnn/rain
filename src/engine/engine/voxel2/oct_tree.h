@@ -22,7 +22,7 @@ namespace rain::engine::voxel2
 	constexpr OCTTREE_LOD OCTTREE_LOD_4 = OCTTREE_LOD_3 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_5 = OCTTREE_LOD_4 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_MIN = OCTTREE_LOD_1;
-	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_5;
+	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_3;
 
 	struct OctTreeNode
 	{

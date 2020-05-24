@@ -71,8 +71,7 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::load()
 	{
-		RAIN_LOG("loading");
-
+		RAIN_LOG("loading octtree node (%d, %d, %d)", min.x, min.y, min.z);
 		for (i32 i = 0; i < size; ++i)
 		{
 			for (i32 j = 0; j < size; ++j)
@@ -80,9 +79,12 @@ namespace rain::engine::voxel2
 				for (i32 k = 0; k < size; ++k)
 				{
 					const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
-					//const Sample& sample = volume_data.get(sample_pos);
+					const Sample& sample = volume_data.get(sample_pos);
 
-					mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
+					if (sample.value > 0)
+					{
+						mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
+					}
 				}
 			}
 		}
@@ -93,13 +95,12 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::unload()
 	{
-		RAIN_LOG("unloading");
 		RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
 	}
 
 	void OctTreeNode::draw()
 	{
-
+		RAIN_LOG("drawing (%d, %d, %d)", min.x, min.y, min.z);
 		if (has_children)
 		{
 			for (u32 u(0); u < children.size(); ++u)
@@ -114,18 +115,7 @@ namespace rain::engine::voxel2
 			const glm::vec3 center = get_center();
 			glm::vec3 color{};
 
-			if (LOD == OCTTREE_LOD_1)
-			{
-				color = glm::vec3(1, 0, 0);
-			}
-			if (LOD == OCTTREE_LOD_2)
-			{
-				color = glm::vec3(0, 1, 0);
-			}
-			if (LOD == OCTTREE_LOD_3)
-			{
-				color = glm::vec3(0, 0, 1);
-			}
+			color = glm::vec3(1.0f - f32(LOD) / f32(OCTTREE_LOD_MAX), 0, 0);
 
 			RAIN_RENDERER->draw_debug_cube(center, f32(size) * LOD, f32(size) * LOD, color);
 		}
@@ -133,11 +123,11 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::update(const glm::vec3& other)
 	{
+		RAIN_LOG("udpate (%d, %d, %d)", min.x, min.y, min.z);
 		const f32 distance = glm::distance(glm::vec3(get_center()), other);
 
 		if (!point_collision(other) /*distance >= max_distance*/ && has_children)
 		{
-			RAIN_LOG("delete children");
 			delete_children();
 			has_children = false;
 
@@ -146,7 +136,6 @@ namespace rain::engine::voxel2
 		}
 		else if (point_collision(other) /*distance < max_distance*/ && !has_children && LOD > OCTTREE_LOD_MIN)
 		{
-			RAIN_LOG("create children");
 			create_children();
 			unload();
 			is_loaded = false;

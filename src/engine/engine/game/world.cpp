@@ -90,10 +90,6 @@ namespace rain::engine
             5.0f,
         };
 
-
-        //chara.position = glm::vec3{};
-        //chara.speed = 5.0f;
-
         //actor* new_actor = sg.create();
         //core::transform* t = new_actor->components.create<core::transform>();
         //t->scale = glm::vec3{ 0.1f, 0.1f, 0.1f };
@@ -163,7 +159,7 @@ namespace rain::engine
 			static bool done = false;
 			if (!done)
 			{
-				volume_data.reload_debug();
+				//volume_data.reload_debug();
 				done = true;
 			}
 		}
