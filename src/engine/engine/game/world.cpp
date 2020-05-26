@@ -53,8 +53,7 @@ namespace rain::engine
         //voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
 
 		::Sleep(3000);
-		volume_data.init_debug();
-		volume_data.load_debug();
+		volume_data.init();
 
 		oct_tree.init(&volume_data, voxel2::VolumeChunk::DEFAULT_SIZE, voxel2::OCTTREE_LOD_MAX);
 
@@ -154,17 +153,6 @@ namespace rain::engine
             chara.position.y -= 0.1f * chara.speed;
         }
 
-		if (RAIN_INPUT->is_key_released(DIK_Q))
-		{
-			RAIN_LOG("reloading");
-			static bool done = false;
-			if (!done)
-			{
-				//volume_data.reload_debug();
-				done = true;
-			}
-		}
-
 		oct_tree.update(chara.position);
 
         //voxel::update_map(&voxmap, main_camera.transform->position);
@@ -226,7 +214,6 @@ namespace rain::engine
         RAIN_RENDERER->update();
 
         //voxel::draw_map(&voxmap, main_camera.transform->position);
-		//volume_data.draw_debug();
         if (RAIN_INPUT->is_key_pressed(DIK_M))
         {
 		    oct_tree.draw();

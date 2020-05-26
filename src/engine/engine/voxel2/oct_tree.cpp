@@ -3,6 +3,7 @@
 
 #include "engine/gfx/ogl/ogl_renderer.h"
 #include "engine/core/context.h"
+#include "engine/core/profiler.h"
 #include "engine/game/world.h"
 
 namespace rain::engine::voxel2
@@ -77,7 +78,8 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::load()
 	{
-		RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
+        RAIN_PROFILE("loading octtree node");
+		//RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
 		for (i32 i = 0; i < size; ++i)
 		{
 			for (i32 j = 0; j < size; ++j)

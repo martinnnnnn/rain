@@ -38,90 +38,15 @@ namespace rain::engine::voxel2
 			create_add_and_fill_chunk(chunk_index);
 		}
 
-
-		//int offset_index =
-		//	(x - chunk_index.x * chunk_size.value) +
-		//	(y - chunk_index.y * chunk_size.value) * chunk_size.value +
-		//	(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
-
 		return data[chunk_index]->get_absolute(x, y, z);
 	}
 
 
-	void VolumeData::init_debug()
+	void VolumeData::init()
 	{
 		transform.position = glm::vec3{ 5, 0, 5 };
 		transform.scale = glm::vec3{ 2, 1, 1 };
 		transform.orientation = glm::quat();
-
-		RAIN_LOG("init debug");
-		
-		//for (i32 i = 0; i < i32(chunk_size.value) * 5; ++i)
-		//{
-		//	for (i32 j = -i32(chunk_size.value); j < i32(chunk_size.value); ++j)
-		//	{
-		//		for (i32 k = 0; k < i32(chunk_size.value); ++k)
-		//		{
-		//			set(i, j, k, Sample(i8(core::simplex_noise::noise(f32(i), f32(j), f32(k)) * 127)));
-		//		}
-		//	}
-		//}
-	}
-
-	u32 vao, vbo, vbo2;
-	handle<Texture> const * texture_handle;
-	std::vector<glm::mat4> model_matrices;
-
-	void VolumeData::load_debug()
-	{
-		//RAIN_LOG("load debug");
-		//model_matrices.reserve(10'000'000);
-
-		//for (auto item : data)
-		//{
-		//	const glm::vec3 chunk_pos = item.second->index;
-		//	RAIN_LOG("loading chunk at (%f, %f, %f)", chunk_pos.x, chunk_pos.y, chunk_pos.z);
-		//	for (u32 u = 0; u < chunk_size.cubed; ++u)
-		//	{
-		//		glm::vec3 sample_pos = chunk_size.get_position(u);
-		//		if (item.second->get(u).value > 0)
-		//		{
-		//			model_matrices.emplace_back(glm::translate(glm::mat4(1), chunk_pos * f32(chunk_size.value) + sample_pos) /** glm::scale(glm::mat4(1), glm::vec3(0.1f, 0.1f, 0.1f))*/);
-		//		}
-		//	}
-		//}
-
-		//RAIN_LOG("%d cubes to drawn", model_matrices.size());
-		//RAIN_RENDERER->init_instancing_cube(model_matrices, vao, vbo, vbo2);
-
-		//texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
-	}
-
-	void VolumeData::reload_debug()
-	{
-		//set(i32(chunk_size.value) * 6, i32(chunk_size.value) * 6, i32(chunk_size.value) * 6, Sample(5));
-
-		//model_matrices.clear();
-		//for (auto item : data)
-		//{
-		//	const glm::vec3 chunk_pos = item.second->index;
-		//	for (u32 u = 0; u < chunk_size.cubed; ++u)
-		//	{
-		//		glm::vec3 sample_pos = chunk_size.get_position(u);
-		//		if (item.second->get(u).value > 0)
-		//		{
-		//			model_matrices.emplace_back(glm::translate(glm::mat4(1), chunk_pos * f32(chunk_size.value) + sample_pos) /** glm::scale(glm::mat4(1), glm::vec3(0.1f, 0.1f, 0.1f))*/);
-		//		}
-		//	}
-		//}
-
-		//RAIN_LOG("%d cubes to drawn", model_matrices.size());
-		//RAIN_RENDERER->reload_instancing_cube(vao, vbo, model_matrices);
-	}
-
-	void VolumeData::draw_debug()
-	{
-		//RAIN_RENDERER->draw_instancing_cube(vao, model_matrices.size(), get_transform_matrix(transform), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
 	}
 
 	VolumeChunk* VolumeData::create_chunk(const ivec3& chunk_index)
@@ -131,7 +56,7 @@ namespace rain::engine::voxel2
 
 	VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
 	{
-		RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
+		//RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
 		VolumeChunk* new_chunk = create_chunk(chunk_index);
         add_chunk(new_chunk);
 
