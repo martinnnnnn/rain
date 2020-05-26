@@ -41,6 +41,12 @@ namespace rain::engine::voxel2
 		const ivec3 center = get_center();
 		const OCTTREE_LOD child_lod = LOD / 2;
 
+        for (const ivec3& child_min : CHILDREN_MINS)
+        {
+            // use this to generate children  [ min + size * LOD / 2 * child_min => chooses between min or center for child min x y z]
+            //RAIN_LOG("1 :: %d, %d, %d", min + ivec3{ size * LOD / 2, size * LOD / 2, size * LOD / 2 } *child_min);
+        }
+
 		children[0] = new OctTreeNode(volume_data, ivec3{ min.x,    min.y,    min.z    }, child_lod, size, max_distance / 2.0f);
 		children[1] = new OctTreeNode(volume_data, ivec3{ center.x, min.y,    min.z    }, child_lod, size, max_distance / 2.0f);
 		children[2] = new OctTreeNode(volume_data, ivec3{ min.x,    min.y,    center.z }, child_lod, size, max_distance / 2.0f);
@@ -71,7 +77,7 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::load()
 	{
-		RAIN_LOG("loading octtree node (%d, %d, %d)", min.x, min.y, min.z);
+		RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
 		for (i32 i = 0; i < size; ++i)
 		{
 			for (i32 j = 0; j < size; ++j)
@@ -81,7 +87,7 @@ namespace rain::engine::voxel2
 					const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
 					const Sample& sample = volume_data.get(sample_pos);
 
-					RAIN_LOG("%u", sample.value);
+					//RAIN_LOG("%u", sample.value);
 
 					if (sample.value > 0)
 					{
@@ -112,15 +118,27 @@ namespace rain::engine::voxel2
 		else
 		{
 			RAIN_RENDERER->draw_instancing_cube(vao, mats.size(), glm::mat4(1), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
-
-			const glm::vec3 center = get_center();
-			glm::vec3 color{};
-
-			color = glm::vec3(1.0f - f32(LOD) / f32(OCTTREE_LOD_MAX), 0, 0);
-
-			RAIN_RENDERER->draw_debug_cube(center, f32(size) * LOD, f32(size) * LOD, color);
 		}
 	}
+
+    void OctTreeNode::draw_debug()
+    {
+        if (has_children)
+        {
+            for (u32 u(0); u < children.size(); ++u)
+            {
+                children[u]->draw_debug();
+            }
+        }
+        else
+        {
+            const glm::vec3 center = get_center();
+            glm::vec3 color{};
+
+            color = glm::vec3(1.0f - f32(LOD) / f32(OCTTREE_LOD_MAX), 0, 0);
+            RAIN_RENDERER->draw_debug_cube(center, f32(size) * LOD, f32(size) * LOD, color);
+        }
+    }
 
 	void OctTreeNode::update(const glm::vec3& other)
 	{
@@ -186,6 +204,14 @@ namespace rain::engine::voxel2
 			roots[u]->draw();
 		}
 	}
+
+    void OctTree::draw_debug()
+    {
+        for (u32 u(0); u < roots.size(); ++u)
+        {
+            roots[u]->draw_debug();
+        }
+    }
 }
 
 

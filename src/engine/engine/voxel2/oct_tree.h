@@ -22,7 +22,7 @@ namespace rain::engine::voxel2
 	constexpr OCTTREE_LOD OCTTREE_LOD_4 = OCTTREE_LOD_3 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_5 = OCTTREE_LOD_4 * 2;
 	constexpr OCTTREE_LOD OCTTREE_LOD_MIN = OCTTREE_LOD_1;
-	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_3;
+	constexpr OCTTREE_LOD OCTTREE_LOD_MAX = OCTTREE_LOD_5;
 
 	struct OctTreeNode
 	{
@@ -30,7 +30,7 @@ namespace rain::engine::voxel2
 
 		using Children = std::array<OctTreeNode*, OCTTREE_CHILDREN_COUNT>;
 
-		static constexpr ivec3 CHILDREN_MINS[]
+		static constexpr std::array<ivec3, OCTTREE_CHILDREN_COUNT> CHILDREN_MINS =
 		{
 			ivec3(0, 0, 0),
 			ivec3(1, 0, 0),
@@ -52,6 +52,7 @@ namespace rain::engine::voxel2
 		void load();
 		void unload();
 		void draw();
+        void draw_debug();
 		void update(const glm::vec3& other);
 
 		VolumeData&			volume_data;
@@ -77,7 +78,8 @@ namespace rain::engine::voxel2
 
 		void init(VolumeData* volume_data, u32 size, OCTTREE_LOD max_lod);
 		void update(const glm::vec3& other);
-		void draw();
+        void draw();
+        void draw_debug();
 
 		VolumeData*					volume_data;
 		u32							size;

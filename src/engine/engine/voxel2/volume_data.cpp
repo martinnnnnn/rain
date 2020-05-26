@@ -16,7 +16,7 @@ namespace rain::engine::voxel2
 
 		if (!contains(chunk_index))
 		{
-			add_chunk(create_and_fill_chunk(chunk_index));
+			create_add_and_fill_chunk(chunk_index);
 			//chunk = create_chunk(chunk_index);
 			//add_chunk(chunk);
 		}
@@ -35,14 +35,14 @@ namespace rain::engine::voxel2
 		//assert(contains(chunk_index) && "Trying to access an element not present in data");
 		if (!contains(chunk_index))
 		{
-			add_chunk(create_and_fill_chunk(chunk_index));
+			create_add_and_fill_chunk(chunk_index);
 		}
 
 
-		int offset_index =
-			(x - chunk_index.x * chunk_size.value) +
-			(y - chunk_index.y * chunk_size.value) * chunk_size.value +
-			(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
+		//int offset_index =
+		//	(x - chunk_index.x * chunk_size.value) +
+		//	(y - chunk_index.y * chunk_size.value) * chunk_size.value +
+		//	(z - chunk_index.z * chunk_size.value) * chunk_size.squared;
 
 		return data[chunk_index]->get_absolute(x, y, z);
 	}
@@ -129,10 +129,11 @@ namespace rain::engine::voxel2
 		return new VolumeChunk(chunk_index, chunk_size.value);
 	}
 
-	VolumeChunk* VolumeData::create_and_fill_chunk(const ivec3& chunk_index)
+	VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
 	{
-		//RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
+		RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
 		VolumeChunk* new_chunk = create_chunk(chunk_index);
+        add_chunk(new_chunk);
 
 		for (i32 i = 0; i < i32(chunk_size.value); ++i)
 		{
@@ -140,9 +141,14 @@ namespace rain::engine::voxel2
 			{
 				for (i32 k = 0; k < i32(chunk_size.value); ++k)
 				{
-					const ivec3 sample_map_pos = chunk_index + ivec3{ i, j, k };
+					const ivec3 sample_map_pos = (chunk_index * i32(chunk_size.value)) + ivec3{ i, j, k };
 					const glm::vec3 absolute_pos = transform.position + glm::vec3(sample_map_pos);
-					set(sample_map_pos.x, sample_map_pos.y, sample_map_pos.z, Sample(i8(core::simplex_noise::noise(absolute_pos.x, absolute_pos.y, absolute_pos.z) * 127)));
+                    const f32 distf = core::simplex_noise::noise(
+                        f32(sample_map_pos.x) / f32(chunk_size.value),
+                        f32(sample_map_pos.y) / f32(chunk_size.value), 
+                        f32(sample_map_pos.z) / f32(chunk_size.value)) * 127.0f;
+
+                    set(sample_map_pos.x, sample_map_pos.y, sample_map_pos.z, Sample(i8(distf)));
 				}
 			}
 		}

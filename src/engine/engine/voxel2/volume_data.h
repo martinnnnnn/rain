@@ -43,7 +43,7 @@ namespace rain::engine::voxel2
 		using VolumeChunkMap = std::unordered_map<ivec3, VolumeChunk*, ivec3_hasher, ivec3_hasher>;
 
 		VolumeChunk*	create_chunk(const ivec3& chunk_index);
-		VolumeChunk*	create_and_fill_chunk(const ivec3& chunk_index);
+		VolumeChunk*	create_add_and_fill_chunk(const ivec3& chunk_index);
 		void			add_chunk(VolumeChunk* chunk);
 		ivec3			get_chunk_index(i32 x, i32 y, i32 z);
 		bool			contains(const ivec3& chunk_index);
