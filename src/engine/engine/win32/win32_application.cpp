@@ -120,11 +120,9 @@ namespace rain::engine
         currentTime = newTime;
         accumulator += frameTime;
 
-		RAIN_LOG("acc >= dt || %f >= %f", accumulator, dt);
         while (accumulator >= dt)
         {
             RAIN_WPROFILE("CPU : ", 1000.0f, 10.0f, 0.4f, (glm::vec4{ 0.9, 0.5f, 0.2f, 1.0f }));
-			RAIN_LOG("update");
             RAIN_WORLD->update_physics((float)dt);
             RAIN_WORLD->update_camera((float)dt);
             accumulator -= dt;
@@ -133,7 +131,6 @@ namespace rain::engine
         const double alpha = accumulator / dt;
         {
             RAIN_WPROFILE("GPU : ", 1000.0f, 25.0f, 0.4f, (glm::vec4{ 0.5, 0.9f, 0.2f, 1.0f }));
-			RAIN_LOG("render");
 			render(float(alpha));
         }
 

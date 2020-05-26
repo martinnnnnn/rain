@@ -81,6 +81,8 @@ namespace rain::engine::voxel2
 					const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
 					const Sample& sample = volume_data.get(sample_pos);
 
+					RAIN_LOG("%u", sample.value);
+
 					if (sample.value > 0)
 					{
 						mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
@@ -100,7 +102,6 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::draw()
 	{
-		RAIN_LOG("drawing (%d, %d, %d)", min.x, min.y, min.z);
 		if (has_children)
 		{
 			for (u32 u(0); u < children.size(); ++u)
@@ -123,7 +124,6 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::update(const glm::vec3& other)
 	{
-		RAIN_LOG("udpate (%d, %d, %d)", min.x, min.y, min.z);
 		const f32 distance = glm::distance(glm::vec3(get_center()), other);
 
 		if (!point_collision(other) /*distance >= max_distance*/ && has_children)

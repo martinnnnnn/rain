@@ -52,6 +52,7 @@ namespace rain::engine
         //voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
         //voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
 
+		::Sleep(3000);
 		volume_data.init_debug();
 		volume_data.load_debug();
 
