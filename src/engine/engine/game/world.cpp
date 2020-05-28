@@ -50,7 +50,6 @@ namespace rain::engine
         //voxmap.min_y = 0;
         //voxmap.max_y = 1;
         //voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
-        //voxel::build_oct_tree(&octtree, glm::vec3(), voxel::OCTTREE_LOD_3);
 
 		::Sleep(3000);
 		volume_data.init();
@@ -214,14 +213,13 @@ namespace rain::engine
         RAIN_RENDERER->update();
 
         //voxel::draw_map(&voxmap, main_camera.transform->position);
-        //if (RAIN_INPUT->is_key_pressed(DIK_M))
+
 		oct_tree.draw();
         oct_tree.draw_debug();
 
         std::vector<actor*> view;
 
         RAIN_RENDERER->draw_sphere(chara.position, glm::quat(), glm::vec3(3, 3, 3));
-        //voxel::draw_oct_tree(&octtree);
 
         //sg.get_view<core::transform, Model, Material>(view);
 
