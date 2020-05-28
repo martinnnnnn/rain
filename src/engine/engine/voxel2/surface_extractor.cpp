@@ -57,11 +57,14 @@ namespace rain::engine::voxel2
 		    {
 			    ivec3 p = absolute_position + CORNER_INDEXES[i] * LOD;
 
-			    corner_normals[i].x = f32(volume_data.get(p + ivec3(1, 0, 0)).value - volume_data.get(p - ivec3(1, 0, 0)).value) * 0.5f;
-			    corner_normals[i].y = f32(volume_data.get(p + ivec3(0, 1, 0)).value - volume_data.get(p - ivec3(0, 1, 0)).value) * 0.5f;
-			    corner_normals[i].z = f32(volume_data.get(p + ivec3(0, 0, 1)).value - volume_data.get(p - ivec3(0, 0, 1)).value) * 0.5f;
+				const glm::vec3 normal =
+				{
+					f32(volume_data.get(p + ivec3(1, 0, 0)).value - volume_data.get(p - ivec3(1, 0, 0)).value) * 0.5f,
+					f32(volume_data.get(p + ivec3(0, 1, 0)).value - volume_data.get(p - ivec3(0, 1, 0)).value) * 0.5f,
+					f32(volume_data.get(p + ivec3(0, 0, 1)).value - volume_data.get(p - ivec3(0, 0, 1)).value) * 0.5f
+				};
 
-			    glm::normalize(corner_normals[i]);
+				corner_normals[i] = glm::normalize(normal);
 		    }
 
 		    u8 regularCellClass = lengyel::regularCellClass[case_code];
