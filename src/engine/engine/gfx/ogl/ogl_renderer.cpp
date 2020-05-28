@@ -849,7 +849,7 @@ namespace rain::engine
 		glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(voxel2::VoxelVertex), mesh->vertices.data(), GL_STATIC_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(u16), mesh->indices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(u32), mesh->indices.data(), GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(voxel2::VoxelVertex), (void*)0);
@@ -879,7 +879,7 @@ namespace rain::engine
 		transvoxel2_handle->data->set("view", view_mat);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
+		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
 

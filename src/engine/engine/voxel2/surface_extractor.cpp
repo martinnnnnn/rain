@@ -34,7 +34,7 @@ namespace rain::engine::voxel2
 
 	    void polygonize_cell(VolumeData& volume_data, const ivec3& offset_position, const ivec3& pos, const i32 LOD, VoxelMesh* mesh)
 	    {
-		    const ivec3 absolute_position = offset_position + pos * LOD;
+			const ivec3 absolute_position = offset_position + pos * LOD;
 
 		    u8 direction_mask = u8((pos.x > 0 ? 1 : 0) | ((pos.z > 0 ? 1 : 0) << 1) | ((pos.y > 0 ? 1 : 0) << 2));
 
@@ -70,7 +70,7 @@ namespace rain::engine::voxel2
 		    lengyel::RegularCellData c = lengyel::regularCellData[regularCellClass];
 		    long vertex_count = c.GetVertexCount();
 		    long triangle_count = c.GetTriangleCount();
-		    std::vector<u16> real_indices;
+		    std::vector<u32> real_indices;
 		    real_indices.resize(c.GetTriangleCount() * 3);
 
 		    for (int i = 0; i < vertex_count; i++)
@@ -87,7 +87,7 @@ namespace rain::engine::voxel2
 
                 const f32 t = f32(d1.value) / f32(d1.value - d0.value);
 
-			    i16 index = -1;
+			    u32 index = LONG_MAX;
 
 			    //if (UseCache && v1 != 7 && (rDir & directionMask) == rDir)
 			    //{
@@ -96,7 +96,7 @@ namespace rain::engine::voxel2
 			    //	index = cell.Verts[reuseIndex];
 			    //}
 
-			    if (index == -1)
+			    if (index == LONG_MAX)
 			    {
                     const glm::vec3 P0 = (absolute_position + CORNER_INDEXES[v0] * LOD);
                     const glm::vec3 P1 = (absolute_position + CORNER_INDEXES[v1] * LOD);
@@ -106,8 +106,7 @@ namespace rain::engine::voxel2
 
                     mesh->vertices.push_back(VoxelVertex{ position, normal });
 
-					assert(false);
-					index = i16(mesh->vertices.size() - 1);
+					index = u32(mesh->vertices.size() - 1);
 			    }
 
 			    //if ((rDir & 8) != 0)
@@ -115,8 +114,9 @@ namespace rain::engine::voxel2
 			    //	cache.SetReusableIndex(pos, reuseIndex, mesh.LatestAddedVertIndex());
 			    //}
 
-			    real_indices[i] = u16(index);
+			    real_indices[i] = u32(index);
 		    }
+
 
 			std::reverse(c.vertexIndex, c.vertexIndex + (c.GetTriangleCount() * 3));
 

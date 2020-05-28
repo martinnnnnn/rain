@@ -29,7 +29,7 @@ namespace rain::engine::voxel2
 
 		}
 		std::vector<VoxelVertex> vertices;
-		std::vector<u16> indices;
+		std::vector<u32> indices;
 		u32 vao;
 		u32 vbo;
 		u32 ebo;
