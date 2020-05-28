@@ -188,13 +188,6 @@ namespace rain::engine
 
     void Renderer::init()
     {
-        //GLenum res = glewInit();
-
-        //if (res != GLEW_OK)
-        //{
-        //    RAIN_LOG("Error : %s\n", glewGetErrorString(res));
-        //}
-
         glEnable(GL_TEXTURE_2D);
         glShadeModel(GL_SMOOTH);
         glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
@@ -874,6 +867,8 @@ namespace rain::engine
 		glDeleteBuffers(1, &ebo);
 		glDeleteVertexArrays(1, &vao);
 		glBindVertexArray(0);
+
+
 	}
 
 	void Renderer::draw_transvoxel_v2(const u32& vao, const u32 indices_count, const glm::vec3& position)
@@ -884,7 +879,7 @@ namespace rain::engine
 		transvoxel2_handle->data->set("view", view_mat);
 
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indices_count, GL_UNSIGNED_SHORT, 0);
 		glBindVertexArray(0);
 	}
 
@@ -1164,10 +1159,10 @@ namespace rain::engine
 
             m_debug_vertex_count += 2;
         }
-		else
-		{
-			RAIN_LOG("debug_vertices_max_count reached");
-		}
+		//else
+		//{
+		//	RAIN_LOG("debug_vertices_max_count reached");
+		//}
     }
 
     void Renderer::draw_debug_line(const glm::vec3& _point1, const glm::vec3& _point2, const glm::vec3& _color1, const glm::vec3& _color2)

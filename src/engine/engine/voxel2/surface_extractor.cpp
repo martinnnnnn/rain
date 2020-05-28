@@ -32,26 +32,6 @@ namespace rain::engine::voxel2
             return code;
         }
 
-	    glm::vec3 interpolate_voxel_vector(const long t, const glm::vec3& p0, const glm::vec3& p1)
-	    {
-		    //long u = 0x0100 - t; //256 - t
-		    //float s = 1.0f / 256.0f;
-		    //glm::vec3 Q = p0 * t + p1 * u; //Density Interpolation
-		    //Q *= s; // shift to shader ! 
-		    //return Q;
-            return glm::vec3{};
-	    }
-
-
-	    void generate_vertex(const ivec3& offsetPos, i32 LOD, long t, u8 v0, u8 v1, const glm::vec3& normal, VoxelMesh* mesh)
-	    {
-		    glm::vec3 P0 = (offsetPos + CORNER_INDEXES[v0] * LOD);
-		    glm::vec3 P1 = (offsetPos + CORNER_INDEXES[v1] * LOD);
-
-		    glm::vec3 Q = interpolate_voxel_vector(t, P0, P1);
-		    mesh->vertices.push_back(VoxelVertex{ Q, normal });
-	    }
-	
 	    void polygonize_cell(VolumeData& volume_data, const ivec3& offset_position, const ivec3& pos, const i32 LOD, VoxelMesh* mesh)
 	    {
 		    const ivec3 absolute_position = offset_position + pos * LOD;
@@ -105,13 +85,6 @@ namespace rain::engine::voxel2
 			    const Sample& d0 = density[v0];
 			    const Sample& d1 = density[v1];
 
-                ///////////////////////////////////////////////////////////////
-                //const f32 t = (d1.value << 8) / (d1.value - d0.value);
-			    //const i32 u = 0x0100 - t;
-			    //const f32 t0 = f32(t) / 256.0f;
-			    //const f32 t1 = f32(u) / 256.0f;
-                ///////////////////////////////////////////////////////////////
-
                 const f32 t = f32(d1.value) / f32(d1.value - d0.value);
 
 			    i16 index = -1;
@@ -125,11 +98,6 @@ namespace rain::engine::voxel2
 
 			    if (index == -1)
 			    {
-                    ///////////////////////////////////////////////////////////////
-                    //glm::vec3 normal = corner_normals[v0] * t0 + corner_normals[v1] * t1;
-				    //generate_vertex(absolute_position, LOD, t, v0, v1, normal, mesh);
-                    ///////////////////////////////////////////////////////////////
-
                     const glm::vec3 P0 = (absolute_position + CORNER_INDEXES[v0] * LOD);
                     const glm::vec3 P1 = (absolute_position + CORNER_INDEXES[v1] * LOD);
 
@@ -138,7 +106,8 @@ namespace rain::engine::voxel2
 
                     mesh->vertices.push_back(VoxelVertex{ position, normal });
 
-				    index = i16(mesh->vertices.size() - 1);
+					assert(false);
+					index = i16(mesh->vertices.size() - 1);
 			    }
 
 			    //if ((rDir & 8) != 0)
@@ -148,6 +117,8 @@ namespace rain::engine::voxel2
 
 			    real_indices[i] = u16(index);
 		    }
+
+			std::reverse(c.vertexIndex, c.vertexIndex + (c.GetTriangleCount() * 3));
 
 		    for (int t = 0; t < triangle_count; t++)
 		    {

@@ -86,7 +86,7 @@ namespace rain::engine
 
         chara =
         {
-            glm::vec3{-5, 0, 0},
+            glm::vec3{-50, 0, 0},
             5.0f,
         };
 
@@ -215,9 +215,7 @@ namespace rain::engine
 
         //voxel::draw_map(&voxmap, main_camera.transform->position);
         //if (RAIN_INPUT->is_key_pressed(DIK_M))
-        {
-		    oct_tree.draw();
-        }
+		oct_tree.draw();
         oct_tree.draw_debug();
 
         std::vector<actor*> view;

@@ -118,6 +118,11 @@ namespace rain::engine::voxel2
 	void OctTreeNode::unload_transvoxel()
 	{
 		RAIN_RENDERER->delete_transvoxel_v2(voxel_mesh.vao, voxel_mesh.vbo, voxel_mesh.ebo);
+		voxel_mesh.vao = 0;
+		voxel_mesh.vbo = 0;
+		voxel_mesh.ebo = 0;
+		voxel_mesh.vertices.clear();
+		voxel_mesh.indices.clear();
 	}
 
 	void OctTreeNode::draw()
@@ -132,7 +137,9 @@ namespace rain::engine::voxel2
 		else
 		{
 			//RAIN_RENDERER->draw_instancing_cube(vao, mats.size(), glm::mat4(1), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
-			RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), min);
+			RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
+
+
 		}
 	}
 
@@ -144,6 +151,7 @@ namespace rain::engine::voxel2
             {
                 children[u]->draw_debug();
             }
+
         }
         else
         {
@@ -152,6 +160,11 @@ namespace rain::engine::voxel2
 
             color = glm::vec3(1.0f - f32(LOD) / f32(OCTTREE_LOD_MAX), 0, 0);
             RAIN_RENDERER->draw_debug_cube(center, f32(size) * LOD, f32(size) * LOD, color);
+
+			//for (u32 j = 0; j < voxel_mesh.vertices.size(); ++j)
+			//{
+			//	RAIN_RENDERER->draw_debug_line(voxel_mesh.vertices[j].vertice, voxel_mesh.vertices[j].vertice + glm::normalize(voxel_mesh.vertices[j].normal), glm::vec3(0, 1, 0));
+			//}
         }
     }
 
