@@ -17,29 +17,41 @@ namespace rain::engine::voxel2
 		if (!contains(chunk_index))
 		{
 			create_add_and_fill_chunk(chunk_index);
-			//chunk = create_chunk(chunk_index);
-			//add_chunk(chunk);
 		}
 		else
 		{
 			chunk = data[chunk_index];
 		}
 
-		chunk->set(sample, chunk->offset_from_absolute(x, y, z));
+		u32 offset = chunk->offset_from_global(x, y, z);
+		if (offset >= chunk->size.cubed)
+		{
+			RAIN_LOG("OUPS");
+		}
+		chunk->set(sample, offset);
 	}
+
 
 	const Sample& VolumeData::get(i32 x, i32 y, i32 z)
 	{
 		ivec3 chunk_index = get_chunk_index(x, y, z);
 
-		//assert(contains(chunk_index) && "Trying to access an element not present in data");
 		if (!contains(chunk_index))
 		{
 			create_add_and_fill_chunk(chunk_index);
 		}
 
-		return data[chunk_index]->get_absolute(x, y, z);
+		return data[chunk_index]->get_from_global(x, y, z);
 	}
+
+	//const Sample& VolumeData::get(i32 x, i32 y, i32 z) const
+	//{
+	//	const ivec3 chunk_index = get_chunk_index(x, y, z);
+
+	//	assert(!contains(chunk_index) && "Trying to access an element not present in data");
+
+	//	return data.at(chunk_index)->get_absolute(x, y, z);
+	//}
 
 
 	void VolumeData::init()
@@ -56,18 +68,40 @@ namespace rain::engine::voxel2
 
 	VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
 	{
-		//RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
+		RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
 		VolumeChunk* new_chunk = create_chunk(chunk_index);
         add_chunk(new_chunk);
-
-		for (i32 i = 0; i < i32(chunk_size.value); ++i)
+		
+		for (i32 i = 0; i < chunk_size.value; ++i)
 		{
-			for (i32 j = 0; j < i32(chunk_size.value); ++j)
+			for (i32 j = 0; j < chunk_size.value; ++j)
 			{
-				for (i32 k = 0; k < i32(chunk_size.value); ++k)
+				for (i32 k = 0; k < chunk_size.value; ++k)
 				{
-					const ivec3 sample_map_pos = (chunk_index * i32(chunk_size.value)) + ivec3{ i, j, k };
+					//ivec3 sample_map_pos;
+
+					//sample_map_pos.x = (chunk_index.x * chunk_size.value) + i;
+					//if (chunk_index.x < 0)
+					//{
+					//	sample_map_pos.x = sample_map_pos.x + 1;
+					//}
+
+					//sample_map_pos.y = (chunk_index.y * chunk_size.value) + j;
+					//if (chunk_index.y < 0)
+					//{
+					//	sample_map_pos.y = sample_map_pos.y + 1;
+					//}
+
+					//sample_map_pos.z = (chunk_index.z * chunk_size.value) + k;
+					//if (chunk_index.z < 0)
+					//{
+					//	sample_map_pos.z = sample_map_pos.z + 1;
+					//}
+
+					const ivec3 sample_map_pos = (chunk_index * chunk_size.value) + ivec3{ i, j, k };
 					const glm::vec3 absolute_pos = transform.position + glm::vec3(sample_map_pos);
+					//RAIN_LOG("setting sample at : (%d, %d, %d)", sample_map_pos.x, sample_map_pos.y, sample_map_pos.z);
+
                     const f32 distf = core::simplex_noise::noise(
                         f32(sample_map_pos.x) / f32(chunk_size.value),
                         f32(sample_map_pos.y) / f32(chunk_size.value), 
@@ -89,22 +123,22 @@ namespace rain::engine::voxel2
 		}
 	} 
 
-	ivec3 VolumeData::get_chunk_index(i32 x, i32 y, i32 z)
+	ivec3 VolumeData::get_chunk_index(i32 x, i32 y, i32 z) const
 	{
-		i32 xI = x / i32(chunk_size.value);
-		if (x < 0)
+		i32 xI = x / chunk_size.value;
+		if (x < 0 && xI == 0)
 		{
 			xI--;
 		}
 
-		i32 yI = y / i32(chunk_size.value);
-		if (y < 0)
+		i32 yI = y / chunk_size.value;
+		if (y < 0 && yI == 0)
 		{
 			yI--;
 		}
 
-		i32 zI = z / i32(chunk_size.value);
-		if (z < 0)
+		i32 zI = z / chunk_size.value;
+		if (z < 0 && zI == 0)
 		{
 			zI--;
 		}
@@ -112,7 +146,7 @@ namespace rain::engine::voxel2
 		return ivec3(xI, yI, zI);
 	}
 
-	bool VolumeData::contains(const ivec3& chunk_index)
+	bool VolumeData::contains(const ivec3& chunk_index) const
 	{
 		return data.find(chunk_index) != data.end();
 	}

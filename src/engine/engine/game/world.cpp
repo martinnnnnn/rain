@@ -214,7 +214,7 @@ namespace rain::engine
         RAIN_RENDERER->update();
 
         //voxel::draw_map(&voxmap, main_camera.transform->position);
-        if (RAIN_INPUT->is_key_pressed(DIK_M))
+        //if (RAIN_INPUT->is_key_pressed(DIK_M))
         {
 		    oct_tree.draw();
         }

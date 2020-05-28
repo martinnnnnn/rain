@@ -15,12 +15,13 @@
 #include "engine/data/material/material.h"
 #include "engine/data/data_handle.h"
 #include "engine/voxel/voxel.h"
+
 //#define SPIRV
 
 
 namespace rain::engine
 {
-	namespace voxel
+	namespace voxel2
 	{
 		struct VoxelMesh;
 	}
@@ -90,8 +91,10 @@ namespace rain::engine
 
         void init_transvoxel(voxel::vox_block* block) const;
         void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& position, const glm::vec3& view_position, f32 max_height);
-		void init_transvoxel2(voxel::VoxelMesh* chunk) const;
-		void draw_transvoxel2(const u32& vao, const u32 indices_count, const glm::vec3& position);
+
+		void init_transvoxel_v2(voxel2::VoxelMesh* mesh) const;
+		void delete_transvoxel_v2(const u32 vao, const u32 vbo, const u32 ebo);
+		void draw_transvoxel_v2(const u32& vao, const u32 indices_count, const glm::vec3& position);
 
         void load_mesh(Mesh* mesh);
         void draw_mesh(Mesh* mesh, const Material& material, const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
