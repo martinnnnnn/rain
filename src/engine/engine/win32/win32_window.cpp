@@ -7,6 +7,8 @@
 #include <strsafe.h>
 #include <map>
 
+#include <GL/glew.h>
+#include <GL/wglew.h>
 
 namespace rain::engine
 {
@@ -134,6 +136,82 @@ namespace rain::engine
         {
             MessageBox(hwnd, "Failed to Make OpenGL Rendering Context Current", "OpenGL Rendering Context Error", MB_OK);
             return -1;
+        }
+
+        glewExperimental = true;
+        GLenum res = glewInit();
+
+        if (res != GLEW_OK)
+        {
+            RAIN_LOG("Error : %s\n", glewGetErrorString(res));
+        }
+
+        //HGLRC hrc1; //vars for the real window
+        //HDC hdc1;
+        //HWND hwnd1;
+
+        //---------------For the real window
+        if (wglewIsSupported("WGL_ARB_create_context") == 1)
+        {
+            wglMakeCurrent(NULL, NULL);
+            wglDeleteContext(m_hglrc);
+            ReleaseDC(hwnd, m_hdc);
+            DestroyWindow(hwnd);
+
+            //hwnd = CreateWindow(
+            //    "coco",
+            //    "ddddd",
+            //    WS_OVERLAPPEDWINDOW,
+            //    CW_USEDEFAULT, CW_USEDEFAULT,
+            //    500, 500,
+            //    NULL,
+            //    NULL,
+            //    _hinstance,
+            //    NULL
+            //);
+
+            hwnd = CreateWindow(
+                RAIN_WNDCLASSNAME,
+                RAIN_WNDNAME,
+                WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+                posx, posy,
+                m_width, m_height,
+                NULL,
+                NULL,
+                _hinstance,
+                NULL);
+
+            m_hdc = GetDC(hwnd);
+
+            const int iPixelFormatAttribList[] = {
+                WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+                WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+                WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+                WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+                WGL_COLOR_BITS_ARB, 32,
+                WGL_DEPTH_BITS_ARB, 24,
+                WGL_STENCIL_BITS_ARB, 8,
+                0 // End of attributes list
+            };
+
+            int attributes[] = {
+                WGL_CONTEXT_MAJOR_VERSION_ARB, 4
+                , WGL_CONTEXT_MINOR_VERSION_ARB, 5
+                , WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
+                , 0
+            };
+
+            int nPixelFormat = 0;
+            UINT iNumFormats = 0;
+
+            wglChoosePixelFormatARB(m_hdc, iPixelFormatAttribList, NULL, 1, &nPixelFormat, (UINT*)&iNumFormats);
+
+            SetPixelFormat(m_hdc, nPixelFormat, &pfd);
+
+            m_hglrc = wglCreateContextAttribsARB(m_hdc, 0, attributes);
+
+            wglMakeCurrent(NULL, NULL);
+            wglMakeCurrent(m_hdc, m_hglrc);
         }
 
         resize(m_width, m_height);
@@ -292,7 +370,7 @@ namespace rain::engine
 	    {
 	    case WM_DESTROY:
 	    {
-		    RAIN_WINDOW->shutdown();
+		    //RAIN_WINDOW->shutdown();
 		    break;
 	    }
 

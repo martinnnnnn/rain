@@ -105,9 +105,6 @@ namespace rain::engine::voxel2
 			    const Sample& d0 = density[v0];
 			    const Sample& d1 = density[v1];
 
-			    assert(v1 > v0 && "??");
-
-
                 ///////////////////////////////////////////////////////////////
                 //const f32 t = (d1.value << 8) / (d1.value - d0.value);
 			    //const i32 u = 0x0100 - t;
@@ -151,8 +148,6 @@ namespace rain::engine::voxel2
 
 			    real_indices[i] = u16(index);
 		    }
-
-            std::reverse(c.vertexIndex, c.vertexIndex + (c.GetTriangleCount() * 3));
 
 		    for (int t = 0; t < triangle_count; t++)
 		    {

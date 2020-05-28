@@ -188,12 +188,12 @@ namespace rain::engine
 
     void Renderer::init()
     {
-        GLenum res = glewInit();
+        //GLenum res = glewInit();
 
-        if (res != GLEW_OK)
-        {
-            RAIN_LOG("Error : %s\n", glewGetErrorString(res));
-        }
+        //if (res != GLEW_OK)
+        //{
+        //    RAIN_LOG("Error : %s\n", glewGetErrorString(res));
+        //}
 
         glEnable(GL_TEXTURE_2D);
         glShadeModel(GL_SMOOTH);

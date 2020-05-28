@@ -18,7 +18,7 @@ namespace rain::core
 
         //static T* instance;
 	public:
-		static T* get() noexcept(std::is_nothrow_constructible<T>::value)
+		inline static T* get() noexcept(std::is_nothrow_constructible<T>::value)
 		{
             static T* instance = new T();
 
