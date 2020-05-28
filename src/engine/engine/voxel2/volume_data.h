@@ -10,6 +10,7 @@
 #include "engine/core/context.h"
 #include "assert.h"
 #include "volume_chunk.h"
+#include "volume_size.h"
 
 // chunk streaming
 // async chunk streaming
@@ -47,7 +48,7 @@ namespace rain::engine::voxel2
         bool            contains(const ivec3& chunk_index) const;
 
         core::transform     transform;
-        VolumeChunk::Size   chunk_size;
+        VolumeSize          chunk_size;
         VolumeChunkMap      data;
     };
 }

@@ -21,3 +21,30 @@ typedef u32 uptr;
 typedef glm::ivec3 ivec3;
 typedef glm::uvec3 uvec3;
 
+struct ivec3_hasher
+{
+    inline std::size_t operator()(const ivec3& position) const;
+
+    inline bool operator()(const ivec3& position_a, const ivec3& position_b) const;
+};
+
+
+
+std::size_t ivec3_hasher::operator()(const ivec3& position) const
+{
+    std::size_t seed = 3;
+
+    seed ^= position.x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    seed ^= position.y + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    seed ^= position.z + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+    return seed;
+}
+
+bool ivec3_hasher::operator()(const ivec3& position_a, const ivec3& position_b) const
+{
+    return position_a.x == position_b.x
+        && position_a.y == position_b.y
+        && position_a.z == position_b.z;
+}
+

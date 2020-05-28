@@ -12,6 +12,7 @@
 #include "engine/data/data_system.h"
 #include "engine/win32/win32_input.h"
 #include "engine/voxel2/oct_tree.h"
+#include "engine/voxel2/oct_tree_node.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

@@ -23,12 +23,7 @@ namespace rain::engine::voxel2
 			chunk = data[chunk_index];
 		}
 
-		u32 offset = chunk->offset_from_global(x, y, z);
-		if (offset >= chunk->size.cubed)
-		{
-			RAIN_LOG("OUPS");
-		}
-		chunk->set(sample, offset);
+		chunk->set(sample, chunk->offset_from_global(x, y, z));
 	}
 
 
@@ -68,7 +63,7 @@ namespace rain::engine::voxel2
 
 	VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
 	{
-		RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
+		//RAIN_LOG("creating chunk : (%d, %d, %d)", chunk_index.x, chunk_index.y, chunk_index.z);
 		VolumeChunk* new_chunk = create_chunk(chunk_index);
         add_chunk(new_chunk);
 		
@@ -78,29 +73,7 @@ namespace rain::engine::voxel2
 			{
 				for (i32 k = 0; k < chunk_size.value; ++k)
 				{
-					//ivec3 sample_map_pos;
-
-					//sample_map_pos.x = (chunk_index.x * chunk_size.value) + i;
-					//if (chunk_index.x < 0)
-					//{
-					//	sample_map_pos.x = sample_map_pos.x + 1;
-					//}
-
-					//sample_map_pos.y = (chunk_index.y * chunk_size.value) + j;
-					//if (chunk_index.y < 0)
-					//{
-					//	sample_map_pos.y = sample_map_pos.y + 1;
-					//}
-
-					//sample_map_pos.z = (chunk_index.z * chunk_size.value) + k;
-					//if (chunk_index.z < 0)
-					//{
-					//	sample_map_pos.z = sample_map_pos.z + 1;
-					//}
-
 					const ivec3 sample_map_pos = (chunk_index * chunk_size.value) + ivec3{ i, j, k };
-					const glm::vec3 absolute_pos = transform.position + glm::vec3(sample_map_pos);
-					//RAIN_LOG("setting sample at : (%d, %d, %d)", sample_map_pos.x, sample_map_pos.y, sample_map_pos.z);
 
                     const f32 distf = core::simplex_noise::noise(
                         f32(sample_map_pos.x) / f32(chunk_size.value),
