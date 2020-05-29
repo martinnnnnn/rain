@@ -2,6 +2,7 @@
 
 #include "oct_tree_node.h"
 #include "engine/voxel/transvoxel_tables.h"
+#include "engine/core/profiler.h"
 
 namespace rain::engine::voxel2
 {
@@ -32,7 +33,7 @@ namespace rain::engine::voxel2
             return code;
         }
 
-	    void polygonize_cell(VolumeData& volume_data, const ivec3& offset_position, const ivec3& pos, const i32 LOD, VoxelMesh* mesh)
+	    void polygonize_cell(VolumeData& volume_data, const ivec3& offset_position, const ivec3& pos, const i32 LOD, VoxelMesh* mesh, i32& caseCountValueCount)
 	    {
 			const ivec3 absolute_position = offset_position + pos * LOD;
 
@@ -51,6 +52,8 @@ namespace rain::engine::voxel2
 		    {
 			    return;
 		    }
+
+            caseCountValueCount++;
 
 		    glm::vec3 corner_normals[8];
 		    for (i32 i = 0; i < 8; i++)
@@ -136,7 +139,10 @@ namespace rain::engine::voxel2
     void SurfaceExtractor::transvoxel(VolumeData& volume_data, const ivec3& min, const VolumeSize& size, const OCTTREE_LOD LOD, VoxelMesh* mesh)
     {
         assert(LOD > 0 && "LOD must at least be 1");
+        RAIN_PROFILE("SurfaceExtractor::transvoxel");
 
+        i32 caseCountValueCount = 0;
+        i32 cellCount = 0;
         for (i32 x = 0; x < size.value; x++)
         {
             for (i32 y = 0; y < size.value; y++)
@@ -144,10 +150,14 @@ namespace rain::engine::voxel2
                 for (i32 z = 0; z < size.value; z++)
                 {
                     ivec3 sample_position(x, y, z);
-                    polygonize_cell(volume_data, min, sample_position, LOD, mesh);
+                    polygonize_cell(volume_data, min, sample_position, LOD, mesh, caseCountValueCount);
+                    cellCount++;
                 }
             }
         }
+
+        RAIN_LOG("Generated %u vertices and %u indices for LOD %d with %d valid case codes in %d cells", mesh->vertices.size(), mesh->indices.size(), i32(LOD), caseCountValueCount, cellCount);
+
     }
 }
 

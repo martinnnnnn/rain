@@ -79,7 +79,6 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::load_instanting()
 	{
-        RAIN_PROFILE("loading octtree node");
 		//RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
 		for (i32 i = 0; i < size; ++i)
 		{
@@ -117,6 +116,7 @@ namespace rain::engine::voxel2
 
 	void OctTreeNode::unload_transvoxel()
 	{
+        RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
 		RAIN_RENDERER->delete_transvoxel_v2(voxel_mesh.vao, voxel_mesh.vbo, voxel_mesh.ebo);
 		voxel_mesh.vao = 0;
 		voxel_mesh.vbo = 0;

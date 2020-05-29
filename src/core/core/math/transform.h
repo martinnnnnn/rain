@@ -10,6 +10,17 @@ namespace rain::core
 
     struct transform
     {
+        transform()
+            : position()
+            , lastPosition()
+            , orientation()
+            , lastOrientation()
+            , scale()
+            , lastScale()
+        {
+
+        }
+
         glm::vec3 position;
         glm::vec3 lastPosition;
 

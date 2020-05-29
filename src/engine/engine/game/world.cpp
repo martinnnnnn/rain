@@ -50,7 +50,6 @@ namespace rain::engine
         //voxel::init_map(&voxmap, glm::vec3{ -0.f, -0.f, -0.f }, 4, RAIN_CONFIG->runtime_data_root);
 
 		::Sleep(3000);
-		volume_data.init();
 
 		oct_tree.init(&volume_data, voxel2::VolumeChunk::DEFAULT_SIZE, voxel2::OCTTREE_LOD_MAX);
 
