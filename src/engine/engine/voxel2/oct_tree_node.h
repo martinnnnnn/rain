@@ -2,8 +2,9 @@
 
 #include <vector>
 #include <array>
-#include "assert.h"
-#include "gtx/transform.hpp"
+#include <future>
+#include <assert.h>
+#include <gtx/transform.hpp>
 
 #include "core/core.h"
 #include "oct_tree_lod.h"
@@ -57,13 +58,34 @@ namespace rain::engine::voxel2
 
 		void	update(const glm::vec3& other);
 
+		// async
+		enum class State
+		{
+			Initial,
+
+			ChildrenLoadInit,
+			ChildrenLoading,
+			ChildrenLoaded,
+			ChildrenUnloading,
+
+			SurfaceLoadInit,
+			SurfaceLoading,
+			SurfaceLoaded,
+			SurfaceUnloading,
+		};
+		State state;
+		std::future<void> async_result;
+		void update_async(const glm::vec3& other);
+		void draw_async();
+
 		void	draw();
 		void	draw_debug();
 
 	private:
 
-		void	load_instanting();
-		void	unload_instanciating();
+		// obselete
+		//void	load_instanting();
+		//void	unload_instanciating();
 
 		void	load_transvoxel();
 		void	unload_transvoxel();
@@ -86,12 +108,12 @@ namespace rain::engine::voxel2
 		// transvoxel
 		VoxelMesh			voxel_mesh;
 
-		// debug
-		std::vector<glm::mat4>	mats;
-		u32						vao;
-		u32						vbo_instances;
-		u32						vbo_cube;
-		handle<Texture> const * texture_handle;
+		// debug // obselete
+		//std::vector<glm::mat4>	mats;
+		//u32						vao;
+		//u32						vbo_instances;
+		//u32						vbo_cube;
+		//handle<Texture> const * texture_handle;
 	};
 }
 

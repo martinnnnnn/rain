@@ -28,7 +28,7 @@ namespace rain::engine::voxel2
 	{
 		for (u32 u(0); u < roots.size(); ++u)
 		{
-			roots[u]->update(other);
+			roots[u]->update_async(other);
 		}
 	}
 
@@ -36,7 +36,7 @@ namespace rain::engine::voxel2
 	{
 		for (u32 u(0); u < roots.size(); ++u)
 		{
-			roots[u]->draw();
+			roots[u]->draw_async();
 		}
 	}
 

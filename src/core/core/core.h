@@ -21,7 +21,8 @@
 #include "core/thread/thread_pool.h"
 #include "core/bit_operations.h"
 #include "core/random.h"
-
+#include "core/thread/thread_safe_queue.h"
+#include "core/thread/thread_safe_unordered_map.h"
 //#include "core/profiler.h"
 
 

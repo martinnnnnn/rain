@@ -179,7 +179,7 @@ namespace rain::core
 
     private:
         std::atomic_bool m_done;
-        tf_queue<std::unique_ptr<i_thread_task>> m_workQueue;
+        queue_tf<std::unique_ptr<i_thread_task>> m_workQueue;
         std::vector<std::thread> m_threads;
     };
 

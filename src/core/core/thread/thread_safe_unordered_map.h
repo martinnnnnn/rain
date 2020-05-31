@@ -1,19 +1,23 @@
 #pragma once
 
+#include <unordered_map>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <queue>
 #include <utility>
 
 namespace rain::core
 {
-    template <typename T>
-    class queue_tf
+	template<class _Kty,
+		class _Ty,
+		class _Hasher = std::hash<_Kty>,
+		class _Keyeq = std::equal_to<_Kty>,
+		class _Alloc = std::allocator<std::pair<const _Kty, _Ty>>>
+    class unordered_map_tf
     {
     public:
         
-        ~queue_tf(void)
+        ~unordered_map_tf(void)
         {
             invalidate();
         }
@@ -22,15 +26,16 @@ namespace rain::core
          * Attempt to get the first value in the queue.
          * Returns true if a value was successfully written to the out parameter, false otherwise.
          */
-        bool try_pop(T& out)
+        bool try_at(_Kty key, _Ty& out)
         {
             std::lock_guard<std::mutex> lock{ m_mutex };
-            if (m_queue.empty() || !m_valid)
-            {
-                return false;
-            }
-            out = std::move(m_queue.front());
-            m_queue.pop();
+
+			if (m_map.find(key) == m_map.end() || !m_valid)
+			{
+				return false;
+			}
+
+			out = m_map.at(key);
             return true;
         }
 
@@ -39,12 +44,12 @@ namespace rain::core
          * Will block until a value is available unless clear is called or the instance is destructed.
          * Returns true if a value was successfully written to the out parameter, false otherwise.
          */
-        bool wait_pop(T& out)
+        bool wait_at(_Kty key, _Ty& out) const
         {
             std::unique_lock<std::mutex> lock{ m_mutex };
             m_condition.wait(lock, [this]()
             {
-                return !m_queue.empty() || !m_valid;
+                return m_map.find(key) != m_map.end() || !m_valid;
             });
             /*
              * Using the condition in the predicate ensures that spurious wakeups with a valid
@@ -54,40 +59,35 @@ namespace rain::core
             {
                 return false;
             }
-            out = std::move(m_queue.front());
-            m_queue.pop();
+			out = m_map.at(key);
             return true;
         }
 
         /**
-         * Push a new value onto the queue.
+         * Adds a new value to the map.
          */
-        void push(T value)
+        void add(_Kty key, _Ty& out)
         {
             std::lock_guard<std::mutex> lock{ m_mutex };
-            m_queue.push(std::move(value));
-            m_condition.notify_one();
+			m_map[key] = out;
         }
 
         /**
-         * Check whether or not the queue is empty.
+         * Check whether or not the map contains the key.
          */
-        bool empty(void) const
+        bool contains(_Kty key) const
         {
             std::lock_guard<std::mutex> lock{ m_mutex };
-            return m_queue.empty();
+            return m_map.find(key) != m_map.end();
         }
 
         /**
-         * Clear all items from the queue.
+         * Clear all items from the map.
          */
         void clear(void)
         {
             std::lock_guard<std::mutex> lock{ m_mutex };
-            while (!m_queue.empty())
-            {
-                m_queue.pop();
-            }
+			m_map.empty();
             m_condition.notify_all();
         }
 
@@ -117,7 +117,7 @@ namespace rain::core
     private:
         std::atomic_bool m_valid{ true };
         mutable std::mutex m_mutex;
-        std::queue<T> m_queue;
+        std::unordered_map<_Ty, _Hasher, _Keyeq, _Alloc> m_map;
         std::condition_variable m_condition;
     };
 }

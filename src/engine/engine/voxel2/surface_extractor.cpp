@@ -3,6 +3,8 @@
 #include "oct_tree_node.h"
 #include "engine/voxel/transvoxel_tables.h"
 #include "engine/core/profiler.h"
+#include <future>
+#include <array>
 
 namespace rain::engine::voxel2
 {
@@ -41,10 +43,26 @@ namespace rain::engine::voxel2
 
 		    Sample density[8];
 
-		    for (int i = 0; i < 8; i++)
-		    {
-			    density[i] = volume_data.get(absolute_position + CORNER_INDEXES[i] * LOD);
-		    }
+
+			//async version
+				std::array<std::future<Sample>, 8> values_future;
+			for (int i = 0; i < 8; i++)
+			{
+				values_future[i] = std::async([&]()
+				{
+					return volume_data.get_tf(absolute_position + CORNER_INDEXES[i] * LOD);
+				});
+			}
+
+			for (int i = 0; i < 8; i++)
+			{
+				density[i] = values_future[i].get();
+			}
+
+			//for (int i = 0; i < 8; i++)
+			//{
+			//	density[i] = volume_data.get(absolute_position + CORNER_INDEXES[i] * LOD);
+			//}
 
 		    u8 case_code = get_case_code(density);
 
@@ -139,7 +157,7 @@ namespace rain::engine::voxel2
     void SurfaceExtractor::transvoxel(VolumeData& volume_data, const ivec3& min, const VolumeSize& size, const OCTTREE_LOD LOD, VoxelMesh* mesh)
     {
         assert(LOD > 0 && "LOD must at least be 1");
-        RAIN_PROFILE("SurfaceExtractor::transvoxel");
+        //RAIN_PROFILE("SurfaceExtractor::transvoxel");
 
         i32 caseCountValueCount = 0;
         i32 cellCount = 0;
@@ -156,7 +174,7 @@ namespace rain::engine::voxel2
             }
         }
 
-        RAIN_LOG("Generated %u vertices and %u indices for LOD %d with %d valid case codes in %d cells", mesh->vertices.size(), mesh->indices.size(), i32(LOD), caseCountValueCount, cellCount);
+        //RAIN_LOG("Generated %u vertices and %u indices for LOD %d with %d valid case codes in %d cells", mesh->vertices.size(), mesh->indices.size(), i32(LOD), caseCountValueCount, cellCount);
 
     }
 }

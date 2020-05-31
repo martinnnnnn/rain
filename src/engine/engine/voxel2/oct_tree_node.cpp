@@ -17,13 +17,14 @@ namespace rain::engine::voxel2
 		, max_distance(max_dist)
 		, has_children(false)
 		, is_loaded(false)
-		, vao(0)
-		, vbo_instances(0)
-		, vbo_cube(0)
-		, texture_handle(nullptr)
+		, state(State::Initial)
+		//, vao(0)
+		//, vbo_instances(0)
+		//, vbo_cube(0)
+		//, texture_handle(nullptr)
 	{
 		children.fill(nullptr);
-		mats.reserve(size * size * size);
+		//mats.reserve(size * size * size);
 	}
 
 	ivec3 OctTreeNode::get_center() const
@@ -43,19 +44,18 @@ namespace rain::engine::voxel2
 		const ivec3 center = get_center();
 		const OCTTREE_LOD child_lod = LOD / 2;
 
-        for (const ivec3& child_min : CHILDREN_MINS)
-        {
-            // use this to generate children  [ min + size * LOD / 2 * child_min => chooses between min or center for child min x y z]
-            //RAIN_LOG("1 :: %d, %d, %d", min + ivec3{ size * LOD / 2, size * LOD / 2, size * LOD / 2 } *child_min);
-        }
+		//for (u32 u = 0; u < CHILDREN_MINS.size(); ++u)
+		//{
+		//	children[u] = new OctTreeNode(volume_data, min + ivec3{ size * LOD / 2, size * LOD / 2, size * LOD / 2 } * CHILDREN_MINS[u], child_lod, size, max_distance / 2.0f);
+		//}
 
 		children[0] = new OctTreeNode(volume_data, ivec3{ min.x,    min.y,    min.z    }, child_lod, size, max_distance / 2.0f);
 		children[1] = new OctTreeNode(volume_data, ivec3{ center.x, min.y,    min.z    }, child_lod, size, max_distance / 2.0f);
 		children[2] = new OctTreeNode(volume_data, ivec3{ min.x,    min.y,    center.z }, child_lod, size, max_distance / 2.0f);
 		children[3] = new OctTreeNode(volume_data, ivec3{ center.x, min.y,    center.z }, child_lod, size, max_distance / 2.0f);
 
-		children[4] = new OctTreeNode(volume_data, ivec3{ min.x,    center.y, min.z    }, child_lod, size, max_distance / 2.0f);
-		children[5] = new OctTreeNode(volume_data, ivec3{ center.x, center.y, min.z    }, child_lod, size, max_distance / 2.0f);
+		children[4] = new OctTreeNode(volume_data, ivec3{ min.x,    center.y, min.z	   }, child_lod, size, max_distance / 2.0f);
+		children[5] = new OctTreeNode(volume_data, ivec3{ center.x, center.y, min.z	   }, child_lod, size, max_distance / 2.0f);
 		children[6] = new OctTreeNode(volume_data, ivec3{ min.x,    center.y, center.z }, child_lod, size, max_distance / 2.0f);
 		children[7] = new OctTreeNode(volume_data, ivec3{ center.x, center.y, center.z }, child_lod, size, max_distance / 2.0f);
 	}
@@ -64,6 +64,7 @@ namespace rain::engine::voxel2
 	{
 		for (u32 u(0); u < children.size(); ++u)
 		{
+			children[u]->unload_transvoxel();
 			delete children[u];
 			children[u] = nullptr;
 		}
@@ -77,46 +78,20 @@ namespace rain::engine::voxel2
 		}
 	}
 
-	void OctTreeNode::load_instanting()
-	{
-		//RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
-		for (i32 i = 0; i < size; ++i)
-		{
-			for (i32 j = 0; j < size; ++j)
-			{
-				for (i32 k = 0; k < size; ++k)
-				{
-					const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
-					const Sample& sample = volume_data.get(sample_pos);
-
-					//RAIN_LOG("%u", sample.value);
-
-					if (sample.value > 0)
-					{
-						mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
-					}
-				}
-			}
-		}
-
-		RAIN_RENDERER->init_instancing_cube(mats, vao, vbo_instances, vbo_cube);
-		texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
-	}
-
-	void OctTreeNode::unload_instanciating()
-	{
-		RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
-	}
-
 	void OctTreeNode::load_transvoxel()
 	{
-		SurfaceExtractor::transvoxel(volume_data, min, size, LOD, &voxel_mesh);
-		RAIN_RENDERER->init_transvoxel_v2(&voxel_mesh);
+		{
+			RAIN_PROFILE("transvoxel");
+			SurfaceExtractor::transvoxel(volume_data, min, size, LOD, &voxel_mesh);
+		}
+		{
+			RAIN_PROFILE("load vertices");
+			RAIN_RENDERER->init_transvoxel_v2(&voxel_mesh);
+		}
 	}
 
 	void OctTreeNode::unload_transvoxel()
 	{
-        RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
 		RAIN_RENDERER->delete_transvoxel_v2(voxel_mesh.vao, voxel_mesh.vbo, voxel_mesh.ebo);
 		voxel_mesh.vao = 0;
 		voxel_mesh.vbo = 0;
@@ -136,10 +111,7 @@ namespace rain::engine::voxel2
 		}
 		else
 		{
-			//RAIN_RENDERER->draw_instancing_cube(vao, mats.size(), glm::mat4(1), texture_handle->data, RAIN_WORLD->main_camera.transform->position);
 			RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
-
-
 		}
 	}
 
@@ -160,11 +132,6 @@ namespace rain::engine::voxel2
 
             color = glm::vec3(1.0f - f32(LOD) / f32(OCTTREE_LOD_MAX), 0, 0);
             RAIN_RENDERER->draw_debug_cube(center, f32(size) * LOD, f32(size) * LOD, color);
-
-			//for (u32 j = 0; j < voxel_mesh.vertices.size(); ++j)
-			//{
-			//	RAIN_RENDERER->draw_debug_line(voxel_mesh.vertices[j].vertice, voxel_mesh.vertices[j].vertice + glm::normalize(voxel_mesh.vertices[j].normal), glm::vec3(0, 1, 0));
-			//}
         }
     }
 
@@ -180,7 +147,6 @@ namespace rain::engine::voxel2
 		else if (point_collision(other) /*distance < max_distance*/ && !has_children && LOD > OCTTREE_LOD_MIN)
 		{
 			create_children();
-			//unload_instanciating();
 			unload_transvoxel();
 			is_loaded = false;
 			has_children = true;
@@ -194,12 +160,133 @@ namespace rain::engine::voxel2
 		{
 			if (!is_loaded)
 			{
-				//load_instanting();
 				load_transvoxel();
 				is_loaded = true;
 			}
 		}
 	}
+
+	void OctTreeNode::update_async(const glm::vec3& other)
+	{
+		switch (state)
+		{
+		case State::Initial:
+		{
+			RAIN_LOG("State::Initial");
+			if (point_collision(other))
+			{
+				state = State::ChildrenLoadInit;
+			}
+			else
+			{
+				state = State::SurfaceLoadInit;
+			}
+			break;
+		}
+		case State::SurfaceUnloading:
+		{
+			RAIN_LOG("State::SurfaceUnloading");
+			unload_transvoxel();
+			state = State::Initial;
+			break;
+		}
+		case State::ChildrenUnloading:
+		{
+			RAIN_LOG("State::ChildrenUnloading");
+			delete_children();
+			state = State::Initial;
+			break;
+		}
+		case State::SurfaceLoadInit:
+		{
+			RAIN_LOG("State::SurfaceLoadInit");
+			async_result = std::async([&]()
+			{
+				SurfaceExtractor::transvoxel(volume_data, min, size, LOD, &voxel_mesh);
+			});
+			state = State::SurfaceLoading;
+			break;
+		}
+		case State::SurfaceLoading:
+		{
+			RAIN_LOG("State::SurfaceLoading");
+			if (async_result._Is_ready())
+			{
+				RAIN_RENDERER->init_transvoxel_v2(&voxel_mesh);
+				state = State::SurfaceLoaded;
+			}
+			break;
+		}
+		case State::SurfaceLoaded:
+		{
+			RAIN_LOG("State::SurfaceLoaded");
+			if (point_collision(other))
+			{
+				state = State::SurfaceUnloading;
+			}
+			break;
+		}
+		}
+	}
+
+	void OctTreeNode::draw_async()
+	{
+		switch (state)
+		{
+		case State::SurfaceLoaded:
+		{
+			RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
+			break;
+		}
+		case State::ChildrenLoaded:
+		{
+			RAIN_LOG("drawing children");
+			break;
+		}
+		default:
+		{
+			RAIN_LOG("Not ready to draw");
+			break;
+		}
+		}
+	}
+
+	// obselete
+	//void OctTreeNode::load_instanting()
+	//{
+	//	//RAIN_LOG("loading octtree node (%d, %d, %d) with LOD : %d", min.x, min.y, min.z, (i32)LOD);
+	//	for (i32 i = 0; i < size; ++i)
+	//	{
+	//		for (i32 j = 0; j < size; ++j)
+	//		{
+	//			for (i32 k = 0; k < size; ++k)
+	//			{
+	//				const ivec3 sample_pos = ivec3{ min.x + i * LOD, min.y + j * LOD, min.z + k * LOD };
+	//				const Sample& sample = volume_data.get(sample_pos);
+
+	//				//RAIN_LOG("%u", sample.value);
+
+	//				if (sample.value > 0)
+	//				{
+	//					mats.emplace_back(glm::translate(glm::mat4(1), glm::vec3(sample_pos)));
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//	RAIN_RENDERER->init_instancing_cube(mats, vao, vbo_instances, vbo_cube);
+	//	texture_handle = RAIN_FIND_DATA_FROM_PATH(Texture, RAIN_CONFIG->data_root + "/awesomeface.png");
+	//}
+
+	//void OctTreeNode::unload_instanciating()
+	//{
+	//	RAIN_RENDERER->delete_instancing_cube(vao, vbo_instances, vbo_cube);
+	//	mats.clear();
+	//	vao = 0;
+	//	vbo_instances = 0;
+	//	vbo_cube = 0;
+	//}
+
 }
 
 

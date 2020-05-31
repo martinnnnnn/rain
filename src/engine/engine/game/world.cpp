@@ -149,6 +149,7 @@ namespace rain::engine
             chara.position.y -= 0.1f * chara.speed;
         }
 
+		volume_data.update();
 		oct_tree.update(chara.position);
 
         //voxel::update_map(&voxmap, main_camera.transform->position);
