@@ -12,124 +12,129 @@ namespace rain::engine::voxel2
 {
     VolumeData::VolumeData(i32 chunk_s)
         : chunk_size(chunk_s)
+        , data_handler(chunk_s)
     {
         transform.position = glm::vec3{ 5, 0, 5 };
         transform.scale = glm::vec3{ 2, 1, 1 };
         transform.orientation = glm::quat();
     }
 
-	void VolumeData::set(i32 x, i32 y, i32 z, const Sample& sample)
-	{
-		ivec3 chunk_index = get_chunk_index(x, y, z);
-		//VolumeChunk* chunk = data[chunk_index];
-		VolumeChunk* chunk = nullptr;
-		bool result = data_tf.wait_at(chunk_index, chunk);
-		chunk->set_global(sample, x, y, z);
-	}
+	//void VolumeData::set(i32 x, i32 y, i32 z, const Sample& sample)
+	//{
+	//	ivec3 chunk_index = get_chunk_index(x, y, z);
+	//	VolumeChunk* chunk = data[chunk_index];
+	//	chunk->set_global(sample, x, y, z);
+	//}
 
 
-	const Sample& VolumeData::get(i32 x, i32 y, i32 z)
-	{
-		ivec3 chunk_index = get_chunk_index(x, y, z);
+	//const Sample& VolumeData::get(i32 x, i32 y, i32 z)
+	//{
+	//	ivec3 chunk_index = get_chunk_index(x, y, z);
 
-		if (!contains(chunk_index))
-		{
-			create_add_and_fill_chunk(chunk_index);
-		}
+	//	if (!contains(chunk_index))
+	//	{
+	//		create_add_and_fill_chunk(chunk_index);
+	//	}
 
-		//return data[chunk_index]->get_global(x, y, z);
-		VolumeChunk* chunk = nullptr;
-		data_tf.wait_at(chunk_index, chunk);
-		return chunk->get_global(x, y, z);
-	}
+	//	return data[chunk_index]->get_global(x, y, z);
+	//}
 
-    const Sample& VolumeData::get(i32 x, i32 y, i32 z) const
+    const Sample& VolumeData::get(i32 x, i32 y, i32 z)
     {
-        const ivec3 chunk_index = get_chunk_index(x, y, z);
+        ivec3 chunk_index = get_chunk_index(x, y, z);
 
-        assert(contains(chunk_index) && "Trying to access an element not present in data");
+        VolumeChunkHandler::AsyncInfo info;
 
-        //return data.at(chunk_index)->get_global(x, y, z);
-		VolumeChunk* chunk = nullptr;
-		data_tf.wait_at(chunk_index, chunk);
-		return chunk->get_global(x, y, z);
+        VolumeChunk* chunk = nullptr;
+        data_handler.get(chunk_index, chunk, info);
+
+        return chunk->get_global(x, y, z);
     }
 
-	const Sample& VolumeData::get_tf(i32 x, i32 y, i32 z)
-	{
-		ivec3 chunk_index = get_chunk_index(x, y, z);
+    //const Sample& VolumeData::get(i32 x, i32 y, i32 z) const
+    //{
+    //    const ivec3 chunk_index = get_chunk_index(x, y, z);
 
-		VolumeChunk* new_chunk = nullptr;
+    //    assert(contains(chunk_index) && "Trying to access an element not present in data");
 
-		if (!contains(chunk_index))
-		{
-			VolumeChunk* temp = create_chunk(chunk_index);
-			temp->init_values_simplex();
+    //    return data.at(chunk_index)->get_global(x, y, z);
+    //}
 
-			new_chunk = temp;
+	//const Sample& VolumeData::get_tf(i32 x, i32 y, i32 z)
+	//{
+	//	ivec3 chunk_index = get_chunk_index(x, y, z);
 
-			RAIN_LOG("pushing new chunk : (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
+	//	VolumeChunk* new_chunk = nullptr;
 
-			chunks_to_add.push(new_chunk);
+	//	if (!contains(chunk_index))
+	//	{
+	//		VolumeChunk* temp = create_chunk(chunk_index);
+	//		temp->init_values_simplex();
 
-			while (!contains(chunk_index)) {}
+	//		new_chunk = temp;
 
-			new_chunk = data[chunk_index];
-			RAIN_LOG("detected new chunk : (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
+	//		RAIN_LOG("pushing new chunk : (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
+
+	//		chunks_to_add.push(new_chunk);
+
+	//		while (!contains(chunk_index)) {}
+
+	//		new_chunk = data[chunk_index];
+	//		RAIN_LOG("detected new chunk : (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
 
 
-			//if (new_chunk != data[chunk_index])
-			//{
-			//	delete new_chunk;
-			//	new_chunk = data[chunk_index];
-			//}
-		}
+	//		//if (new_chunk != data[chunk_index])
+	//		//{
+	//		//	delete new_chunk;
+	//		//	new_chunk = data[chunk_index];
+	//		//}
+	//	}
 
-		return data[chunk_index]->get_global(x, y, z);
-	}
+	//	return data[chunk_index]->get_global(x, y, z);
+	//}
 
-	void VolumeData::update()
-	{
-		VolumeChunk* new_chunk = nullptr;
-		while (chunks_to_add.try_pop(new_chunk))
-		{
-			RAIN_LOG("poping chunk at (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
-			if (!contains(new_chunk))
-			{
-				RAIN_LOG("adding new chunk at (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
-				data[new_chunk->index] = new_chunk;
-			}
-			//else
-			//{
-			//	delete new_chunk;
-			//	new_chunk = nullptr;
-			//}
-		}
-	}
+	//void VolumeData::update()
+	//{
+	//	VolumeChunk* new_chunk = nullptr;
+	//	while (chunks_to_add.try_pop(new_chunk))
+	//	{
+	//		RAIN_LOG("poping chunk at (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
+	//		if (!contains(new_chunk))
+	//		{
+	//			RAIN_LOG("adding new chunk at (%d, %d, %d)", new_chunk->index.x, new_chunk->index.y, new_chunk->index.z);
+	//			data[new_chunk->index] = new_chunk;
+	//		}
+	//		//else
+	//		//{
+	//		//	delete new_chunk;
+	//		//	new_chunk = nullptr;
+	//		//}
+	//	}
+	//}
 
-	VolumeChunk* VolumeData::create_chunk(const ivec3& chunk_index)
-	{
-		return new VolumeChunk(chunk_index, chunk_size.value);
-	}
+	//VolumeChunk* VolumeData::create_chunk(const ivec3& chunk_index)
+	//{
+	//	return new VolumeChunk(chunk_index, chunk_size.value);
+	//}
 
-	VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
-	{
-        //RAIN_PROFILE("VolumeData::create_add_and_fill_chunk");
+	//VolumeChunk* VolumeData::create_add_and_fill_chunk(const ivec3& chunk_index)
+	//{
+ //       //RAIN_PROFILE("VolumeData::create_add_and_fill_chunk");
 
-		VolumeChunk* new_chunk = create_chunk(chunk_index);
-        add_chunk(new_chunk);
-        new_chunk->init_values_simplex();
+	//	VolumeChunk* new_chunk = create_chunk(chunk_index);
+ //       add_chunk(new_chunk);
+ //       new_chunk->init_values_simplex();
 
-		return new_chunk;
-	}
+	//	return new_chunk;
+	//}
 
-	void VolumeData::add_chunk(VolumeChunk* chunk)
-	{
-		if (!contains(chunk->index))
-		{
-			data[chunk->index] = chunk;
-		}
-	} 
+	//void VolumeData::add_chunk(VolumeChunk* chunk)
+	//{
+	//	if (!contains(chunk->index))
+	//	{
+	//		data[chunk->index] = chunk;
+	//	}
+	//} 
 
 	ivec3 VolumeData::get_chunk_index(i32 x, i32 y, i32 z) const
 	{

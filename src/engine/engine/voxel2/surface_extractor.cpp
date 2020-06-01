@@ -45,24 +45,24 @@ namespace rain::engine::voxel2
 
 
 			//async version
-				std::array<std::future<Sample>, 8> values_future;
-			for (int i = 0; i < 8; i++)
-			{
-				values_future[i] = std::async([&]()
-				{
-					return volume_data.get_tf(absolute_position + CORNER_INDEXES[i] * LOD);
-				});
-			}
-
-			for (int i = 0; i < 8; i++)
-			{
-				density[i] = values_future[i].get();
-			}
+			//	std::array<std::future<Sample>, 8> values_future;
+			//for (int i = 0; i < 8; i++)
+			//{
+			//	values_future[i] = std::async([&]()
+			//	{
+			//		return volume_data.get_tf(absolute_position + CORNER_INDEXES[i] * LOD);
+			//	});
+			//}
 
 			//for (int i = 0; i < 8; i++)
 			//{
-			//	density[i] = volume_data.get(absolute_position + CORNER_INDEXES[i] * LOD);
+			//	density[i] = values_future[i].get();
 			//}
+
+            for (int i = 0; i < 8; i++)
+            {
+                density[i] = volume_data.get(absolute_position + CORNER_INDEXES[i] * LOD);
+            }
 
 		    u8 case_code = get_case_code(density);
 
