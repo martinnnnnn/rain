@@ -73,6 +73,7 @@ namespace rain::engine::voxel2
 			SurfaceLoaded,
 			SurfaceUnloading,
 		};
+
 		State state;
 		std::future<void> async_result;
 		void update_async(const glm::vec3& other);
@@ -83,9 +84,6 @@ namespace rain::engine::voxel2
 
 	private:
 
-		// obselete
-		//void	load_instanting();
-		//void	unload_instanciating();
 
 		void	load_transvoxel();
 		void	unload_transvoxel();
@@ -108,12 +106,14 @@ namespace rain::engine::voxel2
 		// transvoxel
 		VoxelMesh			voxel_mesh;
 
-		// debug // obselete
+		// obselete
+		//void	load_instanting();
+		//void	unload_instanciating();
 		//std::vector<glm::mat4>	mats;
 		//u32						vao;
 		//u32						vbo_instances;
 		//u32						vbo_cube;
-		//handle<Texture> const * texture_handle;
+		//handle<Texture> const *   texture_handle;
 	};
 }
 

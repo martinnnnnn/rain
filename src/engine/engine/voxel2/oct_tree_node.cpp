@@ -172,8 +172,7 @@ namespace rain::engine::voxel2
 		{
 		case State::Initial:
 		{
-			RAIN_LOG("State::Initial");
-			if (point_collision(other))
+			if (point_collision(other) && LOD > OCTTREE_LOD_MIN)
 			{
 				state = State::ChildrenLoadInit;
 			}
@@ -183,72 +182,152 @@ namespace rain::engine::voxel2
 			}
 			break;
 		}
-		case State::SurfaceUnloading:
-		{
-			RAIN_LOG("State::SurfaceUnloading");
-			unload_transvoxel();
-			state = State::Initial;
-			break;
-		}
+        case State::ChildrenLoadInit:
+        {
+            create_children();
+            state = State::ChildrenLoading;
+            break;
+        }
+        case State::ChildrenLoading:
+        {
+            bool children_all_loaded = true;
+            for (u32 u(0); u < children.size(); ++u)
+            {
+                //children[u]->update_async(other);
+                if (!(children[u]->state == State::SurfaceLoaded || children[u]->state == State::ChildrenLoaded))
+                {
+                    //RAIN_LOG("child not ready %d -> %d : %s", this, children[u]
+                    //    , children[u]->state == State::Initial ? "Initial"
+                    //    : children[u]->state == State::ChildrenLoadInit ? "ChildrenLoadInit"
+                    //    : children[u]->state == State::ChildrenLoading ? "ChildrenLoading"
+                    //    : children[u]->state == State::ChildrenLoaded ? "ChildrenLoaded"
+                    //    : children[u]->state == State::ChildrenUnloading ? "ChildrenUnloading"
+                    //    : children[u]->state == State::SurfaceLoadInit ? "SurfaceLoadInit"
+                    //    : children[u]->state == State::SurfaceLoading ? "SurfaceLoading"
+                    //    : children[u]->state == State::SurfaceLoaded ? "SurfaceLoaded"
+                    //    :  "SurfaceUnloading");
+
+                    children_all_loaded = false;
+                }
+            }
+
+            if (children_all_loaded)
+            {
+                state = State::ChildrenLoaded;
+            }
+            break;
+        }
+        case State::ChildrenLoaded:
+        {
+            if (voxel_mesh.vao != 0)
+            {
+                unload_transvoxel();
+            }
+            if (!point_collision(other))
+            {
+                state = State::ChildrenUnloading;
+            }
+            break;
+        }
 		case State::ChildrenUnloading:
 		{
-			RAIN_LOG("State::ChildrenUnloading");
-			delete_children();
+            //delete_children();
 			state = State::Initial;
 			break;
 		}
+        // surface
 		case State::SurfaceLoadInit:
 		{
-			RAIN_LOG("State::SurfaceLoadInit");
-			async_result = std::async([&]()
+			async_result = std::async(std::launch::async, [&]()
 			{
+                //RAIN_LOG("started transvoxel");
 				SurfaceExtractor::transvoxel(volume_data, min, size, LOD, &voxel_mesh);
-			});
+                //RAIN_LOG("finished transvoxel");
+            });
 			state = State::SurfaceLoading;
 			break;
 		}
 		case State::SurfaceLoading:
 		{
-			RAIN_LOG("State::SurfaceLoading");
 			if (async_result._Is_ready())
 			{
-				RAIN_RENDERER->init_transvoxel_v2(&voxel_mesh);
+                //RAIN_LOG("async returned");
+                RAIN_RENDERER->init_transvoxel_v2(&voxel_mesh);
 				state = State::SurfaceLoaded;
+                //RAIN_LOG("to surface loaded");
 			}
 			break;
 		}
 		case State::SurfaceLoaded:
 		{
-			RAIN_LOG("State::SurfaceLoaded");
-			if (point_collision(other))
+            if (children[0])
+            {
+                delete_children();
+            }
+			if (point_collision(other) && LOD > OCTTREE_LOD_MIN)
 			{
-				state = State::SurfaceUnloading;
+                //RAIN_LOG("point_collision with LOD %d", LOD);
+                state = State::SurfaceUnloading;
 			}
 			break;
 		}
+        case State::SurfaceUnloading:
+        {
+            //RAIN_LOG("unloading surface");
+            //unload_transvoxel();
+            state = State::Initial;
+            break;
+        }
 		}
+
+        for (u32 u(0); u < children.size(); ++u)
+        {
+            if (children[u])
+            {
+                children[u]->update_async(other);
+            }
+        }
 	}
 
 	void OctTreeNode::draw_async()
 	{
-		switch (state)
-		{
-		case State::SurfaceLoaded:
-		{
-			RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
-			break;
-		}
-		case State::ChildrenLoaded:
-		{
-			RAIN_LOG("drawing children");
-			break;
-		}
-		default:
-		{
-			RAIN_LOG("Not ready to draw");
-			break;
-		}
-		}
+        if (voxel_mesh.vao != 0)
+        {
+            RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
+        }
+
+        for (OctTreeNode*& child : children)
+        {
+            if (child)
+            {
+                child->draw_async();
+            }
+        }
+
+		//switch (state)
+		//{
+		//case State::SurfaceLoaded:
+		//{
+  //          //RAIN_RENDERER->draw_transvoxel_v2(voxel_mesh.vao, voxel_mesh.indices.size(), glm::vec3{});
+		//	break;
+		//}
+		//case State::ChildrenLoaded:
+		//{
+  //          //RAIN_LOG("drawing children");
+  //          for (OctTreeNode*& child : children)
+  //          {
+  //              //if (child && child->state == State::SurfaceLoaded)
+  //              {
+  //                  child->draw_async();
+  //              }
+  //          }
+		//	break;
+		//}
+		//default:
+		//{
+		//	break;
+		//}
+		//}
 	}
 
 	// obselete
