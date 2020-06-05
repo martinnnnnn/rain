@@ -14,8 +14,6 @@ namespace rain::engine
         GLenum target;
         GLuint id;
         bool load(const std::string& file_name, const GLenum t);
+        void bind(GLenum unit);
     };
-
-    bool load_texture(const std::string& file_name, const GLenum t, Texture* texture);
-    void bind_texture(Texture const * const texture, GLenum unit);
 }

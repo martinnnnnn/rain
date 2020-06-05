@@ -193,20 +193,8 @@ namespace rain::engine::voxel2
             bool children_all_loaded = true;
             for (u32 u(0); u < children.size(); ++u)
             {
-                //children[u]->update_async(other);
                 if (!(children[u]->state == State::SurfaceLoaded || children[u]->state == State::ChildrenLoaded))
                 {
-                    //RAIN_LOG("child not ready %d -> %d : %s", this, children[u]
-                    //    , children[u]->state == State::Initial ? "Initial"
-                    //    : children[u]->state == State::ChildrenLoadInit ? "ChildrenLoadInit"
-                    //    : children[u]->state == State::ChildrenLoading ? "ChildrenLoading"
-                    //    : children[u]->state == State::ChildrenLoaded ? "ChildrenLoaded"
-                    //    : children[u]->state == State::ChildrenUnloading ? "ChildrenUnloading"
-                    //    : children[u]->state == State::SurfaceLoadInit ? "SurfaceLoadInit"
-                    //    : children[u]->state == State::SurfaceLoading ? "SurfaceLoading"
-                    //    : children[u]->state == State::SurfaceLoaded ? "SurfaceLoaded"
-                    //    :  "SurfaceUnloading");
-
                     children_all_loaded = false;
                 }
             }

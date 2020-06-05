@@ -100,7 +100,7 @@ namespace rain::engine
         //u32 vertices_count = model.mesh->data->vertices.size();
         //glm::vec3* vertices = (glm::vec3*)malloc(vertices_count * sizeof(glm::vec3));
         //for (u32 i = 0; i < vertices_count; ++i)
-        //{
+        //{ 
         //    memcpy(&vertices[i], &(model.mesh->data->vertices[i].position), sizeof(glm::vec3));
         //}
 

@@ -131,4 +131,71 @@ namespace rain::engine
         std::mutex mut;
         std::string root;
     };
+
+
+    //template<typename T>
+    //struct DataInfo
+    //{
+    //    core::file_path path;
+    //    core::uuid id;
+    //    T* data;
+    //};
+
+    //struct DataSystem
+    //{
+    //    void update();
+
+    //    void require_texture();
+    //    void require_shader();
+    //    void require_mesh();
+
+    //    void load_texture(const file_path& path)
+    //    {
+    //        RAIN_LOG("Loading texture %s", path.get_path_absolute().c_str());
+
+
+    //        Texture*
+
+    //        handle<Texture> new_texture_handle = load_data<Texture>(filepath, core::uuid::random(), filepath.get_path_absolute().c_str(), GL_TEXTURE_2D);
+
+    //        add_data<Texture>(new_texture_handle);
+    //    }
+    //    void load_shader();
+    //    void reload_shader();
+    //    void load_mesh();
+
+    //private:
+    //    std::vector<DataInfo<Texture>> texture_data;
+    //    std::vector<DataInfo<Shader>> shader_data;
+    //    std::vector<DataInfo<Mesh>> mesh_data;
+    //    std::string root;
+    //};
+
+    template<typename T>
+    struct DataInfo
+    {
+        using DataHandle = u32;
+
+        DataHandle id;
+        core::file_path path;
+        T* data;
+    };
+
+    struct TexturesDatabase
+    {
+        static DataInfo<Texture>::DataHandle get_next_handle()
+        {
+            static DataInfo<Texture>::DataHandle handle = 0;
+            return handle++;
+        }
+
+        void load(const core::file_path& path)
+        {
+
+        }
+
+    private:
+        std::vector<DataInfo<Texture>> texture_data;
+    };
+
 }

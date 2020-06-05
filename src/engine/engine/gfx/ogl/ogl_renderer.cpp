@@ -355,7 +355,7 @@ namespace rain::engine
         return vao;
     }
 
-    void Renderer::draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count)
+    void Renderer::draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture * const texture, u32 triangle_count)
     {
         sf_handle->data->use();
         sf_handle->data->set("proj", proj_mat_perspective);
@@ -364,7 +364,7 @@ namespace rain::engine
         sf_handle->data->set("viewPos", view_position);
         sf_handle->data->set("text1", 0);
 
-        bind_texture(texture, 0);
+        texture->bind(0);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, triangle_count);
@@ -942,7 +942,7 @@ namespace rain::engine
 		glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_DYNAMIC_DRAW);
 	}
 
-    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture const * const texture, const glm::vec3& view_position)
+    void Renderer::draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture * const texture, const glm::vec3& view_position)
     {
         instancing_handle->data->use();
 		instancing_handle->data->set("model", model);
@@ -951,7 +951,7 @@ namespace rain::engine
         instancing_handle->data->set("viewPos", view_position);
         instancing_handle->data->set("text1", 0);
 
-        bind_texture(texture, 0);
+        texture->bind(0);
 
         glBindVertexArray(vao);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 36, amount);
@@ -1069,7 +1069,7 @@ namespace rain::engine
     }
 
 
-    void Renderer::draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position)
+    void Renderer::draw_instancing(const u32 vao, const u32 amount, Texture * const texture, const glm::vec3& view_position)
     {
         instancing_handle->data->use();
         instancing_handle->data->set("proj", proj_mat_perspective);
@@ -1077,7 +1077,7 @@ namespace rain::engine
         instancing_handle->data->set("viewPos", view_position);
         instancing_handle->data->set("text1", 0);
 
-        bind_texture(texture, 0);
+        texture->bind(0);
         glBindVertexArray(vao);
         glDrawElementsInstanced(GL_TRIANGLE_STRIP, sphere_index_count, GL_UNSIGNED_INT, 0, amount);
         glBindVertexArray(0);

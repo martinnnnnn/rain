@@ -12,7 +12,6 @@ namespace rain::engine::voxel2
 {
     VolumeData::VolumeData(i32 chunk_s)
         : chunk_size(chunk_s)
-        //, data_handler(chunk_s)
     {
         transform.position = glm::vec3{ 5, 0, 5 };
         transform.scale = glm::vec3{ 2, 1, 1 };

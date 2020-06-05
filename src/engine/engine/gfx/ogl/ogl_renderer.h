@@ -74,7 +74,7 @@ namespace rain::engine
         void draw_quad(const core::plane& _p, const glm::vec3 _position, const glm::vec3& _color);
         void draw_cube(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
         void draw_sphere(const glm::vec3& position, const glm::quat& orientation, const glm::vec3& scale);
-        void draw_instancing(const u32 vao, const u32 amount, Texture const * const texture, const glm::vec3& view_position);
+        void draw_instancing(const u32 vao, const u32 amount, Texture * const texture, const glm::vec3& view_position);
         void draw_mesh();
 
 
@@ -84,10 +84,10 @@ namespace rain::engine
 		void init_instancing_cube(const std::vector<glm::mat4>& instances, u32& vao, u32& instance_vbo, u32& cube_vbo);
 		void delete_instancing_cube(const u32 vao, const u32 instance_vbo, const u32 cube_vbo);
 		void reload_instancing_cube(const u32 vao, const u32 instance_vbo, const std::vector<glm::mat4>& instances);
-		void draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture const * const texture, const glm::vec3& view_position);
+		void draw_instancing_cube(const u32 vao, const u32 amount, const glm::mat4& model, Texture * const texture, const glm::vec3& view_position);
 
         u32 load_scalar_field(core::scalar_field_mesh* mesh);
-        void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture const * const texture, u32 triangle_count);
+        void draw_scalar_field(u32 vao, glm::mat4 transform, glm::vec3 view_position, Texture * const texture, u32 triangle_count);
 
         void init_transvoxel(voxel::vox_block* block) const;
         void draw_transvoxel(const u32& vao, const u32 indices_count, const glm::vec3& position, const glm::vec3& view_position, f32 max_height);
